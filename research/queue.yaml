@@ -1,0 +1,89 @@
+# Research backlog. The overnight agent picks the highest-priority `todo` item whose `needs` exist
+# (see docs/STATUS.md), sets status running -> done | rejected | blocked, and appends new items.
+# priority: 1 = do first. cost: rough GPU time on the 4070 for all 60 calls (estimate; refine from journal).
+# Model ids / licences: docs/research/*.md (verify there before downloading).
+
+items:
+  # ---------------------------------------------------------------- bring-up
+  - {id: B1, group: bringup, priority: 1, status: todo, rq: [RQ12], needs: [gpu-setup],
+     title: "Bring-up: setup, doctor all OK, one call end to end on gpu-12gb, timings + VRAM in journal"}
+  - {id: B2, group: bringup, priority: 1, status: todo, needs: [B1],
+     title: "Transcribe all 60 calls with the default ASR (Swiss German turbo int8_float16) and run the v1 checks: first real baseline numbers on GPU"}
+
+  # ---------------------------------------------------------------- ASR / transcription (RQ2, RQ3, RQ8)
+  - {id: A1, group: asr, priority: 2, status: todo, rq: [RQ2], needs: [B1, asr-eval],
+     title: "asr-eval of the default model: WER/CER vs pseudo-refs, keyword-spot recall, clean vs noisy"}
+  - {id: A2, group: asr, priority: 2, status: todo, rq: [RQ2], needs: [B1], cost: "~15-30 min",
+     title: "Vanilla baselines: openai large-v3 and large-v3-turbo (CT2) - transcribe all 60 + asr-eval"}
+  - {id: A3, group: asr, priority: 2, status: todo, rq: [RQ2], needs: [B1], cost: "~30-60 min",
+     title: "Other Swiss German fine-tunes: large-v3 SPC (MIT, CT2 subfolder), turbo fp16 CT2, flix (hf_whisper, needs torch on host)"}
+  - {id: A4, group: asr, priority: 2, status: todo, rq: [RQ3], needs: [B1, views],
+     title: "Dialect-output ASR (model per docs/research/dialect_asr.md) as view gsw; WER/CER vs reference scripts"}
+  - {id: A5, group: asr, priority: 3, status: todo, rq: [RQ1], needs: [B1, views],
+     title: "Whisper task=translate (large-v3, not turbo) as view en_speech"}
+  - {id: A6, group: asr, priority: 4, status: todo, rq: [RQ8], needs: [A1],
+     title: "Decoding knobs: initial_prompt on/off, beam 1 vs 5, vad on/off - keyword-spot recall + F1"}
+  - {id: A7, group: asr, priority: 5, status: todo, rq: [RQ8], needs: [A1, denoise],
+     title: "Denoise front end (A10) on noisy calls"}
+
+  # ---------------------------------------------------------------- views (RQ1, RQ3)
+  - {id: V1, group: views, priority: 2, status: todo, rq: [RQ1, RQ3], needs: [views, experiment-runner, B2],
+     title: "View comparison: de vs gsw vs de_from_gsw vs en_from_de vs en_from_gsw (vs en_speech) with fixed checks (keywords+llm_judge+geval)"}
+  - {id: V2, group: views, priority: 3, status: todo, rq: [RQ1], needs: [V1],
+     title: "Multi-view ensemble (llm_judge on de + gsw (+ en)); agreement as uncertainty"}
+  - {id: V3, group: views, priority: 3, status: todo, rq: [RQ1], needs: [views, experiment-runner],
+     title: "ORACLE ceiling: ref_gsw vs ref_de vs ref_en (no audio) - how much do ASR errors cost?"}
+  - {id: V4, group: views, priority: 4, status: todo, rq: [RQ1, RQ8], needs: [V1, correction-view],
+     title: "LLM transcript correction view (A4) fusing de + gsw (+ vanilla) hypotheses"}
+
+  # ---------------------------------------------------------------- checks (RQ4, RQ5, RQ7)
+  - {id: C1, group: checks, priority: 2, status: todo, rq: [RQ4], needs: [experiment-runner, B2],
+     title: "Ablation both ways over keywords, patterns, llm_judge, geval (+ new checks as they land)"}
+  - {id: C2, group: checks, priority: 2, status: todo, rq: [RQ7], needs: [keyword_context, B2],
+     title: "keyword_context (G-Eval on keyword windows): FAR on harmless keyword calls, level-1 recall"}
+  - {id: C3, group: checks, priority: 3, status: todo, rq: [RQ4], needs: [semantic_windows, B2],
+     title: "semantic_windows: recall on level-2 (no-keyword) calls"}
+  - {id: C4, group: checks, priority: 2, status: todo, rq: [RQ5, RQ9], needs: [facts, B2],
+     title: "Fact sheet + policy table (A1) vs llm_judge vs geval"}
+  - {id: C5, group: checks, priority: 3, status: todo, rq: [RQ4], needs: [role-aware, B2],
+     title: "Role-aware LLM checks (A7)"}
+  - {id: C6, group: checks, priority: 3, status: todo, rq: [RQ4, RQ10], needs: [few-shot, B2],
+     title: "Twin few-shot (A8): k=1,2 pairs from dev pool (pool dialogues excluded from scoring)"}
+  - {id: C7, group: checks, priority: 4, status: todo, rq: [RQ7], needs: [debate, B2],
+     title: "Prosecutor/defender/judge (A6) on the harmless twins"}
+  - {id: C8, group: checks, priority: 4, status: todo, rq: [RQ9], needs: [B2],
+     title: "Self-consistency samples 1/3/5 at T=0.7: uncertainty quality vs cost"}
+  - {id: C9, group: checks, priority: 4, status: todo, rq: [RQ6], needs: [B2],
+     title: "Criteria/prompt language: German vs English criteria"}
+  - {id: C10, group: checks, priority: 5, status: todo, rq: [RQ1], needs: [audio-llm, B2],
+     title: "Audio-LLM verification (A3: Voxtral Mini / Qwen2.5-Omni) of candidate windows - does it understand Swiss German at all?"}
+
+  # ---------------------------------------------------------------- LLM (RQ6)
+  - {id: L1, group: llm, priority: 3, status: todo, rq: [RQ6], needs: [B2],
+     title: "LLM sweep with transcripts cached (Whisper unloaded -> more VRAM): Qwen2.5-7B-AWQ vs Qwen3-8B-AWQ (thinking off) vs Llama-3.1-8B-AWQ vs Mistral-Nemo-12B vs Qwen2.5-14B-AWQ (if it fits)"}
+
+  # ---------------------------------------------------------------- fusion / uncertainty (RQ9)
+  - {id: F1, group: fusion, priority: 3, status: todo, rq: [RQ9], needs: [B2],
+     title: "Threshold policy: global vs per-family thresholds, review band width; CV-chosen"}
+  - {id: F2, group: fusion, priority: 3, status: todo, rq: [RQ9], needs: [calibrated-fusion, B2],
+     title: "Calibrated + conformal abstention (A5) vs current uncertainty escalation"}
+  - {id: F3, group: fusion, priority: 4, status: todo, rq: [RQ4], needs: [learned-fusion, C1],
+     title: "Learned fusion (logistic regression, fold-fitted) vs weighted"}
+  - {id: F4, group: fusion, priority: 4, status: todo, rq: [RQ12], needs: [cascade, C1],
+     title: "Cascade (A2): quality vs LLM calls per call"}
+
+  # ---------------------------------------------------------------- data (RQ10, RQ11)
+  - {id: D1, group: data, priority: 4, status: todo, rq: [RQ10], needs: [synth-scripts, B1],
+     title: "Generate ~60 synthetic text scripts (twins per family, incl. hard negatives/positives) with the GPU LLM; use as few-shot pool + fusion training"}
+  - {id: D2, group: data, priority: 5, status: todo, rq: [RQ11], needs: [finetune-kit, A1],
+     title: "Whisper LoRA fine-tune on dev-fold audio (12 GB recipe), evaluate on held-out fold"}
+  - {id: D3, group: data, priority: 6, status: todo, rq: [RQ10], needs: [synth-audio],
+     title: "Synthetic audio via TTS + telephone augmentation for ASR robustness"}
+
+  # ---------------------------------------------------------------- product / demo
+  - {id: P1, group: product, priority: 3, status: todo, rq: [RQ12], needs: [B2],
+     title: "Cost model: GPU s per call minute per config; sizing for 10k call minutes/day -> docs/OPERATING_CONCEPT.md"}
+  - {id: P2, group: product, priority: 4, status: todo, needs: [C2],
+     title: "Pick demo calls: best alarm (clear snippet), best borderline harmless keyword call, a review case; note in MORNING_REPORT"}
+  - {id: Z1, group: final, priority: 9, status: todo, needs: [],
+     title: "07:00: freeze champion -> config/recommended.yaml -> one holdout run -> final MORNING_REPORT + DECISIONS"}
