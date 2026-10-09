@@ -63,6 +63,12 @@ class AppConfig(BaseModel):
     families: list[str] | None = None  # restrict to these family ids (None = all enabled)
     snippets: dict[str, Any] = Field(default_factory=lambda: {"pad": 2.0, "link_pad": 10.0})
     app: dict[str, Any] = Field(default_factory=lambda: {"base_url": "http://localhost:8501"})
+    # Transcript views (docs/design/v2_plan.md §1). Empty -> one view "main" = asr + diarizer (v1).
+    # name -> {lang, asr?, diarize?} (ASR view) or {lang, from, translator} (translated view).
+    views: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    primary_view: str | None = None  # passages, snippets, UI transcript; default: first view
+    check_view: str | None = None  # overrides every check's ``view`` (experiments)
+    extra_views: list[str] = Field(default_factory=list)  # computed even if no check reads them
     source_path: str | None = None
 
 

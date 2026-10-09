@@ -42,11 +42,11 @@ spec for building by hand. Set `owner` to `gpu-host` when you start an item, `do
 
 | # | component | prio | spec | status |
 |---|---|---|---|---|
-| 1 | Views (gsw/de/translated/en_speech/ref_*), `translator` plugin kind (`llm_translate`, `hf_mt`, `identity`), multi-view pipeline, check `view` param, `check_view`, language-aware keywords (+ English forms), `faster_whisper task: translate`, provenance | P0 | §1, §5 | todo |
-| 2 | Holdout lock `config/splits.yaml`, `eval --split dev/holdout`, holdout log | P0 | §1c | todo |
-| 3 | Experiment runner `callguard experiment`, `experiments/*.yaml`, dev-fold CV per variant, cost tracking | P0 | §2 | todo |
+| 1 | Views (gsw/de/translated/en_speech/ref_*), `translator` plugin kind (`llm_translate`, `hf_mt`, `identity`), multi-view pipeline, check `view` param, `check_view`, language-aware keywords (+ English forms), `faster_whisper task: translate`, provenance | P0 | §1, §5 | **done** (owner gpu-host): `callguard/views.py`, `callguard/translate/`, `Pipeline.build_views`; profiles `demo-views` (offline, runs), `gpu-views`, `oracle-views` (both UNTESTED: need GPU / LLM); v1 cache keys pinned in `tests/test_views.py`. Not done here: `hf_mt` untested, `eval.py` still calls `decide()` without `views` (labels unaffected, passages of other-view findings re-anchor only with views) |
+| 2 | Holdout lock `config/splits.yaml`, `eval --split dev/holdout`, holdout log | P0 | §1c | done (gpu-host): `callguard splits [--make]`, `eval --split dev\|holdout\|all`, runs/holdout_log.jsonl |
+| 3 | Experiment runner `callguard experiment`, `experiments/*.yaml`, dev-fold CV per variant, cost tracking | P0 | §2 | done (gpu-host): spec format in `callguard/experiments.py` docstring; `--dry-run`, `--variants`, `--jobs`, `--rescore`, re-fusion variants (`refuse_from`); smoke/checks_ablation/thresholds specs |
 | 4 | ASR eval `callguard asr-eval`: WER/CER, pseudo-references, keyword-spot recall, vanilla baselines | P0 | §2 | todo |
-| 5 | Statistics + report: paired bootstrap CIs, McNemar, per-call flip tables, charts, `callguard report`, `callguard leaderboard` | P0 | §9 | todo |
+| 5 | Statistics + report: paired bootstrap CIs, McNemar, per-call flip tables, charts, `callguard report`, `callguard leaderboard` | P0 | §9 | done (gpu-host): `callguard/stats.py`, `report.py`; research/leaderboard.md, research/report/ |
 | 6 | `keyword_context` check (G-Eval on keyword windows) | P1 | §1b | todo |
 | 7 | `semantic_windows` check (embeddings) | P1 | §1b | todo |
 | 8 | Fact sheet + policy table (A1), role-aware LLM checks (A7), twin few-shot (A8) | P1 | §7 | todo |

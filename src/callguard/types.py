@@ -52,6 +52,11 @@ class Transcript(BaseModel):
     segments: list[Segment] = Field(default_factory=list)
     asr_backend: str = ""  # provenance, e.g. "faster_whisper:whisper-turbo-gsw-ct2-int8"
     meta: dict[str, Any] = Field(default_factory=dict)
+    # Which rendering of the call this is (``config.views``): "main" in single-view (v1) configs.
+    # ``lang`` is the view's configured language (gsw / de / en; None = unspecified, v1); ``language``
+    # above is what the ASR reported. Neither enters cache keys (those hash the segments only).
+    view: str = "main"
+    lang: str | None = None
 
     def segment(self, seg_id: str) -> Segment | None:
         return next((s for s in self.segments if s.id == seg_id), None)
@@ -100,9 +105,21 @@ class Keyword(BaseModel):
     enabled: bool = True
     case_sensitive: bool = False
 
+    en: list[str] = Field(default_factory=list)  # English forms, matched on English views
+
     @property
     def phrases(self) -> list[str]:
         return list(dict.fromkeys([*self.de, *self.gsw]))
+
+    def forms(self, lang: str | None = None) -> list[str]:
+        """Phrases to match on a view of language ``lang``. German and Swiss German views both match
+        de + gsw forms (ASR output mixes them); English views match only the English forms; unknown /
+        unset languages (v1 single view) behave like German."""
+        if lang == "en":
+            return list(dict.fromkeys(self.en))
+        if lang == "gsw":
+            return list(dict.fromkeys([*self.gsw, *self.de]))
+        return self.phrases
 
 
 class Family(BaseModel):
@@ -155,6 +172,7 @@ class CheckResult(BaseModel):
     family_scores: dict[str, FamilyScore] = Field(default_factory=dict)
     findings: list[Finding] = Field(default_factory=list)
     meta: dict[str, Any] = Field(default_factory=dict)  # model, latency, errors...
+    view: str | None = None  # transcript view the check read (None: results from before views)
 
 
 # --------------------------------------------------------------------------------------------
@@ -184,6 +202,7 @@ class Passage(BaseModel):
     reasons: list[str] = Field(default_factory=list)
     checks: list[str] = Field(default_factory=list)
     text: str = ""
+    texts: dict[str, str] = Field(default_factory=dict)  # view -> what that view says in [start, end]
     snippet_path: str | None = None
 
 
@@ -201,9 +220,18 @@ class Decision(BaseModel):
 class CallResult(BaseModel):
     call_id: str
     audio_path: str | None = None
-    transcript: Transcript
+    transcript: Transcript  # the primary view
+    views: dict[str, Transcript] = Field(default_factory=dict)  # every computed view (incl. primary)
     checks: dict[str, CheckResult] = Field(default_factory=dict)
     decision: Decision
     timings: dict[str, float] = Field(default_factory=dict)
     config_name: str = ""
-    meta: dict[str, Any] = Field(default_factory=dict)  # sink delivery info, stage warnings...
+    meta: dict[str, Any] = Field(default_factory=dict)  # sink delivery info, stage warnings, provenance
+
+    def all_views(self) -> dict[str, Transcript]:
+        """Every view of the call; results from before views have only the primary transcript."""
+        return self.views or {self.transcript.view: self.transcript}
+
+    def view(self, name: str | None) -> Transcript:
+        """Transcript of view ``name`` (the primary one for None or an unknown name)."""
+        return self.all_views().get(name or "", self.transcript) if name else self.transcript

@@ -1,0 +1,93 @@
+# Transcript views on the 12 GB GPU host: which rendering of the call detects best?
+# NOT RUN YET (written offline). Check first:
+#   uv run callguard doctor -c gpu-views
+#   uv run callguard batch -c gpu-views --limit 2
+# Views (docs/design/v2_plan.md §1):
+#   de          default ASR of gpu-12gb (whisper-turbo GSW fine-tune, int8_float16) -> Standard German
+#   de_large    whisper-large-v3 GSW fine-tune (MIT), float16
+#   de_vanilla  vanilla whisper-large-v3, float16 (baseline: how much does the fine-tune buy?)
+#   en_from_de  de translated to English by the LLM (vLLM `callguard-llm` on :8000)
+#   en_speech   vanilla large-v3 with task=translate: Swiss German speech -> English text directly
+# VRAM (estimates): turbo int8 ~1 GB + large-v3 GSW fp16 ~3.5 GB + vanilla large-v3 fp16 ~3.5 GB (one copy,
+# shared by de_vanilla and en_speech) = ~8 GB of Whisper kept loaded, PLUS vLLM at 0.70 x 12 GB: that does
+# not fit at once. Transcripts are cached per view, so fill the cache in passes, e.g. first
+# `--set extra_views=[]` (only de + en_from_de), then the large views with vLLM stopped and
+# `--set check_view=de --set extra_views=[de_large,de_vanilla,en_speech]` plus rule checks only, or lower
+# vLLM's gpu_memory_utilization.
+extends: gpu-12gb.yaml
+description: GPU 12 GB with transcript views (de, de_large, de_vanilla, en_from_de, en_speech)
+
+views:
+  de:
+    lang: de                 # asr: top-level (gpu-12gb), same cache as gpu-12gb runs
+    diarize: true
+  de_large:
+    lang: de
+    asr:                     # merged onto the top-level asr block (same type: only these keys change)
+      model: models/asr/whisper-large-v3-gsw-ct2
+      compute_type: float16
+      model_tag: whisper-large-v3-gsw-fp16-cuda
+    diarize: true
+  de_vanilla:
+    lang: de
+    asr:
+      model: models/asr/vanilla-large-v3-ct2
+      compute_type: float16
+      model_tag: vanilla-large-v3-fp16-cuda
+    diarize: true
+  en_from_de:
+    lang: en
+    from: de
+    translator:
+      type: llm_translate
+      llm: default
+      batch_size: 12
+      context: 3
+      concurrency: 4         # parallel batches (vLLM max_concurrency 4); speed only, not in the cache key
+  en_speech:
+    lang: en
+    asr:
+      model: models/asr/vanilla-large-v3-ct2
+      compute_type: float16
+      task: translate        # Whisper speech translation -> English (the German initial_prompt is dropped)
+      model_tag: vanilla-large-v3-fp16-translate-cuda
+    diarize: true
+primary_view: de
+check_view: null             # e.g. --set check_view=en_from_de runs every check on the English view
+extra_views: [de_large, de_vanilla, en_speech]   # computed for the UI comparison even without a check
+
+checks:   # gpu-12gb's checks on `de` + shadow keyword checks (weight 0: computed, not fused) per view
+  - name: keywords
+    type: keywords
+    weight: 0.35
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.2
+  - name: llm_judge
+    type: llm_judge
+    llm: default
+    samples: 3
+    temperature: 0.7
+    parallel: 5
+    weight: 1.0
+  - name: geval
+    type: geval
+    llm: default
+    parallel: 5
+    weight: 1.0
+  - name: keywords_en_from_de
+    type: keywords
+    view: en_from_de
+    weight: 0.0
+    fuzzy: 90
+  - name: keywords_en_speech
+    type: keywords
+    view: en_speech
+    weight: 0.0
+    fuzzy: 90
+  - name: keywords_de_large
+    type: keywords
+    view: de_large
+    weight: 0.0
+    fuzzy: 90

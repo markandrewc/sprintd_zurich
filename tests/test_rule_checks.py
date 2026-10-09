@@ -259,11 +259,11 @@ def test_broken_segment_degrades_gracefully(monkeypatch):
     calls = {"n": 0}
     orig = chk.segment_hits
 
-    def flaky(phrases, toks):
+    def flaky(phrases, toks, *rest):
         calls["n"] += 1
         if calls["n"] == 1:
             raise RuntimeError("boom")
-        return orig(phrases, toks)
+        return orig(phrases, toks, *rest)
 
     monkeypatch.setattr(chk, "segment_hits", flaky)
     res = chk.run(transcript(seg("vor der Meldung", "S1"), seg("vor der Meldung", "S2")), [TRADE])

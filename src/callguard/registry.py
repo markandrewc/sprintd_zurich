@@ -8,7 +8,7 @@ Three ways to make a plugin available, in lookup order:
 3. A dotted import path as the type: ``type: "my_team.checks.sentiment:SentimentCheck"``.
    Drop a file anywhere on PYTHONPATH and point the YAML at it - no registry edit needed.
 
-Kinds: asr, diarizer, check, fusion, llm, sink.
+Kinds: asr, diarizer, check, fusion, llm, sink, translator.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from __future__ import annotations
 import importlib
 from typing import Any
 
-KINDS = ("asr", "diarizer", "check", "fusion", "llm", "sink")
+KINDS = ("asr", "diarizer", "check", "fusion", "llm", "sink", "translator")
 
 _REGISTERED: dict[str, dict[str, type]] = {k: {} for k in KINDS}
 
@@ -49,6 +49,11 @@ BUILTINS: dict[str, dict[str, str]] = {
     "sink": {
         "json_dir": "callguard.sinks.json_dir:JsonDirSink",
         "outcept_trigger": "callguard.sinks.outcept:OutceptTriggerSink",
+    },
+    "translator": {
+        "llm_translate": "callguard.translate.llm:LLMTranslator",
+        "hf_mt": "callguard.translate.hf_mt:HFTranslator",
+        "identity": "callguard.translate.identity:IdentityTranslator",
     },
 }
 
@@ -99,10 +104,15 @@ def create(kind: str, spec: dict[str, Any] | str, **deps: Any) -> Any:
         spec = {"type": spec}
     spec = dict(spec)
     type_name = spec.pop("type")
+    # Every check reads one transcript view (config ``views``). Handled here, not in each check's
+    # constructor, so it never enters cache_params(): the view's segments are in the check key anyway.
+    view = spec.pop("view", None) if kind == "check" else None
     cls = resolve(kind, type_name)
     obj = cls(**deps, **spec)
     obj.plugin_kind = kind
     obj.plugin_type = type_name
+    if kind == "check":
+        obj.view = view
     return obj
 
 

@@ -20,6 +20,16 @@ if TYPE_CHECKING:
     from callguard.context import Context
 
 
+def family_cache_view(family: Family) -> dict[str, Any]:
+    """``family.model_dump`` without the fields added after v1 while they are empty (``Keyword.en``),
+    so check results cached before English keyword forms existed keep their keys."""
+    d = family.model_dump(mode="json")
+    for kw in d.get("keywords") or []:
+        if not kw.get("en"):
+            kw.pop("en", None)
+    return d
+
+
 class Plugin(ABC):
     plugin_kind: str = ""
     plugin_type: str = ""
@@ -54,6 +64,13 @@ class Check(Plugin):
     two LLM judges with different models), ``weight`` is read by the fusion.
     """
 
+    # transcript view this instance reads (config ``view:``; None = the primary view). Set by
+    # registry.create, deliberately not a constructor param, so it is not in cache_params().
+    view: str | None = None
+    # True if the output depends on ``Transcript.lang`` beyond the text (keyword forms per language):
+    # the pipeline then adds the view language to the check's cache key.
+    lang_sensitive: bool = False
+
     def __init__(self, ctx: "Context", *, name: str | None = None, weight: float = 1.0,
                  enabled: bool = True, **params: Any):
         super().__init__(ctx, **params)
@@ -68,7 +85,7 @@ class Check(Plugin):
     def cache_key(self, families: list[Family]) -> dict[str, Any]:
         """Everything the output depends on besides the transcript. LLM checks override this to
         depend only on the family criteria (not the keyword list) and on the LLM's model id."""
-        return {"params": self.cache_params(), "families": [f.model_dump(mode="json") for f in families]}
+        return {"params": self.cache_params(), "families": [family_cache_view(f) for f in families]}
 
     @abstractmethod
     def run(self, transcript: Transcript, families: list[Family]) -> CheckResult: ...
@@ -77,11 +94,26 @@ class Check(Plugin):
 class Fusion(Plugin):
     """Combines all CheckResults into one Decision. Must be cheap and pure: the UI re-runs it on every
     threshold slider move without touching ASR or LLMs. ``overrides`` carries UI knobs such as
-    ``threshold`` and per-check ``weights``."""
+    ``threshold`` and per-check ``weights``. ``views`` (name -> Transcript, incl. the primary one) lets
+    the fusion resolve findings of checks that read another view (``CheckResult.view``) and fill
+    ``Passage.texts``; None = single-view call (v1)."""
 
     @abstractmethod
     def decide(self, transcript: Transcript, results: dict[str, CheckResult], families: list[Family],
-               overrides: dict[str, Any] | None = None) -> Decision: ...
+               overrides: dict[str, Any] | None = None,
+               views: dict[str, Transcript] | None = None) -> Decision: ...
+
+
+class Translator(Plugin):
+    """Transcript -> the same call in another language (a translated view).
+
+    Must keep segment ids, start/end, speaker, role and confidence (so findings on the translated view
+    point at the same audio) and drop word timestamps (they belong to the source words). Returns a new
+    Transcript with ``lang = target_lang``. ``cache_params()`` must name the real model (the pipeline
+    caches translations on source segments + cache_params + target language)."""
+
+    @abstractmethod
+    def translate(self, transcript: Transcript, target_lang: str) -> Transcript: ...
 
 
 class LLM(Plugin):

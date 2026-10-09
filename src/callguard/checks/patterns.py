@@ -43,24 +43,31 @@ SCORES: dict[str, tuple[str, float]] = {
 }
 
 ACCESS_CUES = ("PIN", "TAN", "Code", "Bestätigungscode", "Passwort", "Kennwort", "Anmeldecode",
-               "SMS-Code", "Zugangscode", "Sicherheitscode", "Freigabecode", "Geheimzahl")
+               "SMS-Code", "Zugangscode", "Sicherheitscode", "Freigabecode", "Geheimzahl",
+               # English transcript views (translations, Whisper task=translate)
+               "password", "passcode")
 PIN_CUES = frozenset({"pin", "pincode", "geheimzahl"})  # a 4-5 digit run is only a secret near these
 # "...code" compounds that are not secrets (QR-bill, BIC, ...)
 NOT_SECRET_CODES = frozenset({"barcode", "qrcode", "landercode", "postcode", "zipcode", "swiftcode",
                               "bankcode", "farbcode", "dresscode", "quellcode", "rabattcode", "gutscheincode"})
 MASKED_CUES = frozenset({"letzten", "letzte", "letschte", "letschti", "endziffern", "endziffer", "endstellen",
-                         "endnummer", "endet", "schluss", "maskiert", "verdeckt"})
-SAMPLE_STEMS = ("beispiel", "muster", "abgelaufen", "abglaufe", "ungultig", "ungueltig")
+                         "endnummer", "endet", "schluss", "maskiert", "verdeckt", "last", "ending", "ends", "masked"})
+SAMPLE_STEMS = ("beispiel", "muster", "abgelaufen", "abglaufe", "ungultig", "ungueltig",
+                "example", "sample", "expired", "invalid")
 UNIT_WORDS = frozenset({
     "franken", "franke", "fr", "chf", "rappen", "rp", "euro", "eur", "dollar", "usd", "prozent",
     "prozentpunkte", "uhr", "minute", "minuten", "minute", "sekunde", "sekunden", "stunde", "stunden",
     "stund", "tag", "tage", "tagen", "tag", "woche", "wochen", "wuche", "monat", "monate", "monaten",
     "jahr", "jahre", "jahren", "johr", "mal", "stuck", "kilo", "kg", "meter", "km", "grad", "mio", "mrd",
+    # English views
+    "francs", "franc", "cents", "dollars", "percent", "minutes", "seconds", "hours", "hour", "days", "day",
+    "weeks", "week", "months", "month", "years", "year", "times", "million", "billion",
 })
 MONTHS = frozenset({"januar", "janner", "februar", "marz", "maerz", "merz", "april", "mai", "juni",
-                    "juli", "august", "september", "oktober", "november", "dezember"})
+                    "juli", "august", "september", "oktober", "november", "dezember",
+                    "january", "february", "march", "june", "july", "october", "december"})
 CURRENCY_BEFORE = frozenset({"chf", "fr", "eur", "usd", "franken"})
-CONNECTORS = frozenset({"und"})
+CONNECTORS = frozenset({"und", "and"})
 MAX_RUN_GAP = 1.5  # seconds: a digit run may continue into the next ASR segment of the same speaker
 
 _UNITS = {
@@ -68,6 +75,11 @@ _UNITS = {
     "drü": "3", "drüü": "3", "vier": "4", "fünf": "5", "füf": "5", "füüf": "5", "foif": "5", "föif": "5",
     "sechs": "6", "sächs": "6", "sieben": "7", "siebe": "7", "sibe": "7", "acht": "8", "neun": "9",
     "nün": "9", "nüün": "9", "zehn": "10", "zäh": "10", "elf": "11", "zwölf": "12",
+    # English (translated views): units and teens only. "twenty four" would read as 20 + 4 = "204",
+    # so tens are left out; digit-by-digit dictation ("four two four two") is the case that matters.
+    "zero": "0", "one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7",
+    "eight": "8", "nine": "9", "ten": "10", "eleven": "11", "twelve": "12", "thirteen": "13",
+    "fourteen": "14", "fifteen": "15", "sixteen": "16", "seventeen": "17", "eighteen": "18", "nineteen": "19",
 }
 _UNIT_STEMS = {"ein": "1", "eine": "1", "eis": "1", **{k: v for k, v in _UNITS.items() if len(v) == 1}}
 _TEEN_STEMS = {"drei": "3", "dri": "3", "drü": "3", "vier": "4", "fünf": "5", "füf": "5", "föif": "5",
@@ -85,7 +97,7 @@ def _alt(words: Any) -> str:
 
 _TEEN_RE = re.compile(rf"^({_alt(_TEEN_STEMS)})(zehn|zäh)$")
 _TENS_RE = re.compile(rf"^(?:({_alt(_UNIT_STEMS)})(?:und|e|ä)?)?({_alt(_TENS)})$")
-_AMOUNT_RE = re.compile(r"hundert|tausend|tuusig|tusig|million|milliard")
+_AMOUNT_RE = re.compile(r"hundert|tausend|tuusig|tusig|million|milliard|hundred|thousand|billion")
 _IBAN_PREFIX_RE = re.compile(r"^[a-z]{2}\d{2}$")
 # char spans that look like digits but are amounts/dates: 12,50 / 8'000 / 30.09.2026 / 12/27
 _NOT_A_CODE_RE = re.compile(

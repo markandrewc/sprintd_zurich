@@ -133,7 +133,8 @@ class GEvalCheck(LLMCheck):
     def locate(self, llm: LLM, transcript: Transcript, rendered: str, family: Family,
                expected: float) -> tuple[list[str], str]:
         messages = prompts.evidence_messages(family, rendered, expected, self.scale, self.reason_language,
-                                             example_id=transcript.segments[0].id)
+                                             example_id=transcript.segments[0].id,
+                                             transcript_lang=transcript.lang)
         raw = (llm.chat(messages, temperature=0.0, max_tokens=self.max_tokens,
                         json_schema=prompts.evidence_schema()) or [""])[0]
         obj = prompts.parse_json_object(raw)
@@ -144,7 +145,8 @@ class GEvalCheck(LLMCheck):
     def score_family(self, llm: LLM, transcript: Transcript, rendered: str,
                      family: Family) -> tuple[FamilyScore, list[Finding]]:
         steps, steps_source, steps_error = self.evaluation_steps(llm, family)
-        messages = prompts.geval_messages(family, rendered, steps, self.scale, self.reason_language)
+        messages = prompts.geval_messages(family, rendered, steps, self.scale, self.reason_language,
+                                          transcript_lang=transcript.lang)
         dist, info = self.score_distribution(llm, messages)
 
         expected = sum(int(c) * p for c, p in dist.items())

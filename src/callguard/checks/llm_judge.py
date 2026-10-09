@@ -248,7 +248,8 @@ class LLMJudgeCheck(LLMCheck):
     def score_family(self, llm: LLM, transcript: Transcript, rendered: str,
                      family: Family) -> tuple[FamilyScore, list[Finding]]:
         messages = prompts.judge_messages(family, rendered, self.reason_language,
-                                          example_id=transcript.segments[0].id)
+                                          example_id=transcript.segments[0].id,
+                                          transcript_lang=transcript.lang)
         samples, invalid = self._ask(llm, messages, transcript, self.temperature)
         retried = False
         if not samples:

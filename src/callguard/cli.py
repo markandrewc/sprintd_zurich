@@ -292,15 +292,36 @@ def eval_cmd(level: LevelOpt = None, clean_only: CleanOpt = False, limit: LimitO
                  "--write-results/--no-write-results", help="Also write result.json per call for the UI.")] = True,
              cv: Annotated[bool, typer.Option(
                  "--cv/--no-cv", help="Cross-validate the suggested threshold over dialogue-level folds.")] = True,
+             split: Annotated[str, typer.Option(
+                 "--split", help="dev (tuning: CV over the dev folds of config/splits.yaml), holdout (final "
+                                 "number, logged to runs/holdout_log.jsonl) or all.")] = "all",
              config: ConfigOpt = "local", set_: SetOpt = None, no_cache: NoCacheOpt = False,
              verbose: VerboseOpt = False) -> None:
     """Measure false alarms and misses on the case calls, sweep the threshold, write a report."""
     from callguard import eval as ev
+    from callguard import splits as sp
     from callguard.sinks.json_dir import JsonDirSink
 
+    if split not in sp.SPLIT_CHOICES:
+        raise typer.BadParameter(f"expected one of {', '.join(sp.SPLIT_CHOICES)}", param_hint="--split")
     ts = _numbers(thresholds, "--thresholds", float) if thresholds else None  # fail before the long run
     pipe = _pipeline(config, set_, no_cache, verbose)
     selected = _select_calls(pipe, level, clean_only, limit, calls, folds)
+    locked = sp.load_splits(required=split != "all")
+    cv_folds = None
+    if locked is not None:
+        selected = locked.select(selected, split)
+        cv_folds = locked.dev_fold_of() if split == "dev" else locked.all_fold_of()
+        if split == "all":
+            console.print("[yellow]--split all includes the holdout dialogues: do not tune on these numbers "
+                          "(use --split dev).[/yellow]")
+    if split == sp.HOLDOUT:
+        do_sweep = cv = False  # the holdout scores the config as it is; tuning on it would be peeking
+        console.print(f"[bold]Holdout run[/bold] ({len(selected)} calls); this look is logged "
+                      f"(earlier looks: {sp.holdout_looks(pipe.cfg)}).")
+    if not selected:
+        console.print("[red]No calls selected.[/red]")
+        raise typer.Exit(1)
     with _progress() as prog:
         task = prog.add_task("eval", total=len(selected))
 
@@ -331,14 +352,19 @@ def eval_cmd(level: LevelOpt = None, clean_only: CleanOpt = False, limit: LimitO
             console.print(f"[bold]Vorschlag:[/bold] {suggestion['reason']}  "
                           f"[dim](--set fusion.threshold={suggestion['threshold']:.2f})[/dim]")
         if cv:
-            cvr = ev.cross_validate(pipe, results, selected, thresholds=ts)
+            cvr = ev.cross_validate(pipe, results, selected, thresholds=ts, fold_of=cv_folds)
             if cvr:
                 console.print(_cv_table(cvr))
 
     meta = {"config": pipe.cfg.name, "threshold": pipe.cfg.fusion.get("threshold"), "calls": len(selected),
+            "split": split,
             "filters": {"level": level, "clean_only": clean_only, "limit": limit, "calls": calls, "folds": folds},
             "overrides": set_ or [], "created": time.strftime("%Y-%m-%d %H:%M:%S")}
-    j, md = ev.write_report(pipe.ctx.runs_dir / "eval", m, rows, swept, suggestion, meta, cvr)
+    if split == sp.HOLDOUT:
+        lp = sp.log_holdout_run(pipe.cfg, m, len(selected), kind="eval", overrides=set_ or [])
+        console.print(f"[dim]Holdout look logged: {_rel(lp)} (looks so far: {sp.holdout_looks(pipe.cfg)})[/dim]")
+    j, md = ev.write_report(pipe.ctx.runs_dir / ("eval" if split == "all" else f"eval_{split}"), m, rows, swept,
+                            suggestion, meta, cvr)
     console.print(f"[dim]Bericht: {_rel(md)} · {_rel(j)}[/dim]")
 
 
@@ -548,6 +574,18 @@ def _sweep_table(swept: list[dict[str, Any]], suggestion: dict[str, Any] | None,
                   _pct(f["false_alarm_rate"]), _pct(f["miss_rate"]), _num(a["f1"]), _pct(s["metrics"]["accuracy"]),
                   " ".join(tags))
     return t
+
+
+
+# commands living in callguard/commands/<name>.py, each with register(app)
+from callguard.commands import asr_eval as _asr_eval  # noqa: E402
+from callguard.commands import experiment as _experiment  # noqa: E402
+from callguard.commands import leaderboard as _leaderboard  # noqa: E402
+from callguard.commands import report as _report  # noqa: E402
+from callguard.commands import splits as _splits  # noqa: E402
+
+for _mod in (_asr_eval, _splits, _experiment, _leaderboard, _report):
+    _mod.register(app)
 
 
 if __name__ == "__main__":

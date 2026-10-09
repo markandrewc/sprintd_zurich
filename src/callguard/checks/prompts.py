@@ -81,7 +81,24 @@ def language_name(code: str) -> str:
 # --------------------------------------------------------------------------------------------
 
 
-def system_prompt(reason_language: str, *, scoring: bool = False) -> str:
+# How the transcript came about, per view language. The `de` text is the original wording (cache-stable).
+_TRANSCRIPT_NOTES = {
+    "de": ("- It is an automatic transcription of a Swiss German phone call, translated by the speech "
+           "recognizer into Standard German. It may contain recognition errors: misheard words, odd "
+           "grammar, garbled names and numbers."),
+    "en": ("- It is an automatic transcription of a Swiss German phone call, machine-translated into "
+           "English. It may contain recognition and translation errors: misheard words, odd grammar, "
+           "garbled names and numbers."),
+    "gsw": ("- It is a transcription of a Swiss German phone call written in Swiss German dialect "
+            "(non-standard spelling). It may contain errors: misheard words, garbled names and numbers."),
+}
+
+
+def transcript_note(lang: str | None) -> str:
+    return _TRANSCRIPT_NOTES.get((lang or "de").lower(), _TRANSCRIPT_NOTES["de"])
+
+
+def system_prompt(reason_language: str, *, scoring: bool = False, transcript_lang: str | None = None) -> str:
     """Shared rules for every LLM check call. ``scoring`` swaps the "answer undetermined" rule for
     "pick the middle of the scale", so G-Eval maps unknowable cases to ~0.5 like the judge does."""
     if scoring:
@@ -96,9 +113,7 @@ def system_prompt(reason_language: str, *, scoring: bool = False) -> str:
         "You are a careful compliance analyst at a Swiss bank. You review recorded phone calls "
         "between bank advisors and customers for one specific kind of misconduct.\n\n"
         "About the transcript:\n"
-        "- It is an automatic transcription of a Swiss German phone call, translated by the speech "
-        "recognizer into Standard German. It may contain recognition errors: misheard words, odd "
-        "grammar, garbled names and numbers.\n"
+        f"{transcript_note(transcript_lang)}\n"
         "- Each line is one segment: [segment-id mm:ss speaker] text. Speaker roles "
         "(advisor/customer) may be missing or wrong; work out who says what from the content when "
         "it matters.\n\n"
@@ -170,7 +185,8 @@ def render_transcript(t: Transcript, max_chars: int) -> tuple[str, int]:
     return "\n".join([*head, marker, *tail]), omitted
 
 
-def judge_messages(f: Family, rendered: str, reason_language: str, example_id: str = "S001") -> list[dict[str, str]]:
+def judge_messages(f: Family, rendered: str, reason_language: str, example_id: str = "S001",
+                   transcript_lang: str | None = None) -> list[dict[str, str]]:
     lang = language_name(reason_language)
     user = (
         f"{_transcript_block(rendered)}\n\n{family_block(f)}\n\n"
@@ -185,7 +201,7 @@ def judge_messages(f: Family, rendered: str, reason_language: str, example_id: s
         "\"confidence\": number from 0 to 1, how sure you are about the verdict.\n"
         f"The reason must be written in {lang}."
     )
-    return [{"role": "system", "content": system_prompt(reason_language)},
+    return [{"role": "system", "content": system_prompt(reason_language, transcript_lang=transcript_lang)},
             {"role": "user", "content": user}]
 
 
@@ -209,7 +225,7 @@ def _scale_middle(scale: int) -> str:
 
 
 def geval_messages(f: Family, rendered: str, steps: list[str], scale: int,
-                   reason_language: str) -> list[dict[str, str]]:
+                   reason_language: str, transcript_lang: str | None = None) -> list[dict[str, str]]:
     """G-Eval form filling: input, task, criteria, evaluation steps, then the bare score slot so the
     next token is the digit whose probabilities we read. The input comes first (unlike the paper) so
     the transcript prefix is shared with the other calls (see PROMPT_VERSION)."""
@@ -226,12 +242,12 @@ def geval_messages(f: Family, rendered: str, steps: list[str], scale: int,
         "Evaluation form (score only):\n"
         f"Risk score (1-{scale}), answer with the digit only:"
     )
-    return [{"role": "system", "content": system_prompt(reason_language, scoring=True)},
+    return [{"role": "system", "content": system_prompt(reason_language, scoring=True, transcript_lang=transcript_lang)},
             {"role": "user", "content": user}]
 
 
 def evidence_messages(f: Family, rendered: str, expected: float, scale: int, reason_language: str,
-                      example_id: str = "S001") -> list[dict[str, str]]:
+                      example_id: str = "S001", transcript_lang: str | None = None) -> list[dict[str, str]]:
     lang = language_name(reason_language)
     user = (
         f"{_transcript_block(rendered)}\n\n{family_block(f)}\n\n"
@@ -244,7 +260,7 @@ def evidence_messages(f: Family, rendered: str, expected: float, scale: int, rea
         "empty list if there are none.\n"
         f"The reason must be written in {lang}."
     )
-    return [{"role": "system", "content": system_prompt(reason_language, scoring=True)},
+    return [{"role": "system", "content": system_prompt(reason_language, scoring=True, transcript_lang=transcript_lang)},
             {"role": "user", "content": user}]
 
 

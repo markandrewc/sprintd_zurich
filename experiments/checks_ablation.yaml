@@ -1,0 +1,28 @@
+# RQ4: which checks carry the decision? Ablation both ways (add to the keyword baseline, remove from all).
+# Varies: the check set only. `all` computes every check once (gpu-12gb: Whisper turbo + vLLM 7B);
+#         every other variant is a RE-FUSION of `all` (same check results, fewer checks in the fusion),
+#         so the ablation costs nothing beyond `all` and the comparisons are exactly paired.
+# Runtime (48 dev calls): ASR cached (~3 min for all 60 otherwise); llm_judge (3 samples) + geval over
+#         5 families ~ 1-2 min/call on the 4070 at --jobs 6 -> roughly 20-40 min for `all` when nothing is
+#         cached, seconds when it is. Dry run first: callguard experiment experiments/checks_ablation.yaml --dry-run
+# Read: CV table (primary); "all minus X" vs all shows what X contributes; small diffs are noise at n=24.
+name: checks_ablation
+description: Which checks carry the decision (keywords, patterns, llm_judge, geval; add and remove)
+rq: [RQ4]
+base: gpu-12gb
+split: dev
+compare_to: all
+variants:
+  - name: all
+    description: keywords + patterns + llm_judge + geval (the v1 champion set)
+  # -- add to the keyword baseline
+  - {name: keywords, refuse_from: all, checks: [keywords]}
+  - {name: kw_patterns, refuse_from: all, checks: [keywords, patterns]}
+  - {name: kw_pat_judge, refuse_from: all, checks: [keywords, patterns, llm_judge]}
+  - {name: kw_pat_geval, refuse_from: all, checks: [keywords, patterns, geval]}
+  - {name: llm_only, refuse_from: all, checks: [llm_judge, geval]}
+  # -- remove from all
+  - {name: all_minus_keywords, refuse_from: all, drop_checks: [keywords]}
+  - {name: all_minus_patterns, refuse_from: all, drop_checks: [patterns]}
+  - {name: all_minus_llm_judge, refuse_from: all, drop_checks: [llm_judge]}
+  - {name: all_minus_geval, refuse_from: all, drop_checks: [geval]}

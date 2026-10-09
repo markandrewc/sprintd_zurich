@@ -87,3 +87,37 @@ items:
      title: "Pick demo calls: best alarm (clear snippet), best borderline harmless keyword call, a review case; note in MORNING_REPORT"}
   - {id: Z1, group: final, priority: 9, status: todo, needs: [],
      title: "07:00: freeze champion -> config/recommended.yaml -> one holdout run -> final MORNING_REPORT + DECISIONS"}
+
+  # ---------------------------------------------------------------- ideas round 1 (research/ideas_round1.md)
+  # Outside research lead, 2026-10-10. Details, falsification and cost per item: research/ideas_round1.md.
+  # Implement as new plugin classes / default-off knobs so existing cache keys stay stable.
+  - {id: N14, group: ideas, priority: 2, status: todo, rq: [RQ4, RQ9], needs: [B2], cost: "0 GPU (fusion replay on cache)",
+     title: "Fusion fix: keyword/pattern 'nothing found' (score 0, conf 0.25) must not add disagreement - today a no-keyword alarm with geval conf <=0.6 is escalated to review (simulated); knob absent_rule_checks ignore|mean_only|full; count flips on dev"}
+  - {id: N1, group: ideas, priority: 2, status: todo, rq: [RQ1, RQ4, RQ9], needs: [B2], cost: "0 GPU",
+     title: "Twin-aware evaluation: Stufe2 twins are 90-97% identical; C02/C04/C06 (holdout) have twins in dev, C07/08, C11/12, C15/16 split across dev folds -> report dev-CV also with twin-grouped folds, exclude twins from few-shot pools / learned fusion / synth seeds"}
+  - {id: N2, group: ideas, priority: 2, status: todo, rq: [RQ9], needs: [B2], cost: "0 GPU",
+     title: "Threshold policy for the hidden set: per-family thresholds at fixed FP rate on ~200 cross-family negatives + plateau-centre global knob vs argmax; leave-one-fold-out mean and worst-fold FA+miss, threshold SD"}
+  - {id: N6, group: ideas, priority: 2, status: todo, rq: [RQ5, RQ9], needs: [B2], cost: "~5 min",
+     title: "Log-prob fact probes (sharper A1): 3-5 atomic Ja/Nein/Unklar questions per family via choice_probs on the cached transcript prefix, noisy-AND policy; questions in config/facts.yaml; vs geval/llm_judge: dev-CV F1, twin-pair AUC, review recall"}
+  - {id: N4, group: ideas, priority: 3, status: todo, rq: [RQ7], needs: [B2], cost: "~5 min",
+     title: "Anchored full-call probes: G-Eval digit per anchor (keyword/pattern/geval-located segment) with the WHOLE call as context vs keyword_context +-3 windows vs plain geval; twin-pair AUC (decisive context can be 7 turns from the act)"}
+  - {id: N3, group: ideas, priority: 3, status: todo, rq: [RQ4, RQ5], needs: [B2], cost: "~15 min",
+     title: "Quote-grounded judge (verbatim quotes + alarm_when clause id, fuzzy-verified against cited segments; unverified 'present' -> undetermined) + fusion gate 'no verified passage, no alarm'; FAR, F1, Belege hit rate"}
+  - {id: N7, group: ideas, priority: 3, status: todo, rq: [RQ9], needs: [N6], cost: "~3 min",
+     title: "Two-axis decision: P(act happened) x P(decisive context unresolved) -> alarm / review / no_alert instead of a 1-D review band; review precision/recall (only 3 dev review dialogues: qualitative + N13 review twins)"}
+  - {id: N8, group: ideas, priority: 3, status: todo, rq: [RQ7], needs: [B2], cost: "~3 min",
+     title: "Prefix-max for act families (access, disclosure): also score the transcript cut after each candidate act turn (+1 turn), family score = max; targets recency bias from the advisor's closing refusal; never for trade (D03-type late clarification)"}
+  - {id: N15, group: ideas, priority: 4, status: todo, rq: [RQ12], needs: [B2], cost: "0 GPU sim + ~5 min timing",
+     title: "G-Eval-first cascade (sharper F4): gate llm_judge/locate by single-token geval >= 0.25 instead of keywords (keyword gate has low recall on Stufe2); simulate from cache: label agreement, output tokens saved"}
+  - {id: N9, group: ideas, priority: 4, status: todo, rq: [RQ9], needs: [B2], cost: "~10 min",
+     title: "Occlusion evidence: mask each candidate turn and re-score geval; largest drops = passage, evidence concentration as uncertainty; Belege hit rate vs model-cited evidence, AUROC of concentration for errors"}
+  - {id: N12, group: ideas, priority: 4, status: todo, rq: [RQ4], needs: [B2, views], cost: "~35 min",
+     title: "Speaker roles asset or liability: oracle vs neutral (Sprecher A/B) vs swapped roles on ref view, diarizer vs neutral on ASR view; decide whether to keep roles in LLM prompts"}
+  - {id: N13, group: ideas, priority: 4, status: todo, rq: [RQ10], needs: [B2, N1], cost: "~10 min gen + ~5 min/config",
+     title: "Minimal-edit counterfactual twins from dev ASR transcripts (1-2 turns flipped via a named criterion clause; seeds exclude C01/C03/C05 whose twins are holdout); human spot-check 15; pair-AUC stress test + extra negatives for N2/N7"}
+  - {id: N5, group: ideas, priority: 4, status: todo, rq: [RQ5, RQ12], needs: [B2], cost: "~8 min",
+     title: "One-pass turn-level event log (act, speaker, mode actual/quoted/negated, info status) + officer-editable YAML rules over the ordered events; 1 request per call; kill if event recall on Belege turns < 80%"}
+  - {id: N10, group: ideas, priority: 5, status: todo, rq: [RQ2, RQ8], needs: [A1, V3], cost: "~5 min ASR + ~10 min LLM",
+     title: "Hot-window ASR re-decoding: large-v3 beam 5 + 5-best only on +-8 s around anchors/passages (~5% of audio); keyword confidence = share of hypotheses; noisy keyword-spot recall, negation/digit accuracy"}
+  - {id: N11, group: ideas, priority: 5, status: todo, rq: [RQ2, RQ8], needs: [A1], cost: "0 GPU",
+     title: "Phonetic (Koelner Phonetik) + ASR word-prob weighted keyword matching as keywords subclass; keyword-spot recall/precision on noisy calls; 'moeglicherweise verhoert' flag in UI"}

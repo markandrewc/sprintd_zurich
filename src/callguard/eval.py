@@ -228,11 +228,14 @@ def suggest_threshold(swept: list[dict[str, Any]], max_false_alarm_rate: float |
 
 def cross_validate(pipeline: "Pipeline", results: Sequence[CallResult], calls: Sequence[Call], n_folds: int = 5,
                    thresholds: Sequence[float] | None = None,
-                   overrides: dict[str, Any] | None = None) -> dict[str, Any] | None:
+                   overrides: dict[str, Any] | None = None,
+                   fold_of: Mapping[str, int] | None = None) -> dict[str, Any] | None:
     """Out-of-fold metrics for the threshold suggestion: per dialogue-level fold, ``suggest_threshold`` on
     the other folds, then that threshold on the held-out fold. A suggestion fitted and scored on the same
-    30 dialogues is optimistic; this is not. ``None`` when the results cover fewer than two folds."""
-    fold_of = split_dialogues(list(calls), n_folds)
+    30 dialogues is optimistic; this is not. ``None`` when the results cover fewer than two folds.
+    ``fold_of`` (dialogue -> fold) overrides the default split, e.g. the dev folds of config/splits.yaml;
+    results of dialogues it does not list are left out."""
+    fold_of = dict(fold_of) if fold_of is not None else split_dialogues(list(calls), n_folds)
     by_fold: dict[int, list[CallResult]] = {}
     for r in results:
         k = fold_of.get(dialogue_of(r.call_id))

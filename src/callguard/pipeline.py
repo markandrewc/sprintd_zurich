@@ -2,21 +2,30 @@
 
 Every stage is a plugin picked by the YAML config and every expensive stage is cached, so
 changing one check only reruns that check, and moving the threshold reruns nothing but fusion.
+
+Transcript views (config ``views``, :mod:`callguard.views`): a call may be rendered several times
+(Standard German ASR, dialect ASR, translations, Whisper speech translation). :meth:`Pipeline.build_views`
+computes the views the enabled checks need, each check reads its own view, fusion merges by audio time.
+Without a ``views`` block there is one view ``main`` and every cache key is exactly the v1 key.
 """
 
 from __future__ import annotations
 
+import datetime as _dt
+import functools
 import logging
+import subprocess
 import time
 from pathlib import Path
 from typing import Any, Callable
 
 from callguard import audio, registry
 from callguard.cache import file_hash, stable_hash
-from callguard.config import AppConfig
+from callguard.config import ROOT, AppConfig
 from callguard.context import Context
-from callguard.plugins import ASRBackend, Check, Diarizer, Fusion, Sink
+from callguard.plugins import ASRBackend, Check, Diarizer, Fusion, Sink, Translator
 from callguard.types import CallResult, CheckResult, Decision, Family, Transcript
+from callguard.views import ViewConfigError, ViewSpec, build_order, parse_views, primary_of, root_of
 
 log = logging.getLogger("callguard")
 
@@ -30,6 +39,17 @@ class Pipeline:
         self.checks: list[Check] = [registry.create("check", spec, ctx=self.ctx) for spec in cfg.checks]
         self.fusion: Fusion = registry.create("fusion", cfg.fusion, ctx=self.ctx)
         self.sinks: list[Sink] = [registry.create("sink", spec, ctx=self.ctx) for spec in cfg.sinks]
+        # views: plugins per view are built lazily (keyed by spec), like the top-level ASR
+        self.view_specs: dict[str, ViewSpec] = parse_views(cfg)
+        self.multi_view = bool(cfg.views)
+        self.primary_view = primary_of(cfg, self.view_specs)
+        self._view_asrs: dict[str, ASRBackend] = {}
+        self._translators: dict[str, Translator] = {}
+        for c in self.checks:  # fail at start, not after an hour of ASR
+            if c.view is not None and c.view not in self.view_specs and not cfg.check_view:
+                raise ViewConfigError(f"check {c.name!r} reads view {c.view!r}, which is not defined "
+                                      f"(views: {list(self.view_specs)})")
+        self.needed_views()
 
     # -- lazily built: loading Whisper is slow and not needed when everything is cached ----------
 
@@ -45,20 +65,157 @@ class Pipeline:
             self._diarizer = registry.create("diarizer", self.cfg.diarizer, ctx=self.ctx)
         return self._diarizer
 
+    # -- views ----------------------------------------------------------------------------------
+
+    def view_of(self, check: Check) -> str:
+        """The view ``check`` reads: ``check_view`` overrides all, else the check's ``view``, else primary."""
+        return self.cfg.check_view or check.view or self.primary_view
+
+    def needed_views(self) -> list[str]:
+        """Views to compute, sources first: primary + views of enabled checks + extra_views (+ sources)."""
+        wanted = [self.primary_view, *(self.view_of(c) for c in self.checks if c.enabled),
+                  *self.cfg.extra_views]
+        return build_order(self.view_specs, dict.fromkeys(wanted))
+
+    def asr_for(self, view: str) -> ASRBackend:
+        spec = self.view_specs[view]
+        if spec.asr is None:
+            raise ViewConfigError(f"view {view!r} is a translated view, it has no ASR")
+        if spec.asr == self.cfg.asr:
+            return self.asr  # shared with transcribe() without a view: same plugin, same cache keys
+        key = stable_hash(spec.asr)
+        if key not in self._view_asrs:
+            self._view_asrs[key] = registry.create("asr", spec.asr, ctx=self.ctx)
+        return self._view_asrs[key]
+
+    def translator_for(self, view: str) -> Translator:
+        spec = self.view_specs[view]
+        if spec.translator is None:
+            raise ViewConfigError(f"view {view!r} is not a translated view")
+        key = stable_hash(spec.translator)
+        if key not in self._translators:
+            self._translators[key] = registry.create("translator", spec.translator, ctx=self.ctx)
+        return self._translators[key]
+
+    def _built_asr(self, spec: ViewSpec) -> ASRBackend | None:
+        if spec.asr is None:
+            return None
+        if spec.asr == self.cfg.asr:
+            return self._asr
+        return self._view_asrs.get(stable_hash(spec.asr))
+
+    def _as_view(self, t: Transcript, view: str) -> Transcript:
+        spec = self.view_specs.get(view)
+        t.view = view
+        t.lang = spec.lang if spec is not None and spec.lang is not None else t.lang
+        return t
+
+    def translate(self, source: Transcript, view: str) -> Transcript:
+        """Translated view ``view`` of ``source`` (cached on source segments + translator + languages)."""
+        spec = self.view_specs[view]
+        tr = self.translator_for(view)
+        target = spec.lang or "en"
+        key = {"source": stable_hash(source.segments), "source_lang": source.lang,
+               "translator": tr.cache_params(), "target": target}
+        t, cached = self.ctx.cache.get_or_compute(
+            "translate", key, Transcript, lambda: tr.translate(source, target),
+            store=lambda t: not t.meta.get("degraded"))
+        log.info("translate %s %s -> %s %s", source.call_id, source.view, view, "(cached)" if cached else "")
+        t.call_id, t.audio_path = source.call_id, source.audio_path
+        return self._as_view(t, view)
+
+    def build_views(self, audio_path: str | Path | None, call_id: str, *,
+                    given: dict[str, Transcript] | None = None, warnings: list[str] | None = None,
+                    timings: dict[str, float] | None = None,
+                    on_stage: Callable[[str], None] | None = None) -> dict[str, Transcript]:
+        """Compute every needed view (see :meth:`needed_views`).
+
+        ``given`` binds views to ready transcripts (transcript-only path: reference scripts, synthetic
+        text). Views that cannot be computed (an ASR view without audio, a failed translation) are left
+        out with a warning; checks reading them then report the view as missing. The primary view must
+        exist, else this raises.
+        """
+        warnings = warnings if warnings is not None else []
+        timings = timings if timings is not None else {}
+        stage = on_stage or (lambda name: None)
+        announced: set[str] = set()
+
+        def enter(name: str) -> float:
+            if name not in announced:
+                announced.add(name)
+                stage(name)
+            return time.time()
+
+        def took(name: str, t0: float) -> None:
+            timings[name] = timings.get(name, 0.0) + time.time() - t0
+
+        out: dict[str, Transcript] = {}
+        multi = self.multi_view
+        for name in self.needed_views():
+            spec = self.view_specs[name]
+            if given and name in given:
+                out[name] = self._as_view(given[name].model_copy(deep=True), name)
+                continue
+            if spec.kind == "asr":
+                if audio_path is None:
+                    warnings.append(f"view {name}: no audio, ASR view not computed")
+                    continue
+                t0 = enter("asr")
+                try:
+                    t = self.transcribe(Path(audio_path), call_id, view=name if multi else None)
+                except Exception as e:
+                    took("asr", t0)
+                    if name == self.primary_view or not multi:
+                        raise
+                    log.exception("view %s of %s: ASR failed", name, call_id)
+                    warnings.append(f"view {name}: ASR failed: {type(e).__name__}: {e}")
+                    continue
+                took("asr", t0)
+                if spec.diarize:
+                    t0 = enter("diarize")
+                    try:
+                        t = self.diarize(Path(audio_path), t)
+                    except Exception as e:  # roles are a refinement: checks still run on the plain transcript
+                        log.warning("diarization of %s (view %s) failed, continuing without speakers: %s",
+                                    call_id, name, e)
+                        prefix = f"view {name}: " if multi else ""
+                        warnings.append(f"{prefix}diarization failed: {type(e).__name__}: {e}")
+                    took("diarize", t0)
+                out[name] = t
+            else:
+                src = out.get(spec.source or "")
+                if src is None:
+                    warnings.append(f"view {name}: source view {spec.source} missing, not translated")
+                    continue
+                t0 = enter("translate")
+                try:
+                    out[name] = self.translate(src, name)
+                except Exception as e:
+                    log.exception("view %s of %s: translation failed", name, call_id)
+                    warnings.append(f"view {name}: translation failed: {type(e).__name__}: {e}")
+                took("translate", t0)
+        if self.primary_view not in out:
+            raise RuntimeError(f"primary view {self.primary_view!r} of {call_id} could not be built: "
+                               f"{'; '.join(warnings) or 'no audio / no transcript'}")
+        return out
+
     # -- stages ---------------------------------------------------------------------------------
 
     # Cache keys come from the plugins' cache_params() (not the raw YAML block), so plugins can leave
     # out speed-only knobs (threads, concurrency) and add what the YAML does not show (the role LLM's
     # model). Building a plugin is cheap: models load lazily on first use.
 
-    def transcribe(self, audio_path: Path, call_id: str) -> Transcript:
-        key = {"audio": file_hash(audio_path), "asr": self.asr.cache_params()}
+    def transcribe(self, audio_path: Path, call_id: str, view: str | None = None) -> Transcript:
+        """ASR of the top-level ``asr`` (``view=None``, v1) or of an ASR view. The key is the v1 key
+        {audio hash, asr.cache_params()}: views with the same ASR share transcripts."""
+        asr = self.asr if view is None else self.asr_for(view)
+        key = {"audio": file_hash(audio_path), "asr": asr.cache_params()}
         t, cached = self.ctx.cache.get_or_compute(
-            "asr", key, Transcript, lambda: self.asr.transcribe(Path(audio_path), call_id),
+            "asr", key, Transcript, lambda: asr.transcribe(Path(audio_path), call_id),
             store=lambda t: not t.meta.get("degraded"))
-        log.info("asr %s %s", call_id, "(cached)" if cached else "")
+        log.info("asr %s %s%s", call_id, f"[{view}] " if view else "", "(cached)" if cached else "")
         t.call_id, t.audio_path = call_id, str(audio_path)
-        return t
+        return self._as_view(t, view) if view is not None else t
 
     def diarize(self, audio_path: Path | None, transcript: Transcript) -> Transcript:
         key = {"transcript": stable_hash(transcript.segments), "diarizer": self.diarizer.cache_params(),
@@ -67,14 +224,21 @@ class Pipeline:
             "diarize", key, Transcript, lambda: self.diarizer.diarize(audio_path, transcript),
             store=lambda t: not (t.meta.get("diarization") or {}).get("error"))
         log.info("diarize %s %s", transcript.call_id, "(cached)" if cached else "")
+        t.view, t.lang = transcript.view, transcript.lang  # the cached copy may come from another view
         return t
 
     def check_key(self, check: Check, transcript: Transcript, families: list[Family]) -> dict[str, Any]:
-        return {"transcript": stable_hash(transcript.segments), "check": check.cache_key(families)}
+        key = {"transcript": stable_hash(transcript.segments), "check": check.cache_key(families)}
+        if check.lang_sensitive and transcript.lang is not None:
+            key["lang"] = transcript.lang  # v1 transcripts have no lang: their key is unchanged
+        return key
 
     def cached_check(self, check: Check, transcript: Transcript, families: list[Family]) -> CheckResult | None:
         """The cached result of ``check`` if there is one; never runs the check (UI: reuse LLM results)."""
-        return self.ctx.cache.get(f"check/{check.name}", self.check_key(check, transcript, families), CheckResult)
+        res = self.ctx.cache.get(f"check/{check.name}", self.check_key(check, transcript, families), CheckResult)
+        if res is not None:
+            res.view = transcript.view
+        return res
 
     def run_check(self, check: Check, transcript: Transcript, families: list[Family]) -> CheckResult:
         key = self.check_key(check, transcript, families)
@@ -94,19 +258,46 @@ class Pipeline:
                                                         store=complete)
         except Exception as e:  # a broken check must not kill the call: fusion sees it as missing
             log.exception("check %s failed", check.name)
-            return CheckResult(check=check.name, type=check.plugin_type, meta={"error": repr(e)})
+            return CheckResult(check=check.name, type=check.plugin_type, meta={"error": repr(e)},
+                               view=transcript.view)
         log.info("check %s %s %s", check.name, transcript.call_id, "(cached)" if cached else "")
+        res.view = transcript.view  # not part of the cached value's key: set on every read
         return res
 
-    def run_checks(self, transcript: Transcript, families: list[Family] | None = None) -> dict[str, CheckResult]:
+    def check_transcript(self, check: Check, views: dict[str, Transcript] | Transcript) -> Transcript | None:
+        """The transcript ``check`` reads among ``views`` (a bare Transcript = single view)."""
+        if isinstance(views, Transcript):
+            return views
+        return views.get(self.view_of(check))
+
+    def run_checks(self, transcript: Transcript | dict[str, Transcript],
+                   families: list[Family] | None = None) -> dict[str, CheckResult]:
+        """Run every enabled check on its view. ``transcript``: one Transcript (all checks read it, v1)
+        or the dict from :meth:`build_views`."""
         families = families if families is not None else self.ctx.families()
-        return {c.name: self.run_check(c, transcript, families) for c in self.checks if c.enabled}
+        out: dict[str, CheckResult] = {}
+        for c in self.checks:
+            if not c.enabled:
+                continue
+            t = self.check_transcript(c, transcript)
+            if t is None:
+                view = self.view_of(c)
+                out[c.name] = CheckResult(check=c.name, type=c.plugin_type, view=view,
+                                          meta={"error": f"view {view!r} not available for this call"})
+                continue
+            out[c.name] = self.run_check(c, t, families)
+        return out
 
     def decide(self, transcript: Transcript, results: dict[str, CheckResult],
-               overrides: dict[str, Any] | None = None, families: list[Family] | None = None) -> Decision:
+               overrides: dict[str, Any] | None = None, families: list[Family] | None = None,
+               views: dict[str, Transcript] | None = None) -> Decision:
+        """``views`` (multi-view calls: ``CallResult.views``) lets fusion place findings of checks that
+        read other views and fill ``Passage.texts``. Omitted for single-view calls (v1 decisions)."""
         families = families if families is not None else self.ctx.families()
         overrides = dict(overrides or {})
         overrides.setdefault("weights", {c.name: c.weight for c in self.checks})
+        if views:
+            return self.fusion.decide(transcript, results, families, overrides, views=views)
         return self.fusion.decide(transcript, results, families, overrides)
 
     def make_snippets(self, result: CallResult) -> None:
@@ -130,59 +321,101 @@ class Pipeline:
     def process(self, audio_path: str | Path, call_id: str | None = None, *, emit: bool = True,
                 overrides: dict[str, Any] | None = None,
                 on_stage: Callable[[str], None] | None = None) -> CallResult:
-        """``on_stage(name)`` is called before each stage (asr, diarize, checks, decide, snippets, emit)
-        so a UI can show progress without re-implementing the chain."""
+        """``on_stage(name)`` is called before each stage (asr, diarize, [translate,] checks, decide,
+        snippets, emit) so a UI can show progress without re-implementing the chain."""
         audio_path = Path(audio_path)
         call_id = call_id or audio_path.stem
         timings: dict[str, float] = {}
         stage = on_stage or (lambda name: None)
-
-        stage("asr")
-        t = time.time()
-        transcript = self.transcribe(audio_path, call_id)
-        timings["asr"] = time.time() - t
-
-        stage("diarize")
-        t = time.time()
         warnings: list[str] = []
-        try:
-            transcript = self.diarize(audio_path, transcript)
-        except Exception as e:  # roles are a refinement: the checks still run on the plain transcript
-            log.warning("diarization of %s failed, continuing without speakers: %s", call_id, e)
-            warnings.append(f"diarization failed: {type(e).__name__}: {e}")
-        timings["diarize"] = time.time() - t
+        views = self.build_views(audio_path, call_id, warnings=warnings, timings=timings, on_stage=stage)
+        return self._finish(views, call_id, str(audio_path), warnings, timings, overrides, stage, emit)
 
+    def process_transcript(self, transcript: Transcript, *, emit: bool = False,
+                           overrides: dict[str, Any] | None = None, view: str | None = None) -> CallResult:
+        """Skip audio: run checks + fusion on a given transcript (reference scripts, synthetic text).
+
+        With views, ``transcript`` is bound to ``view`` (default: the ASR view the primary view is
+        built from) and translated views are derived from it; other ASR views need audio and are
+        skipped with a warning."""
+        bound = view or root_of(self.view_specs, self.primary_view)
+        if bound not in self.view_specs:
+            raise ViewConfigError(f"view {bound!r} is not defined (views: {list(self.view_specs)})")
+        warnings: list[str] = []
+        if self.multi_view:
+            views = self.build_views(None, transcript.call_id, given={bound: transcript}, warnings=warnings)
+        else:
+            views = {bound: transcript}  # v1: the transcript object itself, untouched
+        return self._finish(views, transcript.call_id, transcript.audio_path, warnings, None, overrides,
+                            lambda name: None, emit, snippets=False)
+
+    def _finish(self, views: dict[str, Transcript], call_id: str, audio_path: str | None,
+                warnings: list[str], timings: dict[str, float] | None, overrides: dict[str, Any] | None,
+                stage: Callable[[str], None], emit: bool, snippets: bool = True) -> CallResult:
+        transcript = views[self.primary_view]
         families = self.ctx.families()
         stage("checks")
         t = time.time()
-        results = self.run_checks(transcript, families)
-        timings["checks"] = time.time() - t
+        results = self.run_checks(views if self.multi_view else transcript, families)
+        if timings is not None:
+            timings["checks"] = time.time() - t
 
         stage("decide")
-        decision = self.decide(transcript, results, overrides, families)
-        result = CallResult(call_id=call_id, audio_path=str(audio_path), transcript=transcript,
-                            checks=results, decision=decision, config_name=self.cfg.name,
-                            timings={k: round(v, 2) for k, v in timings.items()},
-                            meta={"warnings": warnings} if warnings else {})
-        stage("snippets")
-        self.make_snippets(result)
+        decision = self.decide(transcript, results, overrides, families, views=views if self.multi_view else None)
+        meta: dict[str, Any] = {"warnings": warnings} if warnings else {}
+        meta["provenance"] = self.provenance(views)
+        result = CallResult(call_id=call_id, audio_path=audio_path, transcript=transcript,
+                            views=views if self.multi_view else {}, checks=results, decision=decision,
+                            config_name=self.cfg.name, timings={k: round(v, 2) for k, v in (timings or {}).items()},
+                            meta=meta)
+        if snippets:
+            stage("snippets")
+            self.make_snippets(result)
         if emit:
             stage("emit")
             self.emit(result)
         return result
 
-    def process_transcript(self, transcript: Transcript, *, emit: bool = False,
-                           overrides: dict[str, Any] | None = None) -> CallResult:
-        """Skip audio: run checks + fusion on a given transcript (reference scripts, synthetic text)."""
-        families = self.ctx.families()
-        results = self.run_checks(transcript, families)
-        decision = self.decide(transcript, results, overrides, families)
-        result = CallResult(call_id=transcript.call_id, audio_path=transcript.audio_path,
-                            transcript=transcript, checks=results, decision=decision,
-                            config_name=self.cfg.name)
-        if emit:
-            self.emit(result)
-        return result
+    # -- provenance -------------------------------------------------------------------------------
+
+    def provenance(self, views: dict[str, Transcript]) -> dict[str, Any]:
+        """What produced a result (docs/design/v2_plan.md §5). Only plugins that were actually built are
+        asked for their params (no diarizer is loaded just to describe it). Never raises: a plugin whose
+        params cannot be read is recorded with the error."""
+        def safe(fn: Callable[[], Any]) -> Any:
+            try:
+                return fn()
+            except Exception as e:
+                return {"error": f"{type(e).__name__}: {e}"}
+
+        view_info: dict[str, Any] = {}
+        for name, t in views.items():
+            spec = self.view_specs.get(name)
+            info: dict[str, Any] = {"lang": t.lang, "asr_backend": t.asr_backend}
+            if spec is not None and spec.kind == "translate":
+                info["params"] = {"from": spec.source,
+                                  "translator": safe(lambda n=name: self.translator_for(n).cache_params())}
+            elif spec is not None:
+                asr = self._built_asr(spec)
+                params: dict[str, Any] = {"asr": safe(asr.cache_params) if asr is not None else None}
+                if spec.diarize and self._diarizer is not None:
+                    params["diarizer"] = safe(self._diarizer.cache_params)
+                info["params"] = params
+            view_info[name] = info
+        checks = {c.name: {"type": c.plugin_type, "view": self.view_of(c), "weight": c.weight,
+                           "params": safe(c.cache_params),
+                           **({"llm": safe(lambda c=c: c.llm_identity)} if hasattr(c, "llm_identity") else {})}
+                  for c in self.checks if c.enabled}
+        return {
+            "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
+            "config_name": self.cfg.name,
+            "config_hash": config_hash(self.cfg),
+            "code_version": code_version(),
+            "primary_view": self.primary_view,
+            "views": view_info,
+            "checks": checks,
+            "fusion": {"type": self.fusion.plugin_type, "params": safe(self.fusion.cache_params)},
+        }
 
     def emit(self, result: CallResult) -> None:
         for s in self.sinks:
@@ -192,3 +425,22 @@ class Pipeline:
                 s.emit(result)
             except Exception:
                 log.exception("sink %s failed", s.plugin_type)
+
+
+def config_hash(cfg: AppConfig) -> str:
+    return stable_hash(cfg.model_dump(mode="json", exclude={"source_path"}))
+
+
+@functools.lru_cache(maxsize=1)
+def code_version() -> str:
+    """Git commit of the code (``+dirty`` with uncommitted changes), or "unknown" outside a checkout."""
+    try:
+        sha = subprocess.run(["git", "rev-parse", "--short=12", "HEAD"], cwd=ROOT, capture_output=True,
+                             text=True, timeout=5).stdout.strip()
+        if not sha:
+            return "unknown"
+        dirty = subprocess.run(["git", "diff", "--quiet", "HEAD", "--", "src"], cwd=ROOT,
+                               capture_output=True, timeout=5).returncode != 0
+        return sha + ("+dirty" if dirty else "")
+    except Exception:
+        return "unknown"

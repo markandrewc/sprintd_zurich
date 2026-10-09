@@ -70,6 +70,8 @@ KW_CONFIG = {
     "de": st.column_config.TextColumn("Standard German phrases", width="large",
                                       help="Comma-separated. The speech recognition writes Standard German."),
     "gsw": st.column_config.TextColumn("Swiss German spellings", width="large", help="Comma-separated."),
+    "en": st.column_config.TextColumn("English phrases", width="large",
+                                      help="Comma-separated. Only matched on English transcript views."),
     "harmless": st.column_config.TextColumn("Harmless when …", width="large",
                                             help="When a hit is NOT suspicious; also shown to the LLM checks."),
     "case_sensitive": st.column_config.CheckboxColumn("Aa", width="small", default=False,

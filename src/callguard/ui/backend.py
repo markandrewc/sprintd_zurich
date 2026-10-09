@@ -31,7 +31,8 @@ from callguard.config import AppConfig
 from callguard.context import Context
 from callguard.data import Call, load_calls
 from callguard.families import load_families, save_keywords
-from callguard.types import LABELS, CallResult, CheckResult, Decision, Family, FusedFamily, Keyword, Passage
+from callguard.types import (LABELS, CallResult, CheckResult, Decision, Family, FusedFamily, Keyword, Passage,
+                             Transcript)
 
 if TYPE_CHECKING:
     from callguard.pipeline import Pipeline
@@ -192,13 +193,16 @@ class Engine:
 
     def decide(self, result: CallResult, overrides: dict[str, Any] | None = None,
                families: list[Family] | None = None) -> Decision:
+        views = result.views or None  # multi-view results: fusion places other views' findings
         if self.pipeline is not None:
-            return self.pipeline.decide(result.transcript, result.checks, overrides, families)
+            return self.pipeline.decide(result.transcript, result.checks, overrides, families, views=views)
         if self.fusion is None:
             raise RuntimeError(self.error or "no fusion plugin")
         fams = families if families is not None else self.families()
         o = dict(overrides or {})
         o.setdefault("weights", check_weights(self.cfg))
+        if views:
+            return self.fusion.decide(result.transcript, result.checks, fams, o, views=views)
         return self.fusion.decide(result.transcript, result.checks, fams, o)
 
 
@@ -521,7 +525,7 @@ def passage_clip(result: CallResult, passage: Passage, result_dir: Path, pad: fl
 # Keyword list and criteria editing
 # --------------------------------------------------------------------------------------------
 
-KEYWORD_COLUMNS = ("enabled", "id", "label", "de", "gsw", "harmless", "case_sensitive")
+KEYWORD_COLUMNS = ("enabled", "id", "label", "de", "gsw", "en", "harmless", "case_sensitive")
 
 
 def join_phrases(phrases: Iterable[str]) -> str:
@@ -537,7 +541,8 @@ def split_phrases(text: Any) -> list[str]:
 
 def keyword_rows(family: Family) -> list[dict[str, Any]]:
     return [{"enabled": k.enabled, "id": k.id, "label": k.label, "de": join_phrases(k.de),
-             "gsw": join_phrases(k.gsw), "harmless": k.harmless or "", "case_sensitive": k.case_sensitive}
+             "gsw": join_phrases(k.gsw), "en": join_phrases(k.en), "harmless": k.harmless or "",
+             "case_sensitive": k.case_sensitive}
             for k in family.keywords]
 
 
@@ -572,6 +577,7 @@ def rows_to_keywords(rows: Iterable[Mapping[str, Any]], taken_ids: set[str]) -> 
     seen: set[str] = set()
     for i, row in enumerate(rows, 1):
         de, gsw = split_phrases(row.get("de")), split_phrases(row.get("gsw"))
+        en = split_phrases(row.get("en"))  # English forms: only matched on English transcript views
         kid = "" if _blank(row.get("id")) else str(row.get("id")).strip()
         if not de and not gsw:
             if kid or not all(_blank(row.get(c)) for c in ("label", "harmless")):
@@ -586,7 +592,7 @@ def rows_to_keywords(rows: Iterable[Mapping[str, Any]], taken_ids: set[str]) -> 
         label = "" if _blank(row.get("label")) else str(row.get("label")).strip()
         harmless = None if _blank(row.get("harmless")) else str(row.get("harmless")).strip()
         enabled, case = row.get("enabled"), row.get("case_sensitive")
-        out.append(Keyword(id=kid, label=label or (de + gsw)[0], de=de, gsw=gsw, harmless=harmless,
+        out.append(Keyword(id=kid, label=label or (de + gsw)[0], de=de, gsw=gsw, en=en, harmless=harmless,
                            enabled=True if _blank(enabled) else bool(enabled),
                            case_sensitive=False if _blank(case) else bool(case)))
     return out, warnings
@@ -668,9 +674,14 @@ def is_cheap(check: Check) -> bool:
 def cached_check(pipeline: Pipeline, check: Check, result: CallResult, families: list[Family]) -> CheckResult | None:
     """The check's result from the pipeline cache, if its inputs are unchanged (never runs the check)."""
     try:
-        return pipeline.cached_check(check, result.transcript, families)
+        return pipeline.cached_check(check, check_view_transcript(pipeline, check, result), families)
     except Exception:
         return None
+
+
+def check_view_transcript(pipeline: Pipeline, check: Check, result: CallResult) -> Transcript:
+    """The transcript view ``check`` reads in ``result`` (the primary one for single-view results)."""
+    return result.view(pipeline.view_of(check)) if result.views else result.transcript
 
 
 @dataclass
@@ -706,14 +717,15 @@ def rerun_checks(pipeline: Pipeline, loaded: Loaded, *, include_llm: bool = Fals
                     checks[check.name] = hit
                     report.reused += 1
                 elif include_llm or is_cheap(check):
-                    checks[check.name] = pipeline.run_check(check, r.transcript, families)
+                    checks[check.name] = pipeline.run_check(check, check_view_transcript(pipeline, check, r),
+                                                            families)
                     report.rerun += 1
                 elif check.name in r.checks:
                     old = r.checks[check.name].model_copy(deep=True)
                     old.meta["stale"] = "Kriterien seit dieser Bewertung geändert; Prüfung nicht neu gelaufen."
                     checks[check.name] = old
                     report.kept += 1
-            decision = pipeline.decide(r.transcript, checks, None, families)
+            decision = pipeline.decide(r.transcript, checks, None, families, views=r.views or None)
             new = r.model_copy(update={"checks": checks, "decision": carry_snippets(decision, r.decision)})
             try:
                 pipeline.make_snippets(new)
@@ -740,6 +752,12 @@ def process_call(pipeline: Pipeline, audio_path: str | Path, call_id: str,
     alone takes about as long as the call). Same stage methods and result as ``Pipeline.process``."""
     say = notify or (lambda msg: None)
     audio_path = Path(audio_path)
+    if pipeline.multi_view:  # several transcript views: the pipeline builds them (stage-level progress)
+        stages = {"asr": "Transcribing (speech recognition, every ASR view)",
+                  "diarize": "Separating speakers (advisor / customer)", "translate": "Translating views",
+                  "checks": "Running the checks", "decide": "Deciding", "snippets": "Cutting audio snippets",
+                  "emit": "Saving the result"}
+        return pipeline.process(audio_path, call_id, on_stage=lambda name: say(stages.get(name, name)))
     timings: dict[str, float] = {}
 
     say("Transcribing (speech recognition)")
@@ -774,7 +792,8 @@ def process_call(pipeline: Pipeline, audio_path: str | Path, call_id: str,
     decision = pipeline.decide(transcript, results, None, families)
     result = CallResult(call_id=call_id, audio_path=str(audio_path), transcript=transcript, checks=results,
                         decision=decision, config_name=pipeline.cfg.name,
-                        timings={k: round(v, 2) for k, v in timings.items()})
+                        timings={k: round(v, 2) for k, v in timings.items()},
+                        meta={"provenance": pipeline.provenance({transcript.view: transcript})})
     say("Cutting audio snippets")
     try:
         pipeline.make_snippets(result)

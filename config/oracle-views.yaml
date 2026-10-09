@@ -1,0 +1,21 @@
+# ORACLE views: the reference scripts (dialect) and their translations. Experiments only (CLAUDE.md rule 2):
+# the ceiling per view language, and ref_de / ref_en as pseudo-references for the WER of the de / en views.
+# Needs the LLM of the oracle profile (local.yaml: llama.cpp :8001) for the translations, or e.g.
+#   --set llms.default.base_url=http://127.0.0.1:8000/v1 --set llms.default.model=callguard-llm
+extends: oracle.yaml
+description: ORACLE views (reference script ref_gsw + LLM translations ref_de, ref_en)
+
+views:
+  ref_gsw:
+    lang: gsw                # top-level asr = reference script turns (ids T001...), diarizer none
+  ref_de:
+    lang: de
+    from: ref_gsw
+    translator: {type: llm_translate, llm: default, batch_size: 12, context: 3}
+  ref_en:
+    lang: en
+    from: ref_gsw
+    translator: {type: llm_translate, llm: default, batch_size: 12, context: 3}
+primary_view: ref_gsw
+check_view: null             # --set check_view=ref_de / ref_en: all checks on one rendering
+extra_views: [ref_de, ref_en]

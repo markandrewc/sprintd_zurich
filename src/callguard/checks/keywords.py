@@ -36,6 +36,10 @@ log = logging.getLogger("callguard.checks.keywords")
 ROLES = ("advisor", "customer", "unknown")
 NEGATION_CUES = ("nicht", "nichts", "nöd", "nid", "nit", "kein", "keine", "keinen", "keinem", "keiner",
                  "keines", "kei", "keini", "keis", "nie", "niemals", "nimmer", "ohne", "ohni", "nüt", "nüüt")
+# English views only: "no" is Swiss German for "noch", so these never apply to gsw/de text
+# Single tokens as the tokenizer sees them ("don't" -> "don" + "t").
+NEGATION_CUES_EN = ("not", "never", "no", "without", "nothing", "neither", "nor", "cannot", "dont", "don",
+                    "doesn", "didn", "isn", "aren", "wasn", "shouldn", "mustn")
 MAX_FAMILY_SCORE = 0.9  # keywords alone never make a family certain
 
 
@@ -71,6 +75,7 @@ class _Hit:
 class KeywordCheck(Check):
     plugin_kind = "check"
     plugin_type = "keywords"
+    lang_sensitive = True  # matches Keyword.forms(transcript.lang): the view language is part of the key
 
     def __init__(self, ctx: "Context", *, fuzzy: float = 90, hit_score: float = 0.35,
                  negated_score: float = 0.1, confidence: float = 0.4, absent_confidence: float = 0.25,
@@ -104,11 +109,19 @@ class KeywordCheck(Check):
         self.roles = list(roles) if roles else None
         cues = NEGATION_CUES if negation_cues is None else negation_cues
         self.negation_cues = frozenset(t.text for c in cues for t in tokenize(c))
+        # configured cues apply to every language; the built-in English list only to English views
+        self.negation_cues_en = (self.negation_cues if negation_cues is not None
+                                 else frozenset(t.text for c in NEGATION_CUES_EN for t in tokenize(c)))
+
+    def cues_for(self, lang: str | None) -> frozenset[str]:
+        return self.negation_cues_en if lang == "en" else self.negation_cues
 
     # -- matching -------------------------------------------------------------------------------
 
-    def compile(self, families: list[Family]) -> tuple[list[_Phrase], list[str]]:
-        """Keyword list -> match patterns. Returns patterns and warnings for unusable entries."""
+    def compile(self, families: list[Family], lang: str | None = None) -> tuple[list[_Phrase], list[str]]:
+        """Keyword list -> match patterns for a view language (``Keyword.forms``). Returns patterns and
+        warnings for unusable entries."""
+        cues = self.cues_for(lang)
         phrases: list[_Phrase] = []
         warnings: list[str] = []
         for fam in families:
@@ -117,7 +130,7 @@ class KeywordCheck(Check):
             for kw in fam.keywords:
                 if not kw.enabled:
                     continue
-                for text in kw.phrases:
+                for text in kw.forms(lang):
                     toks = tokenize(text)
                     if not toks:
                         log.warning("keywords: %s phrase %r has no letters or digits, skipped", kw.id, text)
@@ -128,7 +141,7 @@ class KeywordCheck(Check):
                     phrases.append(_Phrase(
                         family=fam, keyword=kw, text=text, case_sensitive=cs, acro=acro,
                         toks=tuple(t.cased if cs else t.text for t in toks),
-                        has_negation=any(t.text in self.negation_cues for t in toks),
+                        has_negation=any(t.text in cues for t in toks),
                     ))
         return phrases, warnings
 
@@ -158,8 +171,10 @@ class KeywordCheck(Check):
                         hits.append(_Hit(phrase, i, i + w - 1, round(s, 1)))
         return hits
 
-    def segment_hits(self, phrases: list[_Phrase], toks: list[Token]) -> list[_Hit]:
+    def segment_hits(self, phrases: list[_Phrase], toks: list[Token],
+                     cues: frozenset[str] | None = None) -> list[_Hit]:
         """All hits in one segment: best non-overlapping span per keyword, negation resolved."""
+        cues = self.negation_cues if cues is None else cues
         by_kw: dict[str, list[_Hit]] = {}
         for p in phrases:
             by_kw.setdefault(f"{p.family.id}/{p.keyword.id}", []).extend(self.match(p, toks))
@@ -177,7 +192,7 @@ class KeywordCheck(Check):
             for j in range(h.first - 1, max(-1, h.first - 1 - self.negation_window), -1):
                 if toks[j + 1].boundary:
                     break
-                if toks[j].text in self.negation_cues and j not in consumed:
+                if toks[j].text in cues and j not in consumed:
                     h.negated, h.cue = True, toks[j].raw
                     break
         return kept
@@ -192,14 +207,16 @@ class KeywordCheck(Check):
         return [s for s in transcript.segments if s.role in self.roles], None
 
     def run(self, transcript: Transcript, families: list[Family]) -> CheckResult:
-        phrases, errors = self.compile(families)
+        lang = transcript.lang
+        phrases, errors = self.compile(families, lang)
+        cues = self.cues_for(lang)
         segments, note = self.select_segments(transcript)
         findings: list[Finding] = []
         best: dict[str, dict[str, float]] = {}  # family -> keyword -> best hit score
         for seg in segments:
             try:
                 text, toks = segment_tokens(seg)
-                hits = self.segment_hits(phrases, toks)
+                hits = self.segment_hits(phrases, toks, cues)
             except Exception as e:  # one odd segment must not cost the whole call its keyword evidence
                 log.warning("keywords: segment %s skipped: %r", seg.id, e)
                 errors.append(f"segment {seg.id}: {e!r}")
@@ -212,13 +229,15 @@ class KeywordCheck(Check):
 
         result = CheckResult(check=self.name, type=self.plugin_type, meta={
             "segments_checked": len(segments), "phrases": len(phrases), "fuzzy": self.fuzzy})
+        if lang is not None:
+            result.meta["lang"] = lang
         if note:
             result.meta["note"] = note
         if errors:
             result.meta["errors"] = errors
         no_keywords = []
         for fam in (f for f in families if f.enabled):
-            if not any(k.enabled for k in fam.keywords):
+            if not any(k.enabled and k.forms(lang) for k in fam.keywords):
                 no_keywords.append(fam.id)  # no opinion, rather than a misleading "nothing found"
                 continue
             fam_findings = [f for f in findings if f.family == fam.id]

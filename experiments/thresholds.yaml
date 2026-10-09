@@ -1,0 +1,25 @@
+# RQ: threshold policy (feeds DECISIONS.md "threshold policy"): fixed threshold, review band and
+#     uncertainty escalation of the weighted fusion.
+# Varies: fusion params only. `base` computes the checks once (gpu-12gb); every other variant is a
+#         RE-FUSION of it (no ASR, no LLM): runtime = `base` (seconds if cached, else ~20-40 min for 48 dev
+#         calls) + < 1 s per variant.
+# Read the FIXED-threshold table: CV picks its own threshold per fold, so threshold-only variants are
+#         identical under CV by construction (review_band / max_uncertainty variants still differ).
+#         The CV fold thresholds column shows how stable the chosen threshold is across folds.
+name: thresholds
+description: Fixed threshold, review band and uncertainty escalation (re-fusion of one check run)
+rq: [RQ9, RQ12]
+base: gpu-12gb
+split: dev
+compare_to: base
+thresholds: [0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8]
+variants:
+  - name: base
+    description: gpu-12gb as configured (threshold 0.55, review band 0.15, max_uncertainty 0.35)
+  - {name: t035, refuse_from: base, set: ["fusion.threshold=0.35"]}
+  - {name: t045, refuse_from: base, set: ["fusion.threshold=0.45"]}
+  - {name: t065, refuse_from: base, set: ["fusion.threshold=0.65"]}
+  - {name: band0, refuse_from: base, set: ["fusion.review_band=0.0"], description: no review band}
+  - {name: band025, refuse_from: base, set: ["fusion.review_band=0.25"]}
+  - {name: no_unc_escalation, refuse_from: base, set: ["fusion.max_uncertainty=1.0"]}
+  - {name: strict_unc, refuse_from: base, set: ["fusion.max_uncertainty=0.2"]}

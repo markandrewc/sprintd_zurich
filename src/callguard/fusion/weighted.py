@@ -105,7 +105,11 @@ class WeightedFusion(Fusion):
         return out
 
     def decide(self, transcript: Transcript, results: dict[str, CheckResult], families: list[Family],
-               overrides: dict[str, Any] | None = None) -> Decision:
+               overrides: dict[str, Any] | None = None,
+               views: dict[str, Transcript] | None = None) -> Decision:
+        """``views``: every view of the call (multi-view configs). Findings of a check that read another
+        view are placed by audio time and mapped onto the primary ``transcript``'s segments; each
+        passage gets ``texts`` (what every view says in its time range)."""
         o = overrides or {}
 
         def knob(name: str) -> float:
@@ -164,7 +168,10 @@ class WeightedFusion(Fusion):
 
         floor = min(_band_floor(t, band), min_review)
         passages = self._passages(transcript, usable, fused, fam_by_id, floor, merge_gap,
-                                  max_len)[:max(0, max_passages)]
+                                  max_len, views)[:max(0, max_passages)]
+        if views:
+            for p in passages:
+                p.texts = {name: view_text(v, p.start, p.end) for name, v in views.items()}
         return Decision(label=label, score=score, uncertainty=unc, threshold=t, families=fused,
                         passages=passages, reasons=reasons, top_family=top if score > 0 else None)
 
@@ -250,8 +257,23 @@ class WeightedFusion(Fusion):
     # -- passages ---------------------------------------------------------------------------------
 
     def _passages(self, transcript: Transcript, usable: dict[str, CheckResult], fused: dict[str, FusedFamily],
-                  fams: dict[str, Family], floor: float, merge_gap: float, max_len: float) -> list[Passage]:
+                  fams: dict[str, Family], floor: float, merge_gap: float, max_len: float,
+                  views: dict[str, Transcript] | None = None) -> list[Passage]:
         out: list[Passage] = []
+
+        def source(r: CheckResult) -> Transcript:
+            """The transcript the check's segment ids refer to."""
+            if views and r.view and r.view != transcript.view and r.view in views:
+                return views[r.view]
+            return transcript
+
+        def evidence(name: str, r: CheckResult, start: float | None, end: float | None,
+                     seg_ids: list[str], score: float, reason: str) -> _Evidence | None:
+            src = source(r)
+            ev = self._evidence(src, name, start, end, seg_ids, score, reason)
+            if ev is not None and src is not transcript:  # another view's segment ids: re-anchor by time
+                ev.segment_ids = overlapping_ids(transcript, ev.start, ev.end)
+            return ev
         for fid, ff in fused.items():
             fam = fams[fid]
             # numbers-like families only annotate; their passages would crowd out real evidence
@@ -262,14 +284,14 @@ class WeightedFusion(Fusion):
                 for f in r.findings:
                     if f.family != fid:
                         continue
-                    ev = self._evidence(transcript, name, f.start, f.end, f.segment_ids, f.score, f.reason)
+                    ev = evidence(name, r, f.start, f.end, f.segment_ids, f.score, f.reason)
                     if ev:
                         items.append(ev)
             if not items:  # checks gave a call-level opinion only: point at the segments they cited
                 for name in ff.per_check:
                     fs = usable[name].family_scores[fid]
                     if fs.segment_ids:
-                        ev = self._evidence(transcript, name, None, None, fs.segment_ids, fs.score, fs.reason)
+                        ev = evidence(name, usable[name], None, None, fs.segment_ids, fs.score, fs.reason)
                         if ev:
                             items.append(ev)
             out.extend(self._merge(transcript, fam, items, merge_gap, max_len))
@@ -305,7 +327,7 @@ class WeightedFusion(Fusion):
             start, end = min(x.start for x in g), max(x.end for x in g)
             seg_ids = list(dict.fromkeys(sid for x in g for sid in x.segment_ids))
             if not seg_ids:  # time-only findings: attach the overlapping segments for text and highlighting
-                seg_ids = [s.id for s in transcript.segments if s.end > start and s.start < max(end, start + 1e-3)]
+                seg_ids = overlapping_ids(transcript, start, end)
             seg_ids.sort(key=lambda sid: order.get(sid, len(order)))
             by_score = sorted(g, key=lambda x: -x.score)
             reasons = list(dict.fromkeys(f"{x.check}: {x.reason}" for x in by_score if x.reason))
@@ -327,3 +349,14 @@ class WeightedFusion(Fusion):
                 checks=list(dict.fromkeys(x.check for x in by_score)), text=text,
             ))
         return passages
+
+
+def overlapping_ids(transcript: Transcript, start: float, end: float) -> list[str]:
+    """Ids of the segments overlapping [start, end] (a zero-length range still hits its segment)."""
+    return [s.id for s in transcript.segments if s.end > start and s.start < max(end, start + 1e-3)]
+
+
+def view_text(transcript: Transcript, start: float, end: float) -> str:
+    """What ``transcript`` says in [start, end]: the text of its overlapping segments."""
+    return " ".join(s.text.strip() for s in transcript.segments
+                    if s.end > start and s.start < max(end, start + 1e-3))

@@ -36,7 +36,7 @@ def load_families(keywords_path: Path, criteria_path: Path | None = None,
                 continue
             keywords.append(Keyword(
                 id=k["id"], label=k.get("label", k["id"]), de=k.get("de", []), gsw=k.get("gsw", []),
-                harmless=k.get("harmless"), enabled=k.get("enabled", True),
+                en=k.get("en", []), harmless=k.get("harmless"), enabled=k.get("enabled", True),
                 case_sensitive=k.get("case_sensitive", False),
             ))
         fam = Family(
@@ -74,6 +74,8 @@ def save_keywords(families: list[Family], keywords_path: Path) -> None:
     def entry_for(k: Keyword, old: dict) -> dict:
         entry = dict(old)
         entry.update(id=k.id, label=k.label, de=k.de, gsw=k.gsw)
+        if k.en or "en" in old:
+            entry["en"] = k.en
         for name, default in (("enabled", True), ("case_sensitive", False)):
             value = getattr(k, name)
             if name in old or value != default:

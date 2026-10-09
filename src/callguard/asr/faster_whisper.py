@@ -28,6 +28,7 @@ log = logging.getLogger("callguard.asr")
 # per process and loading Whisper costs seconds and ~1 GB each time.
 _MODELS: dict[tuple[str, str, str, int], Any] = {}
 _LOCK = threading.Lock()
+TASKS = ("transcribe", "translate")
 
 
 def check_ct2_dir(path: Path) -> None:
@@ -95,12 +96,17 @@ class FasterWhisperASR(ASRBackend):
                  language: str | None = "de", beam_size: int = 1, vad_filter: bool = True,
                  word_timestamps: bool = True, initial_prompt: str | None = None, cpu_threads: int = 0,
                  condition_on_previous_text: bool = True, vad_parameters: dict[str, Any] | None = None,
-                 hotwords: str | None = None, **inherited: Any):
+                 hotwords: str | None = None, task: str = "transcribe", **inherited: Any):
+        if task not in TASKS:
+            raise ValueError(f"faster_whisper task must be one of {TASKS}, got {task!r}")
+        # ``task`` enters params (and so the cache key) only when it is not the default: transcripts
+        # cached before the param existed keep their keys.
+        extra = {"task": task} if task != "transcribe" else {}
         super().__init__(ctx, model=model, device=device, compute_type=compute_type, language=language,
                          beam_size=beam_size, vad_filter=vad_filter, word_timestamps=word_timestamps,
                          initial_prompt=initial_prompt, cpu_threads=cpu_threads,
                          condition_on_previous_text=condition_on_previous_text,
-                         vad_parameters=vad_parameters, hotwords=hotwords)
+                         vad_parameters=vad_parameters, hotwords=hotwords, **extra)
         self.ignored_params = drop_inherited("faster_whisper", inherited)
         self.model_path, self.is_local = resolve_model(model)
         if self.is_local:
@@ -119,6 +125,12 @@ class FasterWhisperASR(ASRBackend):
             "condition_on_previous_text": bool(condition_on_previous_text),
             "hotwords": hotwords or None,
         }
+        if task != "transcribe":
+            # Whisper's built-in speech translation: any language -> English text (the ``en_speech``
+            # view). ``language`` stays the SOURCE language. A German initial_prompt would pull the
+            # output back to German, so it is dropped.
+            self.options["task"] = task
+            self.options["initial_prompt"] = None
 
     def cache_params(self) -> dict[str, Any]:
         # thread count changes speed, not the transcript: a demo run with more cores reuses the cache
