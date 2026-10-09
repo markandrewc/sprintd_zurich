@@ -1,0 +1,81 @@
+# Home PC with one 12 GB GPU (RTX 4070): ASR, LLM and app all run ON the PC (mode A in docs/REMOTE_GPU.md).
+# NOT RUN YET: written on a CPU laptop; VRAM figures below are estimates. Check first:
+#   scripts/remote/serve_models.sh start        vLLM :8000 (+ ASR server :8010 for the laptop)
+#   source scripts/remote/cuda_env.sh           cuBLAS/cuDNN for CTranslate2 (setup_gpu_host.sh writes it)
+#   uv run callguard doctor -c gpu-12gb
+#   uv run callguard batch -c gpu-12gb
+# VRAM budget (12 GB, estimates): Whisper turbo int8_float16 ~1 GB (+~0.4 GB CUDA context per process),
+# vLLM capped at 0.70 x 12 GB = 8.4 GB (7B AWQ weights ~5.5 GB + KV cache), desktop ~0.5-1 GB.
+# Diarization stays on the CPU (sherpa-onnx, cheap).
+extends: base.yaml
+description: Home GPU 12 GB (Whisper-turbo GSW int8_float16 on CUDA + vLLM 7B AWQ as callguard-llm)
+
+asr:
+  type: faster_whisper
+  # Same weights as local.yaml, so GPU and laptop transcripts are comparable (not bit-identical:
+  # int8_float16 on CUDA vs int8 on CPU).
+  model: models/asr/whisper-turbo-gsw-ct2-int8
+  device: cuda
+  compute_type: int8_float16      # int8 weights, fp16 compute: ~1 GB VRAM (estimate)
+  # Name under which callguard.serve.asr_server announces this setup; config/remote.yaml must use the
+  # same tag. Change it whenever you change model/compute_type/beam_size here: it is the remote cache key.
+  # (faster_whisper ignores it; it is a param of the `remote` ASR.)
+  model_tag: whisper-turbo-gsw-int8-cuda
+  # Alternatives (each: change model, compute_type, beam_size AND model_tag together):
+  #   fp16 turbo, Apache-2.0, 1.6 GB on disk, ~2 GB VRAM (estimate; repo layout not verified, doctor
+  #   checks for model.bin + tokenizer.json):
+  #     huggingface-cli download jayr23/whisper-large-v3-turbo-swiss-german-ct2 --local-dir models/asr/whisper-turbo-gsw-ct2-fp16
+  #     model: models/asr/whisper-turbo-gsw-ct2-fp16, compute_type: float16, model_tag: whisper-turbo-gsw-fp16-cuda
+  #   large-v3, MIT (licence-clean), ~3 GB on disk, ~3-4 GB VRAM, ~2-3x slower than turbo:
+  #     scripts/download_models.sh gpu   (gcoli/whisper-large-v3-swiss-german-mit, ct2/ subfolder)
+  #     model: models/asr/whisper-large-v3-gsw-ct2, compute_type: float16, beam_size: 5,
+  #     model_tag: whisper-large-v3-gsw-fp16-b5-cuda
+  # beam_size stays 1 (base.yaml) for comparability with the laptop; the GPU could afford 5.
+
+diarizer:
+  type: sherpa_onnx
+  provider: cpu          # pyannote segmentation + WeSpeaker on the CPU: seconds per call, no VRAM
+  roles: llm             # advisor/customer decided by llms.default (falls back to first speaker)
+
+llms:
+  default:
+    type: openai_compat
+    # Every model is served under the alias "callguard-llm" (scripts/remote/serve_models.sh), so a model
+    # swap needs no config edit. Cache keys follow the real checkpoint: the client reads it from
+    # GET /v1/models (vLLM "root"). Servers that do not report it (llama-cpp-python, Ollama): set
+    # CALLGUARD_LLM_TAG to a name of the weights, e.g. qwen2.5-7b-q4km.
+    base_url: ${CALLGUARD_LLM_URL:-http://127.0.0.1:8000/v1}
+    model: callguard-llm
+    cache_tag: ${CALLGUARD_LLM_TAG:-null}
+    api_key: ${CALLGUARD_TOKEN:-none}   # vLLM --api-key (serve_models.sh passes CALLGUARD_TOKEN)
+    timeout: 180
+    json_mode: json_schema          # vLLM / llama-server structured outputs
+    supports_n: true                # vLLM samples n completions in one request (shared prefix)
+    max_concurrency: 4              # KV cache of a 7B at 16k context on 12 GB: ~4 requests (estimate)
+    # Qwen3 models: switch thinking off (also works through --set, see docs/REMOTE_GPU.md):
+    # extra_body: {chat_template_kwargs: {enable_thinking: false}}
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.35
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.2
+  - name: llm_judge
+    type: llm_judge
+    llm: default
+    samples: 3           # self-consistency is affordable on the GPU: disagreement -> uncertainty -> review
+    temperature: 0.7
+    parallel: 5          # families scored concurrently (speed only, not part of the cache key)
+    weight: 1.0
+  - name: geval
+    type: geval
+    llm: default
+    parallel: 5
+    weight: 1.0
+
+app:
+  # Deep links in Outcept triggers point at the UI: the PC's tailnet name when the UI runs there.
+  base_url: http://${CALLGUARD_UI_HOST:-localhost}:8501

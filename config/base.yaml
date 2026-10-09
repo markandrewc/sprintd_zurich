@@ -1,0 +1,83 @@
+# Shared defaults. Profiles (local.yaml, gpu.yaml, oracle.yaml) `extends:` this file and override.
+# Every block with a `type:` is a plugin: see `callguard plugins` for what is available, or point
+# `type:` at your own class: `type: my_module:MyCheck`.
+
+paths:
+  data_dir: data_upstream/inventx-case-study/data
+  keywords: config/keywords.json
+  criteria: config/criteria.yaml
+  runs_dir: runs
+  cache_dir: .cache
+
+asr:
+  type: faster_whisper
+  model: models/asr/whisper-turbo-gsw-ct2-int8
+  device: cpu
+  compute_type: int8
+  language: de
+  beam_size: 1
+  vad_filter: true
+  word_timestamps: true
+  # Bias Whisper towards bank/compliance vocabulary (cheap and often effective).
+  initial_prompt: >-
+    Telefongespräch einer Schweizer Bank. Beratung und Kundin sprechen über Konto, Depot, Aktien,
+    Quartalszahlen, Übernahme, Finanzabteilung, Vollmacht, PIN, TAN, Passwort, Bestätigungscode,
+    Kreditkarte, Rechnung, Teilzahlungen.
+
+diarizer:
+  type: sherpa_onnx
+  segmentation_model: models/diar/sherpa-onnx-pyannote-segmentation-3-0/model.onnx
+  embedding_model: models/diar/wespeaker_en_voxceleb_resnet34.onnx
+  num_speakers: 2
+  roles: llm           # llm | first_speaker_advisor | none   (who is advisor vs customer)
+  llm: default
+
+llms:
+  default:
+    type: openai_compat
+    base_url: http://127.0.0.1:8001/v1
+    model: local
+    api_key: none
+    timeout: 300
+    json_mode: json_schema   # json_schema (vLLM/OpenAI) | json_object_schema (llama-cpp-python) | none
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.35
+    fuzzy: 90            # rapidfuzz score 0-100 for near-miss spellings; 100 = exact only
+  - name: patterns
+    type: patterns
+    weight: 0.2
+  - name: llm_judge
+    type: llm_judge
+    llm: default
+    samples: 1           # >1 = self-consistency, disagreement becomes uncertainty
+    temperature: 0.0
+    weight: 1.0
+  - name: geval
+    type: geval
+    llm: default
+    weight: 1.0
+
+fusion:
+  type: weighted
+  threshold: 0.55        # THE knob: call score >= threshold -> alarm
+  review_band: 0.15      # score in [threshold - band, threshold) -> review
+  max_uncertainty: 0.35  # above this an alarm/no_alert near the line is escalated to review
+  min_score_for_review: 0.25
+  max_passage_seconds: 60  # longer cited stretches are cut to a listenable window (0 = no cap)
+
+snippets:
+  pad: 2.0               # seconds of context cut around each passage
+  link_pad: 10.0         # seconds before/after in deep links (Outcept trigger)
+
+sinks:
+  - type: json_dir
+  - type: outcept_trigger
+    enabled: false
+    url: http://localhost:8080/triggers
+    labels: [alarm, review]
+
+app:
+  base_url: http://localhost:8501

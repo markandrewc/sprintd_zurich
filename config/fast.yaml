@@ -1,0 +1,19 @@
+# Rule checks only (keywords + patterns): no LLM, no diarization. Once the transcripts are in .cache/asr
+# (same ASR block as local.yaml, so any local run fills it) a whole-dataset eval takes seconds.
+# Use it to tune keywords, patterns and fusion; it cannot tell "talking about" from "doing".
+#   callguard eval -c fast                                            real ASR (cached) transcripts
+#   callguard eval -c fast --set asr.type=reference --set name=fast-oracle   reference scripts, no models at all
+extends: local.yaml
+description: Keywords + patterns on cached local ASR transcripts (no LLM, no diarization)
+
+diarizer:
+  type: none
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.35
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.2

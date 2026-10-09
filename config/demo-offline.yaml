@@ -1,0 +1,15 @@
+# Full chain with zero models: reference scripts as ASR, no diarization, a deterministic fake LLM.
+# For UI and plumbing work (callguard batch -c demo-offline, then callguard ui -c demo-offline).
+# The labels it produces mean nothing about detection quality: the fake "judges" by cue words.
+extends: oracle.yaml
+description: Offline demo (reference scripts + fake LLM, all checks; no models or servers needed)
+
+llms:
+  default:
+    type: fake
+    cues:   # the reference scripts are Swiss German, so the fake needs dialect cues to flag anything
+      trade: [vor der Meldung, vor de Meldig, noch nicht publiziert, no nöd publiziert, unter uns, under eus]
+      access: [TAN, PIN, Bestätigungscode, Passwort]
+      disclosure: [ohne Vollmacht, ohni Vollmacht]
+      documentation: [nicht protokollieren, nöd protokolliere, nicht in die Notiz, nöd i d Notiz]
+      splitting: [aufteilen, ufteile, Kontrolle umgehen, Kontrolle umgah]

@@ -1,0 +1,55 @@
+# App + UI on the LAPTOP, ASR and LLM on the GPU PC over the tailnet (mode B in docs/REMOTE_GPU.md).
+# NOT RUN YET (no GPU host while writing). On the PC: scripts/remote/serve_models.sh start (with
+# BIND=tailscale for direct tailnet access); on the laptop:
+#   export CALLGUARD_GPU_HOST=gpu-pc        # the PC's MagicDNS name or tailnet IP (default: gpu-pc)
+#   export CALLGUARD_TOKEN=...              # only if the PC's servers were started with one
+#   uv run callguard doctor -c remote
+#   uv run callguard run -c remote data_upstream/inventx-case-study/data/Audio/Stufe1_D02-K1.wav
+# Through an SSH tunnel instead (servers bound to 127.0.0.1 on the PC): scripts/remote/tunnel.sh HOST,
+# then CALLGUARD_GPU_HOST=127.0.0.1.
+extends: base.yaml
+description: Laptop app, GPU PC models over Tailscale (remote Whisper + vLLM callguard-llm)
+
+asr:
+  type: remote
+  url: http://${CALLGUARD_GPU_HOST:-gpu-pc}:8010
+  # Must equal the tag the PC's ASR server announces (config/gpu-12gb.yaml asr.model_tag); it is the
+  # cache key of the transcripts, and the server refuses a mismatch.
+  model_tag: whisper-turbo-gsw-int8-cuda
+  timeout: 900           # a long call queued behind others on the GPU
+  # token: defaults to env CALLGUARD_TOKEN
+
+# Diarization runs here on the laptop CPU (inherited from base.yaml: sherpa_onnx, roles by the LLM).
+
+llms:
+  default:
+    type: openai_compat
+    base_url: http://${CALLGUARD_GPU_HOST:-gpu-pc}:8000/v1
+    model: callguard-llm             # alias; cache keys use the served checkpoint (GET /v1/models)
+    cache_tag: ${CALLGUARD_LLM_TAG:-null}
+    api_key: ${CALLGUARD_TOKEN:-none}
+    timeout: 180
+    json_mode: json_schema
+    supports_n: true
+    max_concurrency: 4
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.35
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.2
+  - name: llm_judge
+    type: llm_judge
+    llm: default
+    samples: 3
+    temperature: 0.7
+    parallel: 5
+    weight: 1.0
+  - name: geval
+    type: geval
+    llm: default
+    parallel: 5
+    weight: 1.0

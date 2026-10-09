@@ -1,0 +1,102 @@
+# What each check family means. Edited by compliance, read by the LLM checks and shown in the UI.
+# Source: policy_examples + "harmless" notes of the case's Stichwortliste (test conventions, not Inventx rules).
+# Keys per family:
+#   label           human label (overrides the keyword list)
+#   policy          one-paragraph rule
+#   alarm_when      concrete patterns that ARE the misconduct
+#   not_alarm_when  look-alikes that are harmless (negated, quoted, refused, public, expired...)
+#   review_when     what makes a case undecidable from the call alone -> hand to a human
+#   can_alarm       false = this family only classifies / annotates, never raises an alarm by itself
+#   enabled         false = skip this family entirely
+
+families:
+  trade:
+    label: Insiderhandel (Information und Kaufwunsch)
+    policy: >-
+      Eine Person äussert einen eigenen Kauf- oder Handelswunsch und begründet ihn mit selbst erhaltener,
+      noch nicht öffentlicher, kursrelevanter Information (z.B. Quartalszahlen, Übernahme, Grossauftrag,
+      Absatzzahlen vor der Medienmitteilung). Die Ausführung des Auftrags ist nicht nötig; eine spätere
+      Ablehnung durch die Beratung macht den geäusserten Wunsch nicht ungeschehen.
+    alarm_when:
+      - Kaufwunsch "vor der Meldung/Bekanntgabe" wegen Information aus interner Quelle (Familie, Arbeitgeber, Finanzabteilung)
+      - Information wird ausdrücklich als vertraulich, "unter uns" oder noch nicht publiziert beschrieben und begründet den Handel
+      - Persönlich vorab gezeigte Dokumente oder Zahlen, die anderen Anlegern noch nicht zugänglich sind
+    not_alarm_when:
+      - Kaufwunsch beruht nur auf bereits veröffentlichten Berichten, Medienmitteilungen oder allgemein zugänglichen Zahlen
+      - Begriffe wie Insiderhandel oder Quartalszahlen werden nur erklärt, zitiert, verneint oder als Beispiel besprochen
+      - Kein konkreter eigener Handelswunsch, nur allgemeine Information
+    review_when:
+      - Herkunft oder Öffentlichkeit der Information bleibt unklar, aber ein Handelswunsch wird damit verknüpft
+
+  access:
+    label: Zugangsinformation preisgegeben
+    policy: >-
+      Ein aktuell gültiges Zugangsgeheimnis (PIN, Passwort, TAN, Bestätigungscode, Anmeldecode) wird am
+      Telefon tatsächlich ausgesprochen. Erwähnen, Nachfragen, Verweigern oder das Vorlesen eines
+      abgelaufenen bzw. Muster-Werts ist keine Preisgabe eines aktiven Geheimnisses. Frühere Warnungen
+      oder ein späterer Abbruch heben eine erfolgte Preisgabe nicht auf.
+    alarm_when:
+      - Kundin/Kunde liest einen gültigen Code, eine TAN, PIN oder ein Passwort tatsächlich vor
+      - Der vorgelesene Wert gehört zum laufenden, noch gültigen Anmelde- oder Freigabevorgang
+    not_alarm_when:
+      - Die Beratung warnt nur davor, Codes zu nennen, oder der Code wird verweigert
+      - Ein ausdrücklich abgelaufener Wert oder ein Muster aus einer Anleitung wird vorgelesen
+      - Nur letzte vier Stellen oder eine Referenznummer werden genannt
+    review_when:
+      - Ein Wert wird vorgelesen, aber unklar ist, zu welchem Vorgang er gehört oder ob er noch gültig ist
+
+  disclosure:
+    label: Auskunft an Dritte
+    policy: >-
+      Die Beratung gibt geschützte Informationen über eine dritte Person (Kontostand, Darlehen, Zinstermin,
+      Kundendaten) tatsächlich an eine Person heraus, deren Berechtigung (Vollmacht) fehlt oder ausdrücklich
+      nicht festgestellt wurde. Die blosse Anfrage oder eine Verweigerung ist keine Preisgabe.
+    alarm_when:
+      - Nach festgestellter fehlender Vollmacht nennt die Beratung trotzdem konkrete Daten der Drittperson
+      - Konkrete Auskunft geht über den bestätigten Umfang einer Vollmacht hinaus
+    not_alarm_when:
+      - Identität, gültige Vollmacht und Umfang werden vor der Auskunft bestätigt und die Auskunft bleibt im Umfang
+      - Die Beratung verweigert die Auskunft oder gibt nur allgemeine, nicht personenbezogene Information
+    review_when:
+      - Die Berechtigung bleibt ungeklärt, auch wenn keine konkreten Daten herausgegeben wurden
+
+  documentation:
+    label: Relevante Angabe verschweigen
+    policy: >-
+      Eine Person verlangt absichtlich, dass eine relevante Tatsache (z.B. eine bestehende rückzahlbare
+      Verpflichtung) vor der dafür zuständigen internen Stelle (Kreditstelle, Finanzierungsstelle)
+      verborgen oder nicht protokolliert wird. Die Berichtigung einer falschen Notiz oder das Weglassen
+      sachfremder privater Angaben ist harmlos.
+    alarm_when:
+      - Wunsch, eine bekannte Schuld/Verpflichtung "nicht zu protokollieren" oder "nicht in die Notiz" für die Kreditprüfung zu nehmen
+    not_alarm_when:
+      - Eine falsche oder sachfremde alte Angabe wird korrigiert oder entfernt, alles Relevante bleibt sichtbar
+      - Private, für den Vorgang irrelevante Details werden weggelassen
+    review_when:
+      - Etwas soll vor der zuständigen Stelle verborgen werden, aber ob es relevant ist, bleibt offen
+
+  splitting:
+    label: Zuständigkeit/Kontrolle umgehen (Aufteilen)
+    policy: >-
+      Eine Person verlangt, zusammenhängende Zahlungen (z.B. eine einzige Rechnung) in Teilbeträge
+      aufzuteilen, ausdrücklich um eine genannte interne Kontrolle, Freigabe oder Zuständigkeit zu
+      verhindern. Mehrere echte, unabhängige Rechnungen sind harmlos.
+    alarm_when:
+      - Eine Rechnung wird in Teilzahlungen aufgeteilt, damit die interne Gesamtfreigabe/Prüfung nicht greift
+    not_alarm_when:
+      - Mehrere unabhängige echte Rechnungen werden nach Fälligkeit bezahlt
+      - Eine Umgehung wird abgelehnt, verneint oder als Schulungsbeispiel zitiert
+    review_when:
+      - Teilbeträge werden angefragt, aber Zusammenhang der Belege oder Motiv ist unbekannt
+
+  numbers:
+    label: Zahlenobjekte (Karten- und Referenznummern)
+    can_alarm: false
+    policy: >-
+      Genannte Ziffernfolgen werden als Objekt klassifiziert (Kartennummer, Kartenendziffern,
+      Rechnungs- oder Reservationsreferenz). Ziffern allein lösen keinen Alarm aus; die Einordnung
+      bleibt mit ihrer Unsicherheit erhalten und unterstützt die anderen Prüfungen.
+    alarm_when: []
+    not_alarm_when:
+      - Letzte vier Stellen, Referenznummern, Beträge
+    review_when: []
