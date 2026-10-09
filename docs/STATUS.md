@@ -4,7 +4,7 @@ Update this file whenever a component changes state (and say who/which session).
 before the research loop, P1 = research-critical, P2 = strengthens results/demo, P3 = stretch goal.
 Spec references point into `docs/design/v2_plan.md`.
 
-Last update: 2026-10-10 00:40, laptop session (v2 build starting; stages are pushed as they land).
+Last update: 2026-10-10 01:05, laptop session (v2 build handed to the GPU-host session).
 
 ## Done (on `main`)
 
@@ -22,36 +22,39 @@ Last update: 2026-10-10 00:40, laptop session (v2 build starting; stages are pus
 | UI | Inbox (live threshold), Call detail (passages first, snippets, deep link), Keywords & criteria editor, Process a call, Quality |
 | First results | CPU chain on 4 calls (plumbing only, 1.5B LLM useless as judge); rule-checks floor on reference scripts: out-of-fold flag F1 0.46 (README "Measured so far") |
 
-## In progress (laptop)
+## In progress (laptop, finishing; pushed to main when done)
 
 | component | prio | notes |
 |---|---|---|
 | GPU host setup: `config/gpu-12gb.yaml`, `config/remote.yaml`, remote ASR server, `scripts/remote/*`, `docs/REMOTE_GPU.md`, `callguard doctor` | P0 | agent `remote-gpu`; doctor already in CLI |
-| Model research notes `docs/research/*.md` | P0 | translation + fine-tuning done; dialect ASR + synthetic/TTS running |
+| Model research notes `docs/research/*.md` | P0 | translation + fine-tuning + dialect ASR written; synthetic/TTS running |
+
+If these are not on `main` when you start, the laptop session died: follow START_HERE Step 1 (inline
+setup) and treat missing research notes as your own research item.
 
 ## To build (v2), in priority order
 
-**Laptop build in progress (started 2026-10-10 ~00:55, ETA ~03:30), in 4 pushed stages:** stage 1 = items 1, 2, 16 + scaffolds/stubs for
-everything else; stage 2 = items 3-10; stage 3 = items 11-15; stage 4 = integration + review. The column
-`owner` says who builds it. A GPU-host session must NOT build items owned by `laptop` unless the last
-push to `main` is more than 90 minutes old (`git log -1 --format=%cr origin/main`): then the laptop build
-is presumed dead - set owner to `gpu-host` here, push, and build it yourself.
+**The GPU-host session builds all of this** (the laptop build was cancelled on purpose: everything
+happens on the GPU host). Order and pacing: `START_HERE.md` Step 3. If your harness supports Claude Code
+workflows, `.claude/workflows/v2-build.js` builds it in 4 pushed stages with per-stage engineering
+prompts (run it with args `{root: "<abs path of this repo>"}`); otherwise use those prompts as the
+spec for building by hand. Set `owner` to `gpu-host` when you start an item, `done` when it landed.
 
-| # | component | prio | spec | owner |
+| # | component | prio | spec | status |
 |---|---|---|---|---|
-| 1 | Views (gsw/de/translated/en_speech/ref_*), `translator` plugin kind (`llm_translate`, `hf_mt`, `identity`), multi-view pipeline, check `view` param, `check_view`, language-aware keywords (+ English forms), `faster_whisper task: translate`, provenance | P0 | §1, §5 | laptop |
-| 2 | Holdout lock `config/splits.yaml`, `eval --split dev/holdout`, holdout log | P0 | §1c | laptop |
-| 3 | Experiment runner `callguard experiment`, `experiments/*.yaml`, dev-fold CV per variant, cost tracking | P0 | §2 | laptop |
-| 4 | ASR eval `callguard asr-eval`: WER/CER, pseudo-references, keyword-spot recall, vanilla baselines | P0 | §2 | laptop |
-| 5 | Statistics + report: paired bootstrap CIs, McNemar, per-call flip tables, charts, `callguard report`, `callguard leaderboard` | P0 | §9 | laptop |
-| 6 | `keyword_context` check (G-Eval on keyword windows) | P1 | §1b | laptop |
-| 7 | `semantic_windows` check (embeddings) | P1 | §1b | laptop |
-| 8 | Fact sheet + policy table (A1), role-aware LLM checks (A7), twin few-shot (A8) | P1 | §7 | laptop |
-| 9 | Calibrated / conformal fusion (A5), learned fusion, `fit-fusion` | P1 | §7, §3 | laptop |
-| 10 | Cascade (A2), debate (A6), transcript correction view (A4), audio-LLM check (A3), denoise preprocess (A10) | P2 | §7 | laptop |
-| 11 | UI: view tabs + side-by-side passages, evidence timeline, "why not an alarm", Experiments page | P2 | §7 UX | laptop |
-| 12 | Synthetic kit: scenarios, LLM script writer, TTS plugins, render, telephone augmentation | P2 | §4 | laptop |
-| 13 | Fine-tune kit `finetune/` (data prep with dialogue folds, LoRA training for 12 GB, CT2 conversion) | P2 | §3, research note | laptop |
-| 14 | Routing + notify sink, feedback loop + tuning overlay, cross-call patterns + entities, audit log | P3 | §3, §5 | laptop |
-| 15 | `docs/OPERATING_CONCEPT.md`, `docs/ARCHITECTURE.md` | P3 | §3 | laptop |
-| 16 | Overnight harness: `research/` protocol, questions, queue, templates (written), saved workflow `.claude/workflows/overnight-research.js` | P0 | §8 | laptop |
+| 1 | Views (gsw/de/translated/en_speech/ref_*), `translator` plugin kind (`llm_translate`, `hf_mt`, `identity`), multi-view pipeline, check `view` param, `check_view`, language-aware keywords (+ English forms), `faster_whisper task: translate`, provenance | P0 | §1, §5 | todo |
+| 2 | Holdout lock `config/splits.yaml`, `eval --split dev/holdout`, holdout log | P0 | §1c | todo |
+| 3 | Experiment runner `callguard experiment`, `experiments/*.yaml`, dev-fold CV per variant, cost tracking | P0 | §2 | todo |
+| 4 | ASR eval `callguard asr-eval`: WER/CER, pseudo-references, keyword-spot recall, vanilla baselines | P0 | §2 | todo |
+| 5 | Statistics + report: paired bootstrap CIs, McNemar, per-call flip tables, charts, `callguard report`, `callguard leaderboard` | P0 | §9 | todo |
+| 6 | `keyword_context` check (G-Eval on keyword windows) | P1 | §1b | todo |
+| 7 | `semantic_windows` check (embeddings) | P1 | §1b | todo |
+| 8 | Fact sheet + policy table (A1), role-aware LLM checks (A7), twin few-shot (A8) | P1 | §7 | todo |
+| 9 | Calibrated / conformal fusion (A5), learned fusion, `fit-fusion` | P1 | §7, §3 | todo |
+| 10 | Cascade (A2), debate (A6), transcript correction view (A4), audio-LLM check (A3), denoise preprocess (A10) | P2 | §7 | todo |
+| 11 | UI: view tabs + side-by-side passages, evidence timeline, "why not an alarm", Experiments page | P2 | §7 UX | todo |
+| 12 | Synthetic kit: scenarios, LLM script writer, TTS plugins, render, telephone augmentation | P2 | §4 | todo |
+| 13 | Fine-tune kit `finetune/` (data prep with dialogue folds, LoRA training for 12 GB, CT2 conversion) | P2 | §3, research note | todo |
+| 14 | Routing + notify sink, feedback loop + tuning overlay, cross-call patterns + entities, audit log | P3 | §3, §5 | todo |
+| 15 | `docs/OPERATING_CONCEPT.md`, `docs/ARCHITECTURE.md` | P3 | §3 | todo |
+| 16 | Overnight harness: `research/` protocol, questions, queue, templates (written), saved workflow `.claude/workflows/overnight-research.js` | P0 | §8 | todo |

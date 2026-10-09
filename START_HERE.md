@@ -68,18 +68,26 @@ Whisper baseline, the dialect-output model(s) and Whisper `task: translate` (Eng
 licences: `docs/research/dialect_asr.md`. Run them one after another in `tmux` with logs in
 `runs/logs/`; while they run, do Step 3.
 
-## Step 3: build what is still missing
+## Step 3: build the v2 components (you own this; nobody else is building)
 
-`docs/STATUS.md` lists every component with status and owner. The laptop build pushes finished parts
-to `main` in stages; `git pull` first and re-pull every ~30 minutes. Items owned by `laptop` are being
-built there: do not build them (do Step 2 and research items whose dependencies exist instead), unless
-the last push to `main` is older than 90 minutes (`git log -1 --format=%cr origin/main`) - then the
-laptop build is presumed dead: take the items over (owner `gpu-host`, push that first). Items that are
-`todo` without an owner, or taken over, you build yourself in the
-priority order given there, following the spec `docs/design/v2_plan.md` (sections 1-9). For each:
-implement, add offline tests, `uv run pytest -q -m "not slow"` green, update `docs/STATUS.md`, commit
-to `main`, push. Research-critical items first (views, experiment runner, asr-eval, report/statistics,
-holdout lock, keyword-context check); stretch goals only after the research loop is running.
+`docs/STATUS.md` "To build" lists every component in priority order with its spec section in
+`docs/design/v2_plan.md`. You build them on this host while the transcription sweep (Step 2) runs.
+Two ways:
+- **Workflow** (if your harness supports Claude Code workflows): run `.claude/workflows/v2-build.js`
+  with args `{root: "<abs path of this repo>"}`. It builds in stages (1: views, translators, holdout
+  lock, hooks, scaffolds, stats + overnight harness; 2: experiment runner, asr-eval, report, new
+  checks, fusion variants; 3: UI, routing/feedback/audit, patterns, synth + fine-tune kits, docs;
+  then integration, review, fixes) and commits + pushes `main` after each stage.
+- **By hand**: same order; the workflow file's per-stage prompts are the detailed spec. For each item:
+  implement, offline tests, `uv run pytest -q -m "not slow"` green, update `docs/STATUS.md`, commit to
+  `main`, push.
+
+Pacing (the research is the point of the night): items 1-5 (views, holdout lock, experiment runner,
+asr-eval, statistics/report) and the harness first - **start the research loop (Step 4) as soon as
+those exist, at the latest ~03:00**, using whatever checks exist then. Build items 6-10 between research
+rounds (each new check becomes a research item when it lands). Items 11-15 (UI polish, stretch goals,
+kits) only if time remains after the core research questions have answers; note in the journal what
+was skipped. Builds and tests run offline (demo profiles, fake LLM) - GPU time belongs to experiments.
 
 ## Step 4: the research loop (the main job of the night)
 
