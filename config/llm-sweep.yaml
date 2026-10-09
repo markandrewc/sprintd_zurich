@@ -1,0 +1,34 @@
+# LLM sweep (RQ6): gpu-12gb, but speaker roles are pinned to the cached Qwen2.5-7B role decisions so only
+# the CHECK LLM varies between variants (and diarization is not recomputed per model: ~15 min saved each).
+# `default` (used by the diarizer for roles) gets cache_tag = the 7B id, so diarization reuses the 7B-role cache;
+# the checks use `judge` = whatever is served. Uncached diarizations would be labelled with the wrong model id ->
+# only use on transcripts diarized with the 7B (all default-ASR calls are). Variant qwen25_7b recomputes the 7B
+# checks under the `judge` name (cache keys include the LLM entry name) so all variants are run identically.
+extends: gpu-12gb.yaml
+description: LLM sweep base (roles pinned to Qwen2.5-7B cache; checks + geval_cot on the served model)
+llms:
+  default:
+    type: openai_compat
+    base_url: ${CALLGUARD_LLM_URL:-http://127.0.0.1:8000/v1}
+    model: callguard-llm
+    cache_tag: Qwen/Qwen2.5-7B-Instruct-AWQ
+    api_key: ${CALLGUARD_TOKEN:-none}
+    timeout: 180
+    json_mode: json_schema
+    supports_n: true
+    max_concurrency: 12
+  judge:
+    type: openai_compat
+    base_url: ${CALLGUARD_LLM_URL:-http://127.0.0.1:8000/v1}
+    model: callguard-llm
+    api_key: ${CALLGUARD_TOKEN:-none}
+    timeout: 300
+    json_mode: json_schema
+    supports_n: true
+    max_concurrency: 12
+checks:
+  - {name: keywords, type: keywords, weight: 0.35, fuzzy: 90}
+  - {name: patterns, type: patterns, weight: 0.2}
+  - {name: llm_judge, type: llm_judge, llm: judge, samples: 3, temperature: 0.7, parallel: 5, weight: 1.0}
+  - {name: geval, type: geval, llm: judge, parallel: 5, weight: 1.0}
+  - {name: geval_cot, type: geval_cot, llm: judge, parallel: 5, weight: 0.0}

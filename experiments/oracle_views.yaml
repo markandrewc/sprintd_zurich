@@ -1,0 +1,13 @@
+# ORACLE (reference scripts, no audio): ceiling + the dialect question (RQ1/RQ3).
+# ref_gsw = dialect script as written; ref_de / ref_en = LLM translations of it. Same checks + LLM.
+# Compare oracle ref_de with the audio `de` view of experiments/views.yaml: the gap = cost of ASR errors.
+name: oracle_views
+description: ORACLE ceiling per rendering (dialect script vs Standard German vs English translation)
+rq: [RQ1, RQ3]
+base: oracle-views-gpu
+split: dev
+compare_to: ref_de
+variants:
+  - {name: ref_gsw, oracle: true, set: [check_view=ref_gsw]}
+  - {name: ref_de, oracle: true, set: [check_view=ref_de]}
+  - {name: ref_en, oracle: true, set: [check_view=ref_en]}

@@ -1,0 +1,8 @@
+# ORACLE on the GPU host: reference scripts instead of ASR (no audio), checks + vLLM as gpu-12gb.
+# Experiments only (ceiling: how much do ASR errors cost?). Never the submission.
+extends: gpu-12gb.yaml
+description: ORACLE reference scripts + gpu-12gb checks/LLM (ceiling)
+asr:
+  type: reference
+diarizer:
+  type: none

@@ -1,0 +1,20 @@
+# RQ6: does a bigger / newer LLM fix the judge? Same transcripts (default ASR), same roles (pinned), same
+# prompts; only the model served as `callguard-llm` varies (scripts/remote/swap_llm.sh <hf-id>).
+# Run ONE variant per served model:  callguard experiment experiments/llm_models.yaml --variants <name>
+# geval_cot has weight 0 here (computed, not fused); experiments/geval_cot.yaml re-fuses it.
+# Cache keys use the real served model id, so variants never mix. ~10-20 min per model on dev.
+name: llm_models
+description: Check LLM sweep (Qwen2.5-7B-AWQ vs Qwen3-8B-AWQ vs Qwen2.5-14B-AWQ vs Qwen3-14B-AWQ)
+rq: [RQ6]
+base: llm-sweep
+split: dev
+compare_to: qwen25_7b
+variants:
+  - {name: qwen25_7b, description: "Qwen/Qwen2.5-7B-Instruct-AWQ (v1 default)"}
+  - name: qwen3_8b
+    description: "Qwen/Qwen3-8B-AWQ, thinking off"
+    set: ["llms.judge.extra_body={chat_template_kwargs: {enable_thinking: false}}"]
+  - {name: qwen25_14b, description: "Qwen/Qwen2.5-14B-Instruct-AWQ (alone on the GPU, 8k ctx, fp8 KV)"}
+  - name: qwen3_14b
+    description: "Qwen/Qwen3-14B-AWQ, thinking off (alone on the GPU, 8k ctx, fp8 KV)"
+    set: ["llms.judge.extra_body={chat_template_kwargs: {enable_thinking: false}}"]

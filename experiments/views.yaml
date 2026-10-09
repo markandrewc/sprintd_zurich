@@ -1,0 +1,18 @@
+# RQ1/RQ3: which transcript VIEW detects best? Same checks + LLM, only check_view varies.
+# de = Swiss German speech -> Standard German ASR (default); en_from_de = LLM translation of de;
+# de_large = large-v3 gsw ASR as a view. No dialect-output ASR exists (docs/research/dialect_asr.md):
+# the gsw question is answered by experiments/oracle_views.yaml (ref_gsw vs ref_de vs ref_en).
+# Runtime: translation ~1 min/call + all LLM checks per view (~15-30 min per view on dev).
+name: views
+description: Detection per transcript view (de vs en_from_de vs de_large)
+rq: [RQ1, RQ3]
+base: gpu-views
+split: dev
+compare_to: de
+variants:
+  - name: de
+    set: ["extra_views=[]"]
+    drop_checks: [keywords_en_from_de, keywords_en_speech, keywords_de_large]
+  - name: en_from_de
+    set: ["extra_views=[]", check_view=en_from_de]
+    drop_checks: [keywords_en_from_de, keywords_en_speech, keywords_de_large]

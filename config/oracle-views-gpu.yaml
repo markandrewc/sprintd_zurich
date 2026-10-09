@@ -1,0 +1,16 @@
+# ORACLE views on the GPU host: ref_gsw (dialect script), ref_de / ref_en (LLM translations of it).
+extends: oracle-gpu.yaml
+description: ORACLE views ref_gsw / ref_de / ref_en with gpu-12gb checks/LLM (ceiling)
+views:
+  ref_gsw: {lang: gsw}
+  ref_de:
+    lang: de
+    from: ref_gsw
+    translator: {type: llm_translate, llm: default, batch_size: 12, context: 3, concurrency: 4}
+  ref_en:
+    lang: en
+    from: ref_gsw
+    translator: {type: llm_translate, llm: default, batch_size: 12, context: 3, concurrency: 4}
+primary_view: ref_gsw
+check_view: null
+extra_views: []

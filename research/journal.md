@@ -65,3 +65,32 @@ pushing stages as they land (see docs/STATUS.md). First CPU-only numbers in READ
   RTF 0.041 vs 0.015 (still ~2.5 GPU-s per audio minute). Licence MIT vs CC BY-NC origin.
 - Early signal: large-v3 MIT is better on exactly what the checks need (keywords on noisy audio) AND licence-clean.
   Paired test + detection F1 pending (needs LLM). Candidate for the champion ASR.
+
+## 2026-10-10T01:33 A2 (part) vanilla large-v3-turbo vs Swiss German turbo fine-tunes (ASR metrics)
+- vanilla turbo kw-spot recall 76.5% [66.7-87.5] vs nebi turbo int8 71.4% vs jayr23 turbo fp16 70.4% vs gcoli large-v3 MIT 83.7%.
+- Vanilla is NOT worse than the turbo fine-tunes on this TTS data (CIs overlap); the large-v3 MIT fine-tune leads.
+  Caveat for the team: synthetic voices; real callers would favour fine-tunes (literature). Detection F1 decides.
+- vLLM back up 01:32 (0.66 util); experiment queue: checks_ablation -> asr_models:large_v3_gsw -> oracle_views.
+
+## 2026-10-10T01:43 B2/C1 first real baseline + check ablation (Qwen2.5-7B, default ASR, dev 48 calls)
+- `callguard experiment experiments/checks_ablation.yaml --split dev` (10 min for all 4 checks on 48 calls; ~10 LLM calls/call,
+  31.8 s check compute per call at 6 parallel calls).
+- all: CV flag F1 0.67 [0.46, 0.83], FAR 45%, miss 31%; Stufe2 F1 0.43. Removing llm_judge: miss +46 pp (real).
+- Diagnosis: G-Eval stuck at 3/5 (middle anchor); 7B judge over-triggers on documentation. -> findings/RQ4.md.
+- DECISION: the LLM layer is the bottleneck -> run the LLM sweep (RQ6) BEFORE oracle/new-check experiments, so those run
+  with the best model. Killed the 7B queue (oracle_views, new_checks) after asr_models:large_v3_gsw.
+- Built `geval_cot` (analysis first, then digit by logprobs; no "middle = undetermined" anchor). Smoke: distributions
+  spread out but on 2 calls direction still wrong with 7B (C12 disclosure 0.44, harmless D03 trade 0.73).
+- config/llm-sweep.yaml: roles pinned to the cached 7B role decisions (diarization not recomputed per model; only
+  the check LLM varies) — checks use LLM entry `judge`. Sweep: Qwen2.5-7B -> Qwen3-8B -> Qwen2.5-14B -> Qwen3-14B.
+- condition_on_previous_text=false (turbo int8): kw-spot recall 76.5% vs 71.4%, noisy 73.5% vs 63.3%, CER 25.2 vs 27.6
+  -> candidate ASR fix (cheap); confirms the hallucination/loop failure mode.
+
+## 2026-10-10T01:50 F (fusion knobs, N14) on the 7B baseline: re-fusion only, 0 GPU
+- experiments/fusion.yaml: abstain_on_empty (N14), uncertainty_from=llm, review band 0.10/0.20, max_uncertainty 0.25/0.45.
+  All within noise of base (CV flag F1 0.67-0.70, CIs ~[0.5, 0.83]); N14 raises recall (miss 31->15%) at FAR 45->68%.
+- METHOD PROBLEM FOUND: on dev the trivial "flag every call" policy has flag F1 = 0.70 (alarm+review prevalence ~0.54).
+  Max-F1 threshold choice therefore drifts to flag-everything and flag F1 cannot rank systems. DECISION: primary metric
+  becomes threshold-free ROC AUC of the call score (+ CV operating point at FAR <= 20%), flag-all baseline printed in
+  every summary. Asked the harness builder to add it and rescore.
+- Conclusion so far: no fusion knob rescues a weak LLM signal; fix the signal first (LLM sweep running).
