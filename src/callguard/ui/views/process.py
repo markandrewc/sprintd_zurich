@@ -28,22 +28,26 @@ from callguard.ui.session import current_app, ground_truth
 app = current_app()
 pipeline = app.engine.pipeline
 
-st.title("Process a call")
+st.title("Anruf verarbeiten")
 if pipeline is None:
-    st.error(f"Processing is not available: {app.engine.error}", icon=":material/block:")
+    st.error(f"Verarbeitung nicht verfügbar: {app.engine.error}", icon=":material/block:")
+    st.stop()
+if app.read_only:
+    st.info("Angezeigt wird eine Experiment-Variante (nur lesen). Zum Verarbeiten in der Seitenleiste einen "
+            "Profil-Lauf als Quelle wählen.", icon=":material/lock:")
     st.stop()
 
 device = str(app.cfg.asr.get("device", "cpu")).lower()
 if app.cfg.asr.get("type") == "reference":
-    st.warning("This profile reads the case's reference scripts instead of running speech recognition (oracle, "
-               "for ceiling experiments only; the case rules forbid it for the submission).",
+    st.warning("Dieses Profil liest die Referenz-Skripte des Falls statt Spracherkennung (Orakel, nur für "
+               "Experimente; für die Abgabe verboten).",
                icon=":material/science:")
 elif device == "cpu":
-    st.info("This profile runs on the CPU: speech recognition takes about as long as the recording "
-            "(a 4-minute call ≈ 4 minutes), plus the LLM checks. Keep this tab open while it runs; cached "
-            "stages are skipped when a call is processed again.", icon=":material/hourglass_top:")
-st.caption(f"Profile **{app.cfg.name}** · ASR `{app.cfg.asr.get('type')}` on {device} · results go to "
-           f"`{app.runs_dir}`")
+    st.info("Dieses Profil läuft auf der CPU: die Spracherkennung dauert etwa so lange wie die Aufnahme "
+            "(4 Minuten Anruf ≈ 4 Minuten), dazu die LLM-Prüfungen. Diesen Tab offen lassen; bereits gerechnete "
+            "Schritte werden beim erneuten Verarbeiten übersprungen.", icon=":material/hourglass_top:")
+st.caption(f"Profil **{app.cfg.name}** · Spracherkennung `{app.cfg.asr.get('type')}` auf {device} · Ergebnisse "
+           f"nach `{app.runs_dir}`")
 
 
 @st.cache_data(show_spinner=False)
@@ -56,7 +60,7 @@ def _fmt_dur(seconds: float | None) -> str:
 
 
 def _run(audio_path, call_id: str) -> None:
-    with st.status(f"Processing {call_id} …", expanded=True) as status:
+    with st.status(f"{call_id} wird verarbeitet …", expanded=True) as status:
         t0 = time.time()
 
         def notify(msg: str) -> None:
@@ -66,12 +70,12 @@ def _run(audio_path, call_id: str) -> None:
         try:
             result = process_call(pipeline, audio_path, call_id, notify=notify)
         except Exception as e:
-            status.update(label=f"{call_id}: failed ({type(e).__name__})", state="error", expanded=True)
+            status.update(label=f"{call_id}: fehlgeschlagen ({type(e).__name__})", state="error", expanded=True)
             st.error(f"{type(e).__name__}: {e}")
             st.session_state.setdefault("cg_proc_failed", {})[call_id] = f"{type(e).__name__}: {e}"
             return
         d = result.decision
-        status.update(label=f"{call_id}: {LABEL_TEXT[d.label]} · score {d.score:.2f} · {time.time() - t0:.0f} s",
+        status.update(label=f"{call_id}: {LABEL_TEXT[d.label]} · Score {d.score:.2f} · {time.time() - t0:.0f} s",
                       state="complete", expanded=False)
     st.session_state.get("cg_proc_failed", {}).pop(call_id, None)
     st.session_state.setdefault("cg_processed", []).insert(0, call_id)
@@ -83,60 +87,60 @@ def _run_all(jobs: list[tuple]) -> None:
     st.rerun()  # reload the results so the inbox, counts and the list below include the new calls
 
 
-tab_data, tab_upload = st.tabs(["Case dataset", "Upload a recording"])
+tab_data, tab_upload = st.tabs(["Falldaten", "Aufnahme hochladen"])
 
 with tab_data:
     calls = {cid: c for cid, c in ground_truth(str(app.ctx.data_dir)).items() if c.audio_path.is_file()}
     if not calls:
-        st.info(f"No case recordings found in `{app.ctx.data_dir}/Audio`.")
+        st.info(f"Keine Fallaufnahmen in `{app.ctx.data_dir}/Audio` gefunden.")
     else:
         done = app.loaded.results
 
         def _fmt(cid: str) -> str:
             return f"{cid}  ·  {LABEL_TEXT[app.decided[cid].decision.label]}" if cid in done else cid
 
-        picked = st.multiselect("Recordings", sorted(calls), format_func=_fmt, key="cg_proc_pick",
-                                placeholder="Choose one or more recordings",
-                                help="Already processed calls show their current label; processing again reuses "
-                                     "cached stages.")
+        picked = st.multiselect("Aufnahmen", sorted(calls), format_func=_fmt, key="cg_proc_pick",
+                                placeholder="Eine oder mehrere Aufnahmen wählen",
+                                help="Bereits verarbeitete Anrufe zeigen ihren Status; erneutes Verarbeiten nutzt "
+                                     "den Zwischenspeicher.")
         total = sum(_duration(str(calls[c].audio_path)) or 0.0 for c in picked)
         if picked:
             est = sum(estimate_seconds(app.cfg, _duration(str(calls[c].audio_path)) or 0.0) for c in picked)
-            st.caption(f"{len(picked)} recording(s), {fmt_ts(total)} of audio · roughly {fmt_ts(est)} (mm:ss) on "
-                       f"this machine without cache.")
-        if st.button("Process", type="primary", icon=":material/play_arrow:", disabled=not picked,
+            st.caption(f"{len(picked)} Aufnahme(n), {fmt_ts(total)} Audio · etwa {fmt_ts(est)} (mm:ss) auf "
+                       f"diesem Rechner ohne Zwischenspeicher.")
+        if st.button("Verarbeiten", type="primary", icon=":material/play_arrow:", disabled=not picked,
                      key="cg_proc_go"):
             _run_all([(calls[cid].audio_path, cid) for cid in picked])
 
 with tab_upload:
-    up = st.file_uploader("Recording", type=[s.lstrip(".") for s in AUDIO_SUFFIXES], key="cg_proc_upload",
-                          help="16 kHz mono WAV is best; other formats are converted with ffmpeg.")
-    call_id = st.text_input("Call id", value=safe_call_id(up.name) if up else "", key="cg_proc_upload_id",
-                            help="Name under which the result is stored. An existing result with this id is "
-                                 "replaced.", disabled=up is None)
+    up = st.file_uploader("Aufnahme", type=[s.lstrip(".") for s in AUDIO_SUFFIXES], key="cg_proc_upload",
+                          help="Am besten 16 kHz Mono-WAV; andere Formate wandelt ffmpeg um.")
+    call_id = st.text_input("Anruf-Id", value=safe_call_id(up.name) if up else "", key="cg_proc_upload_id",
+                            help="Name, unter dem das Ergebnis gespeichert wird. Ein bestehendes Ergebnis mit "
+                                 "dieser Id wird ersetzt.", disabled=up is None)
     if up is not None and call_id and call_id in app.loaded.results:
-        st.caption(f":material/warning: `{call_id}` already exists and will be replaced.")
-    if st.button("Process upload", type="primary", icon=":material/play_arrow:", disabled=up is None,
+        st.caption(f":material/warning: `{call_id}` existiert schon und wird ersetzt.")
+    if st.button("Hochgeladene Aufnahme verarbeiten", type="primary", icon=":material/play_arrow:", disabled=up is None,
                  key="cg_proc_upload_go"):
         try:
             path = save_upload(app.runs_dir, up.name, up.getvalue())
         except Exception as e:
-            st.error(f"Upload could not be saved: {e}")
+            st.error(f"Upload konnte nicht gespeichert werden: {e}")
         else:
-            st.caption(f"Saved to `{path}` ({_fmt_dur(_duration(str(path)))})")
+            st.caption(f"Gespeichert unter `{path}` ({_fmt_dur(_duration(str(path)))})")
             _run_all([(path, safe_call_id(call_id or up.name))])
 
 for cid, err in st.session_state.get("cg_proc_failed", {}).items():
-    st.error(f"Processing {cid} failed: {err}", icon=":material/error:")
+    st.error(f"Verarbeitung von {cid} fehlgeschlagen: {err}", icon=":material/error:")
 
 recent = [cid for cid in dict.fromkeys(st.session_state.get("cg_processed", [])) if cid in app.loaded.results]
 if recent:
-    st.subheader("Processed in this session")
+    st.subheader("In dieser Sitzung verarbeitet")
     for cid in recent[:10]:
         d = app.decided[cid].decision
         with st.container(border=True):
             c1, c2, c3 = st.columns([2, 5, 1], vertical_alignment="center")
-            c1.markdown(f"**{cid}**  \n{ui.label_md(d.label)} · score {d.score:.2f}")
+            c1.markdown(f"**{cid}**  \n{ui.label_md(d.label)} · Score {d.score:.2f}")
             c2.caption(ui.esc(headline_reason(d, app.loaded.results[cid], app.settings.weights, app.can_alarm)))
-            if c3.button("Open", key=f"cg_proc_open_{cid}", icon=":material/open_in_new:", width="stretch"):
+            if c3.button("Öffnen", key=f"cg_proc_open_{cid}", icon=":material/open_in_new:", width="stretch"):
                 app.goto_call(cid)

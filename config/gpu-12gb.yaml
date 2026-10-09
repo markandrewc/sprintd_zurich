@@ -51,7 +51,7 @@ llms:
     timeout: 180
     json_mode: json_schema          # vLLM / llama-server structured outputs
     supports_n: true                # vLLM samples n completions in one request (shared prefix)
-    max_concurrency: 4              # KV cache of a 7B at 16k context on 12 GB: ~4 requests (estimate)
+    max_concurrency: 12             # measured: 7B AWQ at 0.66 util has 42k KV tokens + 78% prefix-cache hits; 4 left it idle
     # Qwen3 models: switch thinking off (also works through --set, see docs/REMOTE_GPU.md):
     # extra_body: {chat_template_kwargs: {enable_thinking: false}}
 

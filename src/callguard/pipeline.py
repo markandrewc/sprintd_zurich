@@ -410,6 +410,7 @@ class Pipeline:
             "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
             "config_name": self.cfg.name,
             "config_hash": config_hash(self.cfg),
+            **({"tuning": self.cfg.tuning} if self.cfg.tuning else {}),  # officer overlay: path, hash, applied
             "code_version": code_version(),
             "primary_view": self.primary_view,
             "views": view_info,

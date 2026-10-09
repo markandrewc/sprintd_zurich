@@ -18,3 +18,25 @@ variants:
   - name: qwen3_14b
     description: "Qwen/Qwen3-14B-AWQ, thinking off (alone on the GPU, 8k ctx, fp8 KV)"
     set: ["llms.judge.extra_body={chat_template_kwargs: {enable_thinking: false}}"]
+
+  # ---- re-fusion variants per model (no LLM calls; need the model's base variant first)
+  - {name: qwen25_7b__kwpat_facts, refuse_from: qwen25_7b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_7b__facts_only, refuse_from: qwen25_7b, checks: [facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_7b__judge_facts, refuse_from: qwen25_7b, checks: [keywords, patterns, llm_judge, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_7b__gcot, refuse_from: qwen25_7b, checks: [keywords, patterns, llm_judge, geval_cot], set: [checks.geval_cot.weight=1.0]}
+  - {name: qwen25_7b__all_plus, refuse_from: qwen25_7b, checks: [keywords, patterns, llm_judge, geval_cot, facts, anchored], set: [checks.geval_cot.weight=1.0, checks.facts.weight=1.0, checks.anchored.weight=1.0]}
+  - {name: qwen3_8b__kwpat_facts, refuse_from: qwen3_8b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_8b__facts_only, refuse_from: qwen3_8b, checks: [facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_8b__judge_facts, refuse_from: qwen3_8b, checks: [keywords, patterns, llm_judge, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_8b__gcot, refuse_from: qwen3_8b, checks: [keywords, patterns, llm_judge, geval_cot], set: [checks.geval_cot.weight=1.0]}
+  - {name: qwen3_8b__all_plus, refuse_from: qwen3_8b, checks: [keywords, patterns, llm_judge, geval_cot, facts, anchored], set: [checks.geval_cot.weight=1.0, checks.facts.weight=1.0, checks.anchored.weight=1.0]}
+  - {name: qwen25_14b__kwpat_facts, refuse_from: qwen25_14b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_14b__facts_only, refuse_from: qwen25_14b, checks: [facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_14b__judge_facts, refuse_from: qwen25_14b, checks: [keywords, patterns, llm_judge, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_14b__gcot, refuse_from: qwen25_14b, checks: [keywords, patterns, llm_judge, geval_cot], set: [checks.geval_cot.weight=1.0]}
+  - {name: qwen25_14b__all_plus, refuse_from: qwen25_14b, checks: [keywords, patterns, llm_judge, geval_cot, facts, anchored], set: [checks.geval_cot.weight=1.0, checks.facts.weight=1.0, checks.anchored.weight=1.0]}
+  - {name: qwen3_14b__kwpat_facts, refuse_from: qwen3_14b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_14b__facts_only, refuse_from: qwen3_14b, checks: [facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_14b__judge_facts, refuse_from: qwen3_14b, checks: [keywords, patterns, llm_judge, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_14b__gcot, refuse_from: qwen3_14b, checks: [keywords, patterns, llm_judge, geval_cot], set: [checks.geval_cot.weight=1.0]}
+  - {name: qwen3_14b__all_plus, refuse_from: qwen3_14b, checks: [keywords, patterns, llm_judge, geval_cot, facts, anchored], set: [checks.geval_cot.weight=1.0, checks.facts.weight=1.0, checks.anchored.weight=1.0]}

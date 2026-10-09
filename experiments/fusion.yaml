@@ -1,0 +1,57 @@
+# RQ9 (threshold policy / fusion rules) and RQ4 (which checks carry the decision): does the fusion
+#     penalise no-keyword alarms (N14, "absence of evidence is not evidence of absence"), and do the
+#     review band / uncertainty escalation knobs matter? Fitted fusions (A5 calibrated + conformal, learned
+#     logistic regression, N2 per-family thresholds) are evaluated by nested CV on the same stored results.
+# Varies: fusion only. `base` computes the checks once (gpu-12gb); every other variant is a RE-FUSION of
+#         it (no ASR, no LLM): runtime = `base` (seconds if cached, else ~20-40 min for 48 dev calls) + < 1 s
+#         per variant.
+# Read: the CV table (threshold re-chosen on the other dev folds) is primary. Count dialogues, not calls:
+#       a paired difference needs >= ~5 net dialogue flips to clear noise at n=24 dev dialogues.
+#       N14 mechanism check: the flips of `abstain` vs `base` should be Stufe2 alarm calls with no keyword
+#       hit that `base` sent to review because of the uncertainty rule.
+#
+# Run:
+#   uv run callguard experiment experiments/fusion.yaml
+# Fitted fusions (honest numbers = nested CV over the dev folds; the holdout is never touched). Each
+# writes runs/experiments/fusion/<variant>__cv_<kind>/ (rows like a variant) + compare_<baseline>.md with
+# paired bootstrap / McNemar / flips against the weighted fusion's CV rows:
+#   uv run callguard fusion-cv -e fusion --variant base --kind calibrated              # 3-label conformal
+#   uv run callguard fusion-cv -e fusion --variant base --kind calibrated --labels 2 --name base__cv_cal2
+#   uv run callguard fusion-cv -e fusion --variant base --kind learned
+#   uv run callguard fusion-cv -e fusion --variant base --kind thresholds              # N2 per-family
+#   uv run callguard fusion-cv -e fusion --variant abstain --kind thresholds --compare-to abstain
+# (fusion-cv fits on the stored results of the named variant with that variant's fusion params as the
+# feature base, so `--variant abstain` = abstain_on_empty features.) Ship a fitted fusion only after its
+# nested CV beats or ties the weighted CV rows; then fit it once on all dev folds:
+#   uv run callguard fit-fusion -e fusion --variant base --kind calibrated   -> runs/fusion/fusion-base-calibrated.json
+# Never score a fitted model file with `callguard experiment` on dev: that is in-sample.
+name: fusion
+description: Weighted-fusion knobs (N14 abstention, uncertainty source, review band, uncertainty cap) as re-fusions of one check run; fitted fusions via `callguard fusion-cv`
+rq: [RQ9, RQ4]
+base: gpu-12gb
+split: dev
+compare_to: base
+thresholds: [0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9]
+variants:
+  - name: base
+    description: gpu-12gb as configured = weighted fusion default (threshold 0.55, band 0.15, max_uncertainty 0.35)
+  - name: abstain
+    refuse_from: base
+    set: ["fusion.abstain_on_empty=true"]
+    description: N14 - keyword/pattern checks that found nothing abstain (no pull on mean, no disagreement)
+  - name: abstain_llmunc
+    refuse_from: base
+    set: ["fusion.abstain_on_empty=true", "fusion.uncertainty_from=llm"]
+    description: N14 + uncertainty only from the LLM checks' disagreement and confidence
+  - name: llmunc
+    refuse_from: base
+    set: ["fusion.uncertainty_from=llm"]
+    description: uncertainty only from the LLM checks (rule checks still in the score)
+  - {name: band010, refuse_from: base, set: ["fusion.review_band=0.10"]}
+  - {name: band020, refuse_from: base, set: ["fusion.review_band=0.20"]}
+  - {name: unc025, refuse_from: base, set: ["fusion.max_uncertainty=0.25"]}
+  - {name: unc045, refuse_from: base, set: ["fusion.max_uncertainty=0.45"]}
+  # round 2 (01:55): uncertainty escalation floors the FAR (CV@FAR20 cannot get under 20%) -> switch it off / narrow it
+  - {name: noesc, refuse_from: base, set: ["fusion.max_uncertainty=1.0"]}
+  - {name: noesc_noband, refuse_from: base, set: ["fusion.max_uncertainty=1.0", "fusion.review_band=0.0"]}
+  - {name: abstain_noesc, refuse_from: base, set: ["fusion.abstain_on_empty=true", "fusion.max_uncertainty=1.0"]}

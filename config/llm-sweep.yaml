@@ -32,3 +32,6 @@ checks:
   - {name: llm_judge, type: llm_judge, llm: judge, samples: 3, temperature: 0.7, parallel: 5, weight: 1.0}
   - {name: geval, type: geval, llm: judge, parallel: 5, weight: 1.0}
   - {name: geval_cot, type: geval_cot, llm: judge, parallel: 5, weight: 0.0}
+  # computed for every model (weight 0 = not fused here); combined by re-fusion variants in llm_models.yaml
+  - {name: facts, type: facts, llm: judge, parallel: 5, weight: 0.0}
+  - {name: anchored, type: keyword_context, llm: judge, window: 1, context: full, parallel: 5, weight: 0.0}

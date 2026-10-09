@@ -14,19 +14,14 @@ from typing import Any
 import streamlit as st
 
 from callguard.config import AppConfig, load_config
-from callguard.types import Family
+from callguard.types import CallResult, Family
 from callguard.ui import backend as be
+from callguard.ui import sources as srcs
 from callguard.ui.backend import Decided, Engine, Loaded, UIArgs
+from callguard.ui.sources import Source
 
 APP_KEY = "_callguard_app"
 VIEWS = Path(__file__).resolve().parent / "views"
-PAGES = {  # key -> (file, title, icon, url_path)
-    "inbox": ("inbox.py", "Inbox", ":material/inbox:", "inbox"),
-    "detail": ("detail.py", "Call detail", ":material/graphic_eq:", "call"),
-    "keywords": ("keywords.py", "Keywords & criteria", ":material/tune:", "keywords"),
-    "process": ("process.py", "Process a call", ":material/upload_file:", "process"),
-    "quality": ("quality.py", "Quality", ":material/insights:", "quality"),
-}
 
 
 @dataclass
@@ -60,6 +55,8 @@ class AppState:
     decided: dict[str, Decided]  # under the sidebar settings
     baseline: dict[str, Decided]  # under the config defaults (for the deltas)
     pages: dict[str, Any] = field(default_factory=dict)
+    source: Source | None = None  # where the results come from (profile run or experiment variant)
+    sources: list[Source] = field(default_factory=list)
 
     @property
     def ctx(self):
@@ -67,7 +64,27 @@ class AppState:
 
     @property
     def runs_dir(self) -> Path:
+        """Folder of the shown results: runs/<profile>, or the experiment variant's folder."""
+        if self.source is not None and self.source.kind == "experiment":
+            return self.source.path
         return self.engine.ctx.runs_dir
+
+    @property
+    def runs_root(self) -> Path:
+        return self.cfg.paths.resolve("runs_dir")
+
+    @property
+    def read_only(self) -> bool:
+        """Experiment variants are shown, never rewritten (keyword re-runs / processing: profile runs only)."""
+        return self.source is not None and self.source.read_only
+
+    def result_dir(self, call_id: str) -> Path:
+        return self.loaded.paths[call_id].parent
+
+    def live_result(self, call_id: str) -> CallResult:
+        """The stored result with its decision replaced by the live one (what panels get)."""
+        r = self.loaded.results[call_id]
+        return r.model_copy(update={"decision": self.decided[call_id].decision})
 
     @property
     def can_alarm(self) -> set[str]:
@@ -102,6 +119,9 @@ class AppState:
     def rows(self) -> list[dict[str, Any]]:
         return be.inbox_rows(self.loaded, self.decided, self.all_families, self.baseline, self.settings.weights)
 
+    def family(self, fid: str) -> Family | None:
+        return next((f for f in self.all_families if f.id == fid), None)
+
     def family_label(self, fid: str) -> str:
         return next((be.short_label(f.label) for f in self.all_families if f.id == fid), fid)
 
@@ -115,14 +135,20 @@ class AppState:
 def current_app() -> AppState:
     app = st.session_state.get(APP_KEY)
     if app is None:
-        st.error("Start the UI through its entry point: `uv run streamlit run src/callguard/ui/app.py -- --config local`")
+        st.error("Bitte die UI über ihren Einstieg starten: `uv run callguard ui -c local`")
         st.stop()
     return app
 
 
-@st.cache_resource(show_spinner="Loading configuration and plugins…")
+@st.cache_resource(show_spinner="Konfiguration und Plugins werden geladen …")
 def _engine(config: str, sets: tuple[str, ...], no_cache: bool) -> tuple[AppConfig, Engine]:
     cfg = load_config(config, list(sets))
+    return cfg, Engine(cfg, use_cache=not no_cache)
+
+
+@st.cache_resource(show_spinner="Konfiguration der Quelle wird geladen …")
+def _source_engine(key: str, runs_root: str, sets: tuple[str, ...], no_cache: bool) -> tuple[AppConfig, Engine]:
+    cfg = srcs.source_config(srcs.source_from_key(key, Path(runs_root)), sets)
     return cfg, Engine(cfg, use_cache=not no_cache)
 
 
@@ -142,6 +168,8 @@ def reload_everything() -> None:
 # Sidebar
 # --------------------------------------------------------------------------------------------
 
+SOURCE_KEY = "cg_source"
+
 
 def _wkey(check: str) -> str:
     return f"cg_w_{check}"
@@ -152,21 +180,43 @@ def _fkey(fid: str) -> str:
 
 
 def _reset(defaults: dict[str, float], weights: dict[str, float], families: list[Family]) -> None:
-    st.session_state["cg_threshold"] = defaults["threshold"]
+    st.session_state["cg_threshold"] = min(1.0, max(0.0, defaults["threshold"]))
     st.session_state["cg_band"] = defaults["review_band"]
-    st.session_state["cg_maxunc"] = defaults["max_uncertainty"]
+    st.session_state["cg_maxunc"] = min(1.0, max(0.0, defaults["max_uncertainty"]))
     for name, w in weights.items():
-        st.session_state[_wkey(name)] = w
+        st.session_state[_wkey(name)] = max(0.0, w)
     for f in families:
         st.session_state[_fkey(f.id)] = True
 
 
+def _pick_source(sources: list[Source]) -> Source:
+    """Sidebar "Quelle": the launch profile's run, other profile runs, experiment variants."""
+    ss = st.session_state
+    keys = [x.key for x in sources]
+    by_key = {x.key: x for x in sources}
+    wanted = st.query_params.get("src")
+    if wanted in by_key and ss.get(SOURCE_KEY) != wanted and not ss.get("_cg_src_from_url"):
+        ss[SOURCE_KEY] = wanted  # deep link ?src=exp:<experiment>/<variant>, applied once
+        ss["_cg_src_from_url"] = True
+    if ss.get(SOURCE_KEY) not in by_key:
+        ss[SOURCE_KEY] = keys[0]
+    if len(sources) > 1:
+        st.sidebar.selectbox("Quelle", keys, key=SOURCE_KEY, format_func=lambda k: by_key[k].label,
+                             help="Welche Ergebnisse angezeigt werden: der Lauf eines Profils "
+                                  "(runs/<profil>) oder eine Variante eines Experiments "
+                                  "(runs/experiments/<experiment>/<variante>, nur lesen).")
+    return by_key[ss[SOURCE_KEY]]
+
+
 def _sidebar(cfg: AppConfig, engine: Engine, defaults: dict[str, float], weights: dict[str, float],
-             families: list[Family], n_calls: int) -> Settings:
+             families: list[Family], n_calls: int, source: Source) -> Settings:
     ss = st.session_state
     defaults = {**defaults, "threshold": min(1.0, max(0.0, defaults["threshold"])),
                 "max_uncertainty": min(1.0, max(0.0, defaults["max_uncertainty"]))}
     weights = {k: max(0.0, w) for k, w in weights.items()}
+    if ss.get("_cg_knobs_for") not in (None, source.key):  # new source: start from its own config
+        _reset(defaults, weights, families)
+    ss["_cg_knobs_for"] = source.key
     ss.setdefault("cg_threshold", defaults["threshold"])
     ss.setdefault("cg_band", defaults["review_band"])
     ss.setdefault("cg_maxunc", defaults["max_uncertainty"])
@@ -176,42 +226,44 @@ def _sidebar(cfg: AppConfig, engine: Engine, defaults: dict[str, float], weights
         ss.setdefault(_fkey(f.id), True)
 
     with st.sidebar:
-        st.markdown("### :material/shield: callguard")
-        st.caption(f"Profile **{cfg.name}** · {n_calls} processed call{'s' if n_calls != 1 else ''}")
+        st.caption(f"{source.label} · {n_calls} Anruf{'e' if n_calls != 1 else ''}"
+                   + (" · nur lesen" if source.read_only else ""))
         if engine.error:
-            st.warning(f"Running in fallback mode: {engine.error}. Showing stored decisions where needed.",
+            st.warning(f"Notbetrieb: {engine.error}. Wo nötig werden die gespeicherten Entscheide gezeigt.",
                        icon=":material/warning:")
 
-        st.markdown("#### Decision")
-        thr = st.slider("Alarm threshold", 0.0, 1.0, step=0.01, key="cg_threshold", persist_state="session",
-                        help="A call whose score reaches this value raises an alarm. Lower = more alarms.")
-        band = st.slider("Review band", 0.0, max(0.5, defaults["review_band"]), step=0.01, key="cg_band",
-                         persist_state="session",
-                         help="Calls scoring this far below the threshold go to a human for review.")
-        max_unc = st.slider("Max. uncertainty", 0.0, 1.0, step=0.01, key="cg_maxunc", persist_state="session",
-                            help="If the checks disagree or are unsure beyond this, the call goes to review "
-                                 "instead of being decided automatically.")
+        st.markdown("#### Entscheidung")
+        thr = st.slider("Alarmschwelle", 0.0, 1.0, step=0.01, key="cg_threshold", persist_state="session",
+                        help="Ab diesem Score löst ein Anruf Alarm aus. Tiefer = mehr Alarme. Wirkt sofort auf "
+                             "alle Anrufe (nur Neu-Bewertung, keine Spracherkennung, kein LLM).")
+        band = st.slider("Prüfbereich unter der Schwelle", 0.0, max(0.5, defaults["review_band"]), step=0.01,
+                         key="cg_band", persist_state="session",
+                         help="Anrufe, die so knapp unter der Schwelle liegen, gehen zur Prüfung an einen Menschen.")
+        max_unc = st.slider("Max. Unsicherheit", 0.0, 1.0, step=0.01, key="cg_maxunc", persist_state="session",
+                            help="Sind sich die Prüfungen uneinig oder unsicher über diesen Wert hinaus, geht der "
+                                 "Anruf zur Prüfung statt automatisch entschieden zu werden.")
         floor = max(0.0, thr - band)
-        st.caption(f"Alarm ≥ **{thr:.2f}** · Review ≥ **{floor:.2f}** · config default {defaults['threshold']:.2f}")
+        st.caption(f"Alarm ab **{thr:.2f}** · Prüfen ab **{floor:.2f}** · Standard des Profils "
+                   f"{defaults['threshold']:.2f}")
 
         w_out: dict[str, float] = {}
-        with st.expander("Check weights", icon=":material/balance:"):
-            st.caption("How much each check counts in the fused score. 0 = ignore the check.")
+        with st.expander("Gewichte der Prüfungen", icon=":material/balance:"):
+            st.caption("Wie stark jede Prüfung im Gesamtscore zählt. 0 = Prüfung ignorieren.")
             for name in weights:
                 w_out[name] = st.slider(name, 0.0, max(2.0, round(2 * weights[name], 2)), step=0.05,
                                         key=_wkey(name), persist_state="session")
         on: list[str] = []
-        with st.expander("Families", icon=":material/category:"):
-            st.caption("Switch off a kind of misconduct to leave it out of every decision.")
+        with st.expander("Arten von Fehlverhalten", icon=":material/category:"):
+            st.caption("Eine Art ausschalten = sie zählt in keinem Entscheid mehr.")
             for f in families:
                 if st.toggle(be.short_label(f.label), key=_fkey(f.id), persist_state="session",
-                             help=f"{f.id}" + ("" if f.can_alarm else " · annotates only, never alarms")):
+                             help=f"{f.id}" + ("" if f.can_alarm else " · nur Hinweis, löst nie Alarm aus")):
                     on.append(f.id)
 
         c1, c2 = st.columns(2)
-        c1.button("Reset", icon=":material/restart_alt:", on_click=_reset, args=(defaults, weights, families),
-                  help="Back to the values of the configuration profile.", width="stretch")
-        if c2.button("Reload", icon=":material/refresh:", help="Re-read configuration files and results.",
+        c1.button("Zurücksetzen", icon=":material/restart_alt:", on_click=_reset,
+                  args=(defaults, weights, families), help="Zurück auf die Werte des Profils.", width="stretch")
+        if c2.button("Neu laden", icon=":material/refresh:", help="Konfiguration und Ergebnisse neu einlesen.",
                      width="stretch"):
             reload_everything()
             st.rerun()
@@ -225,10 +277,11 @@ def _sidebar(cfg: AppConfig, engine: Engine, defaults: dict[str, float], weights
 
 
 def _pages() -> dict[str, Any]:
-    out = {}
-    for key, (file, title, icon, url) in PAGES.items():
-        out[key] = st.Page(VIEWS / file, title=title, icon=icon, url_path=url, default=(key == "inbox"))
-    return out
+    """st.Page per entry of ``pages_registry`` (key -> page), in navigation order."""
+    from callguard.ui.pages_registry import pages
+
+    return {p.key: st.Page(p.path(), title=p.title, icon=p.icon, url_path=p.url, default=p.default)
+            for p in pages()}
 
 
 def bootstrap() -> AppState:
@@ -236,24 +289,34 @@ def bootstrap() -> AppState:
     try:
         cfg, engine = _engine(args.config, args.sets, args.no_cache)
     except Exception as e:
-        st.error(f"Configuration **{args.config}** could not be loaded: {type(e).__name__}: {e}")
-        st.caption("Start with `uv run streamlit run src/callguard/ui/app.py -- --config local` "
-                   "(profiles live in `config/`).")
+        st.error(f"Konfiguration **{args.config}** konnte nicht geladen werden: {type(e).__name__}: {e}")
+        st.caption("Start mit `uv run callguard ui -c local` (Profile liegen in `config/`).")
         st.stop()
+
+    st.sidebar.markdown("### :material/shield: callguard")
+    sources = srcs.list_sources(cfg.paths.resolve("runs_dir"), cfg.name)
+    source = _pick_source(sources)
+    if source.key != sources[0].key:
+        try:
+            cfg, engine = _source_engine(source.key, str(cfg.paths.resolve("runs_dir")), args.sets, args.no_cache)
+        except Exception as e:
+            st.sidebar.error(f"Konfiguration der Quelle konnte nicht geladen werden ({type(e).__name__}: {e}); "
+                             "es gilt das Startprofil.", icon=":material/error:")
+    loaded = srcs.load_jsonl(source.path) if source.kind == "experiment" else be.load_results(engine.ctx.runs_dir)
 
     defaults = be.fusion_defaults(cfg)
     default_weights = be.check_weights(cfg)
     all_families = engine.families()
-    loaded = be.load_results(engine.ctx.runs_dir)
-    settings = _sidebar(cfg, engine, defaults, default_weights, all_families, len(loaded.results))
+    settings = _sidebar(cfg, engine, defaults, default_weights, all_families, len(loaded.results), source)
     families = [f for f in all_families if f.id in set(settings.families_on)]
     if not all_families:  # unreadable keyword list/criteria: say so instead of deciding "nothing found"
-        st.sidebar.error(f"Keyword list or criteria could not be read ({engine.ctx.path('keywords')}, "
-                         f"{engine.ctx.path('criteria')}); showing stored decisions.", icon=":material/error:")
+        st.sidebar.error(f"Stichwortliste oder Kriterien unlesbar ({engine.ctx.path('keywords')}, "
+                         f"{engine.ctx.path('criteria')}); es gelten die gespeicherten Entscheide.",
+                         icon=":material/error:")
     decided = be.decide_all(engine, loaded, settings.overrides(), families if all_families else None)
     baseline = be.decide_all(engine, loaded, None, all_families or None)
     app = AppState(args=args, cfg=cfg, engine=engine, defaults=defaults, default_weights=default_weights,
                    settings=settings, all_families=all_families, families=families, loaded=loaded,
-                   decided=decided, baseline=baseline, pages=_pages())
+                   decided=decided, baseline=baseline, pages=_pages(), source=source, sources=sources)
     st.session_state[APP_KEY] = app
     return app

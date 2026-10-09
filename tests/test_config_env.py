@@ -102,7 +102,8 @@ def test_shipped_profiles_load_without_any_environment(monkeypatch: pytest.Monke
         monkeypatch.delenv(var, raising=False)
     root = Path(__file__).resolve().parents[1] / "config"
     for p in sorted(root.glob("*.yaml")):
-        if p.name in ("criteria.yaml", "splits.yaml"):  # data files, not profiles
+        if p.name in ("criteria.yaml", "splits.yaml", "policy_table.yaml", "routing.yaml", "directory.yaml",
+                      "tuning.yaml"):  # data files, not profiles
             continue
         cfg = load_config(p)
         assert "${" not in repr(cfg.model_dump()), p.name

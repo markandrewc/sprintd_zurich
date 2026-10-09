@@ -22,7 +22,7 @@ from callguard.ui import backend as be
 from callguard.ui import metrics_view as mv
 
 APP = Path(__file__).resolve().parents[1] / "src" / "callguard" / "ui" / "app.py"
-PAGES = ["inbox", "detail", "keywords", "process", "quality"]
+PAGES = ["inbox", "detail", "keywords", "process", "quality", "experiments"]
 
 
 @pytest.fixture
@@ -156,7 +156,7 @@ def test_inbox_rows_sorted_and_explained(env: FixtureEnv):
     assert rows[0]["family"] == "Insiderhandel" and rows[0]["passages"] >= 1
     harmless = rows[2]["reason"]
     assert harmless.startswith("Insiderhandel:") and "veröffentlichten Quartalszahlen" in harmless  # not "G-Eval"
-    assert rows[1]["changed"] == "Alarm → Review"  # review case was an alarm at threshold 0.45
+    assert rows[1]["changed"] == "Alarm → Prüfen"  # review case was an alarm at threshold 0.45
 
 
 def test_checks_said_and_linked_passage(env: FixtureEnv):
@@ -281,8 +281,8 @@ def test_process_call_offline_with_reference_asr(env: FixtureEnv):
     r = be.process_call(engine.pipeline, audio, UNPROCESSED_ID, notify=msgs.append)
     assert r.transcript.segments and r.decision.label in ("alarm", "review", "no_alert")
     assert env.result_path(UNPROCESSED_ID).is_file()
-    assert msgs[0].startswith("Transcribing") and any("Check 'keywords'" in m for m in msgs)
-    assert msgs[-1] == "Saving the result"
+    assert msgs[0].startswith("Spracherkennung") and any("Prüfung 'keywords'" in m for m in msgs)
+    assert msgs[-1] == "Ergebnis speichern"
 
 
 def test_upload_helpers(tmp_path: Path):
@@ -317,13 +317,14 @@ def test_flag_metrics_counts_review_as_flagged():
 def test_confusion_matrix_and_charts_build():
     pairs = [("alarm", "alarm"), ("review", "alarm"), ("no_alert", "review")]
     cm = mv.confusion(pairs)
-    assert list(cm.index) == ["Alarm", "Review", "No alert"] and cm.loc["Review", "Alarm"] == 1
+    assert list(cm.index) == ["Alarm", "Prüfen", "Kein Alarm"] and cm.loc["Prüfen", "Alarm"] == 1
     assert int(cm.values.sum()) == 3
     mv.confusion_chart(cm).to_dict()
     rows = mv.sweep({0.3: {"a": "alarm", "b": "review"}, 0.6: {"a": "alarm", "b": "no_alert"}},
                     {"a": "alarm", "b": "no_alert"})
     mv.sweep_chart(rows, 0.3, 0.6).to_dict()
     mv.sweep_chart(rows, 0.6, 0.6).to_dict()
+    mv.sweep_chart(rows, 0.6, 0.3, [{"value": 0.5, "what": "Holdout-F1"}]).to_dict()
 
 
 def test_suggest_threshold_prefers_f1_then_fewer_false_alarms_and_skips_flag_everything():
@@ -350,8 +351,8 @@ def test_transcript_markdown_escapes_and_highlights(env: FixtureEnv):
 
     r = be.load_results(env.runs_dir).results[ALARM_ID]
     md = render.transcript_markdown(r.transcript, r.decision.passages, r)
-    assert ":orange-background[" in md and ":red-badge[Insiderhandel]" in md
-    assert "**noch nicht publiziert**" in md and "**Advisor**" in md
+    assert ":orange-background[" in md and ":blue-badge[Insiderhandel]" in md
+    assert "**noch nicht publiziert**" in md and "**Beratung**" in md
     assert render.esc("$5 [a]* :x:") == r"\$5 \[a\]\* \:x\:"
     assert render._bold_terms("Die Quartalszahlen, quartalszahlen.", ["Quartalszahlen"]).count("**") == 4
 
@@ -369,7 +370,7 @@ def test_every_page_renders(env: FixtureEnv, page: str):
 
 def test_inbox_counts_follow_the_threshold_slider(env: FixtureEnv):
     at = run_app()
-    assert metrics(at) == {"Alarm": "1", "Review": "1", "No alert": "1", "Need a human": "2"}
+    assert metrics(at) == {"Alarm": "1", "Prüfen": "1", "Kein Alarm": "1", "Mensch nötig": "2"}
     assert all(m.delta in (None, "") for m in at.metric)
     engine = engine_for(env)
     loaded = be.load_results(env.runs_dir)
@@ -379,8 +380,8 @@ def test_inbox_counts_follow_the_threshold_slider(env: FixtureEnv):
         want = be.label_counts(be.decide_all(engine, loaded, ui_overrides(engine, t), engine.families()))
         shown = metrics(at)
         assert {k: shown[be.LABEL_TEXT[k]] for k in want} == {k: str(v) for k, v in want.items()}
-        assert any(m.delta and "vs default" in m.delta for m in at.metric)
-    reset = next(b for b in at.sidebar.button if b.label == "Reset")
+        assert any(m.delta and "zum Profil" in m.delta for m in at.metric)
+    reset = next(b for b in at.sidebar.button if b.label == "Zurücksetzen")
     reset.click().run()
     assert at.slider(key="cg_threshold").value == pytest.approx(0.55)
     assert metrics(at)["Alarm"] == "1"
@@ -401,9 +402,11 @@ def test_deep_link_opens_call_at_passage(env: FixtureEnv):
     at = run_app(query={"call": ALARM_ID, "t": "48"})
     assert at.title[0].value.startswith(ALARM_ID)
     body = texts(at)
-    assert "linked from alert" in body and "Opened from an alert link at 00:48" in body
-    assert "Suspicious passages (2)" in [h.value for h in at.subheader]
+    assert "aus dem Alarm-Link" in body and "Geöffnet über einen Alarm-Link bei 00:48" in body
+    assert "Verdächtige Passagen (2)" in [h.value for h in at.subheader]
     assert len(at.get("audio")) >= 3  # two snippets + full call
+    assert "Beweis-Zeitachse" in [h.value for h in at.subheader]
+    assert "Kriterium" in body and "llm\\_judge 0.92" in body  # matched criterion + supporting check score
 
 
 def test_review_call_hands_over_to_a_human(env: FixtureEnv):
@@ -419,7 +422,7 @@ def test_unknown_call_falls_back_with_warning(env: FixtureEnv):
 
 def test_detail_next_button_walks_calls_by_score(env: FixtureEnv):
     at = run_app("detail", query={"call": ALARM_ID})
-    next(b for b in at.button if b.label == "Next").click().run()
+    next(b for b in at.button if b.label == "Weiter").click().run()
     assert at.title[0].value.startswith(REVIEW_ID)
     assert at.selectbox(key="cg_detail_pick").value == REVIEW_ID and at.query_params["call"] == REVIEW_ID
     at.selectbox(key="cg_detail_pick").set_value(HARMLESS_ID).run()
@@ -439,8 +442,8 @@ def test_empty_runs_dir_shows_guidance(tmp_path: Path, monkeypatch: pytest.Monke
 def test_fallback_when_fusion_cannot_be_built(env: FixtureEnv, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv(be.ENV_ARGS, env.args + " --set fusion.type=no_such_fusion")
     at = run_app()
-    assert any("fallback mode" in w.value for w in at.sidebar.warning)
-    assert any("stored at processing time" in w.value for w in at.warning)
+    assert any("Notbetrieb" in w.value for w in at.sidebar.warning)
+    assert any("gespeicherten Entscheid" in w.value for w in at.warning)
     assert metrics(at)["Alarm"] == "1"
     at.slider(key="cg_threshold").set_value(0.1).run()
     assert not at.exception and metrics(at)["Alarm"] == "1"  # stored decisions don't move
@@ -452,21 +455,21 @@ def test_fallback_when_fusion_cannot_be_built(env: FixtureEnv, monkeypatch: pyte
 def test_broken_check_plugin_still_redecides_with_fusion_only(env: FixtureEnv, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv(be.ENV_ARGS, env.args + " --set checks.0.type=no_such_check")
     at = run_app()
-    assert any("fallback mode" in w.value for w in at.sidebar.warning)
+    assert any("Notbetrieb" in w.value for w in at.sidebar.warning)
     at.slider(key="cg_threshold").set_value(0.05).run()
-    assert metrics(at)["No alert"] == "0"
+    assert metrics(at)["Kein Alarm"] == "0"
 
 
 def test_unknown_config_is_reported(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv(be.ENV_ARGS, "--config does_not_exist")
     at = AppTest.from_file(str(APP), default_timeout=60).run()
-    assert not at.exception and "could not be loaded" in at.error[0].value
+    assert not at.exception and "konnte nicht geladen werden" in at.error[0].value
 
 
 def test_keywords_page_save_and_rerun_cheap_checks(env: FixtureEnv):
     at = run_app("keywords")
     before = env.keywords.read_text()
-    next(b for b in at.button if b.label == "Save keywords").click().run()
+    next(b for b in at.button if b.label == "Stichwörter speichern").click().run()
     assert not at.exception
     old, new = json.loads(before), json.loads(env.keywords.read_text())  # unchanged table -> same content
 
@@ -476,18 +479,18 @@ def test_keywords_page_save_and_rerun_cheap_checks(env: FixtureEnv):
     assert by_id(new) == by_id(old)
     assert new["families"] == old["families"]
     assert list((env.runs_dir / "_backups").glob("keywords.*.json"))
-    next(b for b in at.button if b.label == "Re-run cheap checks on all calls").click().run()
+    next(b for b in at.button if b.label == "Stichwörter jetzt auf alle Anrufe anwenden").click().run()
     assert not at.exception
     shown = metrics(at)
-    assert {"Alarm", "Review", "No alert", "Keyword hits"} <= set(shown)
+    assert {"Alarm", "Prüfen", "Kein Alarm", "Stichwort-Treffer"} <= set(shown)
     assert at.session_state["cg_kw_report"]["report"]["calls"] == 3
 
 
 def test_criteria_form_saves_yaml(env: FixtureEnv):
     at = run_app("keywords")
-    policy = next(t for t in at.text_area if t.label.startswith("Policy"))  # first tab: trade
+    policy = next(t for t in at.text_area if t.label.startswith("Richtlinie"))  # first tab: trade
     policy.set_value("Neue Richtlinie für Insiderhandel.")
-    next(b for b in at.button if b.label == "Save criteria").click().run()
+    next(b for b in at.button if b.label == "Kriterien speichern").click().run()
     assert not at.exception
     fams = yaml.safe_load(env.criteria.read_text())["families"]
     assert fams["trade"]["policy"] == "Neue Richtlinie für Insiderhandel."
@@ -498,7 +501,7 @@ def test_try_a_sentence_against_keywords(env: FixtureEnv):
     at = run_app("keywords")
     at.text_input(key="cg_kw_try").set_value("Ich will vor der Meldung kaufen, die Quartalszahlen sind gut.").run()
     assert not at.exception
-    assert at.dataframe and "trade" in at.dataframe[-1].value["Family"].tolist()
+    assert at.dataframe and "trade" in at.dataframe[-1].value["Art"].tolist()
 
 
 def test_quality_view_and_apply_suggested_threshold(env: FixtureEnv):
@@ -506,12 +509,13 @@ def test_quality_view_and_apply_suggested_threshold(env: FixtureEnv):
     at.slider(key="cg_threshold").set_value(0.05).run()  # harmless call becomes a false alarm
     at.switch_page("views/quality.py").run()
     assert not at.exception
-    assert {"Precision", "Recall", "F1", "False-alarm rate", "Miss rate", "Exact label"} <= set(metrics(at))
-    apply = next(b for b in at.button if b.label == "Apply suggested threshold")
+    assert {"Präzision", "Recall", "F1", "Fehlalarmquote", "Verpasst", "Exakter Status"} <= set(metrics(at))
+    assert "95%-KI" in texts(at)
+    apply = next(b for b in at.button if b.label == "Vorschlag übernehmen")
     apply.click().run()
     assert not at.exception
     assert at.slider(key="cg_threshold").value > 0.05
-    assert metrics(at)["False-alarm rate"] == "0%"
+    assert metrics(at)["Fehlalarmquote"] == "0%"
 
 
 def test_process_page_runs_a_dataset_call_offline(env: FixtureEnv, monkeypatch: pytest.MonkeyPatch):
@@ -522,7 +526,7 @@ def test_process_page_runs_a_dataset_call_offline(env: FixtureEnv, monkeypatch: 
     assert not at.exception, [e.message for e in at.exception]
     assert env.result_path(UNPROCESSED_ID).is_file()
     assert UNPROCESSED_ID in at.session_state["cg_processed"]
-    assert any(b.label == "Open" for b in at.button)
+    assert any(b.label == "Öffnen" for b in at.button)
 
 
 @pytest.mark.slow
@@ -548,7 +552,7 @@ def test_process_real_audio_excerpt_on_cpu(tmp_path: Path):
 def test_unreadable_keyword_list_shows_stored_decisions(env: FixtureEnv):
     env.keywords.write_text("{broken")
     at = run_app()
-    assert any("could not be read" in e.value for e in at.sidebar.error)
+    assert any("unlesbar" in e.value for e in at.sidebar.error)
     assert metrics(at)["Alarm"] == "1"  # stored decisions, not "nothing found"
     for page in PAGES[1:]:
         at.switch_page(f"views/{page}.py").run()

@@ -78,6 +78,9 @@ sinks:
     enabled: false
     url: http://localhost:8080/triggers
     labels: [alarm, review]
+  - type: notify         # route flagged calls (config/routing.yaml) -> runs/<profile>/outbox.jsonl
+    channels: [outbox]   # + webhook (webhook_url) / smtp (smtp: {host, port, sender})
+  - type: audit          # decision events -> runs/<profile>/audit.jsonl
 
 app:
   base_url: http://localhost:8501

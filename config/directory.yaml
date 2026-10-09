@@ -1,0 +1,36 @@
+# FICTIONAL staff directory (stands in for the bank's HR / CRM system).
+# Advisor names are the ones that introduce themselves in the case calls ("da isch d Simone Wenger");
+# units and supervisors are invented. Used only AFTER the decision (routing, cross-call patterns):
+# it never influences a label. In production the recording system delivers advisor_id per call
+# (sidecar <audio>.meta.json), and this file is replaced by an HR export.
+
+supervisors:
+  SUP-ANL: {name: Beat Zürcher, unit: Anlageberatung, email: beat.zuercher@bank.example}
+  SUP-ONL: {name: Urs Brändli, unit: Online-Service, email: urs.braendli@bank.example}
+  SUP-SVC: {name: Peter Lanz, unit: Service-Team, email: peter.lanz@bank.example}
+  SUP-FIN: {name: Markus Studer, unit: Finanzierung, email: markus.studer@bank.example}
+  SUP-ZAH: {name: Hans Oberholzer, unit: Zahlungs- und Firmenservice, email: hans.oberholzer@bank.example}
+
+advisors:
+  A01: {name: Simone Wenger, unit: Service-Team, supervisor: SUP-SVC}
+  A02: {name: Claudia Frei, unit: Anlageberatung, supervisor: SUP-ANL}
+  A03: {name: Andrea Moser, unit: Anlageberatung, supervisor: SUP-ANL}
+  A04: {name: Patricia Roth, unit: Anlageberatung, supervisor: SUP-ANL}
+  A05: {name: Isabelle Brunner, unit: Online-Service, supervisor: SUP-ONL}
+  A06: {name: Sonja Hess, unit: Online-Service, supervisor: SUP-ONL}
+  A07: {name: Karin Lüthi, unit: Finanzierung, supervisor: SUP-FIN}
+  A08: {name: Monika Graf, unit: Service-Team, supervisor: SUP-SVC}
+  A09: {name: Nicole Meier, unit: Finanzierung, supervisor: SUP-FIN}
+  A10: {name: Sandra Eberle, unit: Zahlungsservice, supervisor: SUP-ZAH}
+  A11: {name: Doris Ammann, unit: Service-Team, supervisor: SUP-SVC}
+  A12: {name: Barbara Steiger, unit: Service-Team, supervisor: SUP-SVC}
+  A13: {name: Martina Wild, unit: Anlageberatung, supervisor: SUP-ANL}
+  A14: {name: Nadja Furrer, unit: Anlageberatung, supervisor: SUP-ANL}
+  A15: {name: Rita Kunz, unit: Online-Service, supervisor: SUP-ONL}
+  A16: {name: Marion Gloor, unit: Service-Team, supervisor: SUP-SVC}
+  A17: {name: Regula Bachmann, unit: Finanzierung, supervisor: SUP-FIN}
+  A18: {name: Silvia Bader, unit: Firmenservice, supervisor: SUP-ZAH}
+  A19: {name: Esther Fankhauser, unit: Online-Service, supervisor: SUP-ONL}
+  A20: {name: Daniela Vogt, unit: Service-Team, supervisor: SUP-SVC}
+  A21: {name: Kathrin Vogel, unit: Finanzierung, supervisor: SUP-FIN}
+  A22: {name: Irene Walter, unit: Firmenservice, supervisor: SUP-ZAH}

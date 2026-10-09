@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("callguard.ui")
 
 ENV_ARGS = "CALLGUARD_ARGS"
-LABEL_TEXT = {"alarm": "Alarm", "review": "Review", "no_alert": "No alert"}
+LABEL_TEXT = {"alarm": "Alarm", "review": "Prüfen", "no_alert": "Kein Alarm"}  # officer wording (German)
 LABEL_RANK = {lbl: i for i, lbl in enumerate(LABELS)}
 FUSION_DEFAULTS = {"threshold": 0.55, "review_band": 0.15, "max_uncertainty": 0.35, "min_score_for_review": 0.25}
 CHEAP_CHECK_TYPES = frozenset({"keywords", "patterns"})
@@ -443,7 +443,7 @@ def inbox_rows(loaded: Loaded, decided: Mapping[str, Decided], families: list[Fa
         rows.append({
             "call_id": cid, "label": d.label, "score": round(d.score, 3), "uncertainty": round(d.uncertainty, 3),
             "family": short_label(top.label) if top else "", "passages": len(d.passages),
-            "reason": f"Checks failed: {', '.join(failed)} · {reason}" if failed else reason,
+            "reason": f"Prüfung ausgefallen: {', '.join(failed)} · {reason}" if failed else reason,
             "changed": label_change(d.label, base.decision.label if base else None),
             "live": dd.live, "failed_checks": failed,
         })
@@ -753,26 +753,26 @@ def process_call(pipeline: Pipeline, audio_path: str | Path, call_id: str,
     say = notify or (lambda msg: None)
     audio_path = Path(audio_path)
     if pipeline.multi_view:  # several transcript views: the pipeline builds them (stage-level progress)
-        stages = {"asr": "Transcribing (speech recognition, every ASR view)",
-                  "diarize": "Separating speakers (advisor / customer)", "translate": "Translating views",
-                  "checks": "Running the checks", "decide": "Deciding", "snippets": "Cutting audio snippets",
-                  "emit": "Saving the result"}
+        stages = {"asr": "Spracherkennung (alle ASR-Ansichten)",
+                  "diarize": "Sprecher trennen (Beratung / Kunde)", "translate": "Ansichten übersetzen",
+                  "checks": "Prüfungen laufen", "decide": "Entscheiden", "snippets": "Audio-Ausschnitte schneiden",
+                  "emit": "Ergebnis speichern"}
         return pipeline.process(audio_path, call_id, on_stage=lambda name: say(stages.get(name, name)))
     timings: dict[str, float] = {}
 
-    say("Transcribing (speech recognition)")
+    say("Spracherkennung")
     t = time.time()
     transcript = pipeline.transcribe(audio_path, call_id)
     timings["asr"] = time.time() - t
-    say(f"Transcript ready: {len(transcript.segments)} segments ({timings['asr']:.0f} s)")
+    say(f"Transkript fertig: {len(transcript.segments)} Abschnitte ({timings['asr']:.0f} s)")
 
-    say("Separating speakers (advisor / customer)")
+    say("Sprecher trennen (Beratung / Kunde)")
     t = time.time()
     try:
         transcript = pipeline.diarize(audio_path, transcript)
     except Exception as e:  # roles are a refinement: the checks still run without them
         log.warning("UI: diarization of %s failed: %s", call_id, e)
-        say(f"Speaker separation failed ({type(e).__name__}); continuing without roles")
+        say(f"Sprechertrennung fehlgeschlagen ({type(e).__name__}); weiter ohne Rollen")
     timings["diarize"] = time.time() - t
 
     families = pipeline.ctx.families()
@@ -781,26 +781,26 @@ def process_call(pipeline: Pipeline, audio_path: str | Path, call_id: str,
     for check in pipeline.checks:
         if not check.enabled:
             continue
-        say(f"Check '{check.name}' running")
+        say(f"Prüfung '{check.name}' läuft")
         t1 = time.time()
         results[check.name] = pipeline.run_check(check, transcript, families)
         err = results[check.name].meta.get("error")
-        say(f"Check '{check.name}' {'FAILED: ' + str(err)[:120] if err else 'done'} ({time.time() - t1:.0f} s)")
+        say(f"Prüfung '{check.name}' {'AUSGEFALLEN: ' + str(err)[:120] if err else 'fertig'} ({time.time() - t1:.0f} s)")
     timings["checks"] = time.time() - t
 
-    say("Deciding")
+    say("Entscheiden")
     decision = pipeline.decide(transcript, results, None, families)
     result = CallResult(call_id=call_id, audio_path=str(audio_path), transcript=transcript, checks=results,
                         decision=decision, config_name=pipeline.cfg.name,
                         timings={k: round(v, 2) for k, v in timings.items()},
                         meta={"provenance": pipeline.provenance({transcript.view: transcript})})
-    say("Cutting audio snippets")
+    say("Audio-Ausschnitte schneiden")
     try:
         pipeline.make_snippets(result)
     except Exception as e:
         log.warning("UI: snippets for %s failed: %s", call_id, e)
-        say(f"Snippets could not be cut ({type(e).__name__}); passages play from the full call")
-    say("Saving the result")
+        say(f"Ausschnitte konnten nicht geschnitten werden ({type(e).__name__}); Passagen spielen aus der ganzen Aufnahme")
+    say("Ergebnis speichern")
     pipeline.emit(result)
     return result
 

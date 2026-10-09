@@ -580,11 +580,16 @@ def _sweep_table(swept: list[dict[str, Any]], suggestion: dict[str, Any] | None,
 # commands living in callguard/commands/<name>.py, each with register(app)
 from callguard.commands import asr_eval as _asr_eval  # noqa: E402
 from callguard.commands import experiment as _experiment  # noqa: E402
+from callguard.commands import feedback as _feedback  # noqa: E402
+from callguard.commands import fit_fusion as _fit_fusion  # noqa: E402
 from callguard.commands import leaderboard as _leaderboard  # noqa: E402
+from callguard.commands import patterns as _patterns  # noqa: E402
 from callguard.commands import report as _report  # noqa: E402
+from callguard.commands import route as _route  # noqa: E402
 from callguard.commands import splits as _splits  # noqa: E402
 
-for _mod in (_asr_eval, _splits, _experiment, _leaderboard, _report):
+for _mod in (_asr_eval, _splits, _experiment, _leaderboard, _report, _fit_fusion,
+             _route, _feedback, _patterns):
     _mod.register(app)
 
 

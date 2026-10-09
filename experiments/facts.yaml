@@ -1,0 +1,41 @@
+# RQ5 (do structured fact probes + an officer-editable decision table beat one-shot judges on the twins
+#      and on review?) and RQ9 (traceability / review handling: does "unclear fact -> review" find the
+#      Stufe3 cases without new false alarms?). Ideas A1 + N6 + N7 + N8 (research/ideas_round1.md).
+# Varies: the check set (facts added / facts replacing llm_judge + geval), the fact question language,
+#         prefix-max on act facts. Everything else is gpu-12gb.
+# Runtime (48 dev calls, vLLM Qwen2.5-7B-AWQ on the 4070): `base` is a cache hit if checks_ablation
+#         ran. `facts`: 5 families x 3-4 facts = 18 single-token probes per call (transcript prefix shared
+#         via vLLM prefix caching) + 1 short JSON evidence call per fact with p(yes) > 0.5 -> ~5-15 s/call,
+#         ~5-10 min at --jobs 4. `facts_de`: same again (new prompts). `facts_prefix`: only the 5 act facts x
+#         3 prefixes are new (+15 probes/call, ~3-5 min); full-call probes come from the fact_probe cache.
+#         Re-fusion variants cost nothing. Dry run: callguard experiment experiments/facts.yaml --dry-run
+# Read: CV table (primary). kw_pat_facts vs base answers "can facts replace llm_judge + geval?";
+#       facts vs base "do they add anything?". Per-call flip tables: look at the Stufe2 twins (C05/C06,
+#       C07/C08, ...) and the Stufe3 calls. n=24 dev dialogues: differences of 1-2 calls are noise.
+#       Fact-level output (which rule fired, p per fact) is in results.jsonl -> checks.facts.family_scores.
+name: facts
+description: Fact sheet + policy table check (A1/N6/N7/N8) added to / replacing the LLM judges
+rq: [RQ5, RQ9]
+base: gpu-12gb
+split: dev
+compare_to: base
+variants:
+  - name: base
+    description: gpu-12gb as is (keywords + patterns + llm_judge + geval)
+  - name: facts
+    description: base + facts (English questions, evidence on, no prefix-max)
+    add_checks: [{name: facts, type: facts, llm: default, parallel: 5, weight: 1.0}]
+  - name: kw_pat_facts
+    description: facts replacing llm_judge + geval (re-fusion of `facts`)
+    refuse_from: facts
+    checks: [keywords, patterns, facts]
+  - name: facts_alone
+    description: facts as the only check (re-fusion of `facts`; shows what the table alone decides)
+    refuse_from: facts
+    checks: [facts]
+  - name: facts_de
+    description: base + facts with the German question texts (answer tokens stay yes/no/unknown)
+    add_checks: [{name: facts, type: facts, llm: default, parallel: 5, weight: 1.0, question_lang: de}]
+  - name: facts_prefix
+    description: base + facts with prefix-max on act facts (N8; 3 cut points)
+    add_checks: [{name: facts, type: facts, llm: default, parallel: 5, weight: 1.0, prefix_max: true}]

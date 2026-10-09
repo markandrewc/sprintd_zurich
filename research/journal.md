@@ -94,3 +94,18 @@ pushing stages as they land (see docs/STATUS.md). First CPU-only numbers in READ
   becomes threshold-free ROC AUC of the call score (+ CV operating point at FAR <= 20%), flag-all baseline printed in
   every summary. Asked the harness builder to add it and rescore.
 - Conclusion so far: no fusion knob rescues a weak LLM signal; fix the signal first (LLM sweep running).
+
+## 2026-10-10T01:55 C4 facts check (fact sheet + policy table, A1/N6/N7) landed
+- Builder smoke on the 24 clean dev calls (7B): alarm D02 D04 D05 D09 D10 C06 C12; review C07 C11 C13 C14 C17; rest no_alert.
+  Read against the dev labels this is far better than llm_judge (all 7 alarms are expected alarms; harmless D03/D08/C05/C08
+  stay no_alert) — but CAVEAT: the fact questions were worded while looking at dev ASR transcripts (dev only, no
+  holdout), so dev numbers for `facts` are in-sample for the prompt wording. The holdout run is the honest test.
+- Single-token answers yes/no/unknown (Qwen tokenizer), one forward pass per fact, logprobs -> p(yes/no/unclear).
+- DECISION: compute facts + anchored keyword_context (weight 0) for every model in the LLM sweep and compare check
+  combinations by re-fusion (llm_models.yaml `<model>__*` variants), so the LLM x check-set grid costs one pass per model.
+
+## 2026-10-10T01:58 A3/RQ2 detection: large-v3 gsw (MIT) vs turbo int8 with the 7B checks
+- experiments/asr_models.yaml (large_v3_gsw computed, turbo_gsw_int8 = cached default). Flag AUC 0.66 vs 0.68
+  (diff -0.02 [-0.16, +0.11]); alarm AUC 0.78 vs 0.77 (+0.02 [-0.12, +0.15]) -> no detectable difference.
+- Interpretation: with the 7B judge the LLM layer, not the ASR, limits detection; the better keyword recall of large-v3
+  does not show up. Re-test with the winning LLM. Keep large-v3 MIT as licence-clean option either way.

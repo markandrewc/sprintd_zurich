@@ -61,7 +61,15 @@ def leaderboard_rows(summaries: Sequence[dict[str, Any]]) -> list[dict[str, Any]
         for name, v in s["variants"].items():
             primary = v.get("cv") or v["fixed"]
             lo, hi = _ci(primary, "flag_f1")
+            auc_f = (v.get("auc") or {}).get("flag") or {}
+            auc_a = (v.get("auc") or {}).get("alarm") or {}
+            far20 = v.get("cv_far") or {}
             rows.append({
+                "auc": auc_f.get("value"), "auc_lo": auc_f.get("lo"), "auc_hi": auc_f.get("hi"),
+                "auc_alarm": auc_a.get("value"),
+                "far20_f1": far20.get("flag_f1"), "far20_recall": far20.get("flag_recall"),
+                "far20_far": far20.get("false_alarm_rate"),
+                "balanced_accuracy": _get(primary, "flag_balanced_accuracy"),
                 "experiment": s["experiment"], "variant": name, "split": s.get("split"),
                 "basis": "cv" if v.get("cv") else "fixed",
                 "flag_f1": _get(primary, "flag_f1"), "lo": lo, "hi": hi,
@@ -76,7 +84,8 @@ def leaderboard_rows(summaries: Sequence[dict[str, Any]]) -> list[dict[str, Any]
                 "degraded": v.get("degraded"), "refuse_from": (v.get("meta") or {}).get("refuse_from"),
                 "created": (v.get("meta") or {}).get("created"),
             })
-    rows.sort(key=lambda r: (r["flag_f1"] is None, -(r["flag_f1"] or 0), r["far"] if r["far"] is not None else 9))
+    # primary: threshold-free AUC (flag F1 with a max-F1 threshold cannot beat flag-all at prevalence ~0.5)
+    rows.sort(key=lambda r: (r["auc"] is None, -(r["auc"] or 0), -(r["far20_f1"] or 0), -(r["flag_f1"] or 0)))
     return rows
 
 
@@ -91,14 +100,23 @@ def _f(x: Any, nd: int = 2) -> str:
 def render_leaderboard(rows: Sequence[dict[str, Any]], far_cap: float = 0.2) -> str:
     out = ["# Leaderboard", "",
            f"Generated {time.strftime('%Y-%m-%d %H:%M')} by `callguard leaderboard` from "
-           "runs/experiments/*/summary.json. Sorted by out-of-fold (CV) flag F1 (threshold chosen on the "
-           "other dev folds). Brackets: 95% bootstrap CI over dialogues; overlapping CIs = no detectable "
-           f"difference. FAR above the {far_cap:.0%} cap is marked (!). ORACLE rows read the reference "
-           "scripts and are never submission candidates; DEGRADED rows had failed checks.", ""]
-    head = ["#", "experiment / variant", "split", "n", "CV flag F1 [95% CI]", "FAR", "miss", "review recall",
+           "runs/experiments/*/summary.json. Sorted by **flag AUC** (ROC AUC of the call score, expected "
+           "alarm|review vs no_alert; threshold-free, 0.5 = chance), then CV@FAR20 flag F1. Why not flag F1: "
+           "on dev ~54% of calls are flaggable, so flag-everything already reaches flag F1 ~0.70 and a max-F1 "
+           "threshold drifts there. CV@FAR20 = threshold chosen on the other dev folds for max recall with "
+           "FAR <= 20%. CV flag F1 / FAR / miss / bal. acc = max-F1 CV threshold. Brackets: 95% bootstrap CI "
+           "over twin groups/dialogues; overlapping CIs = no detectable difference. FAR above the "
+           f"{far_cap:.0%} cap is marked (!). ORACLE rows read the reference scripts and are never submission "
+           "candidates; DEGRADED rows had failed checks.", ""]
+    head = ["#", "experiment / variant", "split", "n", "flag AUC [95% CI]", "alarm AUC",
+            "CV@FAR20 F1 / R / FAR", "CV flag F1 [95% CI]", "FAR", "miss", "bal. acc", "review recall",
             "alarm F1", "acc", "check s/call", "LLM calls/call", "commit", "tags"]
     out += ["| " + " | ".join(head) + " |", "|" + "|".join("---" for _ in head) + "|"]
     for i, r in enumerate(rows, 1):
+        auc = _f(r["auc"]) + (f" [{_f(r['auc_lo'])}, {_f(r['auc_hi'])}]" if r["auc_lo"] is not None else "")
+        far20 = "-" if r["far20_f1"] is None and r["far20_recall"] is None else \
+            f"{_f(r['far20_f1'])} / {_p(r['far20_recall'])} / {_p(r['far20_far'])}" + \
+            (" (!)" if r["far20_far"] is not None and r["far20_far"] > far_cap else "")
         f1 = _f(r["flag_f1"]) + (f" [{_f(r['lo'])}, {_f(r['hi'])}]" if r["lo"] is not None else "")
         if r["basis"] == "fixed":
             f1 += " (fixed)"
@@ -107,8 +125,8 @@ def render_leaderboard(rows: Sequence[dict[str, Any]], far_cap: float = 0.2) -> 
             tags.append(f"re-fusion of {r['refuse_from']}")
         far = _p(r["far"]) + (" (!)" if r["far"] is not None and r["far"] > far_cap else "")
         out.append("| " + " | ".join(str(c) for c in [
-            i, f"{r['experiment']} / **{r['variant']}**", r["split"], r["n"], f1, far, _p(r["miss"]),
-            _p(r["review_recall"]), _f(r["alarm_f1"]), _p(r["accuracy"]), _f(r["s_per_call"], 1),
+            i, f"{r['experiment']} / **{r['variant']}**", r["split"], r["n"], auc, _f(r["auc_alarm"]), far20,
+            f1, far, _p(r["miss"]), _f(r["balanced_accuracy"]), _p(r["review_recall"]), _f(r["alarm_f1"]), _p(r["accuracy"]), _f(r["s_per_call"], 1),
             _f(r["llm_calls"], 1), (r["commit"] or "-") + ("*" if r["dirty"] else ""), ", ".join(tags)]) + " |")
     if not rows:
         out.append("\nNo experiments yet: `callguard experiment experiments/<name>.yaml`.")
@@ -214,6 +232,54 @@ def chart_metrics(s: dict[str, Any], out: Path) -> Path:
              color=INK2, fontsize=7.5)
     fig.tight_layout(rect=(0, 0.03, 1, 0.95))
     p = out / "metrics.png"
+    fig.savefig(p, dpi=150)
+    plt.close(fig)
+    return p
+
+
+def chart_auc(s: dict[str, Any], out: Path) -> Path | None:
+    """Threshold-free discrimination: flag AUC and alarm-vs-rest AUC with 95% CIs, chance line at 0.5."""
+    plt = _plt()
+    V = s["variants"]
+    names = [n for n in V if ((V[n].get("auc") or {}).get("flag") or {}).get("value") is not None]
+    if not names:
+        return None
+    fig, axes = plt.subplots(1, 2, figsize=(10, 0.45 * len(names) + 1.8), sharey=True)
+    for ax, (t, title) in zip(axes, (("flag", "flag AUC (alarm|review vs no_alert)"),
+                                     ("alarm", "alarm-vs-rest AUC"))):
+        vals = []
+        for n in names:
+            a = (V[n].get("auc") or {}).get(t) or {}
+            v = a.get("value")
+            vals.append((float("nan"), 0, 0) if v is None else
+                        (v, max(0.0, v - (a.get("lo") if a.get("lo") is not None else v)),
+                         max(0.0, (a.get("hi") if a.get("hi") is not None else v) - v)))
+        y = list(range(len(names)))
+        ax.barh(y, [v[0] for v in vals], height=0.6, color=SERIES[0], edgecolor=SURFACE, linewidth=2)
+        for i, n in enumerate(names):
+            if V[n].get("oracle"):
+                ax.barh(i, vals[i][0], height=0.6, color="none", edgecolor=SURFACE, hatch="//", linewidth=0)
+        ax.errorbar([v[0] for v in vals], y, xerr=[[v[1] for v in vals], [v[2] for v in vals]], fmt="none",
+                    ecolor=INK, elinewidth=1.2, capsize=3)
+        for i, v in enumerate(vals):
+            if v[0] == v[0]:
+                ax.text(v[0] + v[2] + 0.02, i, f"{v[0]:.2f}", va="center", ha="left", color=INK, fontsize=8)
+        ax.axvline(0.5, color=INK2, linestyle="--", linewidth=1)
+        ax.set_xlim(0, 1.17)
+        ax.set_xticks([0, 0.25, 0.5, 0.75, 1.0])
+        ax.set_title(f"{title}; -- chance", fontsize=9)
+        ax.grid(axis="y", visible=False)
+    axes[0].set_yticks(range(len(names)), [_label(n, V[n]) for n in names])
+    axes[0].invert_yaxis()
+    best = max(names, key=lambda n: V[n]["auc"]["flag"]["value"])
+    lo = V[best]["auc"]["flag"].get("lo")
+    verdict = ("its CI stays above chance" if lo is not None and lo > 0.5 else "its CI still reaches chance (0.5)")
+    fig.suptitle(f"{s['experiment']}: best flag AUC {best} {V[best]['auc']['flag']['value']:.2f}; {verdict}",
+                 x=0.01, ha="left")
+    fig.text(0.01, 0.005, "ROC AUC of the call score; whiskers = 95% bootstrap CI over twin groups/dialogues",
+             color=INK2, fontsize=7.5)
+    fig.tight_layout(rect=(0, 0.03, 1, 0.95))
+    p = out / "auc.png"
     fig.savefig(p, dpi=150)
     plt.close(fig)
     return p
@@ -408,7 +474,11 @@ def build_report(names: Sequence[str] | None = None, out: Path | None = None,
             md += [s["description"], ""]
         md += [f"RQ: {', '.join(s.get('rq') or []) or '-'} · split {s['split']} · baseline `{s['compare_to']}` · "
                f"details: `{Path(s['_path']).parent.relative_to(ROOT) if Path(s['_path']).is_relative_to(ROOT) else s['_path']}/summary.md`", ""]
-        for fn in (chart_metrics, chart_cost, chart_noise, chart_levels, chart_thresholds):
+        b = s.get("baselines") or {}
+        if b.get("flag_all"):
+            md += [f"Floor on these calls: flag-all flag F1 {_f(b['flag_all']['flag_f1'])} (FAR 100%), "
+                   f"flag-none 0.00, constant score AUC 0.50.", ""]
+        for fn in (chart_auc, chart_metrics, chart_cost, chart_noise, chart_levels, chart_thresholds):
             try:
                 p = fn(s, d)
             except Exception as e:  # one broken chart must not lose the report
@@ -421,7 +491,10 @@ def build_report(names: Sequence[str] | None = None, out: Path | None = None,
             d1 = block["paired"]["flag_f1"]
             far = block["paired"]["false_alarm_rate"]
             verdict = ("**real difference**" if d1.get("real") else "no detectable difference")
-            md.append(f"- `{c['b']}` vs `{c['a']}`: flag F1 {_sg(d1.get('diff'))} "
+            pa = ((c.get("fixed") or {}).get("auc") or {}).get("flag") or {}
+            auc_txt = (f"flag AUC {_sg(pa.get('diff'))} [{_sg(pa.get('lo'))}, {_sg(pa.get('hi'))}]"
+                       f"{' (real)' if pa.get('real') else ''}; ") if pa.get("diff") is not None else ""
+            md.append(f"- `{c['b']}` vs `{c['a']}`: {auc_txt}flag F1 {_sg(d1.get('diff'))} "
                       f"[{_sg(d1.get('lo'))}, {_sg(d1.get('hi'))}] ({verdict}); FAR {_sg(far.get('diff'), True)}; "
                       f"McNemar p={block['mcnemar_flag']['p']}; {len(block['flips'])} calls flip")
         md.append("")

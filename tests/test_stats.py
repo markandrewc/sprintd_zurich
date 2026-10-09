@@ -144,7 +144,7 @@ def test_compare_bundle():
     a = pair("A", "alarm", "no_alert") + pair("B", "no_alert", "no_alert")
     b = pair("A", "alarm", "alarm") + pair("B", "no_alert", "no_alert")
     c = stats.compare(a, b, n_boot=300)
-    assert set(c) == {"paired", "mcnemar_flag", "mcnemar_label", "flips"}
+    assert set(c) == {"paired", "auc", "mcnemar_flag", "mcnemar_label", "flips"}
     assert c["mcnemar_flag"]["b_only"] == 2 and len(c["flips"]) == 2
     assert not math.isnan(c["paired"]["accuracy"]["diff"])
 
@@ -171,3 +171,52 @@ def test_case_twins_share_a_unit_via_splits_yaml():
         pytest.skip("no twin groups in config/splits.yaml")
     g, ds = next(iter(s.groups.items()))
     assert stats._dialogue(row(f"{ds[0]}-K1", "alarm", "alarm")) == stats._dialogue(row(f"{ds[1]}-K2", "alarm", "alarm")) == g
+
+
+# -- AUC, balanced accuracy, floor -------------------------------------------------------------------
+
+
+def scored(call_id, expected, score):
+    return row(call_id, expected, "alarm", score)
+
+
+def test_auc_known_answer():
+    rows = [scored("A-K1", "alarm", 0.9), scored("B-K1", "review", 0.6), scored("C-K1", "no_alert", 0.7),
+            scored("D-K1", "no_alert", 0.1), scored("E-K1", "alarm", 0.5)]
+    # flag: pos .9 .6 .5 vs neg .7 .1 -> 4 of 6 pairs ordered right
+    assert stats.auc(rows) == pytest.approx(0.6667, abs=1e-4)
+    # alarm: pos .9 .5 vs neg .6 .7 .1 -> 4 of 6
+    assert stats.auc(rows, "alarm") == pytest.approx(0.6667, abs=1e-4)
+    ties = [scored("A-K1", "alarm", 0.5), scored("B-K1", "no_alert", 0.5)]
+    assert stats.auc(ties) == 0.5
+    perfect = [scored(f"P{i}-K1", "alarm", 0.8 + i / 100) for i in range(5)] + \
+              [scored(f"N{i}-K1", "no_alert", 0.1 + i / 100) for i in range(5)]
+    b = stats.bootstrap_auc(perfect, n_boot=300)
+    assert b["flag"]["value"] == 1.0 and b["flag"]["lo"] == 1.0 and b["flag"]["n_pos"] == 5
+    assert b["alarm"]["value"] == 1.0
+    assert stats.auc([row("A-K1", "alarm", "review", None)]) is None  # error rows have no score
+
+
+def test_paired_auc_detects_better_ranking():
+    a, b = [], []
+    for i in range(12):
+        exp = "alarm" if i % 2 else "no_alert"
+        for k in (1, 2):
+            a.append(scored(f"D{i:02d}-K{k}", exp, 0.5))  # constant score: AUC 0.5
+            b.append(scored(f"D{i:02d}-K{k}", exp, 0.9 if exp == "alarm" else 0.1))
+    p = stats.paired_auc(a, b, n_boot=500)
+    assert p["flag"]["a"] == 0.5 and p["flag"]["b"] == 1.0 and p["flag"]["diff"] == 0.5
+    assert p["flag"]["real"] and p["flag"]["better"] == "b" and p["flag"]["lo"] > 0
+    same = stats.paired_auc(b, b, n_boot=200)
+    assert same["flag"]["diff"] == 0 and not same["flag"]["real"]
+
+
+def test_balanced_accuracy_and_trivial_baselines():
+    rows = [row("A-K1", "alarm", "alarm"), row("B-K1", "review", "no_alert"), row("C-K1", "no_alert", "alarm"),
+            row("D-K1", "no_alert", "no_alert")]
+    assert stats.point(rows)["flag_balanced_accuracy"] == 0.5  # recall 1/2, specificity 1/2
+    t = stats.trivial_baselines(rows)
+    assert t["flag_all"]["flag_f1"] == pytest.approx(round(2 * 2 / (2 * 2 + 2), 4))
+    assert t["flag_all"]["false_alarm_rate"] == 1.0 and t["flag_all"]["flag_balanced_accuracy"] == 0.5
+    assert t["flag_none"]["flag_f1"] == 0.0 and t["flag_none"]["miss_rate"] == 1.0
+    assert t["_n"] == {"calls": 4, "prevalence_flag": 0.5}

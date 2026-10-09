@@ -4,6 +4,9 @@ Definitions (research/AGENT.md):
 * flag positive = predicted alarm or review; truth positive = expected alarm or review.
 * ``false_alarm_rate`` = FP / expected no_alert, ``miss_rate`` = FN / expected positives.
 * ``review_recall`` = expected review -> predicted review. ``accuracy`` = 3-class accuracy.
+* ``flag_balanced_accuracy`` = (flag recall + specificity) / 2 (0.5 for any constant policy).
+* ``auc`` = ROC AUC of the call score (flag: expected alarm|review vs no_alert; alarm: alarm vs rest),
+  threshold-free; error rows (no score) are left out.
 
 Resampling unit = twin group (config/splits.yaml ``groups``: the Stufe2 pairs that differ only in
 context), else the dialogue; clean + noisy of a dialogue always stay together. Each row is reduced to a
@@ -64,8 +67,12 @@ METRICS: dict[str, Callable[[np.ndarray], np.ndarray]] = {
     "alarm_f1": lambda c: _ratio(2 * _col(c, "atp"), 2 * _col(c, "atp") + _col(c, "afp") + _col(c, "afn")),
     "review_recall": lambda c: _ratio(_col(c, "rev_hit"), _col(c, "rev_n")),
     "accuracy": lambda c: _ratio(_col(c, "correct"), _col(c, "n")),
+    # (recall + specificity) / 2 of the flag view: 0.5 for flag-all and flag-none, whatever the prevalence
+    "flag_balanced_accuracy": lambda c: (_ratio(_col(c, "tp"), _col(c, "tp") + _col(c, "fn"))
+                                         + _ratio(_col(c, "tn"), _col(c, "tn") + _col(c, "fp"))) / 2,
 }
-DIFF_METRICS = ("flag_f1", "alarm_f1", "false_alarm_rate", "miss_rate", "accuracy", "review_recall")
+DIFF_METRICS = ("flag_f1", "alarm_f1", "false_alarm_rate", "miss_rate", "accuracy", "review_recall",
+                "flag_balanced_accuracy")
 LOWER_IS_BETTER = {"false_alarm_rate", "miss_rate"}
 
 
@@ -222,9 +229,116 @@ def flips(rows_a: Sequence[Row], rows_b: Sequence[Row]) -> list[dict[str, Any]]:
     return out
 
 
+# --------------------------------------------------------------------------------------------
+# threshold-free discrimination: ROC AUC of the call score
+# --------------------------------------------------------------------------------------------
+
+AUC_TARGETS: dict[str, tuple[str, ...]] = {"flag": FLAG, "alarm": ("alarm",)}
+
+
+def _scored(rows: Sequence[Row]) -> list[Row]:
+    """Labelled rows with a score (error rows have none and are left out of the AUC)."""
+    return [r for r in labeled(rows) if isinstance(r.get("score"), (int, float))]
+
+
+def _auc_parts(rows: Sequence[Row], positive: tuple[str, ...]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """(is_pos, is_neg, M) with M[i, j] = 1 / 0.5 / 0 for score_i >, ==, < score_j (Mann-Whitney)."""
+    s = np.array([float(r["score"]) for r in rows])
+    pos = np.array([r["expected"] in positive for r in rows], dtype=float)
+    m = (s[:, None] > s[None, :]).astype(float) + 0.5 * (s[:, None] == s[None, :])
+    return pos, 1.0 - pos, m
+
+
+def _weighted_auc(w: np.ndarray, pos: np.ndarray, neg: np.ndarray, m: np.ndarray) -> np.ndarray:
+    """AUC per row of weights ``w`` (n_rep, n_rows): resampled calls count with their multiplicity."""
+    wp, wn = w * pos, w * neg
+    num = np.einsum("bi,ij,bj->b", wp, m, wn)
+    den = wp.sum(axis=1) * wn.sum(axis=1)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return np.where(den > 0, num / np.where(den > 0, den, 1), np.nan)
+
+
+def _unit_weights(rows: Sequence[Row], n_boot: int, seed: int) -> tuple[np.ndarray, int]:
+    """Bootstrap weights per row: how often its resampling unit (twin group / dialogue) was drawn.
+    Same generator and seed as :func:`bootstrap_ci`, so replicates line up with the other metrics."""
+    units: dict[str, int] = {}
+    col = np.array([units.setdefault(_dialogue(r), len(units)) for r in rows], dtype=int)
+    if not units:
+        return np.zeros((0, len(rows))), 0
+    idx = _resample_index(len(units), n_boot, seed)
+    counts = np.stack([np.bincount(i, minlength=len(units)) for i in idx])
+    return counts[:, col].astype(float), len(units)
+
+
+def auc(rows: Sequence[Row], target: str = "flag") -> float | None:
+    rows = _scored(rows)
+    if not rows:
+        return None
+    pos, neg, m = _auc_parts(rows, AUC_TARGETS[target])
+    return _clean(float(_weighted_auc(np.ones((1, len(rows))), pos, neg, m)[0]))
+
+
+def bootstrap_auc(rows: Sequence[Row], n_boot: int = 2000, seed: int = 13, alpha: float = 0.05
+                  ) -> dict[str, dict[str, Any]]:
+    """ROC AUC of the call score per target (flag: expected alarm|review vs no_alert; alarm: alarm vs
+    rest) with a percentile CI over resampled units. Threshold-free: it says whether the score ranks
+    flaggable calls above harmless ones at all, which flag F1 at a chosen threshold cannot when
+    flag-everything already scores well (prevalence ~0.5)."""
+    rows = _scored(rows)
+    out = {}
+    for t, positive in AUC_TARGETS.items():
+        base = {"value": None, "lo": None, "hi": None, "n_valid": 0,
+                "n_pos": sum(r["expected"] in positive for r in rows),
+                "n_neg": sum(r["expected"] not in positive for r in rows)}
+        if not base["n_pos"] or not base["n_neg"]:
+            out[t] = base
+            continue
+        pos, neg, m = _auc_parts(rows, positive)
+        w, _ = _unit_weights(rows, n_boot, seed)
+        lo, hi, nv = _ci(_weighted_auc(w, pos, neg, m), alpha)
+        out[t] = {**base, "value": auc(rows, t), "lo": lo, "hi": hi, "n_valid": nv}
+    return out
+
+
+def paired_auc(rows_a: Sequence[Row], rows_b: Sequence[Row], n_boot: int = 2000, seed: int = 13,
+               alpha: float = 0.05) -> dict[str, dict[str, Any]]:
+    """AUC difference B - A on the calls both scored, same resampled units for both (paired)."""
+    b_idx = {r["call_id"]: r for r in _scored(rows_b)}
+    pairs = [(a, b_idx[a["call_id"]]) for a in _scored(rows_a) if a["call_id"] in b_idx]
+    ra, rb = [a for a, _ in pairs], [b for _, b in pairs]
+    out = {}
+    for t, positive in AUC_TARGETS.items():
+        va, vb = auc(ra, t), auc(rb, t)
+        res = {"a": va, "b": vb, "diff": None if va is None or vb is None else round(vb - va, 4),
+               "lo": None, "hi": None, "n_valid": 0, "real": False, "better": None}
+        if res["diff"] is not None:
+            w, _ = _unit_weights(ra, n_boot, seed)
+            pa, na, ma = _auc_parts(ra, positive)
+            pb, nb, mb = _auc_parts(rb, positive)
+            lo, hi, nv = _ci(_weighted_auc(w, pb, nb, mb) - _weighted_auc(w, pa, na, ma), alpha)
+            res.update(lo=lo, hi=hi, n_valid=nv, real=lo is not None and hi is not None and (lo > 0 or hi < 0),
+                       better=None if res["diff"] == 0 else ("b" if res["diff"] > 0 else "a"))
+        out[t] = res
+    out["_n"] = {"calls": len(pairs)}  # type: ignore[assignment]
+    return out
+
+
+def trivial_baselines(rows: Sequence[Row]) -> dict[str, dict[str, Any]]:
+    """The floor on the same calls: flag every call (predict alarm), flag none (no_alert), and a
+    constant score (AUC 0.5). A system must beat these to mean anything."""
+    rows = labeled(rows)
+    out = {}
+    for name, label in (("flag_all", "alarm"), ("flag_none", "no_alert")):
+        out[name] = point([{**r, "predicted": label} for r in rows])
+    out["_n"] = {"calls": len(rows), "prevalence_flag": _clean(sum(r["expected"] in FLAG for r in rows) / len(rows))
+                 if rows else None}  # type: ignore[assignment]
+    return out
+
+
 def compare(rows_a: Sequence[Row], rows_b: Sequence[Row], n_boot: int = 2000, seed: int = 13) -> dict[str, Any]:
     """Everything the protocol asks for one A-vs-B comparison on one set of predictions."""
     return {"paired": paired_bootstrap(rows_a, rows_b, n_boot, seed),
+            "auc": paired_auc(rows_a, rows_b, n_boot, seed),
             "mcnemar_flag": mcnemar(rows_a, rows_b, flag_correct),
             "mcnemar_label": mcnemar(rows_a, rows_b, label_correct),
             "flips": flips(rows_a, rows_b)}

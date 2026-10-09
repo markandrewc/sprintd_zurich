@@ -7,6 +7,32 @@ in ``Decision.reasons``.
 Uncertainty has two sources, both of which push borderline calls to ``review`` instead of guessing:
 checks contradicting each other (weighted spread of their scores) and checks reporting low
 confidence in their own score.
+
+Per family, with effective weight ``e_c = weight_c * max(conf_c, 0.05)`` over the checks that scored it:
+``score = sum(e_c * s_c) / sum(e_c)``, ``disagreement = min(1, 2 * sqrt(sum(e_c * (s_c - score)^2) / sum(e_c)))``,
+``uncertainty = 0.5 * disagreement + 0.5 * (1 - sum(weight_c * conf_c) / sum(weight_c))``. The call score is
+the highest family score among families that may alarm.
+
+Optional knobs (all off by default; off = exactly the v1 numbers):
+
+* ``abstain_on_empty: true`` (idea N14, "absence of evidence is not evidence of absence"): a rule check
+  (``rule_checks``, default the types ``keywords`` and ``patterns``) that found nothing for a family
+  (family score <= 0 and no finding of that family with a positive score) abstains for that family: it is
+  left out of the weighted mean, the disagreement AND the mean confidence, as if it had not scored the
+  family. Without the knob it enters all three as "score 0 at its absent_confidence" (keywords: 0.25 at
+  weight 0.35), which pulls the mean down and inflates the uncertainty of a clear no-keyword alarm (the
+  Stufe2 profile) until it is escalated to review. Rule checks with a hit, and LLM checks saying 0, still
+  count in full. If every check that scored the family is an empty rule check, nothing abstains (they are
+  the only opinion there is; score 0 as before).
+* ``uncertainty_from: llm``: disagreement and mean confidence are computed only over the non-rule checks
+  that went into the family (their own weighted mean and spread); the score still uses every check. Falls
+  back to all checks when no non-rule check scored the family. ``all`` (default) = v1.
+* ``family_thresholds: {trade: 0.5, ...}`` (or the path of a ``callguard fit-fusion --kind thresholds``
+  JSON; idea N2): the alarm threshold per family, shown to the officer in the reasons. The officer's one
+  threshold slider shifts all of them together: ``t_f = family_thresholds[f] + (slider - threshold)``;
+  families not listed use the slider value. The top family is then the one with the largest margin
+  ``score_f - t_f`` and the call is labelled against its ``t_f`` (review band below it as usual);
+  ``Decision.threshold`` is that ``t_f``.
 """
 
 from __future__ import annotations
@@ -64,6 +90,37 @@ class _Contribution:
     score: float
     confidence: float
     fs: FamilyScore
+    rule: bool = False  # a rule check (rule_checks): context-blind cue matching
+    empty: bool = False  # a rule check that found nothing for this family
+
+
+UNCERTAINTY_FROM = ("all", "llm")
+RULE_CHECKS = ("keywords", "patterns")
+
+
+def load_family_thresholds(spec: dict[str, Any] | str | None) -> dict[str, float] | None:
+    """``{family: threshold}`` from a dict or the path of a fitted ``thresholds`` model (JSON with a
+    ``family_thresholds`` block). Relative paths are resolved against the repo root."""
+    if spec is None or spec == {} or spec == "":
+        return None
+    if isinstance(spec, str):
+        import json
+        from pathlib import Path
+
+        from callguard.config import ROOT
+        p = Path(spec)
+        p = p if p.is_absolute() else ROOT / p
+        raw = json.loads(p.read_text())
+        spec = raw.get("family_thresholds", raw)
+    if not isinstance(spec, dict):
+        raise ValueError(f"family_thresholds must be a mapping family -> threshold, got {spec!r}")
+    out = {}
+    for k, v in spec.items():
+        x = _num(v)
+        if x is None:
+            raise ValueError(f"family_thresholds.{k}={v!r} is not a number")
+        out[str(k)] = x
+    return out or None
 
 
 @dataclass
@@ -79,10 +136,30 @@ class _Evidence:
 class WeightedFusion(Fusion):
     def __init__(self, ctx: "Context", *, threshold: float = 0.55, review_band: float = 0.15,
                  max_uncertainty: float = 0.35, min_score_for_review: float = 0.25,
-                 max_passages: int = 5, merge_gap: float = 3.0, max_passage_seconds: float = 60.0):
+                 max_passages: int = 5, merge_gap: float = 3.0, max_passage_seconds: float = 60.0,
+                 abstain_on_empty: bool = False, uncertainty_from: str = "all",
+                 rule_checks: list[str] | tuple[str, ...] = RULE_CHECKS,
+                 family_thresholds: dict[str, float] | str | None = None):
+        if uncertainty_from not in UNCERTAINTY_FROM:
+            raise ValueError(f"uncertainty_from must be one of {UNCERTAINTY_FROM}, got {uncertainty_from!r}")
+        # the v2 knobs enter params (provenance) only when set, so default configs keep their v1 params
+        extra: dict[str, Any] = {}
+        if abstain_on_empty:
+            extra["abstain_on_empty"] = True
+        if uncertainty_from != "all":
+            extra["uncertainty_from"] = uncertainty_from
+        if tuple(rule_checks) != RULE_CHECKS:
+            extra["rule_checks"] = list(rule_checks)
+        if family_thresholds:
+            extra["family_thresholds"] = family_thresholds
         super().__init__(ctx, threshold=threshold, review_band=review_band,
                          max_uncertainty=max_uncertainty, min_score_for_review=min_score_for_review,
-                         max_passages=max_passages, merge_gap=merge_gap, max_passage_seconds=max_passage_seconds)
+                         max_passages=max_passages, merge_gap=merge_gap, max_passage_seconds=max_passage_seconds,
+                         **extra)
+        self.abstain_on_empty = bool(abstain_on_empty)
+        self.uncertainty_from = uncertainty_from
+        self.rule_checks = frozenset(rule_checks)  # check types or instance names
+        self.family_thresholds = load_family_thresholds(family_thresholds)
         self.threshold = threshold
         self.review_band = review_band
         self.max_uncertainty = max_uncertainty
@@ -143,7 +220,10 @@ class WeightedFusion(Fusion):
                 if fs is None or score is None:
                     continue
                 conf = _clip(_num(fs.confidence) if _num(fs.confidence) is not None else 1.0)
-                contribs.append(_Contribution(name, w_of[name], _clip(score), conf, fs))
+                rule = r.type in self.rule_checks or name in self.rule_checks
+                empty = rule and score <= 0 and not any(
+                    x.family == f.id and (_num(x.score) or 0.0) > 0 for x in r.findings)
+                contribs.append(_Contribution(name, w_of[name], _clip(score), conf, fs, rule, empty))
             fused[f.id] = self._fuse_family(f, contribs)
             if contribs:
                 has_contrib.add(f.id)
@@ -152,13 +232,25 @@ class WeightedFusion(Fusion):
                 hints[f.id] = hint
 
         alarming = [f.id for f in fams if f.can_alarm]
-        top = max(alarming, key=lambda fid: (fused[fid].score, fid in has_contrib, -fused[fid].uncertainty),
-                  default=None)
+        fam_t, listed = self._family_cuts(o, t, alarming)
+        if fam_t is None:
+            top = max(alarming, key=lambda fid: (fused[fid].score, fid in has_contrib, -fused[fid].uncertainty),
+                      default=None)
+        else:  # per-family thresholds: the family closest to (or furthest over) its own line decides
+            top = max(alarming, key=lambda fid: (round(fused[fid].score - fam_t[fid], 6), fused[fid].score,
+                                                 fid in has_contrib, -fused[fid].uncertainty), default=None)
         score = fused[top].score if top else 0.0
         unc = fused[top].uncertainty if top else 0.0
+        t_call = fam_t[top] if fam_t is not None and top else t
 
-        label, reasons = self._label(score, unc, t, band, max_unc, min_review, top, fused, fam_by_id,
+        label, reasons = self._label(score, unc, t_call, band, max_unc, min_review, top, fused, fam_by_id,
                                      hints, usable, failed)
+        if fam_t is not None and top:
+            base_t = listed.get(top)
+            reasons.append(
+                f"Schwelle je Familie: '{short_label(fam_by_id[top].label)}' {t_call:.2f}"
+                + (f" (konfiguriert {base_t:.2f}, Regler verschiebt alle Familien um {t - self.threshold:+.2f})."
+                   if base_t is not None else " (globale Schwelle, keine eigene Familienschwelle)."))
         if failed:
             for name, err in failed.items():
                 reasons.append(f"Hinweis: Prüfung '{name}' ist ausgefallen und fehlt in der Bewertung "
@@ -166,14 +258,25 @@ class WeightedFusion(Fusion):
         if disabled & set(results):
             reasons.append(f"Deaktivierte Prüfungen: {', '.join(sorted(disabled & set(results)))}.")
 
-        floor = min(_band_floor(t, band), min_review)
+        floor = min(_band_floor(min([t, *fam_t.values()]) if fam_t else t, band), min_review)
         passages = self._passages(transcript, usable, fused, fam_by_id, floor, merge_gap,
                                   max_len, views)[:max(0, max_passages)]
         if views:
             for p in passages:
                 p.texts = {name: view_text(v, p.start, p.end) for name, v in views.items()}
-        return Decision(label=label, score=score, uncertainty=unc, threshold=t, families=fused,
+        return Decision(label=label, score=score, uncertainty=unc, threshold=t_call, families=fused,
                         passages=passages, reasons=reasons, top_family=top if score > 0 else None)
+
+    def _family_cuts(self, o: dict[str, Any], t: float, alarming: list[str]
+                     ) -> tuple[dict[str, float] | None, dict[str, float]]:
+        """(per-family alarm thresholds after the slider shift, the configured ones), or (None, {}) for
+        one global threshold (v1). ``overrides["family_thresholds"]`` replaces the configured block."""
+        listed = load_family_thresholds(o["family_thresholds"]) if o.get("family_thresholds") \
+            else self.family_thresholds
+        if not listed:
+            return None, {}
+        shift = t - float(self.threshold)
+        return {fid: round(_clip(listed[fid] + shift), 6) if fid in listed else t for fid in alarming}, listed
 
     # -- per family -------------------------------------------------------------------------------
 
@@ -181,13 +284,23 @@ class WeightedFusion(Fusion):
         if not contribs:
             return FusedFamily(family=fam.id, label=fam.label, score=0.0, uncertainty=1.0,
                                reason="Keine Prüfung hat diese Familie bewertet.")
+        if self.abstain_on_empty:  # N14: an empty rule check abstains (unless it is the only opinion)
+            contribs = [c for c in contribs if not c.empty] or contribs
         eff = [c.weight * max(c.confidence, MIN_CONFIDENCE) for c in contribs]
         total = sum(eff)
         mean = sum(e * c.score for e, c in zip(eff, contribs)) / total
-        var = sum(e * (c.score - mean) ** 2 for e, c in zip(eff, contribs)) / total
+        src = contribs
+        if self.uncertainty_from == "llm":
+            src = [c for c in contribs if not c.rule] or contribs
+        if src is contribs:
+            var = sum(e * (c.score - mean) ** 2 for e, c in zip(eff, contribs)) / total
+        else:  # spread of the non-rule checks around their own weighted mean
+            s_eff = [c.weight * max(c.confidence, MIN_CONFIDENCE) for c in src]
+            s_mean = sum(e * c.score for e, c in zip(s_eff, src)) / sum(s_eff)
+            var = sum(e * (c.score - s_mean) ** 2 for e, c in zip(s_eff, src)) / sum(s_eff)
         disagreement = min(1.0, 2.0 * math.sqrt(max(var, 0.0)))
-        w_total = sum(c.weight for c in contribs)
-        mean_conf = sum(c.weight * c.confidence for c in contribs) / w_total
+        w_total = sum(c.weight for c in src)
+        mean_conf = sum(c.weight * c.confidence for c in src) / w_total
         unc = _clip(0.5 * disagreement + 0.5 * (1.0 - mean_conf))
         # an explanation ("Kunde will vor der Meldung kaufen ...") beats a bare score ("G-Eval 1.75/5")
         reason = next((c.fs.reason.strip() for c in sorted(

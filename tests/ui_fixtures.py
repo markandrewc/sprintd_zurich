@@ -352,3 +352,77 @@ def write_fixture_env(root: Path, config: str = "local", with_snippet: bool = Tr
             f"paths.criteria={criteria}", f"paths.cache_dir={root / 'cache'}", "llms.default={type: fake}"]
     return FixtureEnv(root=root, runs_dir=runs_dir, data_dir=data, keywords=keywords, criteria=criteria,
                       config=config, sets=sets)
+
+
+# --------------------------------------------------------------------------------------------
+# multi-view result, experiment folder, holdout log
+# --------------------------------------------------------------------------------------------
+
+
+def add_views(env: FixtureEnv, call_id: str = ALARM_ID) -> CallResult:
+    """Give a stored result a second (English) transcript view and per-view passage texts."""
+    path = env.result_path(call_id)
+    r = CallResult.model_validate_json(path.read_text())
+    main = r.transcript.model_copy(update={"view": "main", "lang": "de"})
+    en = main.model_copy(update={"view": "en_from_de", "lang": "en", "asr_backend": "translate:fake",
+                                 "segments": [s.model_copy(update={"text": f"[EN] {s.text}"}) for s in main.segments]})
+    for p in r.decision.passages:
+        p.texts = {"main": p.text, "en_from_de": f"[EN] {p.text}"}
+    r = r.model_copy(update={"transcript": main, "views": {"main": main, "en_from_de": en}})
+    path.write_text(r.model_dump_json(indent=1))
+    return r
+
+
+def _metrics_block(f1: float, lo: float, hi: float, far: float) -> dict:
+    return {"n": 3, "flag_precision": 0.67, "flag_recall": 1.0, "flag_f1": f1, "false_alarm_rate": far,
+            "miss_rate": 0.0, "alarm_f1": 1.0, "review_recall": 1.0, "accuracy": 0.67,
+            "ci": {"flag_f1": {"value": f1, "lo": lo, "hi": hi, "n_valid": 200},
+                   "false_alarm_rate": {"value": far, "lo": 0.0, "hi": 1.0, "n_valid": 200}}}
+
+
+def write_experiment_fixture(env: FixtureEnv, name: str = "fx") -> Path:
+    """runs/experiments/<name>/ as ``callguard experiment`` writes it: spec, summary, two variants."""
+    import json
+
+    import yaml
+
+    d = env.runs_dir.parent / "experiments" / name
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "spec.yaml").write_text(yaml.safe_dump({
+        "name": name, "description": "UI-Test-Experiment", "base": env.config, "split": "dev", "compare_to": "a",
+        "variants": [{"name": "a", "description": "alle Prüfungen"},
+                     {"name": "b", "description": "tiefere Schwelle", "set": ["fusion.threshold=0.3"]}]}))
+    results = [CallResult.model_validate_json(env.result_path(c).read_text()) for c in (ALARM_ID, HARMLESS_ID, REVIEW_ID)]
+    for v in ("a", "b"):
+        (d / v).mkdir(exist_ok=True)
+        (d / v / "results.jsonl").write_text("\n".join(r.model_dump_json() for r in results) + "\n")
+    variants = {
+        v: {"variant": v, "oracle": False, "n_calls": 3, "n_dialogues": 3, "degraded": False, "commit": "abc1234",
+            "dirty": False, "meta": {"description": f"Variante {v}", "refuse_from": None},
+            "fixed": _metrics_block(f1, lo, hi, far), "cv": _metrics_block(f1, lo, hi, far),
+            "suggestion": {"threshold": 0.5}, "cost": {"check_compute_s_total_per_call": 1.5, "llm_calls_per_call": 4}}
+        for v, f1, lo, hi, far in (("a", 0.8, 0.5, 1.0, 0.0), ("b", 0.67, 0.4, 0.9, 1.0))}
+    flips = [{"call_id": HARMLESS_ID, "expected": "no_alert", "a": "no_alert", "b": "review", "a_score": 0.15,
+              "b_score": 0.35, "flag_change": "broken", "label_change": "broken", "a_reason": "Kein Alarm",
+              "b_reason": "Prüfen"}]
+    comp = {"paired": {"flag_f1": {"a": 0.8, "b": 0.67, "diff": -0.13, "lo": -0.4, "hi": 0.1, "real": False,
+                                   "better": "a"}, "_n": {"calls": 3}},
+            "mcnemar_flag": {"n": 3, "a_only": 1, "b_only": 0, "both": 2, "neither": 0, "p": 1.0}, "flips": flips}
+    summary = {"experiment": name, "description": "UI-Test-Experiment", "rq": ["RQ1"], "base": env.config,
+               "split": "dev", "compare_to": "a", "n_boot": 200, "seed": 13, "created": "2026-10-10T01:00:00+0200",
+               "git": {"sha": "abc1234", "dirty": False}, "variants": variants,
+               "comparisons": [{"a": "a", "b": "b", "fixed": comp, "cv": comp}]}
+    (d / "summary.json").write_text(json.dumps(summary))
+    return d
+
+
+def write_holdout_log(env: FixtureEnv, f1: float = 0.6) -> Path:
+    import json
+
+    p = env.runs_dir.parent / "holdout_log.jsonl"
+    entry = {"time": "2026-10-10T05:00:00+0200", "kind": "eval", "config": env.config, "n_calls": 12,
+             "git": {"sha": "abc1234", "dirty": False},
+             "metrics": {"flag_f1": f1, "flag_precision": 0.5, "flag_recall": 0.75, "false_alarm_rate": 0.2,
+                         "miss_rate": 0.25}}
+    p.write_text(json.dumps(entry) + "\n")
+    return p

@@ -1,0 +1,34 @@
+# Who gets told about a flagged call (docs/design/v2_plan.md §3, docs/OPERATING_CONCEPT.md).
+# Read by callguard.routing / the `notify` sink / `callguard route`. Editable without code.
+#
+# rules: every rule whose `when` matches adds its teams (a call can go to several desks).
+#   when keys (all given keys must match; a list means "any of"):
+#     family:  a family the call was flagged for (top family + passage families)
+#     label:   alarm | review | no_alert (the call label)
+#     pattern: a cross-call flag on this call's advisor/customer/company (callguard.patterns), e.g.
+#              repeat_advisor | company_across_customers | repeat_family_customer
+#     min_score: call score at least this
+#   notify: team ids;  cc_supervisor: true = cc the advisor's supervisor (config/directory.yaml)
+# supervisor_cc_on: labels on which the advisor's supervisor is always cc'd.
+# fallback: teams for a flagged call no rule matched (nobody is ever "not told").
+
+labels: [alarm, review]          # only these labels are routed at all
+
+teams:
+  market_surveillance: {name: Market Surveillance, email: market-surveillance@bank.example}
+  fraud_desk: {name: Fraud & Security, email: fraud@bank.example}
+  data_protection: {name: Data Protection, email: dpo@bank.example}
+  aml_desk: {name: AML / Geldwäscherei-Fachstelle, email: aml@bank.example}
+  compliance_desk: {name: Compliance Desk, email: compliance@bank.example}
+
+rules:
+  - {when: {family: trade}, notify: [market_surveillance]}
+  - {when: {family: access}, notify: [fraud_desk]}
+  - {when: {family: disclosure}, notify: [data_protection]}
+  - {when: {family: [documentation, splitting]}, notify: [aml_desk]}
+  - {when: {label: review}, notify: [compliance_desk]}
+  - {when: {pattern: repeat_advisor}, notify: [compliance_desk], cc_supervisor: true}
+  - {when: {pattern: company_across_customers}, notify: [market_surveillance]}
+
+supervisor_cc_on: [alarm]
+fallback: [compliance_desk]

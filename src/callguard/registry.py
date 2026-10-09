@@ -37,9 +37,18 @@ BUILTINS: dict[str, dict[str, str]] = {
         "patterns": "callguard.checks.patterns:PatternCheck",
         "llm_judge": "callguard.checks.llm_judge:LLMJudgeCheck",
         "geval": "callguard.checks.geval:GEvalCheck",
+        "geval_cot": "callguard.checks.geval_cot:GEvalCoTCheck",
+        "entities": "callguard.checks.entities:EntityCheck",
+        "facts": "callguard.checks.facts:FactSheetCheck",
+        "keyword_context": "callguard.checks.keyword_context:KeywordContextCheck",
+        "anchored": "callguard.checks.keyword_context:AnchoredProbeCheck",
+        "semantic_windows": "callguard.checks.semantic:SemanticWindowCheck",
+        "quote_judge": "callguard.checks.quote_judge:QuoteJudgeCheck",
     },
     "fusion": {
         "weighted": "callguard.fusion.weighted:WeightedFusion",
+        "calibrated": "callguard.fusion.calibrated:CalibratedFusion",
+        "learned": "callguard.fusion.learned:LearnedFusion",
     },
     "llm": {
         "openai_compat": "callguard.llm.openai_compat:OpenAICompatLLM",
@@ -49,6 +58,8 @@ BUILTINS: dict[str, dict[str, str]] = {
     "sink": {
         "json_dir": "callguard.sinks.json_dir:JsonDirSink",
         "outcept_trigger": "callguard.sinks.outcept:OutceptTriggerSink",
+        "notify": "callguard.sinks.notify:NotifySink",
+        "audit": "callguard.audit:AuditSink",
     },
     "translator": {
         "llm_translate": "callguard.translate.llm:LLMTranslator",

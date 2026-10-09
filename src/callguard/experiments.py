@@ -9,6 +9,7 @@ Spec (``experiments/<name>.yaml``)::
     split: dev                           # dev (default) | holdout (logged!) | all
     compare_to: all                      # baseline variant for the paired comparisons (default: first)
     thresholds: [0.3, 0.4, 0.5]          # optional: sweep / CV grid (default eval.DEFAULT_THRESHOLDS)
+    use_tuning: false                    # default: config/tuning.yaml (officer overlay) is NOT applied
     variants:
       - name: keywords
         checks: [keywords]               # keep only these checks (by name), in config order
@@ -38,6 +39,7 @@ GPU model is never loaded or driven twice at once. Snippets are never cut in exp
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import statistics
@@ -96,6 +98,7 @@ class Spec:
     split: str = "dev"
     compare_to: str | None = None
     thresholds: list[float] | None = None
+    use_tuning: bool = False  # apply the officer overlay (paths.tuning, config/tuning.yaml); off by default
     path: Path | None = None
 
     def variant(self, name: str) -> Variant:
@@ -149,7 +152,8 @@ def parse_spec(raw: dict[str, Any], *, name: str = "experiment", path: Path | No
     spec = Spec(name=str(raw.get("name") or name), base=str(raw["base"]), variants=variants,
                 description=str(raw.get("description") or ""), rq=[str(x) for x in raw.get("rq") or []],
                 split=str(raw.get("split") or "dev"), compare_to=raw.get("compare_to"),
-                thresholds=[float(t) for t in raw["thresholds"]] if raw.get("thresholds") else None, path=path)
+                thresholds=[float(t) for t in raw["thresholds"]] if raw.get("thresholds") else None,
+                use_tuning=bool(raw.get("use_tuning", False)), path=path)
     if spec.split not in sp.SPLIT_CHOICES:
         raise SpecError(f"{name}: split must be one of {sp.SPLIT_CHOICES}")
     if spec.compare_to is not None:
@@ -211,22 +215,43 @@ def select_checks(checks: list[dict[str, Any]], keep: Sequence[str] | None = Non
     return out + [dict(c) for c in add]
 
 
+def _profile_raw(spec: Spec, profile: str, sets: Sequence[str]) -> tuple[dict[str, Any], Path]:
+    """Profile -> (tuning overlay only if ``spec.use_tuning``) -> ``set`` overrides, like ``load_config``.
+    Experiments never pick up config/tuning.yaml silently: without ``use_tuning: true`` the overlay is
+    disabled (``paths.tuning: null``), so a threshold the officer moved in the UI cannot leak into a
+    comparison. ``raw["tuning"]`` records what was applied (None = nothing)."""
+    from callguard.config import _tuning_path, apply_tuning, tuning_values
+
+    p = resolve_config_path(profile)
+    base = expand_env(_load_raw(p), source=p.name)
+    raw = apply_overrides(base, _named_paths(base, sets))
+    raw.setdefault("name", p.stem)
+    raw.pop("tuning", None)
+    if spec.use_tuning:
+        tp = _tuning_path(raw)
+        if tp is not None and tp.is_file():
+            text = tp.read_text()
+            tuned, applied = apply_tuning(base, tuning_values(yaml.safe_load(text) or {}, raw["name"]))
+            if applied:
+                raw = apply_overrides(tuned, _named_paths(tuned, sets))
+                raw.setdefault("name", p.stem)
+                raw["tuning"] = {"path": str(tp), "hash": hashlib.sha256(text.encode()).hexdigest()[:16],
+                                 "applied": applied}
+    else:
+        raw.setdefault("paths", {})["tuning"] = None
+    return raw, p
+
+
 def variant_raw(spec: Spec, v: Variant) -> tuple[dict[str, Any], Path]:
     """The raw (merged, env-expanded, overridden) config dict of a variant, before validation."""
     if v.refuse_from:
         src = spec.variant(v.refuse_from)
-        p = resolve_config_path(src.profile or spec.base)
-        raw = expand_env(_load_raw(p), source=p.name)
-        sets = [*src.set, *v.set]
-        raw = apply_overrides(raw, _named_paths(raw, sets))
+        raw, p = _profile_raw(spec, src.profile or spec.base, [*src.set, *v.set])
         raw["checks"] = select_checks(raw.get("checks") or [], src.checks, src.drop_checks, src.add_checks)
         raw["checks"] = select_checks(raw["checks"], v.checks, v.drop_checks)
     else:
-        p = resolve_config_path(v.profile or spec.base)
-        raw = expand_env(_load_raw(p), source=p.name)
-        raw = apply_overrides(raw, _named_paths(raw, v.set))
+        raw, p = _profile_raw(spec, v.profile or spec.base, v.set)
         raw["checks"] = select_checks(raw.get("checks") or [], v.checks, v.drop_checks, v.add_checks)
-    raw.setdefault("name", p.stem)
     return raw, p
 
 
@@ -352,12 +377,50 @@ def strip_words(res: CallResult) -> dict[str, Any]:
     return d
 
 
+FAR_CAP = 0.2  # research/AGENT.md: soft cap on the false-alarm rate
+# the recall@FAR policy needs room above the default grid: a weak score separates only near the top
+FAR_GRID_EXTRA = (0.95, 1.0)
+
+
+def pick_recall_at_far(swept: list[dict[str, Any]], cap: float = FAR_CAP) -> dict[str, Any] | None:
+    """Operating point "CV@FAR20": the threshold with the highest flag recall whose false-alarm rate on
+    the training folds is <= ``cap`` (ties: lower FAR, then higher F1, then the higher threshold). If no
+    threshold meets the cap, the lowest-FAR one (ties: higher recall). Unlike max-F1 it cannot drift to
+    "flag everything" when half the calls are positive."""
+    scored = [s for s in swept if s["metrics"]["n"]]
+    if not scored:
+        return None
+
+    def f(s: dict[str, Any], k: str, default: float = 0.0) -> float:
+        v = s["metrics"]["flag"][k]
+        return default if v is None else v
+
+    ok = [s for s in scored if f(s, "false_alarm_rate", 1.0) <= cap]
+    if ok:
+        best = max(ok, key=lambda s: (f(s, "recall"), -f(s, "false_alarm_rate"), f(s, "f1"), s["threshold"]))
+        why = "max recall with FAR <= cap"
+    else:
+        best = max(scored, key=lambda s: (-f(s, "false_alarm_rate", 1.0), f(s, "recall"), s["threshold"]))
+        why = "no threshold meets the FAR cap: lowest FAR"
+    return {"threshold": best["threshold"], "flag_recall": f(best, "recall"),
+            "false_alarm_rate": best["metrics"]["flag"]["false_alarm_rate"], "reason": why}
+
+
+CV_POLICIES = ("max_f1", "recall_at_far")
+
+
 def cv_predict(pipe: Any, results: Sequence[CallResult], calls: Sequence[Call], fold_of: dict[str, int],
-               thresholds: Sequence[float] | None = None, error_rows: Sequence[Row] = ()
-               ) -> tuple[list[Row], list[dict[str, Any]]]:
+               thresholds: Sequence[float] | None = None, error_rows: Sequence[Row] = (),
+               policy: str = "max_f1") -> tuple[list[Row], list[dict[str, Any]]]:
     """Out-of-fold predictions (adapted from ``eval.cross_validate``, keeping the decisions for flip
-    tables): per dev fold, ``suggest_threshold`` on the other folds' results, then that threshold on the
-    fold. Calls whose dialogue has no fold are left out; error rows stay error rows (counted as review)."""
+    tables): per dev fold, a threshold chosen on the other folds' results, then that threshold on the
+    fold. ``policy``: ``max_f1`` (``eval.suggest_threshold``) or ``recall_at_far`` (:func:`pick_recall_at_far`,
+    on the grid plus 0.95/1.0). Calls whose dialogue has no fold are left out; error rows stay error rows
+    (counted as review)."""
+    if policy not in CV_POLICIES:
+        raise ValueError(f"policy must be one of {CV_POLICIES}")
+    if policy == "recall_at_far":
+        thresholds = sorted({*(thresholds or ev.DEFAULT_THRESHOLDS), *FAR_GRID_EXTRA})
     by_fold: dict[int, list[CallResult]] = {}
     for r in results:
         k = fold_of.get(dialogue_of(r.call_id))
@@ -373,7 +436,8 @@ def cv_predict(pipe: Any, results: Sequence[CallResult], calls: Sequence[Call], 
         return [], []
     for k in sorted(by_fold):
         train = [r for j, rs in by_fold.items() if j != k for r in rs]
-        pick = ev.suggest_threshold(ev.sweep(pipe, train, calls, thresholds))
+        swept = ev.sweep(pipe, train, calls, thresholds)
+        pick = ev.suggest_threshold(swept) if policy == "max_f1" else pick_recall_at_far(swept)
         t = pick["threshold"] if pick else default
         for r in by_fold[k]:
             d = pipe.decide(r.transcript, r.checks, {"threshold": t}, families)
@@ -528,14 +592,16 @@ def _write_variant(spec: Spec, v: Variant, cfg: AppConfig, pipe: Any, calls: Seq
     errors = [r for r in rows if r.get("error")]
     cv_rows, cv_folds = ([], []) if spec.split == sp.HOLDOUT else cv_predict(
         pipe, results, calls, fold_of, spec.thresholds, errors)
+    far_rows, far_folds = ([], []) if spec.split == sp.HOLDOUT else cv_predict(
+        pipe, results, calls, fold_of, spec.thresholds, errors, policy="recall_at_far")
     swept = ev.sweep(pipe, results, calls, spec.thresholds) if results else []
     suggestion = ev.suggest_threshold(swept) if swept else None
     with (vdir / "results.jsonl").open("w") as f:
         for r in results:
             f.write(json.dumps(strip_words(r), ensure_ascii=False) + "\n")
     (vdir / "rows.json").write_text(json.dumps(
-        {"fixed": rows, "cv": cv_rows, "cv_folds": cv_folds, "sweep": compact_sweep(swept),
-         "suggestion": suggestion}, ensure_ascii=False, indent=1, default=str))
+        {"fixed": rows, "cv": cv_rows, "cv_folds": cv_folds, "cv_far": far_rows, "cv_far_folds": far_folds,
+         "sweep": compact_sweep(swept), "suggestion": suggestion}, ensure_ascii=False, indent=1, default=str))
     (vdir / "metrics.json").write_text(json.dumps(
         {"fixed": ev.metrics(rows), "cv": ev.metrics(cv_rows) if cv_rows else None}, ensure_ascii=False,
         indent=1, default=str))
@@ -543,6 +609,7 @@ def _write_variant(spec: Spec, v: Variant, cfg: AppConfig, pipe: Any, calls: Seq
         "variant": v.name, "description": v.description, "experiment": spec.name, "split": spec.split,
         "profile": v.profile or spec.base, "set": v.set, "checks": [c.get("name") or c.get("type") for c in cfg.checks],
         "refuse_from": v.refuse_from, "oracle": is_oracle(v, cfg), "config_name": cfg.name,
+        "use_tuning": spec.use_tuning, "tuning": getattr(cfg, "tuning", None),  # None = no overlay applied
         "config_hash": sp.config_hash(cfg), "threshold": cfg.fusion.get("threshold"),
         "fusion": cfg.fusion.get("type"), "asr": cfg.asr.get("type"), "asr_model": cfg.asr.get("model"),
         "llm": {k: {kk: spec_v for kk, spec_v in s.items() if kk in ("type", "model", "base_url", "cache_tag")}
@@ -666,7 +733,15 @@ def _flat(m: dict[str, Any]) -> dict[str, Any]:
     return {"n": m["n"], "flag_precision": f["precision"], "flag_recall": f["recall"], "flag_f1": f["f1"],
             "false_alarm_rate": f["false_alarm_rate"], "miss_rate": f["miss_rate"], "alarm_f1": a["f1"],
             "review_recall": ev._div(rh["as_review"], rh["n"]), "review_escalation": rh["escalation_rate"],
-            "accuracy": m["accuracy"], "tp": f["tp"], "fp": f["fp"], "fn": f["fn"], "tn": f["tn"]}
+            "accuracy": m["accuracy"], "tp": f["tp"], "fp": f["fp"], "fn": f["fn"], "tn": f["tn"],
+            "flag_balanced_accuracy": _balanced(f)}
+
+
+def _balanced(f: dict[str, Any]) -> float | None:
+    """(recall + specificity) / 2 of the flag view."""
+    if f["recall"] is None or f["false_alarm_rate"] is None:
+        return None
+    return round((f["recall"] + 1 - f["false_alarm_rate"]) / 2, 4)
 
 
 def _groups(m: dict[str, Any]) -> dict[str, Any]:
@@ -695,14 +770,54 @@ def variant_summary(name: str, vdir: Path, n_boot: int, seed: int) -> dict[str, 
     if cv:
         mc = ev.metrics(cv)
         out["cv"] = {**_flat(mc), "ci": stats.bootstrap_ci(cv, n_boot, seed), **_groups(mc)}
+    far = data.get("cv_far") or []
+    out["cv_far"] = None
+    out["cv_far_folds"] = data.get("cv_far_folds") or []
+    if far:
+        mf2 = ev.metrics(far)
+        out["cv_far"] = {**_flat(mf2), "ci": stats.bootstrap_ci(far, n_boot, seed), **_groups(mf2)}
+    # threshold-free: the fixed rows carry the fusion's call score (the threshold does not move it)
+    out["auc"] = stats.bootstrap_auc(fixed, n_boot, seed)
     out["degraded"] = bool(out["errors"] or out["check_failures"]["calls"])
     return out
 
 
+def backfill_cv_far(spec: Spec, v: Variant, vdir: Path) -> bool:
+    """Add the CV@FAR20 rows to a variant run that predates them: re-fusion of its stored results with
+    the variant's own config (no ASR, no checks). False if not possible (no results, config broken)."""
+    data = _read_rows(vdir)
+    if not data or "cv_far" in data or spec.split == sp.HOLDOUT:
+        return False
+    results = load_results(vdir)
+    if not results:
+        return False
+    try:
+        from callguard.data import load_calls
+        from callguard.pipeline import Pipeline
+
+        cfg = variant_config(spec, v)
+        pipe = Pipeline(cfg)
+        ids = {r["call_id"] for r in data.get("fixed") or []}
+        calls = [c for c in load_calls(cfg.paths.resolve("data_dir")) if c.call_id in ids]
+        fold_of = cv_fold_map(spec.split, sp.load_splits(required=False), calls)
+        errors = [r for r in data.get("fixed") or [] if r.get("error")]
+        far_rows, far_folds = cv_predict(pipe, results, calls, fold_of, spec.thresholds, errors,
+                                         policy="recall_at_far")
+    except Exception as e:  # an old run whose config no longer builds keeps its other numbers
+        log.warning("CV@FAR20 backfill of %s failed: %s: %s", vdir, type(e).__name__, e)
+        return False
+    data.update(cv_far=far_rows, cv_far_folds=far_folds)
+    (vdir / "rows.json").write_text(json.dumps(data, ensure_ascii=False, indent=1, default=str))
+    return True
+
+
 def summarize(spec: Spec, out_dir: Path, *, n_boot: int = 2000, seed: int = 13) -> dict[str, Any]:
-    """Build summary.json + summary.md from every variant of the spec that has results on disk."""
+    """Build summary.json + summary.md from every variant of the spec that has results on disk
+    (older runs get their CV@FAR20 rows back-filled by re-fusion first)."""
     variants: dict[str, Any] = {}
     rows: dict[str, dict[str, Any]] = {}
+    for v in spec.variants:
+        backfill_cv_far(spec, v, out_dir / v.name)
     for v in spec.variants:
         s = variant_summary(v.name, out_dir / v.name, n_boot, seed)
         if s is not None:
@@ -718,13 +833,17 @@ def summarize(spec: Spec, out_dir: Path, *, n_boot: int = 2000, seed: int = 13) 
                                     "fixed": stats.compare(rows[base]["fixed"], rows[name]["fixed"], n_boot, seed)}
             if rows[base].get("cv") and rows[name].get("cv"):
                 comp["cv"] = stats.compare(rows[base]["cv"], rows[name]["cv"], n_boot, seed)
+            if rows[base].get("cv_far") and rows[name].get("cv_far"):
+                comp["cv_far"] = stats.compare(rows[base]["cv_far"], rows[name]["cv_far"], n_boot, seed)
             comparisons.append(comp)
+    floor_rows = (rows.get(base) or next(iter(rows.values()), {})).get("fixed") or []
     summary = {
         "experiment": spec.name, "description": spec.description, "rq": spec.rq, "base": spec.base,
         "split": spec.split, "compare_to": base, "n_boot": n_boot, "seed": seed,
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "git": sp.git_info(),
         "spec": str(spec.path.relative_to(ROOT)) if spec.path and spec.path.is_relative_to(ROOT) else (
             str(spec.path) if spec.path else None),
+        "baselines": stats.trivial_baselines(floor_rows), "far_cap": FAR_CAP,
         "variants": variants, "comparisons": comparisons,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -782,11 +901,13 @@ def _table(header: list[str], body: list[list[Any]]) -> list[str]:
 
 
 PCT = {"false_alarm_rate", "miss_rate", "accuracy", "review_recall", "flag_precision", "flag_recall"}
+POLICY_TITLE = {"cv": "Out-of-fold (CV, max-F1 threshold)", "cv_far": "Out-of-fold (CV@FAR20: max recall with FAR <= 20%)",
+                "fixed": "Fixed threshold"}
 
 
 def _metric_table(variants: dict[str, Any], key: str) -> list[str]:
     head = ["variant", "n", "flag F1 [95% CI]", "P", "R", "FAR [CI]", "miss [CI]", "alarm F1", "review recall",
-            "3-class acc", ""]
+            "3-class acc", "flag bal. acc [CI]", ""]
     body = []
     for name, s in variants.items():
         b = s.get(key)
@@ -794,7 +915,7 @@ def _metric_table(variants: dict[str, Any], key: str) -> list[str]:
             continue
         body.append([name, b["n"], _ci(b, "flag_f1"), _p(b["flag_precision"]), _p(b["flag_recall"]),
                      _ci(b, "false_alarm_rate", True), _ci(b, "miss_rate", True), _f(b["alarm_f1"]),
-                     _p(b["review_recall"]), _p(b["accuracy"]), _tags(s)])
+                     _p(b["review_recall"]), _p(b["accuracy"]), _ci(b, "flag_balanced_accuracy"), _tags(s)])
     return _table(head, body)
 
 
@@ -816,13 +937,29 @@ def render_summary(s: dict[str, Any]) -> str:
             "the variant's configured threshold. With ~24 dev dialogues (~18 independent units once the Stufe2 "
             "twins are paired), CIs are wide: a difference counts "
             "only if its CI excludes 0.", ""]
+    out += _render_floor(s)
+    out += ["## Discrimination (threshold-free) - ROC AUC of the call score", "",
+            "Does the score rank flaggable calls above harmless ones at all? 0.5 = no better than a coin "
+            "(and than every constant policy). Same scores for every threshold-only variant.", ""]
+    out += _table(["variant", "flag AUC [95% CI]", "alarm-vs-rest AUC [95% CI]", "pos/neg (flag)", ""],
+                  [[n, _auc_cell(v, "flag"), _auc_cell(v, "alarm"),
+                    f"{(v.get('auc') or {}).get('flag', {}).get('n_pos', '-')}/"
+                    f"{(v.get('auc') or {}).get('flag', {}).get('n_neg', '-')}", _tags(v)]
+                   for n, v in V.items()]) + [""]
     out += ["## Out-of-fold (CV) - primary", "", *_metric_table(V, "cv"), ""]
+    if any(v.get("cv_far") for v in V.values()):
+        out += ["## Out-of-fold at the FAR cap (CV@FAR20)", "",
+                "Threshold per fold = highest flag recall with FAR <= 20% on the other dev folds (lowest FAR "
+                "if none meets the cap). Unlike max-F1 it cannot drift to flag-everything.", "",
+                *_metric_table(V, "cv_far"), ""]
     out += ["## Fixed threshold", "", *_metric_table(V, "fixed"), ""]
     out += ["## Threshold, cost, errors", ""]
     body = []
     for name, v in V.items():
         c, sug = v["cost"], v.get("suggestion") or {}
         cv_t = ", ".join(_f(f["threshold"]) for f in v.get("cv_folds") or []) or "-"
+        far_t = ", ".join(_f(f["threshold"]) for f in v.get("cv_far_folds") or [])
+        cv_t += f" (FAR20: {far_t})" if far_t else ""
         stages = ", ".join(f"{k} {_f(x, 1)}" for k, x in (c.get("stage_s_per_call") or {}).items()) or "-"
         fails = ", ".join(f"{k} {n}x" for k, n in (v["check_failures"].get("by_check") or {}).items())
         body.append([name, _f((v["meta"] or {}).get("threshold")), _f(sug.get("threshold")), cv_t,
@@ -852,17 +989,47 @@ def render_summary(s: dict[str, Any]) -> str:
     return "\n".join(out) + "\n"
 
 
+def _auc_cell(v: dict[str, Any], target: str) -> str:
+    a = (v.get("auc") or {}).get(target) or {}
+    if a.get("value") is None:
+        return "-"
+    return f"{_f(a['value'])} [{_f(a.get('lo'))}, {_f(a.get('hi'))}]"
+
+
+def _render_floor(s: dict[str, Any]) -> list[str]:
+    b = s.get("baselines") or {}
+    if not b.get("flag_all"):
+        return []
+    fa, fn, n = b["flag_all"], b["flag_none"], b.get("_n") or {}
+    return [f"**Floor on these {n.get('calls')} calls** (prevalence of alarm|review "
+            f"{_p(n.get('prevalence_flag'))}): flag-all = flag F1 {_f(fa['flag_f1'])}, FAR 100%, miss 0%, "
+            f"bal. acc 0.50, 3-class acc {_p(fa['accuracy'])}; flag-none = flag F1 {_f(fn['flag_f1'])}, FAR 0%, "
+            f"miss 100%, 3-class acc {_p(fn['accuracy'])}; any constant score: AUC 0.50. A variant whose flag F1 "
+            f"is near {_f(fa['flag_f1'])} with FAR near 100% has learned nothing.", ""]
+
+
 def _render_comparison(comp: dict[str, Any], V: dict[str, Any]) -> list[str]:
     a, b = comp["a"], comp["b"]
     primary = "cv" if comp.get("cv") else "fixed"
     out = [f"## `{b}` vs `{a}`" + (" (ORACLE involved)" if V[a].get("oracle") or V[b].get("oracle") else ""), ""]
-    for key in ("cv", "fixed"):
+    pa = (comp.get("fixed") or {}).get("auc")
+    if pa:
+        body = []
+        for t in ("flag", "alarm"):
+            d = pa.get(t) or {}
+            verdict = ("**real**: " + (b if d.get("better") == "b" else a) + " better") if d.get("real") else \
+                "no detectable difference"
+            body.append([f"{t} AUC", _f(d.get("a")), _f(d.get("b")), _signed(d.get("diff")),
+                         f"[{_signed(d.get('lo'))}, {_signed(d.get('hi'))}]", verdict])
+        out += [f"**Threshold-free (ROC AUC of the call score)** - {(pa.get('_n') or {}).get('calls', 0)} calls; "
+                f"difference = {b} - {a}", "", *_table(["metric", a, b, "diff", "95% CI", ""], body), ""]
+    for key in ("cv", "cv_far", "fixed"):
         c = comp.get(key)
         if not c:
             continue
         p = c["paired"]
         n = p.get("_n", {})
-        out += [f"**{'Out-of-fold (CV)' if key == 'cv' else 'Fixed threshold'}** - {n.get('calls', 0)} calls / "
+        out += [f"**{POLICY_TITLE[key]}** - {n.get('calls', 0)} calls / "
                 f"{n.get('dialogues', 0)} dialogues ({n.get('units', 0)} resampling units: twins together); "
                 f"difference = {b} - {a}", ""]
         body = []

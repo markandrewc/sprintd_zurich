@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import os
 import re
 from collections.abc import Mapping
@@ -44,6 +45,8 @@ class Paths(BaseModel):
     criteria: str = "config/criteria.yaml"
     runs_dir: str = "runs"
     cache_dir: str = ".cache"
+    # officer tuning overlay (callguard feedback apply); absent file = no change. None/"" = never load one
+    tuning: str | None = "config/tuning.yaml"
 
     def resolve(self, name: str) -> Path:
         p = Path(getattr(self, name))
@@ -69,6 +72,8 @@ class AppConfig(BaseModel):
     primary_view: str | None = None  # passages, snippets, UI transcript; default: first view
     check_view: str | None = None  # overrides every check's ``view`` (experiments)
     extra_views: list[str] = Field(default_factory=list)  # computed even if no check reads them
+    # set by load_config when a tuning overlay was applied: {path, hash, profile_scoped, applied}
+    tuning: dict[str, Any] | None = None
     source_path: str | None = None
 
 
@@ -199,11 +204,64 @@ def resolve_config_path(path: str | Path) -> Path:
     raise FileNotFoundError(f"config {path!r} not found (looked in ., {ROOT}, {ROOT / 'config'})")
 
 
+# --------------------------------------------------------------------------------------------
+# Tuning overlay (config/tuning.yaml, written by `callguard feedback apply` / the UI)
+# --------------------------------------------------------------------------------------------
+
+TUNING_FUSION_KEYS = ("threshold", "review_band")  # the only knobs an overlay may set (+ check weights)
+
+
+def tuning_values(data: Mapping[str, Any] | None, profile: str) -> dict[str, Any]:
+    """The overlay for ``profile``: top-level ``fusion``/``weights`` (all profiles), then
+    ``profiles.<profile>`` on top. Only threshold, review_band and per-check weights are taken."""
+    data = data or {}
+    out: dict[str, Any] = {"fusion": {}, "weights": {}}
+    for block in (data, (data.get("profiles") or {}).get(profile) or {}):
+        out["fusion"].update({k: v for k, v in (block.get("fusion") or {}).items() if k in TUNING_FUSION_KEYS})
+        out["weights"].update(block.get("weights") or {})
+    return out
+
+
+def apply_tuning(raw: dict, values: Mapping[str, Any]) -> tuple[dict, dict[str, Any]]:
+    """Copy of ``raw`` with the overlay applied; returns (raw, what was actually changed)."""
+    raw = copy.deepcopy(raw)
+    applied: dict[str, Any] = {}
+    fusion = values.get("fusion") or {}
+    if fusion:
+        raw["fusion"] = {**(raw.get("fusion") or {}), **fusion}
+        applied.update({f"fusion.{k}": v for k, v in fusion.items()})
+    for spec in raw.get("checks") or []:
+        name = spec.get("name") or spec.get("type")
+        if name in (values.get("weights") or {}):
+            spec["weight"] = float(values["weights"][name])
+            applied[f"weight.{name}"] = spec["weight"]
+    return raw, applied
+
+
+def _tuning_path(raw: dict) -> Path | None:
+    value = (raw.get("paths") or {}).get("tuning", Paths().tuning)
+    if not value:
+        return None
+    p = Path(value)
+    return p if p.is_absolute() else ROOT / p
+
+
 def load_config(path: str | Path, overrides: list[str] | None = None) -> AppConfig:
     p = resolve_config_path(path)
+    base = expand_env(_load_raw(p), source=p.name)
     # --set comes last and literally: the shell has already expanded its values
-    raw = apply_overrides(expand_env(_load_raw(p), source=p.name), overrides)
+    raw = apply_overrides(base, overrides)
     raw.setdefault("name", p.stem)
+    raw.pop("tuning", None)
+    tp = _tuning_path(raw)
+    if tp is not None and tp.is_file():  # profile, then the officer's overlay, then --set
+        text = tp.read_text()
+        tuned, applied = apply_tuning(base, tuning_values(yaml.safe_load(text) or {}, raw["name"]))
+        if applied:
+            raw = apply_overrides(tuned, overrides)
+            raw.setdefault("name", p.stem)
+            raw["tuning"] = {"path": str(tp), "hash": hashlib.sha256(text.encode()).hexdigest()[:16],
+                             "applied": applied}
     cfg = AppConfig(**raw)
     cfg.source_path = str(p)
     return cfg

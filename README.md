@@ -34,6 +34,17 @@ No models and no server needed (for UI work): `uv run callguard batch -c demo-of
 `uv run callguard ui -c demo-offline`. Alert links `http://localhost:8501/?call=<call_id>&t=<seconds>`
 open a call at that moment.
 
+The UI speaks German to the officer: **Eingang** (inbox; the sidebar threshold re-labels every call
+instantly, filters by status / family / level), **Anruf** (evidence timeline: click a marker and the
+recording jumps there; per passage the family, the matched criterion from `criteria.yaml`, the supporting
+checks with scores, reasons, every view's text side by side and the snippet; "Warum Prüfen?" and
+"Warum kein Alarm?" explanations; transcript tab per view), **Stichwörter & Kriterien** (edit, then
+re-run the keyword check on all calls in seconds), **Qualität** (dev split with 95% bootstrap CIs,
+threshold curve, logged holdout runs), **Experimente** (`runs/experiments/*/summary.json`: variants with
+CIs, paired comparisons, flipped calls, report charts). The sidebar **Quelle** switches between profile
+runs and experiment variants (`?src=exp:<experiment>/<variant>`, read-only). New pages / detail panels:
+one line in `src/callguard/ui/pages_registry.py` / `src/callguard/ui/panels/__init__.py`.
+
 Every command takes `-c <profile|file.yaml>`, repeatable `--set key=value`, `--no-cache` and `-v`.
 Other commands: `transcribe AUDIO` (print the diarized transcript) and `watch DIR` (process every new
 recording in a folder exactly once).

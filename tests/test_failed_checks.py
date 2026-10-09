@@ -68,12 +68,12 @@ def test_inbox_rows_say_which_check_is_missing(broken_env):
     fams = engine.families()
     rows = {r["call_id"]: r for r in be.inbox_rows(loaded, be.decide_all(engine, loaded, None, fams), fams)}
     assert rows[HARMLESS_ID]["failed_checks"] == ["llm_judge"]
-    assert rows[HARMLESS_ID]["reason"].startswith("Checks failed: llm_judge · ")
-    assert rows[ALARM_ID]["failed_checks"] == [] and not rows[ALARM_ID]["reason"].startswith("Checks failed")
+    assert rows[HARMLESS_ID]["reason"].startswith("Prüfung ausgefallen: llm_judge · ")
+    assert rows[ALARM_ID]["failed_checks"] == [] and not rows[ALARM_ID]["reason"].startswith("Prüfung ausgefallen")
 
 
 def test_inbox_warns_about_calls_decided_without_a_check(broken_env):
     at = AppTest.from_file(str(APP), default_timeout=90).run()
     assert not at.exception, [e.message for e in at.exception]
-    warning = next(w.value for w in at.warning if "decided without" in w.value)
-    assert "1 call(s) were decided without llm_judge" in warning and HARMLESS_ID in warning
+    warning = next(w.value for w in at.warning if "entschieden" in w.value)  # UI copy is German
+    assert "1 Anruf(e) wurden ohne llm_judge entschieden" in warning and HARMLESS_ID in warning

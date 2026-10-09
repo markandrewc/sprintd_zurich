@@ -17,8 +17,8 @@ import pandas as pd
 from callguard.types import LABELS
 
 FLAG_LABELS = ("alarm", "review")
-LABEL_TEXT = {"alarm": "Alarm", "review": "Review", "no_alert": "No alert"}
-METRIC_COLORS = {"Precision": "#4e79a7", "Recall": "#f28e2b", "F1": "#2f2f2f", "False-alarm rate": "#c44e52"}
+LABEL_TEXT = {"alarm": "Alarm", "review": "Prüfen", "no_alert": "Kein Alarm"}  # officer wording (German)
+METRIC_COLORS = {"Präzision": "#2a78d6", "Recall": "#1baf7a", "F1": "#0b0b0b", "Fehlalarmquote": "#6250d6"}
 
 
 def is_flag(label: str | None) -> bool:
@@ -126,41 +126,53 @@ def suggest_threshold(rows: list[dict], current: float | None = None) -> float |
 # --------------------------------------------------------------------------------------------
 
 
-def sweep_chart(rows: list[dict], current: float, suggested: float | None) -> alt.LayerChart:
+def sweep_chart(rows: list[dict], current: float, suggested: float | None,
+                holdout: list[dict] | None = None) -> alt.LayerChart:
+    """Flag metrics over the threshold, the current (and suggested) threshold as vertical rules and,
+    if given, logged holdout F1 values as horizontal dotted rules (``holdout``: [{"value", "what"}])."""
     long = []
     for r in rows:
-        for name, k in (("Precision", "precision"), ("Recall", "recall"), ("F1", "f1"),
-                        ("False-alarm rate", "false_alarm_rate")):
+        for name, k in (("Präzision", "precision"), ("Recall", "recall"), ("F1", "f1"),
+                        ("Fehlalarmquote", "false_alarm_rate")):
             if r.get(k) is not None:
                 long.append({"Threshold": r["threshold"], "Metric": name, "Value": r[k]})
     data = pd.DataFrame(long, columns=["Threshold", "Metric", "Value"])
     names = list(METRIC_COLORS)
     color = alt.Color("Metric:N", scale=alt.Scale(domain=names, range=[METRIC_COLORS[n] for n in names]),
                       legend=alt.Legend(orient="bottom", title=None))
-    dash = alt.condition(alt.datum.Metric == "False-alarm rate", alt.value([4, 3]), alt.value([1, 0]))
-    x = alt.X("Threshold:Q", scale=alt.Scale(domain=[0, 1]), axis=alt.Axis(format=".2f"))
+    dash = alt.condition(alt.datum.Metric == "Fehlalarmquote", alt.value([4, 3]), alt.value([1, 0]))
+    x = alt.X("Threshold:Q", scale=alt.Scale(domain=[0, 1]), axis=alt.Axis(format=".2f", title="Alarmschwelle"))
     lines = alt.Chart(data).mark_line(point=alt.OverlayMarkDef(size=28)).encode(
         x=x, y=alt.Y("Value:Q", scale=alt.Scale(domain=[0, 1]), axis=alt.Axis(format="%", title=None)),
         color=color, strokeDash=dash,
-        tooltip=[alt.Tooltip("Threshold:Q", format=".2f"), "Metric:N", alt.Tooltip("Value:Q", format=".0%")],
+        tooltip=[alt.Tooltip("Threshold:Q", title="Schwelle", format=".2f"), alt.Tooltip("Metric:N", title="Mass"),
+                 alt.Tooltip("Value:Q", title="Wert", format=".0%")],
     )
+    cur, sug, both = f"aktuell {current:.2f}", "Vorschlag (max. F1)", f"aktuell = Vorschlag {current:.2f}"
     if suggested is not None and abs(suggested - current) < 1e-9:
-        marks = [{"Threshold": current, "What": "current = suggested"}]
+        marks = [{"Threshold": current, "What": both}]
     else:
-        marks = [{"Threshold": current, "What": "current"}]
+        marks = [{"Threshold": current, "What": cur}]
         if suggested is not None:
-            marks.append({"Threshold": suggested, "What": "suggested (max F1)"})
+            marks.append({"Threshold": suggested, "What": sug})
     rule_data = pd.DataFrame(marks)
-    rule_color = alt.Color("What:N", scale=alt.Scale(domain=["current", "suggested (max F1)", "current = suggested"],
-                                                     range=["#6c6c6c", "#2e8b57", "#2e8b57"]), legend=None)
+    rule_color = alt.Color("What:N", scale=alt.Scale(domain=[cur, sug, both], range=["#0b0b0b", "#1baf7a", "#0b0b0b"]),
+                           legend=None)
     rules = alt.Chart(rule_data).mark_rule(strokeWidth=2).encode(
         x="Threshold:Q", color=rule_color,
-        strokeDash=alt.condition(alt.datum.What == "suggested (max F1)", alt.value([6, 4]), alt.value([1, 0])),
-        tooltip=["What:N", alt.Tooltip("Threshold:Q", format=".2f")],
+        strokeDash=alt.condition(alt.datum.What == sug, alt.value([6, 4]), alt.value([1, 0])),
+        tooltip=[alt.Tooltip("What:N", title="Linie"), alt.Tooltip("Threshold:Q", title="Schwelle", format=".2f")],
     )
-    text = alt.Chart(rule_data).mark_text(align="left", dx=4, dy=0, fontSize=11).encode(
-        x="Threshold:Q", y=alt.value(-8), text="What:N", color=rule_color)
-    return alt.layer(lines, rules, text).resolve_scale(color="independent").properties(height=320)
+    text = alt.Chart(rule_data).mark_text(align="left", dx=4, dy=0, fontSize=11, color="#52514e").encode(
+        x="Threshold:Q", y=alt.value(-8), text="What:N")
+    layers = [lines, rules, text]
+    if holdout:
+        hd = pd.DataFrame(holdout, columns=["value", "what"])
+        layers.append(alt.Chart(hd).mark_rule(strokeWidth=1.5, strokeDash=[2, 2], color="#e34948").encode(
+            y="value:Q", tooltip=[alt.Tooltip("what:N", title="Holdout"), alt.Tooltip("value:Q", format=".0%")]))
+        layers.append(alt.Chart(hd).mark_text(align="right", dx=-4, dy=-6, fontSize=11, color="#8e1b1b").encode(
+            x=alt.datum(1.0), y="value:Q", text="what:N"))
+    return alt.layer(*layers).resolve_scale(color="independent").properties(height=320)
 
 
 def confusion_chart(matrix: pd.DataFrame) -> alt.LayerChart:
@@ -170,14 +182,15 @@ def confusion_chart(matrix: pd.DataFrame) -> alt.LayerChart:
     order = [LABEL_TEXT[x] for x in LABELS]
     top = max(1, int(data["Calls"].max()) if len(data) else 1)
     base = alt.Chart(data).encode(
-        x=alt.X("Predicted:N", sort=order, axis=alt.Axis(orient="top", labelAngle=0, title="Predicted")),
-        y=alt.Y("Expected:N", sort=order, title="Expected"),
+        x=alt.X("Predicted:N", sort=order, axis=alt.Axis(orient="top", labelAngle=0, title="Vom System")),
+        y=alt.Y("Expected:N", sort=order, title="Erwartet"),
     )
     heat = base.mark_rect(stroke="white", strokeWidth=2).encode(
         color=alt.Color("Cell:N", scale=alt.Scale(domain=["correct", "wrong", "none"],
-                                                  range=["#3f9c5f", "#d64545", "#eeeeee"]), legend=None),
+                                                  range=["#2a78d6", "#d03b3b", "#eeeeee"]), legend=None),
         opacity=alt.Opacity("Calls:Q", scale=alt.Scale(domain=[0, top], range=[0.35, 0.9]), legend=None),
-        tooltip=["Expected:N", "Predicted:N", "Calls:Q"],
+        tooltip=[alt.Tooltip("Expected:N", title="Erwartet"), alt.Tooltip("Predicted:N", title="Vom System"),
+                 alt.Tooltip("Calls:Q", title="Anrufe")],
     )
     text = base.mark_text(fontSize=16, fontWeight="bold", color="#1f1f1f").encode(text="Calls:Q")
     return alt.layer(heat, text).properties(height=220)

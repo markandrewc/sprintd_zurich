@@ -108,13 +108,17 @@ def register(app: typer.Typer) -> None:
 
 def _print_summary(cli, summary: dict) -> None:
     t = Table(title=f"experiment {summary['experiment']} (split {summary['split']}, baseline {summary['compare_to']})")
-    for col in ("variant", "n", "CV flag F1 [CI]", "CV FAR", "CV miss", "fixed flag F1", "fixed FAR", "review rec.",
-                "acc", "s/call", "LLM/call", "tags"):
+    for col in ("variant", "n", "flag AUC [CI]", "FAR20 F1/R/FAR", "CV flag F1 [CI]", "CV FAR", "CV miss",
+                "fixed flag F1", "fixed FAR", "review rec.", "acc", "s/call", "LLM/call", "tags"):
         t.add_column(col, justify="left" if col in ("variant", "tags") else "right")
     from callguard import experiments as ex
     for name, v in summary["variants"].items():
         cv, fx = v.get("cv") or {}, v["fixed"]
-        t.add_row(name, str(v["n_calls"]), ex._ci(cv, "flag_f1") if cv else "-",
+        far20 = v.get("cv_far") or {}
+        t.add_row(name, str(v["n_calls"]), ex._auc_cell(v, "flag"),
+                  f"{cli._num(far20.get('flag_f1'))}/{cli._pct(far20.get('flag_recall'))}/"
+                  f"{cli._pct(far20.get('false_alarm_rate'))}" if far20 else "-",
+                  ex._ci(cv, "flag_f1") if cv else "-",
                   cli._pct(cv.get("false_alarm_rate")), cli._pct(cv.get("miss_rate")), ex._ci(fx, "flag_f1"),
                   cli._pct(fx["false_alarm_rate"]), cli._pct(fx["review_recall"]), cli._pct(fx["accuracy"]),
                   cli._num(v["cost"].get("wall_s_per_call"), 1), cli._num(v["cost"].get("llm_calls_per_call"), 1),
@@ -124,6 +128,11 @@ def _print_summary(cli, summary: dict) -> None:
         block = c.get("cv") or c["fixed"]
         d = block["paired"]["flag_f1"]
         verdict = "[bold]real[/bold]" if d.get("real") else "no detectable difference"
+        pa = ((c.get("fixed") or {}).get("auc") or {}).get("flag") or {}
+        if pa.get("diff") is not None:
+            cli.console.print(f"{c['b']} vs {c['a']}: flag AUC diff {ex._signed(pa['diff'])} "
+                              f"[{ex._signed(pa.get('lo'))}, {ex._signed(pa.get('hi'))}]"
+                              f"{' (real)' if pa.get('real') else ''}")
         cli.console.print(f"{c['b']} vs {c['a']}: flag F1 diff {ex._signed(d.get('diff'))} "
                           f"[{ex._signed(d.get('lo'))}, {ex._signed(d.get('hi'))}] -> {verdict}; "
                           f"McNemar p={block['mcnemar_flag']['p']}; {len(block['flips'])} flips")
