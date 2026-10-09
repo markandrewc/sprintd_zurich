@@ -233,9 +233,12 @@ alarm"** explanation for keyword-heavy harmless calls (the strongest counter-evi
 
 ## 8. Overnight autonomous research harness (`research/`)
 
-Goal: an agent with access to this repo (laptop) and the GPU host (ssh over Tailscale) runs the
-experiment backlog all night, implements new hypotheses, keeps what improves dev-CV, and writes a
-morning report. Pieces:
+Goal: an agent runs the experiment backlog all night, implements new hypotheses, keeps what improves
+dev-CV, and writes a morning report. **Default: the agent runs ON the GPU host** (Claude Code / T3 Code
+in `~/sprintd`, a clone of github.com/be-lang/sprintd), so a sleeping laptop or a dropped connection
+cannot kill the night; the laptop only monitors (ssh, UI over the tailnet, `git pull` of branch
+`overnight`, which the agent pushes after every round). Remote mode (laptop agent driving the GPU via
+`run_on_host.sh`) stays supported for daytime work. Pieces:
 
 - `research/AGENT.md` - operating manual: objective (maximize dev-CV flag F1 with false-alarm rate cap,
   review recall, keep traceability), the rules (holdout never touched except one final run, logged;
@@ -257,3 +260,35 @@ morning report. Pieces:
   proposes up to 3 new hypotheses into the queue) -> repeat; stops at deadline_iso or rounds; final
   round writes `research/MORNING_REPORT.md` (what was tried, what won, numbers, recommended config,
   next steps) and runs the holdout exactly once on the recommended config.
+
+## 9. Research outputs for the team (compare, decide, defend)
+
+The point of the overnight run is not one best number but **evidence the team can argue with**.
+
+- `research/QUESTIONS.md` - the research questions, each answered in `research/findings/RQ<n>.md`:
+  RQ1 which view (gsw / de / de_from_gsw / en_from_de / en_from_gsw / en_speech / ensemble) detects best;
+  RQ2 Swiss German Whisper fine-tunes vs vanilla Whisper (WER/CER, keyword-spot recall, detection);
+  RQ3 does dialect output need less fine-tuning than Standard German output;
+  RQ4 which checks carry the decision (ablation: keywords, patterns, keyword_context, semantic_windows,
+  llm_judge, geval, facts, debate);
+  RQ5 fact sheet + policy table vs free judge vs G-Eval (accuracy, review handling, traceability);
+  RQ6 model size (7B vs 14B, later 30B+) vs prompt/criteria language;
+  RQ7 does keyword_context fix the harmless keyword calls (D03 & twins) without losing level-1 alarms;
+  RQ8 clean vs noisy gap, does denoising help;
+  RQ9 calibrated/conformal abstention: review recall vs error rate on decided calls;
+  RQ10 do synthetic calls help (few-shot pools, learned fusion);
+  RQ11 does a LoRA fine-tune on dev-fold case audio help on held-out folds;
+  RQ12 cost per call minute (GPU seconds) -> production sizing.
+- Every finding file has the same shape: question, setup (commit, config, data split), result table,
+  **uncertainty** (paired bootstrap over dialogues: 95% CI of the F1 difference between options;
+  McNemar on per-call correctness; with 30 dialogues small differences are noise - say so),
+  **per-call disagreement table** (which calls flip between options, with the passage and both
+  reasons), cost, qualitative examples, recommendation, **strongest counter-argument** (devil's
+  advocate: when would the other option be the better choice), what would change our mind.
+- `callguard report` builds `research/report/` (markdown + PNG charts: F1 / FAR / miss per option with
+  CIs, cost vs quality scatter, clean vs noisy, per-level heat map, threshold curves) from
+  `runs/experiments/*/summary.json`; the UI "Experiments" page shows the same interactively.
+- `research/DECISIONS.md` - ADR-style decision records (context, options, evidence links, decision,
+  consequences, dissent) for: ASR model, view, check set, LLM, fusion, threshold policy.
+- `research/MORNING_REPORT.md` - one page for teammates: what was tried, what won and by how much
+  (with CIs), what is still open, recommended config for Sunday, the one holdout number.
