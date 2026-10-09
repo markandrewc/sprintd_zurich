@@ -70,8 +70,12 @@ licences: `docs/research/dialect_asr.md`. Run them one after another in `tmux` w
 
 ## Step 3: build what is still missing
 
-`docs/STATUS.md` lists every component with status. The laptop build pushes finished parts to `main`
-as they land; `git pull` first. If items are still `todo` when you get here, build them yourself in the
+`docs/STATUS.md` lists every component with status and owner. The laptop build pushes finished parts
+to `main` in stages; `git pull` first and re-pull every ~30 minutes. Items owned by `laptop` are being
+built there: do not build them (do Step 2 and research items whose dependencies exist instead), unless
+the last push to `main` is older than 90 minutes (`git log -1 --format=%cr origin/main`) - then the
+laptop build is presumed dead: take the items over (owner `gpu-host`, push that first). Items that are
+`todo` without an owner, or taken over, you build yourself in the
 priority order given there, following the spec `docs/design/v2_plan.md` (sections 1-9). For each:
 implement, add offline tests, `uv run pytest -q -m "not slow"` green, update `docs/STATUS.md`, commit
 to `main`, push. Research-critical items first (views, experiment runner, asr-eval, report/statistics,

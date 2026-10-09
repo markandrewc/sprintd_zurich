@@ -31,21 +31,27 @@ Last update: 2026-10-10 00:40, laptop session (v2 build starting; stages are pus
 
 ## To build (v2), in priority order
 
-| # | component | prio | spec |
-|---|---|---|---|
-| 1 | Views (gsw/de/translated/en_speech/ref_*), `translator` plugin kind (`llm_translate`, `hf_mt`, `identity`), multi-view pipeline, check `view` param, `check_view`, language-aware keywords (+ English forms), `faster_whisper task: translate`, provenance | P0 | §1, §5 |
-| 2 | Holdout lock `config/splits.yaml`, `eval --split dev/holdout`, holdout log | P0 | §1c |
-| 3 | Experiment runner `callguard experiment`, `experiments/*.yaml`, dev-fold CV per variant, cost tracking | P0 | §2 |
-| 4 | ASR eval `callguard asr-eval`: WER/CER, pseudo-references, keyword-spot recall, vanilla baselines | P0 | §2 |
-| 5 | Statistics + report: paired bootstrap CIs, McNemar, per-call flip tables, charts, `callguard report`, `callguard leaderboard` | P0 | §9 |
-| 6 | `keyword_context` check (G-Eval on keyword windows) | P1 | §1b |
-| 7 | `semantic_windows` check (embeddings) | P1 | §1b |
-| 8 | Fact sheet + policy table (A1), role-aware LLM checks (A7), twin few-shot (A8) | P1 | §7 |
-| 9 | Calibrated / conformal fusion (A5), learned fusion, `fit-fusion` | P1 | §7, §3 |
-| 10 | Cascade (A2), debate (A6), transcript correction view (A4), audio-LLM check (A3), denoise preprocess (A10) | P2 | §7 |
-| 11 | UI: view tabs + side-by-side passages, evidence timeline, "why not an alarm", Experiments page | P2 | §7 UX |
-| 12 | Synthetic kit: scenarios, LLM script writer, TTS plugins, render, telephone augmentation | P2 | §4 |
-| 13 | Fine-tune kit `finetune/` (data prep with dialogue folds, LoRA training for 12 GB, CT2 conversion) | P2 | §3, research note |
-| 14 | Routing + notify sink, feedback loop + tuning overlay, cross-call patterns + entities, audit log | P3 | §3, §5 |
-| 15 | `docs/OPERATING_CONCEPT.md`, `docs/ARCHITECTURE.md` | P3 | §3 |
-| 16 | Overnight harness: `research/` protocol, questions, queue, templates (written), saved workflow `.claude/workflows/overnight-research.js` | P0 | §8 |
+**Laptop build in progress (started 2026-10-10 ~00:55, ETA ~03:30), in 4 pushed stages:** stage 1 = items 1, 2, 16 + scaffolds/stubs for
+everything else; stage 2 = items 3-10; stage 3 = items 11-15; stage 4 = integration + review. The column
+`owner` says who builds it. A GPU-host session must NOT build items owned by `laptop` unless the last
+push to `main` is more than 90 minutes old (`git log -1 --format=%cr origin/main`): then the laptop build
+is presumed dead - set owner to `gpu-host` here, push, and build it yourself.
+
+| # | component | prio | spec | owner |
+|---|---|---|---|---|
+| 1 | Views (gsw/de/translated/en_speech/ref_*), `translator` plugin kind (`llm_translate`, `hf_mt`, `identity`), multi-view pipeline, check `view` param, `check_view`, language-aware keywords (+ English forms), `faster_whisper task: translate`, provenance | P0 | §1, §5 | laptop |
+| 2 | Holdout lock `config/splits.yaml`, `eval --split dev/holdout`, holdout log | P0 | §1c | laptop |
+| 3 | Experiment runner `callguard experiment`, `experiments/*.yaml`, dev-fold CV per variant, cost tracking | P0 | §2 | laptop |
+| 4 | ASR eval `callguard asr-eval`: WER/CER, pseudo-references, keyword-spot recall, vanilla baselines | P0 | §2 | laptop |
+| 5 | Statistics + report: paired bootstrap CIs, McNemar, per-call flip tables, charts, `callguard report`, `callguard leaderboard` | P0 | §9 | laptop |
+| 6 | `keyword_context` check (G-Eval on keyword windows) | P1 | §1b | laptop |
+| 7 | `semantic_windows` check (embeddings) | P1 | §1b | laptop |
+| 8 | Fact sheet + policy table (A1), role-aware LLM checks (A7), twin few-shot (A8) | P1 | §7 | laptop |
+| 9 | Calibrated / conformal fusion (A5), learned fusion, `fit-fusion` | P1 | §7, §3 | laptop |
+| 10 | Cascade (A2), debate (A6), transcript correction view (A4), audio-LLM check (A3), denoise preprocess (A10) | P2 | §7 | laptop |
+| 11 | UI: view tabs + side-by-side passages, evidence timeline, "why not an alarm", Experiments page | P2 | §7 UX | laptop |
+| 12 | Synthetic kit: scenarios, LLM script writer, TTS plugins, render, telephone augmentation | P2 | §4 | laptop |
+| 13 | Fine-tune kit `finetune/` (data prep with dialogue folds, LoRA training for 12 GB, CT2 conversion) | P2 | §3, research note | laptop |
+| 14 | Routing + notify sink, feedback loop + tuning overlay, cross-call patterns + entities, audit log | P3 | §3, §5 | laptop |
+| 15 | `docs/OPERATING_CONCEPT.md`, `docs/ARCHITECTURE.md` | P3 | §3 | laptop |
+| 16 | Overnight harness: `research/` protocol, questions, queue, templates (written), saved workflow `.claude/workflows/overnight-research.js` | P0 | §8 | laptop |
