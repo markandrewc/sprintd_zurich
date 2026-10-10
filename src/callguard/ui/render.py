@@ -123,6 +123,32 @@ _TICKS = [round(0.1 * i, 1) for i in range(11)]
 _X_AXIS = alt.Axis(values=_TICKS, format=".1f", grid=True)
 
 
+def score_bars(rows: list[dict], threshold: float, floor: float, step: float = 0.05) -> alt.LayerChart:
+    """How many calls fall in each score band (0..1 in ``step`` bins), stacked by their current label, with the
+    threshold and review-band lines: moving the threshold recolours bars, so the officer sees what shifts."""
+    data = pd.DataFrame(rows or [], columns=["call_id", "label", "score"])
+    n_bins = int(round(1 / step))
+    data["bin"] = [min(int(float(s or 0) / step), n_bins - 1) for s in data["score"]]
+    data["Status"] = [label_text(x) for x in data["label"]]
+    agg = data.groupby(["bin", "Status"]).size().reset_index(name="Anrufe")
+    agg["von"] = agg["bin"] * step
+    agg["bis"] = agg["von"] + step
+    agg["Bereich"] = [f"{a:.2f}–{b:.2f}" for a, b in zip(agg["von"], agg["bis"])]
+    order = [label_text(x) for x in LABEL_HEX]
+    agg["ord"] = [order.index(s) for s in agg["Status"]]
+    bars = alt.Chart(agg).mark_bar(stroke="white", strokeWidth=1.5, cornerRadiusTopLeft=3,
+                                   cornerRadiusTopRight=3).encode(
+        x=alt.X("von:Q", scale=alt.Scale(domain=[0, 1]), title="Score des Anrufs", axis=_X_AXIS),
+        x2="bis:Q",
+        y=alt.Y("Anrufe:Q", stack="zero", title="Anrufe", axis=alt.Axis(tickMinStep=1, grid=True)),
+        color=alt.Color("Status:N", scale=alt.Scale(domain=order, range=list(LABEL_HEX.values())),
+                        legend=alt.Legend(orient="top", title=None, symbolType="square")),
+        order=alt.Order("ord:Q"),
+        tooltip=[alt.Tooltip("Bereich:N", title="Score"), alt.Tooltip("Status:N"),
+                 alt.Tooltip("Anrufe:Q")])
+    return alt.layer(bars, _rules(threshold, floor)).properties(height=220)
+
+
 def score_strip(rows: list[dict], threshold: float, floor: float) -> alt.LayerChart:
     """Every call as a dot on the 0..1 score axis, one lane per label: moving the threshold visibly moves
     dots between lanes."""

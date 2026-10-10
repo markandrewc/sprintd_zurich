@@ -123,7 +123,8 @@ def test_worklist_orders_alarm_then_review_and_threshold_moves_counts(env: Fixtu
     at = run_demo()
     assert at.title[0].value == "Fälle"
     shown = {m.label: m.value for m in at.metric}
-    assert shown == {"Alarm": "1", "Prüfen": "1", "Kein Alarm": "1"}
+    assert shown == {"Alarm": "1", "Prüfen": "1", "Kein Alarm": "1", "Mensch nötig": "2"}  # boxes as on 8501
+    assert at.slider(key="dm_threshold") is not None  # full-width Alarmschwelle under the boxes
     df = at.dataframe[0].value
     data = df.data if hasattr(df, "data") else df
     assert list(data["Anruf"])[:2] == [ALARM_ID, REVIEW_ID]
@@ -137,7 +138,9 @@ def test_worklist_orders_alarm_then_review_and_threshold_moves_counts(env: Fixtu
                                                           "max_uncertainty": d["max_uncertainty"],
                                                           "weights": be.check_weights(engine.cfg)}, engine.families()))
     shown = {m.label: m.value for m in at.metric}
-    assert shown == {be.LABEL_TEXT[k]: str(v) for k, v in want.items()} and shown["Alarm"] != "1"
+    want_shown = {be.LABEL_TEXT[k]: str(v) for k, v in want.items()}
+    want_shown["Mensch nötig"] = str(want["alarm"] + want["review"])
+    assert shown == want_shown and shown["Alarm"] != "1"
 
 
 def test_deep_link_opens_call_page_with_synced_player(env: FixtureEnv):

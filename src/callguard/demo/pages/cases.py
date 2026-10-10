@@ -36,20 +36,28 @@ else:
                    "können vom aktiven Regelwerk abweichen (Regeln & Einstellungen → «Gespeicherte Anrufe neu "
                    "entscheiden» nach einer Freigabe).", icon=":material/history:")
 
-    with st.container(border=True):
-        c1, c2, c3 = st.columns([4, 4, 5], gap="large")
-        with c1:
-            ctl.threshold_slider(app)
-        with c2:
-            ctl.mode_control(app)
-        with c3:
-            m = st.columns(3)
-            for col, lbl in zip(m, ("alarm", "review", "no_alert")):
-                delta = counts[lbl] - base[lbl]
-                col.metric(cm.cd.LABEL_DE[lbl], counts[lbl], delta=f"{delta:+d} zum Standard" if delta else None,
-                           delta_color="off", border=False)
-            st.caption(f"Ein Mensch hört **{counts['alarm'] + counts['review']}** von {len(app.decided)} Anrufen "
-                       "(Alarm + Prüfen). Schwelle oder Modus verschieben: die Zahlen folgen sofort.")
+    # 1. the four boxes (as on the internal Eingang page)
+    help_text = {
+        "alarm": "Score ab der Schwelle und die Prüfungen sind sich sicher genug.",
+        "review": "Knapp unter der Schwelle oder die Prüfungen sind unsicher: ein Mensch muss zuhören.",
+        "no_alert": "Nichts ausreichend Verdächtiges gefunden.",
+    }
+    boxes = st.columns(4)
+    for col, lbl in zip(boxes, ("alarm", "review", "no_alert")):
+        delta = counts[lbl] - base[lbl]
+        col.metric(cm.cd.LABEL_DE[lbl], counts[lbl], delta=f"{delta:+d} zum Standard" if delta else None,
+                   delta_color="off", delta_arrow="auto" if delta else "off", border=True, help=help_text[lbl])
+    flagged, flagged_base = counts["alarm"] + counts["review"], base["alarm"] + base["review"]
+    boxes[3].metric("Mensch nötig", flagged,
+                    delta=f"{flagged - flagged_base:+d} zum Standard" if flagged != flagged_base else None,
+                    delta_color="off", delta_arrow="auto" if flagged != flagged_base else "off", border=True,
+                    help="Alarm + Prüfen: Anrufe, die jemand anhören muss.")
+
+    # 2. the Alarmschwelle, full width
+    ctl.threshold_slider(app)
+
+    # 3. the score distribution: bars recolour as the threshold moves
+    st.altair_chart(ui.score_bars(app.rows(), s.threshold, max(0.0, s.review_floor)), width="stretch")
 
     rows = cm.case_rows(app, judged)
     f1, f2, f3 = st.columns([3, 3, 4], vertical_alignment="bottom")
