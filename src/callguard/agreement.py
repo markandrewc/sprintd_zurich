@@ -242,6 +242,8 @@ PAIRS: dict[str, tuple[str, str, str, str]] = {
     "para2": ("two_readers", "para2_src", "kev_vs_facts/qwen_facts_para2", "kev_vs_facts/kev_facts_para2"),
     "blind": ("two_readers", "blind_src", "kev_vs_facts/qwen_facts_blind", "kev_vs_facts/kev_facts_blind"),
     "perturbed": ("two_readers_perturbed", "perturbed_src", "kev_perturbed/perturbed", "kev_perturbed/kev_facts"),
+    # table v3 (adopted 2026-10-10): the Prüfmodus numbers of the live table; not part of the pre-registration
+    "v3": ("two_readers", "v3_src", "champion/table_v3", "kev_vs_facts/kev_facts_v3"),
 }
 REWORDED = ("para", "para2", "blind")
 # pre-registered acceptance constants (research/findings/two_readers_prereg.md)
