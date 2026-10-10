@@ -27,7 +27,7 @@ app = current_app()
 pipeline = app.engine.pipeline
 
 st.title("Anruf verarbeiten")
-st.caption("Eine Aufnahme hochladen: callguard erkennt die Sprache, trennt Beratung und Kunde, prüft das Gespräch "
+st.caption("Eine Aufnahme hochladen: Sherlock Phones erkennt die Sprache, trennt Beratung und Kunde, prüft das Gespräch "
            "und entscheidet. Danach öffnet sich der Anruf mit Begründung und Passagen.")
 
 

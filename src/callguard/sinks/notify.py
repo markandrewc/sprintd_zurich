@@ -152,7 +152,7 @@ class Notifier:
         if not to and not cc:
             return "skipped: no addresses"
         mail = EmailMessage()
-        mail["Subject"], mail["From"] = msg["subject"], s.get("sender", "callguard@bank.example")
+        mail["Subject"], mail["From"] = msg["subject"], s.get("sender", "sherlock-phones@bank.example")
         mail["To"] = ", ".join(to)
         if cc:
             mail["Cc"] = ", ".join(cc)

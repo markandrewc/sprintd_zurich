@@ -135,7 +135,7 @@ def test_test50_timed_script_wins_and_keeps_the_test_data_times(tmp_path: Path, 
         assert [t.id for t in s.turns] == ["T001", "T002", "T003"]  # sorted by start
         assert (s.turns[0].start, s.turns[0].end, s.turns[0].role) == (0.25, 6.49, "advisor")
         assert s.turns[1].role == "customer" and "Zeiten: aus den Testdaten" in s.note
-        assert "nicht von callguard erzeugt und nicht von der KI ausgewertet" in s.note
+        assert "nicht von Sherlock Phones erzeugt und nicht von der KI ausgewertet" in s.note
     assert not [p for p in reads if "Skript_mit_Sollbewertung" in p]
 
 

@@ -34,7 +34,7 @@ def mode_control(app: Any, *, details: bool = False) -> None:
         "Prüfmodus", ds.available_modes(modes), key=ds.MODE_KEY, required=True, format_func=lambda k: by[k].label,
         persist_state="session", on_change=ds.on_mode_change,
         args=(str(app.runs_root), app.source.key, str(app.runs_dir), ds.profile_threshold(app)),
-        help="Wie streng callguard entscheidet. Die Wahl gilt für dieses Profil und wird im Audit-Log vermerkt.")
+        help="Wie streng Sherlock Phones entscheidet. Die Wahl gilt für dieses Profil und wird im Audit-Log vermerkt.")
     cur = by.get(app.settings.mode or modes.spec.default)
     if cur is not None and not details:
         note = md.consequence_short(modes.metrics.get(cur.id))

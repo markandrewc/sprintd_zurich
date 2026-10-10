@@ -15,7 +15,7 @@ import streamlit as st
 
 from callguard.ui.session import bootstrap
 
-st.set_page_config(layout="wide", page_title="callguard", page_icon=":material/shield:")
+st.set_page_config(layout="wide", page_title="Sherlock Phones", page_icon=":material/shield:")
 
 app = bootstrap()
 page = st.navigation(list(app.pages.values()), position="top")

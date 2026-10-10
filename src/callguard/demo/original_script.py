@@ -35,7 +35,7 @@ log = logging.getLogger("callguard.demo")
 
 TIMED_DIR = "Transkript_CH_timed"
 SCRIPT_DIR = "Transkript"
-NO_SCRIPT_DE = ("Kein Originalskript vorhanden: callguard erzeugt Hochdeutsch; Schweizerdeutsch gibt es nur für "
+NO_SCRIPT_DE = ("Kein Originalskript vorhanden: Sherlock Phones erzeugt Hochdeutsch; Schweizerdeutsch gibt es nur für "
                 "Testdaten.")
 TIMING_DE = {"test_data": "aus den Testdaten", "aligned": "per Ausrichtung an das KI-Transkript, ±1 Satz"}
 _VARIANT = re.compile(r"-K\d+$")
@@ -65,7 +65,7 @@ class OriginalScript:
     @property
     def note(self) -> str:
         """The honest label shown under the Swiss German view."""
-        return ("Originalskript aus den Testdaten (Vorlage der Aufnahme), nicht von callguard erzeugt und nicht "
+        return ("Originalskript aus den Testdaten (Vorlage der Aufnahme), nicht von Sherlock Phones erzeugt und nicht "
                 f"von der KI ausgewertet. Zeiten: {TIMING_DE[self.timing]}.")
 
 
