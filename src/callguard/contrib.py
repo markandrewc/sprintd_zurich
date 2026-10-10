@@ -5,7 +5,8 @@ experiment variants on the SAME calls (``<experiment>/<variant>``, read from
 ``<data_root>/<experiment>/<variant>/rows.json`` + ``meta.json``; ``summary.json`` is optional). Nothing is
 recomputed: no ASR, no LLM, only the statistics of :mod:`callguard.stats` over the stored per-call rows.
 
-Per pair (B - A, paired over the calls both have, CI = 95% percentile bootstrap over twin groups/dialogues):
+Per pair (B - A, paired over the calls both have, CI = 95% percentile bootstrap over twin groups/dialogues; rows of
+different datasets (case / synthetic / test50, :mod:`callguard.datasets`) are never paired or pooled):
 
 * flag AUC (threshold-free, from the scores) via :func:`stats.paired_auc`,
 * false-alarm rate, miss rate, 3-class accuracy, review recall (and flag F1, for completeness) at the
@@ -45,6 +46,7 @@ import yaml
 
 from callguard import stats
 from callguard.config import ROOT
+from callguard.datasets import rows_dataset
 
 DEFAULT_SPEC = ROOT / "experiments" / "contrib" / "contrib.yaml"  # own folder: experiments/*.yaml = experiment specs
 DEFAULT_DATA = ROOT / "runs" / "experiments"
@@ -236,7 +238,7 @@ def variant_record(v: Variant, basis: str = "cv", n_boot: int = 2000, seed: int 
                             ("DEGRADED", v.summary.get("degraded")),
                             ("WARN", v.summary.get("warnings"))) if on]
     return {
-        "ref": v.ref, "basis": used, "split": exp_split, "n_calls": len(fixed), "n_dialogues": len(dialogues),
+        "ref": v.ref, "basis": used, "split": exp_split, "dataset": rows_dataset(fixed, v.ref), "n_calls": len(fixed), "n_dialogues": len(dialogues),
         "description": v.meta.get("description") or v.summary.get("meta", {}).get("description"),
         "tags": tags, "warnings": v.summary.get("warnings") or [],
         "auc": {"value": auc_s.get("value"), "lo": auc_s.get("lo"), "hi": auc_s.get("hi")},
@@ -276,6 +278,10 @@ def compare_rows(rows_a: dict[str, list], rows_b: dict[str, list], basis: str = 
                  seed: int = 13) -> dict[str, Any]:
     """Paired deltas B - A. ``rows_*`` = the rows.json dicts (``fixed`` for AUC, ``basis`` for the rest)."""
     fa, fb = rows_a.get("fixed") or [], rows_b.get("fixed") or []
+    da, db = rows_dataset(fa, "rows A"), rows_dataset(fb, "rows B")  # raises on a set that mixes datasets
+    if da and db and da != db:  # different datasets are never paired or pooled: side by side only
+        return {"basis": basis, "n_common": 0, "only_a": len(stats.labeled(fa)), "only_b": len(stats.labeled(fb)),
+                "paired": False, "datasets": [da, db]}
     ra, used_a = (rows_a.get(basis) or [], basis) if rows_a.get(basis) else (fa, "fixed")
     rb, used_b = (rows_b.get(basis) or [], basis) if rows_b.get(basis) else (fb, "fixed")
     if used_a != used_b:  # never mix a CV basis with a fixed one

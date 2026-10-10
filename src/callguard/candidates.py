@@ -47,6 +47,7 @@ import yaml
 from callguard import contrib as cb
 from callguard import stats
 from callguard.config import ROOT
+from callguard.datasets import CASE, DatasetMixError, rows_dataset, same_dataset
 
 DEFAULT_SPEC = ROOT / "experiments" / "contrib" / "candidates.yaml"
 DEFAULT_DECISIONS = ROOT / "experiments" / "contrib" / "decisions.yaml"
@@ -55,12 +56,23 @@ DEFAULT_TEAM = ROOT / "experiments" / "contrib" / "team_decisions.yaml"
 DEFAULT_OUT = ROOT / "runs" / "candidates"
 DEFAULT_DOC = ROOT / "docs" / "TEAM_OPTIONS.md"
 ENV_ZURICH = "CALLGUARD_ZURICH_REPO"
-DEFAULT_ROOTS = {"default": "runs/experiments", "perturbed": "runs/perturbed/experiments"}
+DEFAULT_ROOTS = {"default": "runs/experiments", "perturbed": "runs/perturbed/experiments",
+                 "test50": "runs/test50/experiments"}
+# dataset every root must hold (callguard.datasets): rows of different datasets are never combined
+DEFAULT_ROOT_DATASETS = {"default": CASE, "perturbed": CASE, "test50": "test50"}
+T50 = "test50"
 
 SLOTS = ("tuned", "reworded", "blind", "rerecorded")
 GEN_SLOTS = ("reworded", "blind", "rerecorded")
+ALL_SLOTS = (*SLOTS, T50)
 SLOT_LABELS = {"tuned": "abgestimmt (Dev)", "reworded": "umformuliert", "blind": "blinde Tabelle",
-               "rerecorded": "neu aufgenommen"}
+               "rerecorded": "neu aufgenommen", T50: "test50 (extern)"}
+T50_TITLE = "test50 (extern, FHNW-TTS, 8 Dialekte)"
+T50_BANNER = ("Externer Testsatz: nie zum Tunen verwendet; Zahlen nicht mit Dev vergleichbar gepoolt. "
+              "Eigener Datensatz (100 Anrufe, 50 Dialoge sauber/verrauscht, 8 Dialekt-Stimmen), eigene "
+              "Ergebnisse (runs/test50), vorregistriert (research/findings/test50_prereg.md).")
+T50_TYPES = {"pair": "Paar (A/B)", "trap": "Stichwort-Falle", "review": "Prüfen-Fall", "numbers": "Zahlen-Paar",
+             "multi": "Mehrere Themen"}
 STATUS_TEXT = {"ok": "da", "running": "läuft noch", "pending": "ausstehend", "missing": "nicht geplant",
                "na": "n/a"}
 METRICS = ("false_alarm_rate", "miss_rate", "review_recall", "accuracy")
@@ -71,7 +83,12 @@ COLUMNS = {
     "accuracy": ("Exakt 3 Klassen", True, True), "reworded": ("AUC umformuliert", True, False),
     "blind": ("AUC blinde Tabelle", True, False), "rerecorded": ("AUC neu aufgenommen", True, False),
     "hit1": ("Beleg hit@1", True, True), "cost": ("s/Anruf", False, False),
+    # test50: own dataset, fixed (dev-frozen) threshold; never pooled with the columns above
+    "t50_auc": ("test50 Flag-AUC", True, False), "t50_far": ("test50 Fehlalarme (fix)", False, True),
+    "t50_miss": ("test50 Verpasst (fix)", False, True), "t50_acc": ("test50 Exakt (fix)", True, True),
+    "t50_rr": ("test50 Prüf-Recall (fix)", True, True),
 }
+T50_KEYS = {"t50_far": "false_alarm_rate", "t50_miss": "miss_rate", "t50_acc": "accuracy", "t50_rr": "review_recall"}
 GEN_COLUMNS = ("reworded", "blind", "rerecorded")
 
 
@@ -124,20 +141,31 @@ def load_spec(path: str | Path | None = None) -> dict[str, Any]:
         if not c.get("id") or c["id"] in ids:
             raise SpecError(f"{s['_path']}: every candidate needs a unique `id` ({c!r:.80})")
         ids.add(c["id"])
-        for slot in SLOTS:
+        for slot in ALL_SLOTS:
             for r in _as_list(c.get(slot)):
                 if r != "na":
-                    parse_ref(r)
+                    root = parse_ref(r)[0]
+                    ds = root_datasets(s).get(root)
+                    if ds is not None and (slot == T50) != (ds == T50):
+                        raise SpecError(f"{s['_path']}: {c['id']}.{slot} = {r!r} reads root {root!r} (dataset {ds}): "
+                                        f"test50 rows only in the `test50` slot, never in a dev slot")
     if s.get("reference") and s["reference"] not in ids:
         raise SpecError(f"{s['_path']}: reference {s['reference']!r} is not a candidate id")
     return s
 
 
-class Data:
-    """Stores per named data root + the variant names planned in ``experiments/*.yaml``."""
+def root_datasets(spec: dict[str, Any] | None = None) -> dict[str, str]:
+    return {**DEFAULT_ROOT_DATASETS, **((spec or {}).get("root_datasets") or {})}
 
-    def __init__(self, roots: dict[str, str | Path], experiments_dir: str | Path | None = None):
+
+class Data:
+    """Stores per named data root + the variant names planned in ``experiments/*.yaml``. Every root is keyed to
+    one dataset (``datasets``): a variant whose rows belong to another dataset raises :class:`DatasetMixError`."""
+
+    def __init__(self, roots: dict[str, str | Path], experiments_dir: str | Path | None = None,
+                 datasets: dict[str, str] | None = None):
         self.roots = {k: _abs(v) for k, v in roots.items()}
+        self.datasets = {**DEFAULT_ROOT_DATASETS, **(datasets or {})}
         self.stores = {k: cb.Store(v) for k, v in self.roots.items()}
         self.planned: dict[str, set[str]] = {}
         ed = _abs(experiments_dir or "experiments")
@@ -158,7 +186,12 @@ class Data:
 
     def get(self, ref: str) -> cb.Variant | None:
         root, e, v = parse_ref(ref)
-        return self._store(root).get(f"{e}/{v}")
+        var = self._store(root).get(f"{e}/{v}")
+        if var is not None and self.datasets.get(root):
+            got = rows_dataset(var.rows.get("fixed") or [], ref)
+            if got and got != self.datasets[root]:
+                raise DatasetMixError(f"{ref}: rows are dataset {got!r}, root {root!r} holds {self.datasets[root]!r}")
+        return var
 
     def status(self, ref: str) -> str:
         if ref == "na":
@@ -214,6 +247,7 @@ def mean_auc_delta(sets_a: Sequence[Sequence[dict]], sets_b: Sequence[Sequence[d
     """mean(AUC of sets_b) - mean(AUC of sets_a) on the calls every set scored, paired: all sets use the same
     resampled units (twin groups / dialogues) per bootstrap replicate. With one set per side this equals
     :func:`stats.paired_auc` (flag target)."""
+    same_dataset([*sets_a, *sets_b], "AUC sets")  # never a mean / delta across datasets
     scored = [{r["call_id"]: r for r in stats._scored(s)} for s in [*sets_a, *sets_b]]
     if not sets_a or not sets_b or not scored:
         return {"a": None, "b": None, "diff": None, "lo": None, "hi": None, "real": False, "n": 0}
@@ -309,17 +343,18 @@ def analyse(spec: dict[str, Any], roots: dict[str, str | Path] | None = None, n_
             seed: int | None = None, evidence: dict[str, dict[str, Any]] | None = None,
             experiments_dir: str | Path | None = None) -> dict[str, Any]:
     roots = {**DEFAULT_ROOTS, **(spec.get("data_roots") or {}), **(roots or {})}
-    data = Data(roots, experiments_dir or spec.get("experiments_dir"))
+    data = Data(roots, experiments_dir or spec.get("experiments_dir"), root_datasets(spec))
     n_boot = int(n_boot or spec.get("n_boot") or 2000)
     seed = int(seed if seed is not None else spec.get("seed", 13))
     basis = spec.get("rows") or "cv"
     evidence = evidence or {}
 
     ref_id = spec.get("reference")
-    slots = {c["id"]: {s: resolve(data, c.get(s)) for s in SLOTS} for c in spec["candidates"]
+    slots = {c["id"]: {s: resolve(data, c.get(s)) for s in ALL_SLOTS} for c in spec["candidates"]
              if not c.get("trivial")}
     ref_slots = slots.get(ref_id) or {}
     ref_tuned = data.get(ref_slots["tuned"]["ref"]) if ref_slots.get("tuned", {}).get("status") == "ok" else None
+    ref_t50 = data.get(ref_slots[T50]["ref"]) if ref_slots.get(T50, {}).get("status") == "ok" else None
 
     def gen_sets(sl: dict[str, Any], slot: str, positions: Sequence[int] | None = None) -> list[list[dict]]:
         """Row sets of a condition; for ``reworded`` one per available paraphrase set (``positions``: only those
@@ -342,11 +377,19 @@ def analyse(spec: dict[str, Any], roots: dict[str, str | Path] | None = None, n_
                 continue
             v = trivial_variant(ref_tuned, ref=f"trivial/{c['trivial']}")
             sl = {"tuned": {"ref": f"trivial/{c['trivial']}", "status": "ok", "refs": []},
-                  **{s: {"ref": None, "status": "na", "refs": []} for s in GEN_SLOTS}}
+                  **{s: {"ref": None, "status": "na", "refs": []} for s in GEN_SLOTS},
+                  T50: ({"ref": f"trivial/{c['trivial']}@test50", "status": "ok", "refs": []} if ref_t50 is not None
+                        else {"ref": ref_slots.get(T50, {}).get("ref"), "refs": [],
+                              "status": "pending" if ref_slots.get(T50, {}).get("refs") else "na"})}
+            v50 = trivial_variant(ref_t50, ref=f"trivial/{c['trivial']}@test50") if ref_t50 is not None else None
         else:
             sl = slots[cid]
             v = data.get(sl["tuned"]["ref"]) if sl["tuned"]["status"] == "ok" else None
+            v50 = data.get(sl[T50]["ref"]) if sl[T50]["status"] == "ok" else None
         rec["slots"] = sl
+        if v50 is not None:  # own dataset: never pooled with the dev numbers of the same candidate
+            rec[T50] = test50_record(v50, ref_t50 if cid != ref_id else None, v, n_boot, seed,
+                                     trivial=bool(c.get("trivial")))
         if v is None:
             rec["tuned"] = None
             cands.append(rec)
@@ -414,6 +457,7 @@ def analyse(spec: dict[str, Any], roots: dict[str, str | Path] | None = None, n_
 def mean_auc_ci(sets: Sequence[Sequence[dict]], n_boot: int = 2000, seed: int = 13,
                 alpha: float = 0.05) -> tuple[float | None, float | None]:
     """Percentile CI of the mean AUC over several row sets (common calls, shared resampling weights)."""
+    same_dataset(sets, "AUC sets")
     scored = [{r["call_id"]: r for r in stats._scored(s)} for s in sets]
     common = sorted(set.intersection(*(set(d) for d in scored))) if scored else []
     if not common:
@@ -424,6 +468,89 @@ def mean_auc_ci(sets: Sequence[Sequence[dict]], n_boot: int = 2000, seed: int = 
     reps = [stats._weighted_auc(w, *stats._auc_parts(rows, pos_lab)) for rows in ordered]
     lo, hi, _ = stats._ci(np.mean(reps, axis=0), alpha)
     return lo, hi
+
+
+# --------------------------------------------------------------------------------------------
+# test50 (external held-out set): own record, never pooled
+# --------------------------------------------------------------------------------------------
+
+
+def t50_type(call_id: str) -> str:
+    """pair / trap / review / numbers / multi from the test50 call id (``T50-<family>-<NN>-A-K1`` etc.)."""
+    dlg = call_id.rsplit("-K", 1)[0]
+    if dlg.endswith("-review"):
+        return "review"
+    if dlg.endswith("-trap"):
+        return "trap"
+    if dlg.startswith("T50-multi-"):
+        return "multi"
+    if dlg.startswith("T50-numbers-"):
+        return "numbers"
+    return "pair"
+
+
+def _acc_block(rows: Sequence[dict]) -> dict[str, Any]:
+    lab = stats.labeled(rows)
+    n = len(lab)
+    return {"n": n, "label_acc": _r(sum(stats.label_correct(r) for r in lab) / n) if n else None,
+            "flag_acc": _r(sum(stats.flag_correct(r) for r in lab) / n) if n else None,
+            "expected": {k: sum(r["expected"] == k for r in lab) for k in ("alarm", "review", "no_alert")}}
+
+
+def _r(x: float | None) -> float | None:
+    return None if x is None else round(float(x), 4)
+
+
+def test50_breakdown(rows: Sequence[dict]) -> dict[str, Any]:
+    """Exact label / flag correct per call type and per clean vs noisy recording (fixed-threshold rows)."""
+    rows_dataset(rows, "test50 rows")
+    by_type = {t: _acc_block([r for r in rows if t50_type(r["call_id"]) == t]) for t in T50_TYPES}
+    noisy = lambda r: bool(r.get("noisy")) if r.get("noisy") is not None else r["call_id"].endswith("-K2")  # noqa: E731
+    return {"types": {t: b for t, b in by_type.items() if b["n"]},
+            "audio": {"sauber": _acc_block([r for r in rows if not noisy(r)]),
+                      "verrauscht": _acc_block([r for r in rows if noisy(r)])}}
+
+
+def unpaired_auc_delta(rows_a: Sequence[dict], rows_b: Sequence[dict], n_boot: int = 2000, seed: int = 13,
+                       alpha: float = 0.05) -> dict[str, Any]:
+    """AUC(B) - AUC(A) for two DIFFERENT datasets (e.g. dev -> test50): nothing is pooled or paired; each AUC is
+    bootstrapped over its own units (independent seeds) and the CI is that of the difference of the replicates."""
+    out: dict[str, Any] = {"a": None, "b": None, "diff": None, "lo": None, "hi": None, "real": False,
+                           "paired": False, "datasets": [rows_dataset(rows_a, "A"), rows_dataset(rows_b, "B")]}
+    reps = []
+    for rows, sd in ((rows_a, seed), (rows_b, seed + 1)):
+        sc = stats._scored(rows)
+        pos_lab = stats.AUC_TARGETS["flag"]
+        if not sc or all(r["expected"] in pos_lab for r in sc) or not any(r["expected"] in pos_lab for r in sc):
+            return out
+        w, _ = stats._unit_weights(sc, n_boot, sd)
+        reps.append(stats._weighted_auc(w, *stats._auc_parts(sc, pos_lab)))
+    a, b = stats.auc(rows_a, "flag"), stats.auc(rows_b, "flag")
+    lo, hi, _ = stats._ci(reps[1] - reps[0], alpha)
+    out.update(a=a, b=b, diff=_r(b - a), lo=lo, hi=hi, real=lo is not None and hi is not None and (lo > 0 or hi < 0))
+    return out
+
+
+def test50_record(v50: cb.Variant, ref50: cb.Variant | None, dev: cb.Variant | None, n_boot: int, seed: int,
+                  trivial: bool = False) -> dict[str, Any]:
+    """Fixed-threshold (dev-frozen) metrics, CV-within-test50 metrics, paired delta against the champion's test50
+    run (twin groups = resampling units) and the unpaired dev -> test50 AUC drop."""
+    fx = cb.variant_record(v50, "fixed", n_boot, seed)
+    rec: dict[str, Any] = {"ref": v50.ref, "dataset": fx.get("dataset"), "n_calls": fx["n_calls"],
+                           "n_units": len({stats._dialogue(r) for r in _fixed(v50)}), "auc": fx["auc"],
+                           "fixed": fx["metrics"], "reviews": review_counts(v50, "fixed"),
+                           "breakdown": test50_breakdown(_fixed(v50))}
+    if v50.rows.get("cv"):
+        rec["cv"] = cb.variant_record(v50, "cv", n_boot, seed)["metrics"]
+    if ref50 is not None and not trivial:
+        cmp = cb.compare_rows(ref50.rows, v50.rows, "fixed", n_boot, seed)
+        if cmp.get("paired"):
+            rec["vs_ref"] = {"n_common": cmp["n_common"], "units": cmp.get("units"), "verdict": cmp["verdict"],
+                             "flips": cmp["flips"]["n"],
+                             **{k: _delta(cmp["deltas"].get(k)) for k in ("auc", *METRICS)}}
+    if dev is not None and not trivial:
+        rec["dev_drop"] = unpaired_auc_delta(_fixed(dev), _fixed(v50), n_boot, seed)
+    return rec
 
 
 # --------------------------------------------------------------------------------------------
@@ -445,6 +572,10 @@ def value(c: dict[str, Any], key: str) -> dict[str, Any] | None:
     if key == "cost":
         s = ((t or {}).get("cost") or {}).get("s_per_call") if t else None
         return None if s is None else {"value": s, "lo": None, "hi": None}
+    if key == "t50_auc":
+        return (c.get(T50) or {}).get("auc")
+    if key in T50_KEYS:
+        return ((c.get(T50) or {}).get("fixed") or {}).get(T50_KEYS[key])
     return None
 
 
@@ -454,6 +585,10 @@ def vs_ref(c: dict[str, Any], key: str) -> dict[str, Any] | None:
         return (c.get("vs_ref") or {}).get(key)
     if key in GEN_COLUMNS:
         return ((c.get("gen") or {}).get(key) or {}).get("vs_ref")
+    if key == "t50_auc":
+        return ((c.get(T50) or {}).get("vs_ref") or {}).get("auc")
+    if key in T50_KEYS:
+        return ((c.get(T50) or {}).get("vs_ref") or {}).get(T50_KEYS[key])
     return None
 
 
@@ -476,7 +611,7 @@ def best_marks(result: dict[str, Any]) -> dict[str, dict[str, Any]]:
 def slot_states(c: dict[str, Any]) -> list[tuple[str, str, str]]:
     """(slot, ref, status) for every slot of a candidate, reworded expanded per paraphrase set."""
     out = []
-    for slot in SLOTS:
+    for slot in ALL_SLOTS:
         sl = (c.get("slots") or {}).get(slot) or {}
         if slot == "reworded" and sl.get("refs"):
             parts = ((c.get("gen") or {}).get("reworded") or {}).get("parts")
@@ -538,6 +673,8 @@ def fmt_delta(d: dict[str, Any] | None, pct: bool = False, approx: str = "≈") 
 
 def slot_text(c: dict[str, Any], slot: str) -> str:
     st = ((c.get("gen") or {}).get(slot) or {}).get("status") or ((c.get("slots") or {}).get(slot) or {}).get("status")
+    if slot == T50 and (st or "na") == "na":
+        return "nicht geplant"  # the test50 candidate list is fixed (pre-registered)
     return {"running": "läuft noch", "pending": "ausstehend", "missing": "nicht geplant", "na": "n/a",
             "partial": "teilweise"}.get(st or "na", "–")
 
@@ -549,6 +686,8 @@ def cell(c: dict[str, Any], key: str) -> str:
     if v is None or v.get("value") is None:
         if key in GEN_COLUMNS:
             return slot_text(c, key)
+        if key.startswith("t50_"):
+            return slot_text(c, T50) if not c.get(T50) else "–"
         if key == "hit1":
             return "keine Passagen" if c.get("passages") == "nein" else "–"
         if c.get("tuned") is None:
@@ -610,18 +749,24 @@ def placeholder(cands: dict[str, dict[str, Any]], cid: str, key: str) -> str:
         return f"[? {cid}]"
     simple = {"auc": "auc", "far": "false_alarm_rate", "miss": "miss_rate", "rr": "review_recall",
               "acc": "accuracy", "reworded": "reworded", "blind": "blind", "rerecorded": "rerecorded",
-              "hit1": "hit1", "cost": "cost"}
+              "hit1": "hit1", "cost": "cost", "t50_auc": "t50_auc", "t50_far": "t50_far", "t50_miss": "t50_miss",
+              "t50_acc": "t50_acc", "t50_rr": "t50_rr"}
     if key in simple:
         k = simple[key]
         if value(c, k) is None:
-            return cell(c, k) if k in GEN_COLUMNS or c.get("tuned") is None else "–"
+            return cell(c, k) if k in GEN_COLUMNS or k.startswith("t50_") or c.get("tuned") is None else "–"
         return cell(c, k) if k != "cost" else f"{cell(c, k)} s"
     if key.startswith("vs_"):
         k = simple.get(key[3:])
         if k is None:
             return f"[? {key}]"
         d = vs_ref(c, k)
-        return fmt_delta(d, COLUMNS[k][2]) if d else ("ausstehend" if value(c, k) is None else "–")
+        if d:
+            return fmt_delta(d, COLUMNS[k][2])
+        return (slot_text(c, T50) if k.startswith("t50_") else "ausstehend") if value(c, k) is None else "–"
+    if key == "t50_drop":
+        d = (c.get(T50) or {}).get("dev_drop")
+        return f"{fmt_delta(d)} (ungepaart)" if d and d.get("diff") is not None else slot_text(c, T50)
     if key.startswith("drop_"):
         return drop_text(c, key[5:])
     if key == "reviews":
@@ -732,6 +877,72 @@ def matrix_rows(result: dict[str, Any], bold: bool = True) -> list[list[str]]:
     return rows
 
 
+T50_HEAD = ["Kandidat", "Flag-AUC [KI]", "Fehlalarme (fix)", "Verpasst (fix)", "Exakt 3 Klassen (fix)",
+            "Prüf-Recall (fix)", "CV in test50: Fehlalarme / Verpasst / Exakt", "gepaart vs. Champion (test50)",
+            "Dev → test50 AUC (ungepaart)"]
+
+
+def t50_vs_text(c: dict[str, Any]) -> str:
+    vr = (c.get(T50) or {}).get("vs_ref")
+    if not c.get(T50):
+        return slot_text(c, T50)
+    if not vr:
+        return "Untergrenze" if c.get("kind") == "trivial" else "Referenz" if c.get("_is_ref") else "nicht gepaart"
+    bits = []
+    for key in ("t50_auc", *T50_KEYS):
+        d = vs_ref(c, key)
+        if d and d.get("real"):
+            lab, higher, pct = COLUMNS[key]
+            bits.append(f"{'▲' if (d['diff'] > 0) == higher else '▼'} {lab.replace('test50 ', '')} "
+                        f"{fmt_delta(d, pct).replace(' belegt', '')}")
+    return "; ".join(bits) if bits else "≈ Champion"
+
+
+def test50_rows(result: dict[str, Any], bold: bool = True) -> list[list[str]]:
+    """The test50 column group (own table): fixed-threshold numbers, CV-within-test50, paired vs champion."""
+    best = result.get("best") or {}
+    rows = []
+    for c in visible(result):
+        c = {**c, "_is_ref": c["id"] == result.get("reference")}
+
+        def b(key: str, txt: str) -> str:
+            m = best.get(key)
+            if not bold or not m or c["id"] not in m["ids"] or c.get("kind") != "candidate":
+                return txt
+            tag = "" if c["_is_ref"] else (" belegt" if m["real_vs_ref"].get(c["id"]) else " (≈ Champion)")
+            return f"**{txt}**{tag}"
+
+        t = c.get(T50) or {}
+        cvm = t.get("cv") or {}
+        cv_txt = (" / ".join(fmt_num((cvm.get(k) or {}).get("value"), True) for k in ("false_alarm_rate", "miss_rate",
+                                                                                      "accuracy")) if cvm else
+                  slot_text(c, T50) if not t else "–")
+        drop = t.get("dev_drop")
+        rows.append([c.get("label") or c["id"], b("t50_auc", cell(c, "t50_auc")), b("t50_far", cell(c, "t50_far")),
+                     b("t50_miss", cell(c, "t50_miss")), b("t50_acc", cell(c, "t50_acc")),
+                     b("t50_rr", cell(c, "t50_rr")), cv_txt, t50_vs_text(c),
+                     fmt_delta(drop) if drop and drop.get("diff") is not None else (slot_text(c, T50) if not t else "–")])
+    return rows
+
+
+def breakdown_rows(result: dict[str, Any]) -> list[list[str]]:
+    """Per candidate with test50 data: exact label correct per call type and clean / noisy (n in brackets)."""
+    out = []
+    for c in visible(result):
+        bd = (c.get(T50) or {}).get("breakdown")
+        if not bd:
+            continue
+        cells = []
+        for t in T50_TYPES:
+            x = bd["types"].get(t)
+            cells.append(f"{fmt_num(x['label_acc'], True)} ({x['n']})" if x else "–")
+        for a in ("sauber", "verrauscht"):
+            x = bd["audio"].get(a) or {}
+            cells.append(f"{fmt_num(x.get('label_acc'), True)} ({x.get('n', 0)})" if x.get("n") else "–")
+        out.append([c.get("label") or c["id"], *cells])
+    return out
+
+
 def _md_table(head: list[str], rows: list[list[str]]) -> list[str]:
     esc = [[str(x).replace("|", "\\|").replace("\n", " ") for x in r] for r in rows]
     return ["| " + " | ".join(head) + " |", "|" + "---|" * len(head), *("| " + " | ".join(r) + " |" for r in esc)]
@@ -757,15 +968,26 @@ def render_markdown(result: dict[str, Any], decisions: dict[str, Any] | None = N
         for c in visible(result) if c.get("reviews")) + "."]
     if result.get("evidence_note"):
         out += ["", result["evidence_note"]]
+    out += ["", f"## {T50_TITLE}", "", f"> **{T50_BANNER}**", "",
+            "Eigene Spaltengruppe, eigene Anrufe: fixe Schwelle = die auf Dev eingefrorene Konfiguration jeder Variante; "
+            "CV in test50 = Schwelle out-of-fold innerhalb von test50 (Zwillingsgruppen zusammen), nur zum Vergleich. "
+            "Gepaart gegen den Champion auf denselben test50-Anrufen (KI über A/B-Paare). „Dev → test50“ ist eine "
+            "ungepaarte Differenz zweier getrennt gebooteter AUCs (verschiedene Anrufe), kein gepoolter Wert.", ""]
+    out += _md_table(T50_HEAD, test50_rows(result))
+    bd = breakdown_rows(result)
+    if bd:
+        out += ["", "Exakt richtig je Anruf-Typ und Aufnahme (fixe Schwelle, Anzahl Anrufe in Klammern):", ""]
+        out += _md_table(["Kandidat", *T50_TYPES.values(), "sauber", "verrauscht"], bd)
     notes = [(c.get("label") or c["id"], c.get("note")) for c in visible(result) if c.get("note")]
     if notes:
         out += ["", "### Anmerkungen je Kandidat", ""] + [f"- **{lab}**: {n}" for lab, n in notes]
     out += ["", "### Zuordnung zu gespeicherten Varianten", "",
-            "| Kandidat | abgestimmt | umformuliert | blinde Tabelle | neu aufgenommen |", "|---|---|---|---|---|"]
+            "| Kandidat | abgestimmt | umformuliert | blinde Tabelle | neu aufgenommen | test50 (extern) |",
+            "|---|---|---|---|---|---|"]
     for c in visible(result):
         sl = c.get("slots") or {}
         cells = []
-        for s in SLOTS:
+        for s in ALL_SLOTS:
             st = sl.get(s) or {}
             if s == "reworded" and st.get("refs"):
                 parts = ((c.get("gen") or {}).get("reworded") or {}).get("parts") or []
@@ -773,7 +995,7 @@ def render_markdown(result: dict[str, Any], decisions: dict[str, Any] | None = N
             elif st.get("ref"):
                 cells.append(f"`{st['ref']}` ({STATUS_TEXT.get(st['status'], st['status'])})")
             else:
-                cells.append(STATUS_TEXT.get(st.get("status") or "na", "–"))
+                cells.append(slot_text(c, s) if s == T50 else STATUS_TEXT.get(st.get("status") or "na", "–"))
         out.append(f"| {c.get('label') or c['id']} | " + " | ".join(cells) + " |")
     if result.get("pending"):
         out += ["", "### Ausstehend / läuft noch", ""]
@@ -866,7 +1088,7 @@ def load_or_compute(spec_path: str | Path | None = None, out_dir: str | Path | N
     evidence summaries (no evidence computation in the UI). Returns (result, "file" | "live")."""
     spec = load_spec(spec_path)
     all_roots = {**DEFAULT_ROOTS, **(spec.get("data_roots") or {}), **(roots or {})}
-    data = Data(all_roots, spec.get("experiments_dir"))
+    data = Data(all_roots, spec.get("experiments_dir"), root_datasets(spec))
     p = _abs(out_dir or DEFAULT_OUT) / "candidates.json"
     if p.exists():
         try:

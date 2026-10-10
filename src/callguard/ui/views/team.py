@@ -35,7 +35,8 @@ if "decisions" in app.pages:
     st.page_link(app.pages["decisions"], label="Welche Komponente bringt was? → Entscheidungshilfe (Faktoren)",
                  icon=":material/balance:")
 
-roots = {"default": app.runs_root / "experiments", "perturbed": app.runs_root / "perturbed" / "experiments"}
+roots = {"default": app.runs_root / "experiments", "perturbed": app.runs_root / "perturbed" / "experiments",
+         "test50": app.runs_root / "test50" / "experiments"}
 out_dir = app.runs_root / "candidates"
 team_path = Path(os.environ.get(ENV_TEAM) or cd.DEFAULT_TEAM)
 with st.expander("Datenquelle", icon=":material/folder_open:"):
@@ -59,7 +60,7 @@ def _load(spec_path: str, roots_key: tuple[tuple[str, str], ...], out: str, stam
 
 
 json_path = out_dir / "candidates.json"
-data = cd.Data({**cd.DEFAULT_ROOTS, **roots}, spec.get("experiments_dir"))
+data = cd.Data({**cd.DEFAULT_ROOTS, **roots}, spec.get("experiments_dir"), cd.root_datasets(spec))
 stamp = (data.fingerprint(spec["_path"]), json_path.stat().st_mtime if json_path.exists() else 0.0)
 with st.spinner("Kandidaten werden gerechnet …"):
     result, origin = _load(spec["_path"], tuple(sorted((k, str(v)) for k, v in roots.items())), str(out_dir), stamp)
@@ -104,9 +105,15 @@ else:
                for col, (key, pct) in tv.NUM_COLS.items()}
         cfg.update({col: st.column_config.NumberColumn(format="%+.2f", help="Gepaarte AUC-Differenz zum eigenen "
                                                        "abgestimmten Lauf (gleiche Anrufe).") for col in tv.DROP_COLS})
+        cfg.update({col: st.column_config.NumberColumn(format="%.0f%%" if pct else "%.2f")
+                    for col, (key, pct) in tv.T50_NUM_COLS.items()})
+        cfg[tv.T50_PREFIX + "Dev → test50 (ungepaart)"] = st.column_config.NumberColumn(
+            format="%+.2f", help="AUC test50 minus AUC Dev: verschiedene Anrufe, getrennt gebootet, nie gepoolt.")
         cfg["Daten"] = st.column_config.TextColumn(width="large")
     st.dataframe(tv.style(df, result), hide_index=True, width="stretch", column_config=cfg)
-    st.caption("Grau hinterlegt = Generalisierung (dasselbe System ausserhalb der Dev-Bedingungen): umformulierte "
+    st.caption("Blau hinterlegt = **test50**: eigener, externer Datensatz (fixe Schwelle = auf Dev eingefroren; CV "
+               "innerhalb test50 nur zum Vergleich), nie mit den Dev-Spalten gepoolt. "
+               "Grau hinterlegt = Generalisierung (dasselbe System ausserhalb der Dev-Bedingungen): umformulierte "
                "Fragen (Mittel der Paraphrasen-Sätze), blinde Tabelle (Fragen und Regeln nur aus den Kriterien), neu "
                "aufgenommenes Audio (Tempo 0.96, −3 dB). Δ = gepaarte Differenz zum eigenen abgestimmten Lauf. "
                "Beleg hit@1 immer mit „Zufall“ lesen: lange Passagen treffen schon zufällig. n/a = nicht anwendbar.")
@@ -126,6 +133,23 @@ else:
         st.caption(f"● dunkel = abgestimmte Dev-Fragen, ◆ hell = {tv.CONDITIONS[cond]}; Linien = 95%-Intervalle. "
                    "Ein langer Abstand heisst: das Ergebnis hängt an der auf Dev geschriebenen Formulierung bzw. am "
                    "Audio. Rechts steht, wo die Bedingung noch fehlt. Zahlen im Tooltip und in der Matrix.")
+
+# -- 2b. test50 (external held-out set) -----------------------------------------------------------
+
+st.subheader(f"Externer Testsatz {cd.T50_TITLE}")
+st.warning(cd.T50_BANNER, icon=":material/shield:")
+bdf = tv.breakdown_frame(result)
+if len(bdf):
+    st.markdown("**Exakt richtig je Anruf-Typ und Aufnahme** (fixe Schwelle; Anzahl Anrufe in Klammern). Typen: "
+                "Paar = A/B-Zwillinge, die sich nur im entscheidenden Detail unterscheiden; Stichwort-Falle = "
+                "harmloser Anruf mit Reizwörtern; Prüfen-Fall; Zahlen-Paar (nie Alarm); mehrere Themen.")
+    st.dataframe(bdf, hide_index=True, width="stretch")
+    st.caption("Die Kennzahlen mit Intervallen und der gepaarte Vergleich gegen den Champion (über A/B-Paare) stehen "
+               "in den blauen Spalten der Matrix oben. Sehr wenige Anrufe je Typ (10-60): eine Zelle kippt mit einem Paar.")
+else:
+    t50p = tv.t50_pending(result)
+    st.info("Noch keine test50-Ergebnisse. Erwartet unter `runs/test50/experiments/test50/<variante>/` "
+            f"(experiments/test50.yaml): {len(t50p)} Varianten ausstehend.", icon=":material/hourglass_empty:")
 
 # -- 3. decisions -----------------------------------------------------------------------------------
 
