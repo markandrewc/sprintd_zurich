@@ -1,4 +1,4 @@
-# 4-bit twin of experiments/qwen38.yaml (same cells, variant prefix q38w4_), served by vLLM on the 24 GB A5000.
+# Q6_K twin of experiments/qwen38.yaml (same cells, variant prefix q38q6_), llama.cpp on the 24 GB A5000 box.
 # Does the newest Qwen (Qwen3.8-27B, ~3-bit GGUF on llama.cpp) read the facts better than Qwen2.5-7B-AWQ, and is
 # it more robust to question wording? Same cells as experiments/kev_vs_facts.yaml so the rows line up:
 #   q38_facts        tuned facts + policy table (champion design), + kw/pat         vs  champion / kev_facts
@@ -11,28 +11,28 @@
 # here is whether a newer, larger model closes the ~0.15 AUC wording gap of the 7B.
 # Runs: llama-server up alone on the GPU (scripts/remote/serve_llamacpp.sh models/llm/qwen38-27b-gguf/<file>.gguf).
 # Dev split only. n = 48 calls: differences of 1-2 calls are noise; quote the CIs.
-name: qwen38_w4
-description: Qwen3.8-27B INT4 (vLLM, A5000 24 GB) as the facts / general-questions backend, wording probes
+name: qwen38_q6
+description: Qwen3.8-27B Q6_K (llama.cpp, A5000 24 GB) as the facts / general-questions backend, wording probes
 rq: [RQ6, RQ10]
 base: recommended
 split: dev
-compare_to: q38w4_facts
+compare_to: q38q6_facts
 variants:
-  - {name: q38w4_facts, profile: qwen38-vllm, set: [fusion.threshold=0.55], description: "Qwen3.8-27B reads the tuned facts (champion design); + kw/pat"}
-  - name: q38w4_general
-    profile: qwen38-vllm
+  - {name: q38q6_facts, profile: qwen38-q6, set: [fusion.threshold=0.55], description: "Qwen3.8-27B reads the tuned facts (champion design); + kw/pat"}
+  - name: q38q6_general
+    profile: qwen38-q6
     description: "Qwen3.8-27B asked the 15 general questions (facts prompt, logprob p(yes)); call = max p(yes); + kw/pat"
     drop_checks: [facts]
-    add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions.yaml, parallel: 8, weight: 1.0}]
+    add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions.yaml, parallel: 4, weight: 1.0}]
     set: [fusion.threshold=0.7]
-  - {name: q38w4_facts_alone, refuse_from: q38w4_facts, checks: [facts]}
-  - {name: q38w4_general_alone, refuse_from: q38w4_general, checks: [general]}
-  - {name: q38w4_facts_para, profile: qwen38-vllm, set: [checks.facts.policy_table=config/policy_table_para.yaml, fusion.threshold=0.55], description: "R3 on Qwen3.8: tuned table reworded blind"}
-  - {name: q38w4_facts_blind, profile: qwen38-vllm, set: [checks.facts.policy_table=config/policy_table_blind.yaml, fusion.threshold=0.55], description: "R4 on Qwen3.8: blind table"}
-  - name: q38w4_general_para
-    profile: qwen38-vllm
+  - {name: q38q6_facts_alone, refuse_from: q38q6_facts, checks: [facts]}
+  - {name: q38q6_general_alone, refuse_from: q38q6_general, checks: [general]}
+  - {name: q38q6_facts_para, profile: qwen38-q6, set: [checks.facts.policy_table=config/policy_table_para.yaml, fusion.threshold=0.55], description: "R3 on Qwen3.8: tuned table reworded blind"}
+  - {name: q38q6_facts_blind, profile: qwen38-q6, set: [checks.facts.policy_table=config/policy_table_blind.yaml, fusion.threshold=0.55], description: "R4 on Qwen3.8: blind table"}
+  - name: q38q6_general_para
+    profile: qwen38-q6
     description: "q38_general with the general questions reworded blind"
     drop_checks: [facts]
-    add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions_para.yaml, parallel: 8, weight: 1.0}]
+    add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions_para.yaml, parallel: 4, weight: 1.0}]
     set: [fusion.threshold=0.7]
-  - {name: q38w4_general_para_alone, refuse_from: q38w4_general_para, checks: [general]}
+  - {name: q38q6_general_para_alone, refuse_from: q38q6_general_para, checks: [general]}

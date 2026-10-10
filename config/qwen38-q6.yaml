@@ -1,0 +1,33 @@
+# Qwen3.8-27B at Q6_K (unsloth/Qwen3.8-27B-GGUF UD-Q6_K, 22 GB, ~6.6 bit, near-lossless) on llama.cpp, fully on the
+# 24 GB A5000 box (scripts/remote/serve_llamacpp.sh models/llm/qwen38-27b-gguf/Qwen3.8-27B-UD-Q6_K.gguf 99 32768 4).
+# The least quantisation that fits 24 GB: BF16 is 55 GB, 8-bit 29-31 GB. Same design as config/qwen38.yaml (the ~3-bit
+# IQ3_XXS on the 12 GB 4070), so q38_* vs q38q6_* shows what the heavy quantisation costs.
+extends: qwen38.yaml
+description: Qwen3.8-27B Q6_K (llama.cpp, 24 GB) as the facts backend; roles from the cache (research only)
+
+llms:
+  q38:
+    type: openai_compat
+    base_url: ${CALLGUARD_Q38_URL:-http://127.0.0.1:8004/v1}
+    model: callguard-llm
+    cache_tag: ${CALLGUARD_Q38_TAG:-qwen3.8-27b-ud-q6_k}
+    timeout: 600
+    json_mode: json_schema
+    supports_n: false
+    max_concurrency: 4              # = llama-server slots (-np 4)
+    extra_body: {chat_template_kwargs: {enable_thinking: false}}
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.15
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.1
+  - name: facts
+    type: facts
+    llm: q38
+    parallel: 4
+    evidence: false
+    weight: 1.0
