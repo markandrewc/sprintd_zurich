@@ -136,8 +136,8 @@ def score_bars(rows: list[dict], threshold: float, floor: float, step: float = 0
     agg["Bereich"] = [f"{a:.2f}–{b:.2f}" for a, b in zip(agg["von"], agg["bis"])]
     order = [label_text(x) for x in LABEL_HEX]
     agg["ord"] = [order.index(s) for s in agg["Status"]]
-    bars = alt.Chart(agg).mark_bar(stroke="white", strokeWidth=1.5, cornerRadiusTopLeft=3,
-                                   cornerRadiusTopRight=3).encode(
+    # no corner radius: with x/x2 ranges it collapses the bars to zero width in Vega
+    bars = alt.Chart(agg).mark_bar(stroke="white", strokeWidth=1.5).encode(
         x=alt.X("von:Q", bin="binned", scale=alt.Scale(domain=[0, 1]), title="Score des Anrufs", axis=_X_AXIS),
         x2="bis:Q",  # pre-binned ranges: vertical bars (without bin="binned" Vega-Lite lays them horizontally)
         y=alt.Y("Anrufe:Q", stack="zero", title="Anrufe", axis=alt.Axis(tickMinStep=1, grid=True)),
