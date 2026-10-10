@@ -84,3 +84,21 @@ def register(app: typer.Typer) -> None:
             written = ["dual_facts_test50.md", "dual_facts_test50.json"]
         cli.console.print(md, markup=False, highlight=False)
         cli.console.print("wrote " + ", ".join(str(out / w) for w in written))
+
+    @grp.command("certainty")
+    def certainty_cmd(n_boot: Annotated[int, typer.Option("--n-boot", help="Bootstrap resamples.")] = 2000,
+                      seed: Annotated[int, typer.Option("--seed", help="Bootstrap seed.")] = 13,
+                      threshold: Annotated[float, typer.Option("--threshold", help="Fixed fusion threshold.")] = 0.55,
+                      out: Annotated[Path, typer.Option("--out", help="Evidence directory.")] = EVIDENCE,
+                      verbose: cli.VerboseOpt = False) -> None:
+        """DEV ONLY: the «Sicherheit der KI» knob (c in 0.6..0.8, both readers vs Kev only) -> the default."""
+        from callguard import dual_eval as de
+
+        cli._setup_logging(verbose)
+        es = de.load_set("dev", threshold=threshold)
+        rep = de.evaluate_certainty(es, n_boot=n_boot, seed=seed)
+        md = de.certainty_markdown(rep)
+        _write(out / "dual_facts_certainty.md", md)
+        _write(out / "dual_facts_certainty.json", rep)
+        cli.console.print(md, markup=False, highlight=False)
+        cli.console.print(f"chosen: {rep['chosen']}")

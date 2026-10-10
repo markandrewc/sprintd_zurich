@@ -303,6 +303,7 @@ class Rule:
     node: Node = field(default=("true",), repr=False)
     enabled: bool = True  # `enabled: false` in the table: kept and validated, but never decides
     basis: str = ""  # optional legal basis shown to the officer (display only, not in the cache key)
+    title: str = ""  # optional short title shown on the rule list (display only, not in the cache key)
 
 
 @dataclass
@@ -346,7 +347,7 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
         for i, f in enumerate(entry.get("facts") or []):
             if not isinstance(f, dict):
                 raise PolicyTableError(f"{where}: fact #{i} is not a mapping")
-            bad = set(f) - {"id", "label", "role", "de", "en"}
+            bad = set(f) - {"id", "label", "role", "de", "en", "description"}  # description: display only
             if bad:
                 raise PolicyTableError(f"{where}: fact #{i}: unknown keys {sorted(bad)}")
             fact_id = str(f.get("id") or "")
@@ -369,7 +370,7 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
         for i, r in enumerate(entry.get("rules") or []):
             if not isinstance(r, dict):
                 raise PolicyTableError(f"{where}: rule #{i} is not a mapping")
-            bad = set(r) - {"id", "label", "when", "text", "enabled", "basis"}
+            bad = set(r) - {"id", "label", "when", "text", "enabled", "basis", "title"}
             if bad:
                 raise PolicyTableError(f"{where}: rule #{i}: unknown keys {sorted(bad)}")
             rid = str(r.get("id") or f"{fid}.rule_{i + 1}")
@@ -388,7 +389,7 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
             if enabled not in (True, False):
                 raise PolicyTableError(f"{where}: rule {rid}: enabled must be true or false, got {enabled!r}")
             rule = Rule(id=rid, label=label, when=when, text=str(r.get("text") or ""), node=node,  # type: ignore[arg-type]
-                        enabled=enabled, basis=str(r.get("basis") or ""))
+                        enabled=enabled, basis=str(r.get("basis") or ""), title=str(r.get("title") or ""))
             all_rules.append(rule)
             if enabled:
                 rules.append(rule)

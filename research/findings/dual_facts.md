@@ -130,6 +130,35 @@ Kev-Band (bei Einigkeit):
 - **0.3-0.7**: Kev muss recht sicher sein (ja ab 70 %, nein bis 30 %), sonst «unklar» (Standard). Dev (48 Anrufe): 26 markiert (11 Alarm, 15 Prüfen), FAR 14 %, Miss 12 %.
 - **0.4-0.6**: Kev darf knapp entscheiden (ja ab 60 %, nein bis 40 %), seltener «unklar». Dev (48 Anrufe): 27 markiert (12 Alarm, 15 Prüfen), FAR 14 %, Miss 8 %.
 
+## «Sicherheit der KI»: the certainty knob on «Fälle» (DEV ONLY, added 2026-10-10 ~17:50, after the test50 look)
+
+One officer knob c: per fact and reader, ja if p(ja) >= c, nein if p(ja) <= 1 - c, else unklar; the per-fact
+combination (Einigkeit) applies afterwards. Measured on the 48 dev calls (holdout excluded, fixed threshold 0.55),
+`callguard dualfacts certainty` (research/evidence/dual_facts_certainty.md/.json, CIs over twin groups in the JSON).
+Criterion fixed before reading the table: max 3-class accuracy; ties -> lower FAR -> lower miss -> both readers before
+Kev only -> lower c.
+
+| setting | flagged / alarm / review | 3-class acc | FAR | miss | review recall | flag AUC |
+|---|---|---|---|---|---|---|
+| pre-registered default (Qwen three-way, Kev 0.3-0.7) | 26 / 11 / 15 | 75% | 14% | 12% | 100% | 0.92 |
+| **both readers c=0.60 (chosen)** | 27 / 12 / 15 | 77% | 14% | 8% | 100% | 0.93 |
+| Kev only c=0.60 | 27 / 12 / 15 | 77% | 14% | 8% | 100% | 0.93 |
+| both readers c=0.65 | 26 / 11 / 15 | 75% | 14% | 12% | 100% | 0.93 |
+| Kev only c=0.65 | 27 / 12 / 15 | 77% | 14% | 8% | 100% | 0.93 |
+| both readers c=0.70 | 27 / 11 / 16 | 73% | 18% | 12% | 100% | 0.91 |
+| Kev only c=0.70 | 26 / 11 / 15 | 75% | 14% | 12% | 100% | 0.92 |
+| both readers c=0.75 | 27 / 11 / 16 | 73% | 18% | 12% | 100% | 0.91 |
+| Kev only c=0.75 | 26 / 11 / 15 | 75% | 14% | 12% | 100% | 0.92 |
+| both readers c=0.80 | 27 / 11 / 16 | 73% | 18% | 12% | 100% | 0.91 |
+| Kev only c=0.80 | 26 / 11 / 15 | 75% | 14% | 12% | 100% | 0.92 |
+
+**No spin.** The whole range moves at most 2 of 48 calls (accuracy 73-77%, FAR 14-18%, miss 8-12%); every
+difference is one or two dialogues and far inside the CIs. The band version for Qwen is not worse than three-way on
+dev (c=0.60: 77% vs 75%), so the knob applies to BOTH readers. Default for the demo: **c = 0.60** (config/fact_policy.yaml,
+bands [0.4, 0.6]); the pre-registered default and its single test50 look above are unchanged, and test50 was NOT
+evaluated for c (that would be a second look). The knob is mainly a workload control for the officer (higher c ->
+more «unklar» -> fewer alarms, more Prüfen), not a quality claim.
+
 ## Reproduce
 
 ```bash

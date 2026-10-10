@@ -269,6 +269,24 @@ def draft_rule(llm: LLM, doc: dict[str, Any], request: str, family_names: dict[s
         return validate_draft(obj2, doc, request)
 
 
+def phrase_question(llm: LLM, request: str, family_label: str = "") -> str:
+    """A clear German yes/no question for the fact the officer describes in own words («Fakten» wizard)."""
+    if not str(request or "").strip():
+        raise DraftError("Bitte beschreiben, was die KI im Gespräch herausfinden soll.")
+    messages = [
+        {"role": "system", "content": "Du formulierst für eine Bank-Compliance-Prüfung von Telefongesprächen EINE klare "
+                                      "Ja/Nein-Frage auf Deutsch, die ein Sprachmodell zum ganzen Gespräch beantworten "
+                                      "kann. Konkret, eine Sache pro Frage, Beispiele in Klammern erlaubt, keine "
+                                      "Wertung. Antworte nur mit der Frage."},
+        {"role": "user", "content": (f"Prüfart: {family_label}\n" if family_label else "")
+                                    + "Was herausgefunden werden soll: " + " ".join(str(request).split())}]
+    out = (llm.chat(messages, temperature=0.0, max_tokens=200) or [""])[0]
+    out = " ".join(strip_reasoning(str(out)).strip().strip('"').strip("«»").split())
+    if not out:
+        raise DraftError("Die KI hat keine Frage geliefert.")
+    return out if out.endswith("?") else out.rstrip(".") + "?"
+
+
 def translate_question(llm: LLM, de: str) -> str:
     """English version of a German fact question (the model reads English by default)."""
     messages = [

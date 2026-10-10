@@ -192,6 +192,20 @@ class FactPolicy:
         return FactPolicy(readers=readers, combination=self.combination, overrides=dict(self.overrides),
                           source=self.source)
 
+    def with_certainty(self, c: float, readers: str = "both") -> "FactPolicy":
+        """The «Sicherheit der KI» knob: ja if p(ja) >= c, nein if p(ja) <= 1 - c, else unklar, for both readers
+        (``readers="both"``) or reader B only (``"b"``, reader A keeps its own rule). Per-fact overrides stay."""
+        c = float(c)
+        if not 0.5 <= c <= 1.0:
+            raise FactPolicyError(f"certainty must be within 0.5..1, got {c}")
+        lo, hi = round(1.0 - c, 4), round(c, 4)
+        pol = self.with_reader(1, mode="band", lo=lo, hi=hi)
+        return pol.with_reader(0, mode="band", lo=lo, hi=hi) if readers == "both" else pol
+
+    def certainty(self) -> float:
+        """The current knob value (reader B's upper band edge)."""
+        return round(float(self.b.hi), 4)
+
     def with_combination(self, mode: str) -> "FactPolicy":
         if mode not in COMBINATIONS:
             raise FactPolicyError(f"combination must be one of {COMBINATIONS}, got {mode!r}")

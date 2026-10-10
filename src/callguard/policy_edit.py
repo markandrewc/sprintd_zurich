@@ -238,6 +238,9 @@ def clean_rule(rule: dict[str, Any]) -> dict[str, Any]:
     """Key order as in the shipped file, empty optional keys dropped."""
     out: dict[str, Any] = {"id": str(rule["id"]), "label": str(rule["label"]), "when": str(rule.get("when") or "true"),
                            "text": str(rule.get("text") or "").strip()}
+    if str(rule.get("title") or "").strip():
+        out = {"id": out["id"], "title": " ".join(str(rule["title"]).split()), **{k: v for k, v in out.items()
+                                                                                 if k != "id"}}
     if str(rule.get("basis") or "").strip():
         out["basis"] = str(rule["basis"]).strip()
     if rule.get("enabled", True) is False:
@@ -299,6 +302,9 @@ def clean_fact(fact: dict[str, Any]) -> dict[str, Any]:
     en = " ".join(str(fact.get("en") or "").split())
     if en:
         out["en"] = en
+    desc = " ".join(str(fact.get("description") or "").split())
+    if desc:
+        out["description"] = desc
     if out["role"] not in FACT_ROLES:
         raise PolicyTableError(f"Rolle {out['role']!r} nicht in {FACT_ROLES}")
     return out

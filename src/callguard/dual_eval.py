@@ -572,3 +572,63 @@ def test50_markdown(rep: Mapping[str, Any]) -> str:
            "## Reader agreement (test50 calls)", "", agreement_table(list(rep["agreement"].items())), "",
            "## Sanity", "", sanity_line(rep["sanity"]["only_a_vs_rule_a"]), ""]
     return "\n".join(out)
+
+
+# --------------------------------------------------------------------------------------------
+# «Sicherheit der KI» (certainty knob on Fälle): DEV ONLY, picks the default
+# --------------------------------------------------------------------------------------------
+
+CERTAINTIES = (0.6, 0.65, 0.7, 0.75, 0.8)
+CERTAINTY_CRITERION = ("max 3-class accuracy (dev, fixed threshold); ties -> lower false-alarm rate -> lower miss "
+                       "rate -> both readers on the band before Kev only -> lower c")
+
+
+def _v(b: Mapping[str, Any], k: str) -> float | None:
+    x = b.get(k)
+    return None if not x else x.get("value")
+
+
+def evaluate_certainty(es: EvalSet, certainties: Iterable[float] = CERTAINTIES, n_boot: int = 2000,
+                       seed: int = 13) -> dict[str, Any]:
+    """Per certainty c: both readers on the band [1-c, c] vs Kev only (Qwen three-way), combination as the
+    default (Einigkeit), fixed threshold; plus the pre-registered default. DEV ONLY."""
+    if es.name != "dev":
+        raise ValueError("the certainty default is chosen on dev only")
+    base = fpol.default_policy()
+    entries = []
+    settings = [("default (Qwen three-way, Kev 0.3-0.7)", "default", None, base)]
+    for c in certainties:
+        settings.append((f"both readers c={c:.2f}", "both", c, base.with_certainty(c, "both")))
+        settings.append((f"Kev only c={c:.2f}", "b", c, base.with_certainty(c, "b")))
+    for name, readers, c, pol in settings:
+        rows = policy_rows(es.pipe, es.results, es.calls, pol, es.tables, threshold=es.threshold)
+        b = metric_block(rows.fixed, n_boot, seed)
+        entries.append({"setting": name, "readers": readers, "c": c, "policy": pol.as_dict(), "n": b["n"],
+                        "flagged": b["flagged"], "alarms": b["alarms"], "reviews": b["reviews"],
+                        "accuracy": _v(b, "accuracy"), "false_alarm_rate": _v(b, "false_alarm_rate"),
+                        "miss_rate": _v(b, "miss_rate"), "review_recall": _v(b, "review_recall"), "auc": _v(b, "auc"),
+                        "ci": {k: [b[k]["lo"], b[k]["hi"]] for k in COLS if b.get(k)}})
+    cands = [e for e in entries if e["c"] is not None]
+
+    def key(e: dict[str, Any]) -> tuple:
+        return (-(e["accuracy"] or 0), e["false_alarm_rate"] or 0, e["miss_rate"] or 0, e["readers"] != "both", e["c"])
+
+    best = min(cands, key=key)
+    return {"meta": _set_meta(es, n_boot, seed), "criterion": CERTAINTY_CRITERION, "entries": entries,
+            "chosen": {"c": best["c"], "readers": best["readers"], "setting": best["setting"]}}
+
+
+def certainty_markdown(rep: Mapping[str, Any]) -> str:
+    lines = ["# «Sicherheit der KI» (certainty c): dev only", "",
+             f"Dev calls: {rep['entries'][0]['n']} (dev folds, holdout excluded), fixed threshold "
+             f"{rep['meta']['threshold']}, combination Einigkeit. Per fact and reader: ja if p(ja) >= c, nein if "
+             "p(ja) <= 1 - c, else unklar. 95% CIs over twin groups in the JSON.", "",
+             f"Criterion: {rep['criterion']}.", "",
+             "| setting | flagged / alarm / review | 3-class acc | FAR | miss | review recall | flag AUC |",
+             "|---|---|---|---|---|---|---|"]
+    for e in rep["entries"]:
+        mark = " **(chosen)**" if e["setting"] == rep["chosen"]["setting"] else ""
+        lines.append(f"| {e['setting']}{mark} | {e['flagged']} / {e['alarms']} / {e['reviews']} | "
+                     f"{_pct(e['accuracy'], True)} | {_pct(e['false_alarm_rate'], True)} | {_pct(e['miss_rate'], True)} | "
+                     f"{_pct(e['review_recall'], True)} | {_pct(e['auc'], False)} |")
+    return "\n".join(lines) + "\n"
