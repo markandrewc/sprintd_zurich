@@ -579,3 +579,9 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
 - English fact questions beat German ones with the 7B (real) — consistent with the prompt design (English instructions,
   German criteria/answers for the officer). Caveat: the English wording received more tuning than the German one.
 - Speaker roles help (borderline). prefix_max adds nothing (it stays off).
+
+## 2026-10-10T05:38 Sunday-risk fix: scripts/run_staged.sh works on ANY folder of .wav files
+- `callguard batch` and scripts/research/asr_sweep.py only pick up case-style file names (Stufe1_D02-K1.wav) and silently
+  skip others -> if the hidden set uses other names nothing would be processed. run_staged.sh now runs `transcribe`
+  (stage 1, vLLM stopped) + `run` (stage 2) per file for any folder: `scripts/run_staged.sh recommended <llm> <folder>`.
+  Tested on /tmp/e2e_new/Audio (call_a/b/c): 44 s total, labels alarm / no alert / review as expected.
