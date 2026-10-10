@@ -42,16 +42,27 @@ Gestrichelt: geplant. Die beiden APIs laden ihre Modelle erst bei Bedarf und geb
 ## Starten
 
 ```powershell
-.\start.ps1             # Transkription, Fraud-Analyse, Dashboard -> http://localhost:7860
+.\start.ps1             # Windows: Transkription, Fraud-Analyse, Dashboard -> http://localhost:7860
 .\start.ps1 -Analyse    # zusätzlich die Entwickler-Oberfläche -> http://localhost:7861
 ```
+
+```bash
+./start.sh              # Linux, macOS (und Git Bash unter Windows)
+./start.sh --analyse
+```
+
+Beide rufen `start.py` auf: Es erkennt das Betriebssystem, nimmt das Python aus `.venv` und startet alle Teile im selben
+Terminal (jede Zeile mit dem Namen des Teils davor). Ctrl+C beendet alle. Die Modelle laden erst bei der ersten Prüfung.
 
 Einzeln: `.venv\Scripts\python.exe -m transcription.api` (bzw. `fraud_analysis.api`, `dashboard.app`, `misc.analysis_ui.app`).
 API-Doku der Dienste: http://127.0.0.1:8001/docs und http://127.0.0.1:8002/docs.
 
 ## Konfiguration
 
-- **Checks:** `fraud_analysis/questions.json`, zwei Listen (`gesetzlich`, `intern`). Wird bei jeder Analyse neu gelesen.
+- **Prüfpunkte (Fragen an Kev):** im Dashboard unter „Prüfpunkte“ ansehen, bearbeiten, hinzufügen, löschen. Gespeichert in
+  `fraud_analysis/questions.json` (zwei Listen: `gesetzlich`, `intern`) über `PUT /questions` der Fraud-Analyse; jede
+  Änderung erhöht `version`, die vorherige Fassung liegt in `fraud_analysis/questions_history/`. Jede Analyse speichert
+  ihre `questions_version`. Wird bei jeder Analyse neu gelesen, gilt also ohne Neustart für neu geprüfte Anrufe.
 - **Alarm-Schwelle und Länge der Fundstelle:** im Dashboard unter „Einstellungen“.
 - **GPU:** Kev braucht ~8 GB, die Transkription ~3.4 GB (Whisper + Nemotron, plus Arbeitsspeicher beim Rechnen). Beide Dienste laden ihr
   Modell erst bei der ersten Anfrage und entladen es nach `TRANSCRIPTION_IDLE_SECONDS` bzw. `FRAUD_IDLE_SECONDS`
@@ -73,5 +84,21 @@ Jeder Teil ist ein eigener Dienst bzw. Ordner und soll unabhängig wachsen:
 
 ## Installation
 
-Python 3.11, dann `pip install torch --index-url https://download.pytorch.org/whl/cu128` und
-`pip install -r requirements.txt`. ffmpeg muss im PATH sein.
+Python 3.11 und eine NVIDIA-GPU mit CUDA. ffmpeg muss im PATH sein.
+
+```powershell
+# Windows
+py -3.11 -m venv .venv
+.venv\Scripts\python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cu128
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+```bash
+# Linux (ffmpeg z.B. mit: sudo apt install ffmpeg)
+python3.11 -m venv .venv
+.venv/bin/python -m pip install torch --index-url https://download.pytorch.org/whl/cu128
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Die Modelle (Flix Whisper, Nemotron-3-Diarization, Kev-4B + Qwen3.5-4B-Base, zusammen ~14 GB) lädt der erste Start aus
+Hugging Face in den lokalen Cache.

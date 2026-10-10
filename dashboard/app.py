@@ -7,7 +7,8 @@ Audio -> POST /transcribe -> Transkript -> POST /analyze -> Ergebnis, alles in d
 Beim Hochladen werden zuerst alle Dateien transkribiert, dann das ASR-Modell entladen, dann alles analysiert: So liegt
 nie mehr als ein Modell gleichzeitig auf der GPU.
 Die Alarm-Schwelle ist eine Einstellung des Dashboards: Sie entscheidet über gespeicherte Risiken neu, ohne neue Analyse.
-Umgebungsvariablen: DASHBOARD_HOST (0.0.0.0), DASHBOARD_PORT (7860), TRANSCRIPTION_URL, FRAUD_URL, DASHBOARD_DATA.
+Umgebungsvariablen: DASHBOARD_HOST (0.0.0.0), DASHBOARD_PORT (7860), DASHBOARD_REFRESH_SECONDS (10), TRANSCRIPTION_URL,
+FRAUD_URL, DASHBOARD_DATA.
 """
 import html
 import json
@@ -92,7 +93,21 @@ def summary(calls, th):
             + tile("Anrufe", len(calls)) + tile("Alarme", alarms) + tile("Noch nicht beurteilt", open_) + "</div>")
 
 
-def table(filter_, th):
+SELECTED_ROW = "background-color: rgba(37, 99, 235, 0.16)"
+
+
+def row_table(rows, headers, selected=None):
+    """Tabelle, in der die geöffnete Zeile ganz hinterlegt ist. Gradio kennt nur die Auswahl einzelner Zellen; die Zeile
+    wird deshalb beim Öffnen über pandas-Formatierung markiert (selected = Zeilennummer)."""
+    import pandas as pd
+    df = pd.DataFrame(rows, columns=headers)
+    if selected is not None and 0 <= selected < len(df):
+        df = df.style.apply(lambda r: [SELECTED_ROW if r.name == selected else ""] * len(r), axis=1)
+    return gr.Dataframe(value=df, headers=headers)
+
+
+def table(filter_, th, selected=None):
+    """selected: id des geöffneten Anrufs (wird hinterlegt)."""
     calls = store.list_calls()
     if filter_ == "Nur Alarme": shown = [c for c in calls if c["status"] == "fertig" and c["risk"] >= th]
     elif filter_ == "Noch nicht beurteilt": shown = [c for c in calls if c["status"] == "fertig" and c["label"] is None]
@@ -100,9 +115,11 @@ def table(filter_, th):
     rows = [[c["id"], c["created_at"].replace("T", " ")[:16], c["filename"], verdict(c, th)[0],
              "" if c["risk"] is None else f"{c['risk']:.0%}", main_reason(c) if c["risk"] is not None and c["risk"] >= th else "",
              store.LABELS.get(c["label"], "offen") if c["status"] == "fertig" else ""] for c in shown]
-    df = gr.Dataframe(value=rows or [["", "", "Keine Anrufe", "", "", "", ""]],
-                      headers=["Nr.", "Eingang", "Datei", "Ergebnis", "Risiko", "Hauptgrund", "Beurteilung"])
-    return summary(calls, th), df, [c["id"] for c in shown]
+    ids = [c["id"] for c in shown]
+    df = row_table(rows or [["", "", "Keine Anrufe", "", "", "", ""]],
+                   ["Nr.", "Eingang", "Datei", "Ergebnis", "Risiko", "Hauptgrund", "Beurteilung"],
+                   ids.index(selected) if selected in ids else None)
+    return summary(calls, th), df, ids
 
 
 def findings(call, th):
@@ -110,13 +127,50 @@ def findings(call, th):
     return [c for c in (call["analysis"] or {}).get("checks", []) if c["p"] >= th]
 
 
-def span(passage):
-    if not passage or passage.get("start") is None: return ""
-    return f"{clock(passage['start'])}–{clock(passage['end'])}"
+MERGE_GAP = 2.0   # Sekunden: Fundstellen, die sich überlappen oder näher beieinander liegen, werden eine Stelle
 
 
-def finding_label(c):
-    return f"{c['category']} · {span(c.get('passage')) or 'ohne Zeitangabe'}"
+def regions(call, th):
+    """Fundstellen der Befunde, überlappende zu einer Stelle zusammengefasst, nach Zeit sortiert.
+    -> [{"n": 1, "start", "end", "checks": [Befund, ...]}]. Befunde ohne Zeitangabe bilden je eine eigene Stelle."""
+    timed = sorted((c for c in findings(call, th) if c.get("passage") and c["passage"].get("start") is not None),
+                   key=lambda c: c["passage"]["start"])
+    out = []
+    for c in timed:
+        p = c["passage"]
+        if out and p["start"] <= out[-1]["end"] + MERGE_GAP:
+            out[-1]["end"] = max(out[-1]["end"], p["end"]); out[-1]["checks"].append(c)
+        else:
+            out.append({"start": p["start"], "end": p["end"], "checks": [c]})
+    for c in findings(call, th):
+        if c.get("passage") and c["passage"].get("start") is None:
+            out.append({"start": None, "end": None, "checks": [c], "text": c["passage"]["text"]})
+    for n, r in enumerate(out, 1): r["n"] = n
+    return out
+
+
+def region_of(call, th):
+    """{check_id: Stellennummer}."""
+    return {c["id"]: r["n"] for r in regions(call, th) for c in r["checks"]}
+
+
+def region_text(call, r):
+    """Text der Stelle aus den Abschnitten: die Wörter, deren geschätzte Zeit in [start, end] liegt (die Wörter eines
+    Abschnitts gleichmässig über seine Dauer verteilt, wie bei der Lokalisierung)."""
+    if r.get("text") is not None: return r["text"]
+    lines = []
+    for s in call.get("segments") or []:
+        words = s["text"].split()
+        if not words or s.get("start") is None or s["end"] <= r["start"] or s["start"] >= r["end"]: continue
+        step = (s["end"] - s["start"]) / len(words)
+        keep = [w for i, w in enumerate(words) if s["start"] + (i + 0.5) * step >= r["start"] and s["start"] + (i + 0.5) * step <= r["end"]]
+        if keep: lines.append((f"{s['speaker']}: " if s.get("speaker") else "") + " ".join(keep))
+    return "\n".join(lines)
+
+
+def span(r):
+    if not r or r.get("start") is None: return ""
+    return f"{clock(r['start'])}–{clock(r['end'])}"
 
 
 def detail_html(call, th):
@@ -127,77 +181,100 @@ def detail_html(call, th):
         return f'<div style="{CARD}">{head}<div style="margin-top:8px">{html.escape(call["error"] or "")}</div></div>'
     if call["status"] != "fertig":
         return f'<div style="{CARD}">{head}</div>'
-    found = findings(call, th)
-    blocks = []
+    found, regs = findings(call, th), regions(call, th)
+    where = region_of(call, th)
+    # Befunde: eine Zeile pro Befund, mit Verweis auf die Stelle
+    rows = ""
     for c in found:
-        p = c.get("passage")
-        where = (f'Fundstelle {span(p)}' if span(p) else "Fundstelle ohne Zeitangabe") if p else \
-            "keine Fundstelle gesucht (Schwelle nach der Analyse gesenkt)"
-        quote = (f'<div style="margin-top:4px;padding:6px 10px;border-left:3px solid {RED};background:var(--background-fill-primary);'
-                 f'font-size:12px">{html.escape(p["text"]).replace(chr(10), "<br>")}</div>') if p else ""
-        if p and p.get("context"):
-            ctx = f"{clock(p['context_start'])}–{clock(p['context_end'])}" if p.get("context_start") is not None else ""
-            quote += (f'<details style="font-size:12px"><summary style="cursor:pointer;{MUTED}">Kontext {ctx}</summary>'
-                      f'<div style="{MUTED}">{html.escape(p["context"]).replace(chr(10), "<br>")}</div></details>')
-        blocks.append(f'<div style="margin-top:10px" title="{html.escape(c["question"], quote=True)}">'
-                      f'<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>{html.escape(c["category"])}</b>'
-                      f'<span style="{MUTED};font-size:12px">{html.escape(c["source"])} · {html.escape(c["basis"])}</span>'
-                      f'<span style="margin-left:auto;font-weight:600;color:{RED}">{c["p"]:.0%}</span></div>'
-                      f'<div style="{MUTED};font-size:12px">{where}</div>{quote}</div>')
+        stelle = f"Stelle {where[c['id']]}" if c["id"] in where else "keine Stelle"
+        rows += ('<div style="display:grid;grid-template-columns:minmax(0,1fr) auto 3rem;gap:10px;align-items:baseline;line-height:24px;font-size:13px" '
+                 f'title="{html.escape(c["question"], quote=True)}"><span><b>{html.escape(c["category"])}</b> '
+                 f'<span style="{MUTED};font-size:12px">· {html.escape(c["source"])} · {html.escape(c["basis"])}</span></span>'
+                 f'<span style="{MUTED};font-size:12px">{stelle}</span>'
+                 f'<span style="text-align:right;font-weight:600;color:{RED}">{c["p"]:.0%}</span></div>')
+    # Fundstellen: Text nur einmal pro Stelle
+    blocks = "".join(f'<div style="margin-top:8px"><div style="font-size:12px"><b>Stelle {r["n"]}</b> '
+                     f'<span style="{MUTED}">{span(r) or "ohne Zeitangabe"} · {html.escape(", ".join(dict.fromkeys(c["category"] for c in r["checks"])))}</span></div>'
+                     f'<div style="margin-top:2px;padding:6px 10px;border-left:3px solid {RED};background:var(--background-fill-primary);font-size:12px">'
+                     f'{html.escape(region_text(call, r)).replace(chr(10), "<br>")}</div></div>' for r in regs)
     rest = [c for c in call["analysis"]["checks"] if c["p"] < th]
-    rows = "".join('<div style="display:grid;grid-template-columns:minmax(0,1fr) 120px 3rem;gap:10px;align-items:center;line-height:22px;font-size:12px" '
-                   f'title="{html.escape(c["question"], quote=True)}"><span>{html.escape(c["category"])} <span style="{MUTED}">· {html.escape(c["source"])}</span></span>'
-                   '<span style="height:6px;border-radius:999px;background:var(--border-color-primary);position:relative;overflow:hidden">'
-                   f'<span style="position:absolute;inset:0 auto 0 0;width:{c["p"] * 100:.0f}%;background:{GRAY}"></span></span>'
-                   f'<span style="text-align:right">{c["p"]:.0%}</span></div>' for c in rest)
-    more = f'<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12px;{MUTED}">{len(rest)} Prüfpunkte unter der Schwelle</summary>{rows}</details>' if rest else ""
-    return (f'<div style="{CARD}">{head}<div style="font-size:12px;{MUTED};margin-top:6px">Risiko {call["risk"]:.0%} · '
-            f'Alarm ab {th:.0%} · {len(found)} Befund(e)</div>{"".join(blocks)}{more}</div>')
+    rest_rows = "".join('<div style="display:grid;grid-template-columns:minmax(0,1fr) 120px 3rem;gap:10px;align-items:center;line-height:22px;font-size:12px" '
+                        f'title="{html.escape(c["question"], quote=True)}"><span>{html.escape(c["category"])} <span style="{MUTED}">· {html.escape(c["source"])}</span></span>'
+                        '<span style="height:6px;border-radius:999px;background:var(--border-color-primary);position:relative;overflow:hidden">'
+                        f'<span style="position:absolute;inset:0 auto 0 0;width:{c["p"] * 100:.0f}%;background:{GRAY}"></span></span>'
+                        f'<span style="text-align:right">{c["p"]:.0%}</span></div>' for c in rest)
+    more = f'<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12px;{MUTED}">{len(rest)} Prüfpunkte unter der Schwelle</summary>{rest_rows}</details>' if rest else ""
+    missing = sum(1 for c in found if not c.get("passage"))
+    note = f'<div style="font-size:12px;{MUTED};margin-top:4px">{missing} Befund(e) ohne Fundstelle (Schwelle nach der Analyse gesenkt)</div>' if missing else ""
+    return (f'<div style="{CARD}">{head}<div style="font-size:12px;{MUTED};margin:6px 0">Risiko {call["risk"]:.0%} · Alarm ab {th:.0%} · '
+            f'{len(found)} Befund(e) an {len(regs)} Stelle(n)</div>{rows}{note}'
+            + (f'<div style="margin-top:10px;font-size:12px;{MUTED}">Fundstellen</div>{blocks}' if regs else "") + f'{more}</div>')
 
 
 def transcript_html(call, th):
-    """Abschnitte mit Zeit und Sprecher; Abschnitte, die zu einer Fundstelle gehören, sind markiert."""
+    """Abschnitte mit Zeit und Sprecher; Abschnitte, die eine Fundstelle berühren, sind markiert."""
     segs = call.get("segments") or []
     if not segs:
         body = html.escape(call.get("transcript") or "").replace("\n", "<br>")
     else:
-        marked = {i for c in findings(call, th) if c.get("passage") for i in range(c["passage"]["units"][0], c["passage"]["units"][1] + 1)}
-        body = "".join(f'<div style="margin-bottom:6px;padding:2px 6px;border-radius:4px;{"background:rgba(198,40,40,0.12);" if i in marked else ""}">'
+        regs = [r for r in regions(call, th) if r["start"] is not None]
+        hit = lambda s: s.get("start") is not None and any(s["start"] < r["end"] and s["end"] > r["start"] for r in regs)   # noqa: E731
+        body = "".join(f'<div style="margin-bottom:6px;padding:2px 6px;border-radius:4px;{"background:rgba(198,40,40,0.12);" if hit(s) else ""}">'
                        f'<span style="{MUTED};font-variant-numeric:tabular-nums">{clock(s["start"])}</span> '
                        + (f'<b>{html.escape(s["speaker"])}:</b> ' if s.get("speaker") else "")
-                       + f'{html.escape(s["text"])}</div>' for i, s in enumerate(segs))
+                       + f'{html.escape(s["text"])}</div>' for s in segs)
     return f'<div style="{CARD}max-height:420px;overflow:auto;font-size:13px;line-height:1.5">{body}</div>'
 
 
 # ------------------------------------------------------------------ Handler
 
-def refresh(filter_):
-    s, df, ids = table(filter_, threshold())
+def refresh(filter_, selected=None):
+    s, df, ids = table(filter_, threshold(), selected)
     return status_line(), s, df, ids
 
 
-def open_call(ids, evt: gr.SelectData):
+REFRESH_SECONDS = float(os.environ.get("DASHBOARD_REFRESH_SECONDS", "10"))
+
+
+def snapshot():
+    """Was die Anrufliste und die Statuszeile bestimmt; ändert es sich, wird neu gezeichnet."""
+    calls = tuple((c["id"], c["status"], c["risk"], c["label"]) for c in store.list_calls())
+    return repr((calls, threshold(), status_line()))
+
+
+def auto_refresh(filter_, selected, last):
+    """Alle REFRESH_SECONDS: nur neu zeichnen, wenn sich etwas geändert hat (sonst springt die Tabelle nicht)."""
+    now = snapshot()
+    if now == last: return gr.skip(), gr.skip(), gr.skip(), gr.skip(), last
+    return (*refresh(filter_, selected), now)
+
+
+def open_call(ids, filter_, evt: gr.SelectData):
     if not ids or evt.index[0] >= len(ids):
         return (None, gr.Column(visible=False), "", None, "", None, gr.CheckboxGroup(choices=[], value=[]), [], "", "",
-                gr.Dropdown(choices=[], value=None), None)
+                gr.Dropdown(choices=[], value=None), None, gr.Dataframe())
     call = store.get_call(ids[evt.index[0]])
     th = threshold()
     found = findings(call, th) if call["status"] == "fertig" else []
+    regs = regions(call, th) if call["status"] == "fertig" else []
+    where = {c["id"]: r["n"] for r in regs for c in r["checks"]}
     ok = [cid for cid, good in (call["label_checks"] or {}).items() if good]
-    timed = [c for c in found if span(c.get("passage"))]
+    label = lambda c: f"{c['category']} ({c['id']})" + (f" · Stelle {where[c['id']]}" if c["id"] in where else "")   # noqa: E731
     return (call["id"], gr.Column(visible=True), detail_html(call, th),
             call["audio_path"] if Path(call["audio_path"]).is_file() else None, transcript_html(call, th), call["label"],
-            gr.CheckboxGroup(choices=[(finding_label(c), c["id"]) for c in found], value=[i for i in ok if i in {c["id"] for c in found}]),
-            call["label_missed"] or [], call["label_comment"] or "", call["labeled_by"] or "",
-            gr.Dropdown(choices=[(finding_label(c), c["id"]) for c in timed], value=None), None)
+            gr.CheckboxGroup(choices=[(label(c), c["id"]) for c in found], value=[i for i in ok if i in {c["id"] for c in found}]),
+            gr.CheckboxGroup(choices=categories(), value=call["label_missed"] or []), call["label_comment"] or "", call["labeled_by"] or "",
+            gr.Dropdown(choices=[(f"Stelle {r['n']} · {span(r)} · " + ", ".join(dict.fromkeys(c["category"] for c in r["checks"])), r["n"])
+                                 for r in regs if r["start"] is not None], value=None), None,
+            table(filter_, th, call["id"])[1])
 
 
-def play_snippet(cid, check_id):
-    if cid is None or not check_id: return None
+def play_snippet(cid, n):
+    if cid is None or not n: return None
     call = store.get_call(cid)
-    p = next((c.get("passage") for c in call["analysis"]["checks"] if c["id"] == check_id), None)
-    if not p or p.get("start") is None: raise gr.Error("Diese Fundstelle hat keine Zeitangabe.")
-    try: return store.snippet(call, p["start"], p["end"])
+    r = next((r for r in regions(call, threshold()) if r["n"] == n), None)
+    if not r or r["start"] is None: raise gr.Error("Diese Fundstelle hat keine Zeitangabe.")
+    try: return store.snippet(call, r["start"], r["end"])
     except Exception as e: raise gr.Error(f"Ausschnitt konnte nicht erstellt werden: {e}") from None
 
 
@@ -210,7 +287,7 @@ def save_label(cid, label, ok_ids, missed, comment, name, filter_):
     checks = {c["id"]: c["id"] in (ok_ids or []) for c in found}
     categories = sorted({c["category"] for c in found if checks[c["id"]]} | set(missed or []))
     store.save_label(cid, label, checks, missed, categories, comment, name.strip())
-    st, s, df, ids = refresh(filter_)
+    st, s, df, ids = refresh(filter_, cid)
     return f'<span style="color:{GREEN}">Beurteilung für Anruf {cid} gespeichert.</span>', s, df, ids
 
 
@@ -263,9 +340,84 @@ def save_threshold(th, filter_):
     return f"Gespeichert: Alarm ab **{th:.0%}** Risiko.", s, df, ids
 
 
+# ------------------------------------------------------------------ Prüfpunkte (Kev-Fragen)
+# Gespeichert wird über den Fraud-Analyse-Dienst (PUT /questions): er prüft die Eingaben, zählt die Version hoch und
+# sichert die vorherige Fassung. Neue Prüfpunkte gelten für neu geprüfte Anrufe.
+
+LISTS = ["gesetzlich", "intern"]
+NEW = "(neu)"
+
+
+def checks_table(selected=None):
+    """selected: ID des geöffneten Prüfpunkts (wird hinterlegt)."""
+    cfg = questions_config()
+    rows = [[source, q.get("category", ""), qid, q.get("instructions", ""), q.get("basis", "")]
+            for source, qs in cfg["questions"].items() if isinstance(qs, dict) for qid, q in qs.items()]
+    head = f"Version {cfg.get('version', 1)} · {len(rows)} Prüfpunkte. Klicken Sie auf einen Prüfpunkt, um ihn zu bearbeiten."
+    ids = [r[2] for r in rows]
+    return (head, row_table(rows, ["Liste", "Kategorie", "ID", "Frage an das Modell", "Rechtsgrundlage"],
+                            ids.index(selected) if selected in ids else None), ids)
+
+
+def open_check(ids, evt: gr.SelectData):
+    if not ids or evt.index[0] >= len(ids): return empty_check()
+    qid = ids[evt.index[0]]
+    for source, qs in questions_config()["questions"].items():
+        if isinstance(qs, dict) and qid in qs:
+            q, crit = qs[qid], qs[qid].get("criteria") or {}
+            return (qid, source, q.get("category", ""), qid, q.get("basis", ""), q.get("instructions", ""),
+                    crit.get("true", ""), crit.get("false", ""), "")
+    return empty_check()
+
+
+def empty_check():
+    return NEW, "gesetzlich", "", "", "", "", "", "", ""
+
+
+def save_check(original, source, category, qid, basis, question, yes, no):
+    qid = (qid or "").strip()
+    cfg = questions_config()
+    questions = {s: dict(qs) for s, qs in cfg["questions"].items() if isinstance(qs, dict)}
+    for s in LISTS: questions.setdefault(s, {})
+    if original != NEW:                                   # bearbeiten: alten Eintrag entfernen (auch bei neuer ID/Liste)
+        for qs in questions.values(): qs.pop(original, None)
+    elif any(qid in qs for qs in questions.values()):
+        raise gr.Error(f"Die ID '{qid}' gibt es schon.")
+    crit = {k: v.strip() for k, v in (("true", yes or ""), ("false", no or "")) if v.strip()}
+    questions[source][qid] = {"category": (category or "").strip(), "basis": (basis or "").strip(), "type": "noul",
+                              "instructions": (question or "").strip(), **({"criteria": crit} if crit else {})}
+    try: res = fraud.save_questions(questions)
+    except RuntimeError as e: raise gr.Error(str(e)) from None
+    head, df, ids = checks_table(qid)
+    return (f'<span style="color:{GREEN}">Gespeichert als Version {res["version"]}. Gilt für neu geprüfte Anrufe.</span>',
+            head, df, ids, qid, gr.CheckboxGroup(choices=categories()))
+
+
+def delete_check(original):
+    if original == NEW: raise gr.Error("Erst einen Prüfpunkt in der Tabelle auswählen.")
+    questions = {s: {k: v for k, v in qs.items() if k != original} for s, qs in questions_config()["questions"].items() if isinstance(qs, dict)}
+    try: res = fraud.save_questions(questions)
+    except RuntimeError as e: raise gr.Error(str(e)) from None
+    head, df, ids = checks_table()
+    return (f'<span style="color:{GREEN}">Prüfpunkt {html.escape(original)} gelöscht (Version {res["version"]}).</span>',
+            head, df, ids, *empty_check()[:8], gr.CheckboxGroup(choices=categories()))
+
+
 # ------------------------------------------------------------------ UI
 
-CSS = "#wrap { max-width: 1180px; margin: 0 auto; }"
+CSS = """
+#wrap { max-width: 1180px; margin: 0 auto; }
+/* Tabellen, deren Zeilen man anklickt: Gradio markiert sonst nur die angeklickte Zelle mit einem Rahmen */
+.row-table .body-cell.cell-selected { --ring-color: transparent !important; box-shadow: inset 1px 0 0 var(--border-color-primary) !important; }
+.row-table .body-cell:focus, .row-table .body-cell:focus-visible { outline: none !important; }   /* Fokus-Rahmen beim Klick */
+.row-table .selection-button { display: none !important; }      /* Laschen zum Verschieben der Auswahl */
+.row-table .body-cell.flash { animation: none !important; }      /* Gradio färbt sonst die angeklickte Zelle kurz ein */
+.row-table .cell-menu-button { display: none !important; }
+.row-table tbody tr { cursor: pointer; }
+.row-table tbody tr:hover td { background-color: rgba(37, 99, 235, 0.07) !important; }
+/* die ganze Zeile sofort beim Klick hinterlegen (ohne auf den Server zu warten); gleiche Farbe wie SELECTED_ROW */
+.row-table tbody tr:has(.cell-selected) td { background-color: rgba(37, 99, 235, 0.16) !important; }
+"""
 
 with gr.Blocks(title="Anruf-Prüfung") as demo:
     with gr.Column(elem_id="wrap"):
@@ -275,17 +427,17 @@ with gr.Blocks(title="Anruf-Prüfung") as demo:
             with gr.Tab("Anrufe"):
                 ids_state, current_id = gr.State([]), gr.State(None)
                 with gr.Row(equal_height=True):
-                    filter_radio = gr.Radio(FILTERS, value="Alle", label="Anzeigen", scale=4)
-                    refresh_btn = gr.Button("Aktualisieren", scale=1)
+                    filter_radio = gr.Radio(FILTERS, value="Alle", label="Anzeigen")
+                snapshot_state, refresh_timer = gr.State(""), gr.Timer(REFRESH_SECONDS)   # neue Anrufe erscheinen von selbst
                 summary_html = gr.HTML()
-                calls_df = gr.Dataframe(interactive=False, wrap=True)
+                calls_df = gr.Dataframe(interactive=False, wrap=True, elem_classes="row-table")
                 gr.Markdown("Klicken Sie auf einen Anruf, um ihn zu öffnen.")
                 with gr.Column(visible=False) as detail_col:
                     detail = gr.HTML()
                     with gr.Row():
                         audio = gr.Audio(type="filepath", label="Ganze Aufnahme", interactive=False)
                         with gr.Column():
-                            snippet_dd = gr.Dropdown([], label="Fundstelle anhören (10 s davor und danach)")
+                            snippet_dd = gr.Dropdown([], label="Fundstelle anhören (mit 10 s davor und danach)")
                             snippet_audio = gr.Audio(type="filepath", label="Ausschnitt", interactive=False)
                     with gr.Row():
                         with gr.Column(scale=3):
@@ -306,6 +458,29 @@ with gr.Blocks(title="Anruf-Prüfung") as demo:
                 start_btn = gr.Button("Prüfung starten", variant="primary")
                 progress_html = gr.HTML()
 
+            with gr.Tab("Prüfpunkte"):
+                gr.Markdown("Die Fragen, die das Modell zu jedem Anruf beantwortet. Jede Frage ist ein Prüfpunkt; "
+                            "erreicht ihr Wert die Alarm-Schwelle, gibt es einen Befund.")
+                checks_head = gr.Markdown()
+                checks_df = gr.Dataframe(interactive=False, wrap=True, elem_classes="row-table")
+                check_ids, check_original = gr.State([]), gr.State(NEW)
+                with gr.Row():
+                    with gr.Column(scale=1):
+                        ck_source = gr.Radio(LISTS, value="gesetzlich", label="Liste")
+                        ck_category = gr.Textbox(label="Kategorie", placeholder="z.B. Insiderhandel")
+                        ck_id = gr.Textbox(label="ID", placeholder="z.B. insider_trading (Kleinbuchstaben, Ziffern, _)")
+                        ck_basis = gr.Textbox(label="Rechtsgrundlage", placeholder="z.B. FinfraG Art. 154 oder interne Policy")
+                    with gr.Column(scale=2):
+                        ck_question = gr.Textbox(label="Frage an das Modell (Ja/Nein)", lines=3,
+                                                 placeholder="Englisch funktioniert am besten, z.B. Does someone reveal a valid access credential?")
+                        ck_yes = gr.Textbox(label="„Ja“ bedeutet (optional)", placeholder="leer lassen, wenn die Frage für sich reicht")
+                        ck_no = gr.Textbox(label="„Nein“ bedeutet (optional)", placeholder="leer lassen, wenn die Frage für sich reicht")
+                with gr.Row():
+                    ck_save = gr.Button("Speichern", variant="primary")
+                    ck_new = gr.Button("Neuer Prüfpunkt")
+                    ck_delete = gr.Button("Löschen", variant="stop")
+                ck_msg = gr.HTML()
+
             with gr.Tab("Einstellungen"):
                 gr.Markdown("**Alarm-Schwelle**: Ab welchem Risiko ein Anruf als Alarm markiert wird. "
                             "Tiefer = mehr Alarme, weniger übersehene Fälle. Höher = weniger Fehlalarme.")
@@ -320,11 +495,18 @@ with gr.Blocks(title="Anruf-Prüfung") as demo:
                 pw_saved = gr.Markdown()
 
     list_outputs = [status_html, summary_html, calls_df, ids_state]
-    demo.load(refresh, filter_radio, list_outputs).then(lambda: (threshold(), passage_words()), None, [th_slider, pw_slider])
-    refresh_btn.click(refresh, filter_radio, list_outputs)
+    demo.load(refresh, filter_radio, list_outputs).then(lambda: (threshold(), passage_words()), None, [th_slider, pw_slider]) \
+        .then(checks_table, None, [checks_head, checks_df, check_ids])
+    form = [check_original, ck_source, ck_category, ck_id, ck_basis, ck_question, ck_yes, ck_no, ck_msg]
+    checks_df.select(open_check, check_ids, form).then(lambda o: checks_table(o)[1], check_original, checks_df)
+    ck_new.click(empty_check, None, form)
+    ck_save.click(save_check, [check_original, ck_source, ck_category, ck_id, ck_basis, ck_question, ck_yes, ck_no],
+                  [ck_msg, checks_head, checks_df, check_ids, check_original, missed_box])
+    ck_delete.click(delete_check, check_original, [ck_msg, checks_head, checks_df, check_ids, *form[:8], missed_box])
+    refresh_timer.tick(auto_refresh, [filter_radio, current_id, snapshot_state], [*list_outputs, snapshot_state], show_progress="hidden")
     filter_radio.change(refresh, filter_radio, list_outputs)
-    calls_df.select(open_call, ids_state, [current_id, detail_col, detail, audio, transcript, label_radio, findings_box, missed_box,
-                                           comment_box, name_box, snippet_dd, snippet_audio])
+    calls_df.select(open_call, [ids_state, filter_radio], [current_id, detail_col, detail, audio, transcript, label_radio, findings_box, missed_box,
+                                           comment_box, name_box, snippet_dd, snippet_audio, calls_df])
     snippet_dd.change(play_snippet, [current_id, snippet_dd], snippet_audio)
     save_btn.click(save_label, [current_id, label_radio, findings_box, missed_box, comment_box, name_box, filter_radio],
                    [saved_html, summary_html, calls_df, ids_state])

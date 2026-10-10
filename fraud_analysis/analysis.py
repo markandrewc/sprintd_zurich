@@ -6,10 +6,11 @@ Schwelle sucht ein gleitender Kev über überlappende Fenster den Kontext und gr
 Wörter (~10 s) ein, mit Zeitstempeln aus den Abschnitten der Transkription. Die Checks stehen in questions.json, in zwei Listen ("gesetzlich", "intern").
 """
 import json
+import os
 import re
 from pathlib import Path
 
-from .kev.api import SystemOneRequest
+from .kev.api import Noul, SystemOneRequest
 
 CONFIG = Path(__file__).parent / "questions.json"
 
@@ -19,6 +20,47 @@ TURN = re.compile(r"^(T\d{3})\s*·\s*(.+?)\s*$", re.M)   # Sprecher-Turn im Form
 
 def load_config(path=CONFIG):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+HISTORY = Path(__file__).parent / "questions_history"   # frühere Fassungen von questions.json, eine pro Version
+QID = re.compile(r"^[a-z][a-z0-9_]{1,40}$")
+
+
+def validate_questions(questions):
+    """Prüfpunkte in Listen-Form {liste: {id: prüfpunkt}} prüfen und bereinigen (type = noul, leere criteria weg).
+    -> bereinigte Form. ValueError mit einer Meldung, die man ohne Code-Kenntnis versteht."""
+    if not isinstance(questions, dict): raise ValueError("Prüfpunkte fehlen")
+    clean, seen = {}, set()
+    for source, qs in questions.items():
+        if source.startswith("_"): continue
+        if not isinstance(qs, dict): raise ValueError(f"Liste '{source}' enthält keine Prüfpunkte")
+        clean[source] = {}
+        for qid, q in qs.items():
+            if not QID.match(qid): raise ValueError(f"ID '{qid}': nur Kleinbuchstaben, Ziffern und _, z.B. insider_trading")
+            if qid in seen: raise ValueError(f"ID '{qid}' kommt mehrfach vor")
+            seen.add(qid)
+            if not str(q.get("instructions", "")).strip(): raise ValueError(f"Prüfpunkt '{qid}': die Frage fehlt")
+            crit = {k: str(v).strip() for k, v in (q.get("criteria") or {}).items() if k in ("true", "false") and str(v).strip()}
+            q = {k: v for k, v in q.items() if k != "criteria"} | {"type": "noul"} | ({"criteria": crit} if crit else {})
+            Noul.model_validate({k: q[k] for k in ("type", "instructions", "criteria") if k in q})
+            clean[source][qid] = q
+    if not seen: raise ValueError("Mindestens ein Prüfpunkt ist nötig")
+    return clean
+
+
+def save_questions(questions, path=CONFIG):
+    """Ersetzt die Prüfpunkte in questions.json, zählt "version" hoch und legt die vorherige Fassung in
+    questions_history/ ab. Schwelle und localization bleiben. -> neue Config."""
+    cfg = load_config(path)
+    clean = validate_questions(questions)
+    version = int(cfg.get("version", 1))
+    HISTORY.mkdir(exist_ok=True)
+    (HISTORY / f"questions_v{version}.json").write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
+    new = {k: v for k, v in cfg.items() if k not in ("version", "questions")} | {"version": version + 1, "questions": clean}
+    tmp = Path(path).with_suffix(".tmp")
+    tmp.write_text(json.dumps(new, ensure_ascii=False, indent=2), encoding="utf-8")
+    os.replace(tmp, path)   # atomar: eine laufende Analyse liest nie eine halb geschriebene Datei
+    return new
 
 
 def flatten(questions):

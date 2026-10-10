@@ -23,6 +23,17 @@ def analyze(transcript=None, segments=None, threshold=None, questions=None, pass
     return r.json()
 
 
+def save_questions(questions, url=URL, timeout=30):
+    """Prüfpunkte ersetzen (PUT /questions). -> {"version", "questions"}. RuntimeError mit der Meldung des Dienstes."""
+    try:
+        r = httpx.put(f"{url}/questions", json={"questions": questions}, timeout=timeout)
+    except httpx.HTTPError as e:
+        raise RuntimeError(f"Fraud-Analyse-Dienst nicht erreichbar ({url}): {e}") from None
+    if r.status_code != 200:
+        raise RuntimeError(r.json().get("detail", r.text) if r.headers.get("content-type", "").startswith("application/json") else r.text)
+    return r.json()
+
+
 def config(url=URL, timeout=10):
     return httpx.get(f"{url}/config", timeout=timeout).raise_for_status().json()
 
