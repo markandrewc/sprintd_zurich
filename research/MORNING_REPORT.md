@@ -108,4 +108,5 @@ See `research/findings/RQ*.md`. Each has the setup, a CI table, flips, a recomme
 ## How to use what is running
 - vLLM (Qwen2.5-7B-AWQ) on :8000: `scripts/remote/swap_llm.sh <hf-id> [util] [max_len]`; stop: `kill $(cat runs/logs/vllm.pid)`.
 - UI on the champion results: `uv run callguard ui -c recommended`. Experiment variants are selectable as a source.
+- Sunday procedure (hidden set, scoring with labels, demo, fallback): `docs/SUNDAY_RUNBOOK.md`.
 - Re-run anything: `uv run callguard experiment experiments/<name>.yaml --split dev` (cached), `callguard leaderboard`, `callguard report`.
