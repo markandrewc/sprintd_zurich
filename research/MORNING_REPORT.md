@@ -1,8 +1,9 @@
 # Morning report — overnight research on the GPU host (2026-10-10)
 
-_Last update: 05:20. Read with `research/DEMO.md` (5-minute demo script) and `research/ideas_round3.md` (Q&A cheat sheet)._
-_ Everything below is reproducible from `experiments/*.yaml` + caches; numbers come from
-`runs/experiments/*/summary.md` and `research/journal.md` (timestamped log of every run and decision)._
+_Last update: 05:55 (final). Read with `research/DEMO.md` (5-minute demo script), `docs/SUNDAY_RUNBOOK.md` (how to
+process the hidden set) and `research/ideas_round3.md` (Q&A cheat sheet). Everything below is reproducible from
+`experiments/*.yaml` + caches; numbers come from `runs/experiments/*/summary.md` and `research/journal.md`
+(timestamped log of every run and decision)._
 
 ## TL;DR
 1. **Recommended config for Sunday: `config/recommended.yaml`** (frozen 04:09)
