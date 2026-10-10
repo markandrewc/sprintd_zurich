@@ -15,3 +15,11 @@ llms:
 
 paths:
   runs_dir: runs/dual-facts
+
+# The officer's fact policy decides (callguard.fact_policy; demo tabs «Fakten» / «Regeln»): per fact, each reader's
+# p -> ja / unklar / nein (Qwen three-way, Kev band [0.3, 0.7]), combined «Einigkeit" (pre-registered defaults,
+# research/findings/dual_facts_prereg.md), then the rules of config/policy_table.yaml. Pure re-fusion: the stored
+# answers of both readers are reused, a changed band or rule never runs a model.
+fusion:
+  rule: policy
+  fact_policy: config/fact_policy.yaml
