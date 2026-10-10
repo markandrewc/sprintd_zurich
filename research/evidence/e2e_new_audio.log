@@ -1,0 +1,175 @@
+== E2E new audio (staged, recommended) 04:46:47
+[10/10/26 04:47:14] WARNING  http://127.0.0.1:8000/v1 unreachable for GET       
+                             /models (ConnectError); cache keys use the last    
+                             known model behind 'callguard-llm':                
+                             Qwen/Qwen2.5-7B-Instruct-AWQ                       
+[10/10/26 04:47:19] WARNING  LLM role assignment failed, using first speaker as 
+                             advisor: RuntimeError('LLM server at               
+                             http://127.0.0.1:8000/v1 not reachable - start     
+                             scripts/serve_llm_local.sh (local),                
+                             scripts/serve_vllm.sh (GPU) or                     
+                             scripts/remote/serve_models.sh on the GPU host     
+                             (then check `tailscale status`) [ConnectError:     
+                             [Errno 111] Connection refused]')                  
+[10/10/26 04:47:33] WARNING  http://127.0.0.1:8000/v1 unreachable for GET       
+                             /models (ConnectError); cache keys use the last    
+                             known model behind 'callguard-llm':                
+                             Qwen/Qwen2.5-7B-Instruct-AWQ                       
+[10/10/26 04:47:40] WARNING  LLM role assignment failed, using first speaker as 
+                             advisor: RuntimeError('LLM server at               
+                             http://127.0.0.1:8000/v1 not reachable - start     
+                             scripts/serve_llm_local.sh (local),                
+                             scripts/serve_vllm.sh (GPU) or                     
+                             scripts/remote/serve_models.sh on the GPU host     
+                             (then check `tailscale status`) [ConnectError:     
+                             [Errno 111] Connection refused]')                  
+[10/10/26 04:47:46] WARNING  http://127.0.0.1:8000/v1 unreachable for GET       
+                             /models (ConnectError); cache keys use the last    
+                             known model behind 'callguard-llm':                
+                             Qwen/Qwen2.5-7B-Instruct-AWQ                       
+[10/10/26 04:47:52] WARNING  LLM role assignment failed, using first speaker as 
+                             advisor: RuntimeError('LLM server at               
+                             http://127.0.0.1:8000/v1 not reachable - start     
+                             scripts/serve_llm_local.sh (local),                
+                             scripts/serve_vllm.sh (GPU) or                     
+                             scripts/remote/serve_models.sh on the GPU host     
+                             (then check `tailscale status`) [ConnectError:     
+                             [Errno 111] Connection refused]')                  
+stage1 ASR (3 calls, incl. model load): 45 s
+vLLM Qwen/Qwen2.5-7B-Instruct-AWQ starting, pid 116013, log runs/logs/vllm_Qwen2.5-7B-Instruct-AWQ.log
+UP Qwen/Qwen2.5-7B-Instruct-AWQ
+vLLM restart: 28 s
+╭─────────────────────────────────── call_a ───────────────────────────────────╮
+│  ALARM   Score 0.99  ·  Unsicherheit 0.07  ·  Schwelle 0.55                  │
+│                                                                              │
+│ • Alarm: Score 0.99 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit    │
+│ 0.07 (max. 0.35).                                                            │
+│ • Insiderhandel: Handelswunsch mit nicht öffentlicher Information aus        │
+│ interner Quelle. Regel: trade.alarm_1. Fakten: Eigener Handelswunsch         │
+│ geäussert = ja (1.00); Begründet mit nicht öffentlicher Insider-Information  │
+│ = ja (1.00); Information bereits öffentlich = nein (1.00)                    │
+│                                                                              │
+│ Verdächtige Passagen                                                         │
+│ 1. 00:35-00:47 Insiderhandel (Information und Kaufwunsch)  (Score 1.00;      │
+│ facts, keywords)                                                             │
+│    - facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja  │
+│ (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung       │
+│ arbeitet und ihr vertrauliche Informationen gegeben hat. (Regel:             │
+│ trade.alarm_1)                                                               │
+│    - keywords: Stichwort K02 «Finanzabteilung» (Interne Quelle)              │
+│    - keywords: Stichwort K03 «Quartalszahlen» (Marktrelevanter Inhalt)       │
+│    - keywords: Stichwort K01 «nicht publiziert» (Nicht öffentliche           │
+│ Information)                                                                 │
+│    "Etwa 8000 Franken. Meine Schwester arbeitet dort in der Finanzabteilung. │
+│ Sie hat mir gestern gesagt, Quartalszahlen seien viel besser als erwartet.   │
+│ Diese sind noch nicht publiziert. Die Medienmeldung kommt erst am Freitag."  │
+│    Audio: runs/recommended/call_a/snippets/00_trade_35s.wav                  │
+│ 2. 00:54-01:09 Insiderhandel (Information und Kaufwunsch)  (Score 1.00;      │
+│ facts, keywords)                                                             │
+│    - facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja  │
+│ (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung       │
+│ arbeitet und ihr vertrauliche Informationen gegeben hat. (Regel:             │
+│ trade.alarm_1)                                                               │
+│    - keywords: Stichwort K05 «vertraulich» (Vertraulichkeit)                 │
+│    "Meine Schwester, nicht aus einer öffentlichen Meldung. Ja, sie hat       │
+│ gesagt, ich solle es vertraulich behandeln. Und alles, sie hat mir sogar ein │
+│ Foto von der RIPO-Sicht gezeigt. Ich habe ihr versprochen, ich schicke es    │
+│ niemandem weiter."                                                           │
+│    Audio: runs/recommended/call_a/snippets/01_trade_53s.wav                  │
+│ 3. 01:24-01:34 Insiderhandel (Information und Kaufwunsch)  (Score 1.00;      │
+│ facts, keywords)                                                             │
+│    - facts: Fakt: Eigener Handelswunsch geäussert = ja (1.00) - Der Kunde    │
+│ drückt seinen Wunsch, die Aktie vor der Meldung zu kaufen. (Regel:           │
+│ trade.alarm_1)                                                               │
+│    - keywords: Stichwort K04 «vor der Meldung» (Handeln vor der Meldung)     │
+│    - keywords: Stichwort K03 «Quartalszahlen» (Marktrelevanter Inhalt)       │
+│    "Warum möchte ich diese Aktie jetzt kaufen vor der Meldung? Wenn alle am  │
+│ Freitag die Quartalszahlen sehen, ist der Preis doch schon oben. Können Sie  │
+│ den Kauf nicht für mich machen?"                                             │
+│    Audio: runs/recommended/call_a/snippets/02_trade_83s.wav                  │
+│                                                                              │
+│ Familie                     Score  Unsicherheit  pro Prüfung                 │
+│ Insiderhandel (Information  0.99   0.07          keywords 0.88, facts 1.00   │
+│ und Kaufwunsch)                                                              │
+│ Zahlenobjekte (Karten- und  0.00   0.39          keywords 0.00, patterns     │
+│ Referenznummern)                                 0.00                        │
+│ Zugangsinformation          0.00   0.00          facts 0.00                  │
+│ preisgegeben                                                                 │
+│ Auskunft an Dritte          0.00   0.00          facts 0.00                  │
+│ Relevante Angabe            0.00   0.00          facts 0.00                  │
+│ verschweigen                                                                 │
+│ Zuständigkeit/Kontrolle     0.00   0.00          facts 0.00                  │
+│ umgehen (Aufteilen)                                                          │
+│                                                                              │
+│ Zeiten: asr 0.0s, diarize 4.5s, checks 2.9s                                  │
+╰──────────────────────────────── recommended ─────────────────────────────────╯
+╭─────────────────────────────────── call_b ───────────────────────────────────╮
+│  KEIN ALARM   Score 0.05  ·  Unsicherheit 0.23  ·  Schwelle 0.55             │
+│                                                                              │
+│ • Kein Alarm: höchster Score 0.05 ('Insiderhandel') liegt unter 0.40         │
+│ (Schwelle 0.55 minus Band 0.15).                                             │
+│ • Insiderhandel: Kein Handelswunsch auf Basis nicht öffentlicher             │
+│ Information. Regel: trade.no_alert. Fakten: Eigener Handelswunsch geäussert  │
+│ = nein (0.61); Begründet mit nicht öffentlicher Insider-Information = nein   │
+│ (0.90); Information bereits öffentlich = ja (1.00)                           │
+│                                                                              │
+│ Familie                     Score  Unsicherheit  pro Prüfung                 │
+│ Insiderhandel (Information  0.05   0.23          keywords 0.84, facts 0.00   │
+│ und Kaufwunsch)                                                              │
+│ Zahlenobjekte (Karten- und  0.00   0.39          keywords 0.00, patterns     │
+│ Referenznummern)                                 0.00                        │
+│ Zugangsinformation          0.00   0.00          facts 0.00                  │
+│ preisgegeben                                                                 │
+│ Auskunft an Dritte          0.00   0.00          facts 0.00                  │
+│ Relevante Angabe            0.00   0.00          facts 0.00                  │
+│ verschweigen                                                                 │
+│ Zuständigkeit/Kontrolle     0.00   0.00          facts 0.00                  │
+│ umgehen (Aufteilen)                                                          │
+│                                                                              │
+│ Zeiten: asr 0.0s, diarize 5.0s, checks 1.8s                                  │
+╰──────────────────────────────── recommended ─────────────────────────────────╯
+╭─────────────────────────────────── call_c ───────────────────────────────────╮
+│  PRÜFEN   Score 0.50  ·  Unsicherheit 0.35  ·  Schwelle 0.55                 │
+│                                                                              │
+│ • Prüfen (knapp unter Schwelle): Score 0.50 für 'Zugangsinformation          │
+│ preisgegeben' liegt zwischen 0.40 und der Schwelle 0.55.                     │
+│ • Zugangsinformation preisgegeben: Ein Wert wurde vorgelesen, aber unklar    │
+│ ist, zu welchem Vorgang er gehört oder ob er gültig ist. Regel:              │
+│ access.review_1. Fakten: Code/Wert am Telefon vorgelesen = ja (0.99); Im     │
+│ Gespräch offen, ob der Wert gültig ist = ja (1.00); Wert abgelaufen oder     │
+│ Muster = nein (0.83)                                                         │
+│                                                                              │
+│ Verdächtige Passagen                                                         │
+│ 1. 01:20-01:23 Zugangsinformation preisgegeben  (Score 0.50; facts)          │
+│    - facts: Fakt: Im Gespräch offen, ob der Wert gültig ist = ja (1.00) -    │
+│ Der Kunde sagt, dass er nicht sicher ist, ob der Wert oben oder unten        │
+│ dazugehört und ob der Text jetzt oder damals gültig war. (Regel:             │
+│ access.review_1)                                                             │
+│    "Ich weiss nicht, ob der Wert oben oder unten dazugehört."                │
+│    Audio: runs/recommended/call_c/snippets/00_access_80s.wav                 │
+│ 2. 01:37-01:43 Zugangsinformation preisgegeben  (Score 0.50; facts)          │
+│    - facts: Fakt: Code/Wert am Telefon vorgelesen = ja (0.99) - Der Kunde    │
+│ gibt die Ziffern 2, 9, 6, 4, 8, 1 laut. (Regel: access.review_1)             │
+│    - facts: Fakt: Im Gespräch offen, ob der Wert gültig ist = ja (1.00) -    │
+│ Der Kunde sagt, dass er nicht sicher ist, ob der Wert oben oder unten        │
+│ dazugehört und ob der Text jetzt oder damals gültig war. (Regel:             │
+│ access.review_1)                                                             │
+│    "2, 9, 6, 4, 8, 1. Ob es jetzt oder damals gültig ist, kann ich nicht     │
+│ sagen."                                                                      │
+│    Audio: runs/recommended/call_c/snippets/01_access_96s.wav                 │
+│                                                                              │
+│ Familie                                   Score  Unsicherheit  pro Prüfung   │
+│ Zugangsinformation preisgegeben           0.50   0.35          facts 0.50?   │
+│ Zahlenobjekte (Karten- und                0.20   0.33          patterns 0.20 │
+│ Referenznummern)                                                             │
+│ Insiderhandel (Information und            0.00   0.00          facts 0.00    │
+│ Kaufwunsch)                                                                  │
+│ Auskunft an Dritte                        0.00   0.00          facts 0.00    │
+│ Relevante Angabe verschweigen             0.00   0.00          facts 0.00    │
+│ Zuständigkeit/Kontrolle umgehen           0.00   0.00          facts 0.00    │
+│ (Aufteilen)                                                                  │
+│                                                                              │
+│ Zeiten: asr 0.0s, diarize 3.0s, checks 2.2s                                  │
+╰──────────────────────────────── recommended ─────────────────────────────────╯
+stage2 diarize+facts+fusion+snippets (3 calls): 20 s
+E2E_DONE
