@@ -1,0 +1,98 @@
+# Paraphrase-robustness copy of config/general_questions.yaml (research only, not a candidate).
+# Every instruction reworded with the same meaning; ids, families, categories and threshold identical. Written
+# 2026-10-10 from the original wording alone, without reading transcripts, labels or any result (same protocol as
+# config/policy_table_para.yaml, R3). Compare `*_general` with `*_general_para` in experiments/kev_vs_facts.yaml:
+# the gap measures wording fragility of the general questions, as para/para2 did for the tuned fact questions.
+source: paraphrase of sprintd_zurich@47c4ffd:fraud_analysis/questions.json
+threshold: 0.7
+questions:
+  insider_trading:
+    list: gesetzlich
+    family: trade
+    category: Insiderhandel
+    basis: FinfraG Art. 142 / 154
+    instructions: Does anyone want to trade securities on the basis of information that is not public and could move the price?
+  insider_disclosure:
+    list: gesetzlich
+    family: trade
+    category: Insiderhandel
+    basis: FinfraG Art. 142 / 154
+    instructions: Does anyone share price-sensitive information that has not been published, or suggest a trade because of such information?
+  market_manipulation:
+    list: gesetzlich
+    family: trade
+    category: Marktmanipulation
+    basis: FinfraG Art. 143 / 155
+    instructions: Is anyone attempting to move the market price of an asset by placing orders or spreading information?
+  aml_source_of_funds:
+    list: gesetzlich
+    family: documentation
+    category: Geldwäscherei
+    basis: StGB Art. 305bis, GwG Art. 6
+    instructions: Does anyone hide the origin of money or assets, or decline to say where they come from?
+  aml_structuring:
+    list: gesetzlich
+    family: splitting
+    category: Geldwäscherei
+    basis: StGB Art. 305bis, GwG Art. 6 / 9
+    instructions: Does anyone set up payments or transfers in a way that keeps them below a legal limit or avoids a reporting duty?
+  aml_hidden_beneficiary:
+    list: gesetzlich
+    family: documentation
+    category: Geldwäscherei
+    basis: GwG Art. 4
+    instructions: Does anyone hide the identity of the person who really owns or benefits from the assets?
+  confidential_disclosure:
+    list: gesetzlich
+    family: disclosure
+    category: Vertrauliche Informationen
+    basis: BankG Art. 47, DSG, StGB Art. 162
+    instructions: Does anyone give confidential information to someone who has no right to it?
+  confidential_request:
+    list: gesetzlich
+    family: disclosure
+    category: Vertrauliche Informationen
+    basis: BankG Art. 47, DSG, StGB Art. 162
+    instructions: Is anyone trying to get confidential information that they have no right to receive?
+  false_records:
+    list: gesetzlich
+    family: documentation
+    category: Falsche Dokumentation
+    basis: StGB Art. 251
+    instructions: Does anyone ask for incorrect information to be written down or documented?
+  bribery:
+    list: gesetzlich
+    family: splitting
+    category: Bestechung
+    basis: StGB Art. 322octies / 322novies
+    instructions: Does anyone offer or ask for an improper benefit in return for doing something?
+  withheld_information:
+    list: intern
+    family: documentation
+    category: Falsche Dokumentation
+    basis: interne Policy
+    instructions: Does anyone want information that matters for a decision kept from the people who have to make that decision?
+  control_circumvention:
+    list: intern
+    family: splitting
+    category: Kontrollumgehung
+    basis: interne Policy
+    instructions: Is anyone attempting to bypass an internal sign-off, limit or check?
+  credential_disclosure:
+    list: intern
+    family: access
+    category: Zugangsdaten
+    basis: interne Policy
+    instructions: Does anyone disclose a login secret, code or password that is currently valid?
+  credential_request:
+    list: intern
+    family: access
+    category: Zugangsdaten
+    basis: interne Policy
+    instructions: Does anyone request someone else's login secrets, codes or passwords?
+  manipulated_customer:
+    list: intern
+    family: access
+    category: Kunde als Betrugsopfer
+    basis: interne Policy, StGB Art. 146
+    instructions: Does anyone seem to be acting because a third party is pressuring or deceiving them?

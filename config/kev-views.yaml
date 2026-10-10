@@ -1,0 +1,18 @@
+# The Kev profile + the English view (Kev-4B was trained on English data only; our transcripts are Standard
+# German). experiments/kev_vs_facts.yaml `kev_general_en`: `--set checks.general.view=en_from_de`.
+# The views block is identical to config/recommended-views.yaml; llms.default here is the pinned stand-in for the
+# same Qwen2.5-7B-AWQ, so the translation cache key matches and the translations made with vLLM by
+# recommended-views (`qwen_general_en`) are reused without a server. A missing translation is NOT computed here (the
+# stand-in refuses): the view is then missing and the check reading it fails loudly (variant DEGRADED).
+extends: kev.yaml
+description: Kev profile + English view (translations from the recommended-views cache; research only)
+
+views:
+  de: {lang: de, diarize: true}
+  en_from_de:
+    lang: en
+    from: de
+    translator: {type: llm_translate, llm: default, batch_size: 12, context: 3, concurrency: 4}
+primary_view: de
+check_view: null
+extra_views: []

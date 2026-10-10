@@ -50,9 +50,9 @@ and the call is decided without it (visible in the UI), a call that cannot be pr
 | asr | `faster_whisper`, `hf_whisper`, `remote` (GPU host over HTTP), `reference` (oracle only) | audio -> Transcript (segments, words, confidence) |
 | diarizer | `sherpa_onnx`, `none` | speakers + advisor/customer roles |
 | translator | `llm_translate`, `hf_mt`, `identity` | Transcript -> same segments in another language (view) |
-| check | `keywords`, `patterns`, `keyword_context`, `anchored`, `semantic_windows`, `llm_judge`, `quote_judge`, `geval`, `facts`, `entities` | Transcript + families -> per-family score, confidence, verdict, findings pinned to segments |
+| check | `keywords`, `patterns`, `keyword_context`, `anchored`, `semantic_windows`, `llm_judge`, `quote_judge`, `geval`, `facts`, `entities`, `questions` (general yes/no set, max p(yes); docs/KEV.md) | Transcript + families -> per-family score, confidence, verdict, findings pinned to segments |
 | fusion | `weighted`, `calibrated`, `learned` | all CheckResults -> Decision; pure and cheap (UI re-runs it on every slider move) |
-| llm | `openai_compat` (vLLM, llama.cpp server, Ollama), `llama_cpp` in-process, `fake` (tests) | chat + JSON schema + next-token logprobs |
+| llm | `openai_compat` (vLLM, llama.cpp server, Ollama), `llama_cpp` in-process, `fake` (tests), `kev` (Kev-4B yes/no service, docs/KEV.md), `pinned` (offline stand-in keyed like a cached model) | chat + JSON schema + next-token logprobs |
 | sink | `json_dir`, `outcept_trigger`, `notify`, `audit` | finished CallResult -> somewhere; never breaks a call |
 
 Adding one: subclass the base in `plugins.py` and reference it as `type: my_module:MyClass` (no registry

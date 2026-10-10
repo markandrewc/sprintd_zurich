@@ -69,3 +69,12 @@ Back up `config/keywords.json` before the keyword click: `cp config/keywords.jso
 - **Stop vLLM:** `kill $(cat runs/logs/vllm.pid)`. Never use `pkill -f` (it matches its own shell).
 - **Logs:** `runs/logs/`.
 - **Never commit:** `runs/`, `.cache/`, `models/`, `data_upstream/`.
+
+## 6. Optional research: Kev-4B vs our facts (not the submission)
+`docs/KEV.md` has the exact GPU-host commands. Kev and vLLM never share the 12 GB card, so the run goes in stages:
+1. vLLM: translations for the English view.
+2. Kev (`scripts/remote/serve_kev.py` from the teammate's `.venv-kev`): all `kev_*` variants.
+3. vLLM again: `qwen_*` variants and the champion.
+
+The spec is `experiments/kev_vs_facts.yaml` (dev split only). Restart vLLM before the demo:
+`scripts/remote/swap_llm.sh Qwen/Qwen2.5-7B-Instruct-AWQ 0.80 16384`.

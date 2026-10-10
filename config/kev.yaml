@@ -1,0 +1,63 @@
+# Kev-4B profile (research: experiments/kev_vs_facts.yaml, runbook docs/KEV.md). NOT the Sunday candidate.
+#
+#   ASR     same as recommended (large-v3 MIT, cached transcripts)
+#   roles   from the diarization cache (computed earlier by Qwen2.5-7B-AWQ on vLLM, see llms.default below)
+#   checks  general: the teammate's 15 general law-based yes/no questions (config/general_questions.yaml, written
+#           without test data) asked to Kev-4B in one request per call; call risk = max p(yes) (their rule,
+#           threshold 0.7). keywords + patterns stay as light, editable cues like in recommended.
+#
+# Kev runs in the teammate's environment behind scripts/remote/serve_kev.py (:8003, ~8 GB bf16). It does NOT fit
+# next to vLLM on the 12 GB card: stop vLLM before starting Kev (docs/KEV.md). Hence llms.default is a `pinned`
+# stand-in: it carries the identity of the vLLM model that assigned the advisor/customer roles, so the cached
+# roles are found without a server, and it refuses every request. New (uncached) calls therefore go in stages:
+#   1. ASR with nothing else on the GPU      uv run callguard transcribe <wav> -c recommended --no-diarize
+#   2. vLLM (Qwen2.5-7B-AWQ) up: roles        uv run callguard run <wav...> -c recommended   (caches roles + facts)
+#   3. vLLM down, Kev up: Kev checks          uv run callguard run <wav...> -c kev
+# If you served another model for the roles, change identity.model to what `GET /v1/models` reported as root.
+extends: recommended.yaml
+description: Kev-4B general questions (+ light keywords/patterns); roles from the cache (research only)
+
+llms:
+  default:
+    type: pinned
+    identity: {type: openai_compat, model: Qwen/Qwen2.5-7B-Instruct-AWQ, json_mode: json_schema, seed: null, extra_body: {}}
+    note: advisor/customer roles come from the diarization cache; uncached calls need stage 2 with vLLM first
+  kev:
+    type: kev
+    base_url: ${CALLGUARD_KEV_URL:-http://127.0.0.1:8003}
+    model: ${KEV_MODEL:-jaredpalmer/kev-4b}   # must equal what serve_kev.py reports (pin a revision: repo@sha on both sides)
+    dtype: bf16                               # serve_kev.py KEV_DTYPE; fp32 does not fit 12 GB
+    calibrated: false                         # raw logits like the teammate's analysis (AUC-neutral, see llm/kev.py)
+    fact_answer: noul                         # facts backend: p(yes) / 1 - p(yes), no "unknown" mass
+    max_concurrency: 1                        # one model on one GPU: requests in sequence
+    timeout: 300
+  kev_choice:
+    type: kev
+    base_url: ${CALLGUARD_KEV_URL:-http://127.0.0.1:8003}
+    model: ${KEV_MODEL:-jaredpalmer/kev-4b}
+    dtype: bf16
+    calibrated: false
+    fact_answer: choice                       # facts backend: Kev choice question over yes / no / unknown
+    max_concurrency: 1
+    timeout: 300
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.15
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.1
+  - name: general
+    type: questions
+    llm: kev
+    questions: config/general_questions.yaml
+    localize: true          # best window per fired question -> audio passage (one extra Kev request per window)
+    localize_min: 0.5
+    window_segments: 8
+    weight: 1.0
+
+fusion:
+  type: weighted
+  threshold: 0.7            # the teammate's pre-registered threshold (questions.json); CV numbers fit their own

@@ -44,6 +44,7 @@ BUILTINS: dict[str, dict[str, str]] = {
         "anchored": "callguard.checks.keyword_context:AnchoredProbeCheck",
         "semantic_windows": "callguard.checks.semantic:SemanticWindowCheck",
         "quote_judge": "callguard.checks.quote_judge:QuoteJudgeCheck",
+        "questions": "callguard.checks.questions:QuestionSetCheck",
     },
     "fusion": {
         "weighted": "callguard.fusion.weighted:WeightedFusion",
@@ -56,6 +57,8 @@ BUILTINS: dict[str, dict[str, str]] = {
         "openai_compat": "callguard.llm.openai_compat:OpenAICompatLLM",
         "llama_cpp": "callguard.llm.llama_cpp:LlamaCppLLM",
         "fake": "callguard.llm.fake:FakeLLM",
+        "kev": "callguard.llm.kev:KevLLM",
+        "pinned": "callguard.llm.pinned:PinnedLLM",
     },
     "sink": {
         "json_dir": "callguard.sinks.json_dir:JsonDirSink",
