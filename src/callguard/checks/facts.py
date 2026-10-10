@@ -40,6 +40,7 @@ Both default to off, and then neither the behaviour nor the cache key changes.
 
 from __future__ import annotations
 
+import json
 import logging
 import math
 import re
@@ -499,7 +500,7 @@ class FactSheetCheck(LLMCheck):
                  no_alert_scale: float = 0.4, max_tokens: int = 300, reason_language: str = "de",
                  include_non_alarm: bool = False, max_transcript_chars: int = 24000, parallel: int = 1,
                  paraphrase_tables: list[str] | None = None, unclear_band: list[float] | None = None,
-                 name: str | None = None, weight: float = 1.0, enabled: bool = True):
+                 fewshot: str | None = None, name: str | None = None, weight: float = 1.0, enabled: bool = True):
         if isinstance(paraphrase_tables, str):
             paraphrase_tables = [paraphrase_tables]
         band: tuple[float, float] | None = None
@@ -517,6 +518,15 @@ class FactSheetCheck(LLMCheck):
             extra["paraphrase_tables"] = [str(t) for t in paraphrase_tables]
         if band is not None:
             extra["unclear_band"] = list(band)
+        # research S2: worked examples per (family, fact) from a JSON file; off by default (no cache-key change)
+        self.fewshot: dict[str, dict[str, list[dict[str, str]]]] = {}
+        if fewshot:
+            fp_path = Path(fewshot) if Path(fewshot).is_absolute() else ROOT / fewshot
+            raw_shots = json.loads(fp_path.read_text())
+            self.fewshot = {str(fam): {str(fid): [{"excerpt": str(e["excerpt"]), "answer": str(e["answer"])}
+                                                  for e in exs] for fid, exs in facts_.items()}
+                            for fam, facts_ in (raw_shots.get("families") or {}).items()}
+            extra["fewshot"] = stable_hash(self.fewshot)
         if question_lang not in ("en", "de"):
             raise ValueError(f"question_lang must be en or de, got {question_lang!r}")
         if not 1 / 3 < float(decide_at) <= 1.0:
@@ -673,8 +683,9 @@ class FactSheetCheck(LLMCheck):
         return out
 
     def _messages(self, rendered: str, family: Family, fact: Fact, lang: str | None) -> list[dict[str, str]]:
+        shots = self.fewshot.get(family.id, {}).get(fact.id) if self.fewshot else None
         return fp.fact_messages(rendered, family.label, family.id, fact.question(self.question_lang),
-                                transcript_lang=lang)
+                                transcript_lang=lang, **({"examples": shots} if shots else {}))
 
     def _uses_prefix(self, family: Family, fact: Fact) -> bool:
         return (self.prefix_max and fact.role in self.prefix_roles

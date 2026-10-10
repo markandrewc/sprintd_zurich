@@ -54,13 +54,26 @@ def system_prompt(transcript_lang: str | None = None, *, one_word: bool = True) 
     )
 
 
+def examples_block(examples: list[dict[str, str]]) -> str:
+    """Research S2: short worked examples (excerpts of OTHER calls + the answer) for one question."""
+    out = ["Worked examples for this question (short excerpts from OTHER calls, not from this call):"]
+    for i, ex in enumerate(examples, 1):
+        out.append(f"<example {i}>\n{ex['excerpt'].strip()}\n</example {i}>\nAnswer for example {i}: "
+                   f"{'unknown' if ex['answer'] == 'unclear' else ex['answer']}")
+    return "\n".join(out)
+
+
 def fact_messages(rendered: str, family_label: str, family_id: str, question: str,
-                  transcript_lang: str | None = None) -> list[dict[str, str]]:
+                  transcript_lang: str | None = None,
+                  examples: list[dict[str, str]] | None = None) -> list[dict[str, str]]:
+    shots = (f"{examples_block(examples)}\n\nNow answer the question for the call transcript above.\n"
+             if examples else "")
     user = (
         "Transcript of the call (one line per segment: [segment-id mm:ss speaker] text):\n"
         f"<transcript>\n{rendered}\n</transcript>\n\n"
         f"Topic: {family_label} [{family_id}]\n"
         f"Question: {' '.join(question.split())}\n\n"
+        f"{shots}"
         "Answer with exactly one word: yes, no or unknown."
     )
     return [{"role": "system", "content": system_prompt(transcript_lang)},

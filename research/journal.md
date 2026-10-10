@@ -518,3 +518,47 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   UI-only coupling file config/open_facts.yaml (button texts; which facts an answer settles) — pipeline never reads it.
   Panel appears on 24/62 recommended calls (also alarms with an open exculpatory fact) — team may restrict to review.
 - S1 (confident clearance, decide_at 0.8): FAILED 2 of 3 pre-registered rules -> not adopted (journal 05:09).
+
+## 2026-10-10T05:30 S2 pre-registration (contrastive few-shot in fact probes; ideas_round3 S2)
+- Hypothesis: 1-2 short contrast examples per fact (an excerpt where the fact is "yes" and one where it is "no",
+  <= 6 ASR segments each, with the answer) make the 7B fact answers robust to question wording.
+- Build: optional `checks.facts.fewshot: <json>` (default off; cache keys of existing configs unchanged). Example
+  pool per dev fold k = dev dialogues of folds != k only (fold-aware CV in the experiment layer; the pipeline never
+  sees a fold). Excerpts from the champion's cached large-v3 transcripts; "yes" window = the champion's evidence
+  segments for that fact in a pool dialogue whose family decision was correct; "no" window = best-aligned window in
+  the twin (or another same-family pool dialogue) where the champion value is "no". Holdout dialogues never used.
+  Same excerpts/answers for both wordings (fact ids identical). Driver: scripts/research/s2_fewshot.py (4 fold runs
+  per table merged into one variant: champion.yaml `fs_tuned`, `fs_para`, built from rows, --rescore).
+- PASS (all must hold, fixed before any result): (1) label flips fs_tuned vs fs_para (3-class, fixed threshold)
+  <= 5/48 (baseline champion vs para 11/48); (2) fs_para dev flag AUC >= 0.80; (3) fs_tuned CV FAR <= 20%.
+  Otherwise FAIL -> champion stays. Holdout is spent and not touched.
+
+## 2026-10-10T05:50 S2 result: contrastive few-shot in fact probes (fold-aware) — FAIL, not adopted
+- Built: `checks.facts.fewshot: <json>` in checks/facts.py + `examples` in fact_prompts.fact_messages (default off;
+  cache keys unchanged, pinned test green, 705 offline tests pass). Driver scripts/research/s2_fewshot.py: per dev
+  fold k a few-shot file from dev folds != k (runs/research/s2/fewshot_fold<k>.json, provenance inside), 4 fold runs
+  per table (runs/experiments/s2_folds/), merged into champion.yaml `fs_tuned` / `fs_para`, --rescore. 7B, large-v3
+  transcripts, 48 dev calls, 0 errors, ~10 min total. Log runs/logs/s2_fewshot.log.
+- Coverage: 11-14 of ~21 facts per fold got examples; "yes" from champion evidence segments in correctly decided
+  pool dialogues, "no" only where the champion value is "no" (twin or best-aligned same-family window) -> many facts
+  got a "yes" example only (the 7B hedges to "unclear" on twins); fold 0 had no documentation examples (all
+  documentation dialogues are in fold 0).
+- DEV (flag AUC [CI] | CV FAR / miss | CV review recall | CV 3-class):
+  | champion (no few-shot) | 0.87 [0.72, 0.99] | 14% / 15% | 67% | 79% |
+  | para (no few-shot)     | 0.72 [0.52, 0.88] | 23% / 38% |  0% | 67% |
+  | fs_tuned               | 0.80 [0.62, 0.94] | 14% / 27% |  0% | 71% |
+  | fs_para                | 0.70 [0.52, 0.87] | 18% / 42% |  0% | 65% |
+  Paired AUC vs champion: fs_tuned -0.07 [-0.20, +0.01] (not detectable), fs_para -0.17 [-0.33, -0.03] (real).
+- Wording sensitivity: label flips fs_tuned<->fs_para 8/48 (6 flag; all in the "worse" direction for para: D04-K1,
+  D05-K1, C07-K3/K4 alarm->no_alert, C06-K3/K4 alarm->review, C14-K4 no_alert->review, C18-K3 review->no_alert) vs
+  champion<->para 11/48. Fact value agreement 73.3% -> 80.8%, mean |dp(yes)| 0.038 -> 0.023 (n=960): the examples
+  do reduce fact-level wording noise, but not enough to stop label flips.
+- Few-shot vs no few-shot, same wording: champion->fs_tuned 4 flips (D05-K2 alarm->review, C17-K3/K4 and C18-K4
+  review->no_alert: the examples remove the tuned table's review hits); para->fs_para 3 flips (D01-K1 fixed, D04-K1
+  and C07-K3 alarm->no_alert).
+- PRE-REGISTERED RULES: (1) flips <= 5/48: 8/48 -> FAIL; (2) fs_para AUC >= 0.80: 0.70 -> FAIL; (3) fs_tuned CV FAR
+  <= 20%: 14% -> PASS. => S2 FAILS. Champion stays (table v1, no few-shot). Holdout untouched.
+- Learned: with the 7B, examples move answers toward the examples' "yes" (act facts) and away from "unclear",
+  which kills the `= unclear` review rules (review recall 67% -> 0%, as every robustness lever so far) and does not
+  rescue the paraphrase misses. Wording robustness on dev only came from the 14B (R3 on 14B). Possible but untested
+  follow-up: balanced yes/no examples for every fact (needs human-labelled fact answers, not champion silver labels).

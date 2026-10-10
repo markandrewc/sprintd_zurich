@@ -34,3 +34,8 @@ variants:
   - {name: s1_v1_08, set: [checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: table v1, yes/no need p >= 0.8 (else unclear)"}
   - {name: s1_v3_08, set: [checks.facts.policy_table=config/policy_table_v3.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: table v3, yes/no need p >= 0.8"}
   - {name: s1_para_08, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: paraphrased table (wording-shift bench), yes/no need p >= 0.8"}
+  # ---- S2 (ideas_round3): contrastive few-shot examples in the fact probes, fold-aware. NOT runnable directly:
+  # scripts/research/s2_fewshot.py runs each dev fold k with a few-shot file built from folds != k
+  # (checks.facts.fewshot=runs/research/s2/fewshot_fold<k>.json) and merges the 4 runs here; then --rescore.
+  - {name: fs_tuned, set: [checks.facts.parallel=1], description: "S2: tuned table + per-fold contrast few-shot (built by scripts/research/s2_fewshot.py)"}
+  - {name: fs_para, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.parallel=1], description: "S2: paraphrased table + per-fold contrast few-shot (same examples)"}

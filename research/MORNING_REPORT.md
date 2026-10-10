@@ -91,7 +91,7 @@ See `research/findings/RQ*.md`. Each has the setup, a CI table, flips, a recomme
 - Event GPUs: with ≥24 GB, Qwen2.5-14B (or larger) + large-v3 run side by side (`config/recommended-14b.yaml`): more
   robust to question wording on dev, but not better on dev or the holdout here (candidate B above).
 - Tried and rejected after the freeze: S1 "confident clearance" rule (failed its pre-registered tests), paraphrase
-  ensemble (R6). S2 (fold-aware twin few-shot for the fact probes) — see the journal for the result.
+  ensemble (R6), S2 fold-aware twin few-shot (fails 2 of 3 pre-registered rules: flips 11 -> 8, paraphrased AUC 0.70).
 
 ## How to use what is running
 - vLLM (Qwen2.5-7B-AWQ) on :8000: `scripts/remote/swap_llm.sh <hf-id> [util] [max_len]`; stop: `kill $(cat runs/logs/vllm.pid)`.
