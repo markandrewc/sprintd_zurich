@@ -245,6 +245,7 @@ def load_results(runs_dir: str | Path) -> Loaded:
         except Exception as e:
             out.errors.append(f"{f.parent.name}: {type(e).__name__}: {str(e)[:200]}")
             continue
+        _reroot_paths(r)
         if r.call_id in out.results:
             out.errors.append(f"{f.parent.name}: duplicate call id {r.call_id!r} (also in "
                               f"{out.paths[r.call_id].parent.name}); ignored")
@@ -254,6 +255,30 @@ def load_results(runs_dir: str | Path) -> Loaded:
         sig.append((key, *version))
     out.signature = stable_hash(sig)
     return out
+
+
+def reroot(path: str | None, base: Path | None = None) -> str | None:
+    """A path written on another machine (results made on the GPU host and copied here), re-rooted onto
+    this checkout: the longest trailing part of it that exists under ``base`` (default: the working
+    directory), e.g. /home/x/sprintd/data_upstream/.../a.wav -> ./data_upstream/.../a.wav. Unchanged
+    when the path exists as is or no trailing part is found."""
+    if not path or Path(path).exists():
+        return path
+    base = base or Path.cwd()
+    parts = Path(path).parts
+    for i in range(1, len(parts)):
+        candidate = base.joinpath(*parts[i:])
+        if candidate.exists():
+            return str(candidate)
+    return path
+
+
+def _reroot_paths(r: CallResult) -> None:
+    """Audio and snippet paths of a stored result, re-rooted in place (see :func:`reroot`)."""
+    r.audio_path = reroot(r.audio_path)
+    for p in r.decision.passages:
+        if p.snippet_path:
+            p.snippet_path = reroot(p.snippet_path)
 
 
 def write_result(path: str | Path, result: CallResult) -> Path:
