@@ -19,6 +19,7 @@ from typing import Any
 import streamlit as st
 
 from callguard import audit
+from callguard import fact_policy as fpol
 from callguard import policy_edit as pe
 from callguard import rulebook as rb
 from callguard import rule_drafter as rd
@@ -56,6 +57,10 @@ params = fa.check_params(app.engine, getattr(check, "name", "facts"))
 profile = app.cfg.name
 
 
+_fusion = getattr(app.engine.pipeline, "fusion", None) if getattr(app.engine, "pipeline", None) else None
+POLICY_FUSION = _fusion if getattr(_fusion, "rule", None) == "policy" else None
+
+
 def _extra_paths() -> dict[str, Path]:
     """The other files of the rulebook bundle, as this profile reads them."""
     from callguard.routing import DEFAULT_ROUTING
@@ -67,6 +72,8 @@ def _extra_paths() -> dict[str, Path]:
     tuning = app.cfg.paths.tuning
     if tuning:
         out["tuning"] = Path(tuning) if Path(tuning).is_absolute() else ROOT / tuning
+    if POLICY_FUSION is not None:  # profiles deciding with the fact policy: it is part of the fact bundle
+        out["fact_policy"] = fpol.resolve_path(POLICY_FUSION.fact_policy_path)
     return out
 
 
@@ -252,6 +259,12 @@ def _draft_families() -> list[Any] | None:
 
 
 def _decide_draft(r):
+    if POLICY_FUSION is not None:  # both readers under the working copy's fact policy and table
+        fp_doc = ss["rw_extra"].get("fact_policy")
+        pol = fpol.parse_fact_policy(fp_doc) if fp_doc else POLICY_FUSION.fact_policy()
+        fams = _draft_families() or app.all_families
+        return POLICY_FUSION.decide_policy(r.transcript, r.checks, fams, _draft_overrides(), policy=pol,
+                                           tables=work_table.families)
     return app.engine.decide(r, _draft_overrides(), _draft_families())
 
 
