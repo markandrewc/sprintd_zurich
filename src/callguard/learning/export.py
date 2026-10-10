@@ -178,6 +178,8 @@ def manifest(built: Mapping[str, list[dict[str, Any]]], labels: LabelSet, splits
         "trainable_fact_labels": sum(1 for f in facts if f.use in hy.TRAINABLE),
         "fact_sources": dict(Counter(f.source for f in facts)),
         "answers": dict(Counter(f.answer for f in facts)),
+        "reason_codes": dict(Counter(r.get("code") for c in labels.calls.values() for r in c.reasons)),
+        "officer_agrees": dict(Counter(str(c.agrees).lower() for c in labels.calls.values() if c.agrees is not None)),
         "policy_table_hashes": sorted({f.policy_table_hash for f in facts if f.policy_table_hash}),
         "config_hashes": sorted({c.provenance.get("config_hash") for c in labels.calls.values()
                                  if c.provenance.get("config_hash")}),

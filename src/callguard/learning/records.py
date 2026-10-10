@@ -40,6 +40,10 @@ class CallLabel:
     source: str
     provenance: dict[str, Any] = field(default_factory=dict)
     call_use: str = ""  # the call's own use, ignoring the demo marker (what calibration may read)
+    # review form (feedback.items_from_review): did the officer agree with the shown label, and why (reason
+    # codes as dicts: code, family, fact, passage_index, before, after, rule, text). Latest call item wins.
+    agrees: bool | None = None
+    reasons: list[dict[str, Any]] = field(default_factory=list)
 
     def row(self) -> dict[str, Any]:
         return asdict(self)
@@ -133,13 +137,16 @@ def call_labels(items: Sequence[fb.FeedbackItem], results: Mapping[str, CallResu
                 latest_per_officer[i.user] = fb.derive_label(i, stored.get(cid)) or ""
         r = results.get(cid)
         fams = sorted({i.family for i in its if i.family and i.target in ("call", "family", "passage")})
+        why = next((i for i in reversed(its) if i.reasons or (i.target == "call" and i.agrees is not None)), None)
         out[cid] = CallLabel(
             call_id=cid, label=lab, system_label=last.label_seen or stored.get(cid),
             system_family=(r.decision.top_family if r else None) or last.provenance.get("decision", {}).get("top_family"),
             families=fams, verdict=last.verdict, user=last.user, ts=last.ts,
             officers=sorted(latest_per_officer), disagreement=len(set(latest_per_officer.values())) > 1,
             use=_use(cid, splits, last.source), source=last.source, provenance=last.provenance,
-            call_use=hy.use_of(cid, splits))
+            call_use=hy.use_of(cid, splits),
+            agrees=why.agrees if why is not None and why.target == "call" else None,
+            reasons=[r.model_dump(mode="json", exclude_defaults=True) for r in why.reasons] if why else [])
     return out
 
 
