@@ -1,10 +1,10 @@
 {
- "created": "2026-10-10T13:36:17+0200",
- "spec": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a9c21ffda9a23d374/experiments/contrib/candidates.yaml",
+ "created": "2026-10-10T15:33:35+0200",
+ "spec": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a16a203b1c36e3d18/experiments/contrib/candidates.yaml",
  "roots": {
-  "default": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a9c21ffda9a23d374/runs/experiments",
-  "perturbed": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a9c21ffda9a23d374/runs/perturbed/experiments",
-  "test50": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a9c21ffda9a23d374/runs/test50/experiments"
+  "default": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a16a203b1c36e3d18/runs/experiments",
+  "perturbed": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a16a203b1c36e3d18/runs/perturbed/experiments",
+  "test50": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a16a203b1c36e3d18/runs/test50/experiments"
  },
  "n_boot": 2000,
  "seed": 13,
@@ -59,9 +59,169 @@
     },
     "test50": {
      "ref": "test50:test50/champion",
-     "status": "pending",
+     "status": "ok",
      "refs": [
       "test50:test50/champion"
+     ]
+    }
+   },
+   "test50": {
+    "ref": "test50/champion",
+    "dataset": "test50",
+    "n_calls": 100,
+    "n_units": 32,
+    "auc": {
+     "value": 0.8019,
+     "lo": 0.6753,
+     "hi": 0.9039
+    },
+    "fixed": {
+     "false_alarm_rate": {
+      "value": 0.3519,
+      "lo": 0.1833,
+      "hi": 0.5278
+     },
+     "miss_rate": {
+      "value": 0.2174,
+      "lo": 0.0625,
+      "hi": 0.3914
+     },
+     "accuracy": {
+      "value": 0.6,
+      "lo": 0.451,
+      "hi": 0.73
+     },
+     "review_recall": {
+      "value": 0.4167,
+      "lo": 0.125,
+      "hi": 0.75
+     },
+     "flag_f1": {
+      "value": 0.7129,
+      "lo": 0.5961,
+      "hi": 0.8119
+     }
+    },
+    "reviews": {
+     "predicted": 25,
+     "expected": 12,
+     "hit": 5,
+     "n": 100
+    },
+    "breakdown": {
+     "types": {
+      "pair": {
+       "n": 60,
+       "label_acc": 0.6,
+       "flag_acc": 0.7333,
+       "expected": {
+        "alarm": 30,
+        "review": 0,
+        "no_alert": 30
+       }
+      },
+      "trap": {
+       "n": 10,
+       "label_acc": 0.6,
+       "flag_acc": 0.6,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 10
+       }
+      },
+      "review": {
+       "n": 10,
+       "label_acc": 0.4,
+       "flag_acc": 0.7,
+       "expected": {
+        "alarm": 0,
+        "review": 10,
+        "no_alert": 0
+       }
+      },
+      "numbers": {
+       "n": 12,
+       "label_acc": 0.9167,
+       "flag_acc": 0.9167,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 12
+       }
+      },
+      "multi": {
+       "n": 8,
+       "label_acc": 0.375,
+       "flag_acc": 0.375,
+       "expected": {
+        "alarm": 4,
+        "review": 2,
+        "no_alert": 2
+       }
+      }
+     },
+     "audio": {
+      "sauber": {
+       "n": 50,
+       "label_acc": 0.6,
+       "flag_acc": 0.72,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      },
+      "verrauscht": {
+       "n": 50,
+       "label_acc": 0.6,
+       "flag_acc": 0.7,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      }
+     }
+    },
+    "cv": {
+     "false_alarm_rate": {
+      "value": 0.3889,
+      "lo": 0.2188,
+      "hi": 0.5653
+     },
+     "miss_rate": {
+      "value": 0.2174,
+      "lo": 0.0625,
+      "hi": 0.3914
+     },
+     "accuracy": {
+      "value": 0.61,
+      "lo": 0.4894,
+      "hi": 0.7174
+     },
+     "review_recall": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 0.6667
+     },
+     "flag_f1": {
+      "value": 0.699,
+      "lo": 0.5853,
+      "hi": 0.8
+     }
+    },
+    "dev_drop": {
+     "a": 0.8663,
+     "b": 0.8019,
+     "diff": -0.0644,
+     "lo": -0.238,
+     "hi": 0.1148,
+     "real": false,
+     "paired": false,
+     "datasets": [
+      "case",
+      "test50"
      ]
     }
    },
@@ -291,9 +451,215 @@
     },
     "test50": {
      "ref": "test50:test50/champion_v3",
-     "status": "pending",
+     "status": "ok",
      "refs": [
       "test50:test50/champion_v3"
+     ]
+    }
+   },
+   "test50": {
+    "ref": "test50/champion_v3",
+    "dataset": "test50",
+    "n_calls": 100,
+    "n_units": 32,
+    "auc": {
+     "value": 0.8325,
+     "lo": 0.7156,
+     "hi": 0.9229
+    },
+    "fixed": {
+     "false_alarm_rate": {
+      "value": 0.3519,
+      "lo": 0.1833,
+      "hi": 0.5278
+     },
+     "miss_rate": {
+      "value": 0.1304,
+      "lo": 0.0,
+      "hi": 0.2917
+     },
+     "accuracy": {
+      "value": 0.64,
+      "lo": 0.5,
+      "hi": 0.766
+     },
+     "review_recall": {
+      "value": 0.75,
+      "lo": 0.5,
+      "hi": 1.0
+     },
+     "flag_f1": {
+      "value": 0.7619,
+      "lo": 0.6531,
+      "hi": 0.8572
+     }
+    },
+    "reviews": {
+     "predicted": 29,
+     "expected": 12,
+     "hit": 9,
+     "n": 100
+    },
+    "breakdown": {
+     "types": {
+      "pair": {
+       "n": 60,
+       "label_acc": 0.6,
+       "flag_acc": 0.7333,
+       "expected": {
+        "alarm": 30,
+        "review": 0,
+        "no_alert": 30
+       }
+      },
+      "trap": {
+       "n": 10,
+       "label_acc": 0.6,
+       "flag_acc": 0.6,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 10
+       }
+      },
+      "review": {
+       "n": 10,
+       "label_acc": 0.7,
+       "flag_acc": 1.0,
+       "expected": {
+        "alarm": 0,
+        "review": 10,
+        "no_alert": 0
+       }
+      },
+      "numbers": {
+       "n": 12,
+       "label_acc": 0.9167,
+       "flag_acc": 0.9167,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 12
+       }
+      },
+      "multi": {
+       "n": 8,
+       "label_acc": 0.5,
+       "flag_acc": 0.5,
+       "expected": {
+        "alarm": 4,
+        "review": 2,
+        "no_alert": 2
+       }
+      }
+     },
+     "audio": {
+      "sauber": {
+       "n": 50,
+       "label_acc": 0.62,
+       "flag_acc": 0.74,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      },
+      "verrauscht": {
+       "n": 50,
+       "label_acc": 0.66,
+       "flag_acc": 0.76,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      }
+     }
+    },
+    "cv": {
+     "false_alarm_rate": {
+      "value": 0.3889,
+      "lo": 0.2188,
+      "hi": 0.5653
+     },
+     "miss_rate": {
+      "value": 0.1304,
+      "lo": 0.0,
+      "hi": 0.2917
+     },
+     "accuracy": {
+      "value": 0.65,
+      "lo": 0.5319,
+      "hi": 0.7551
+     },
+     "review_recall": {
+      "value": 0.6667,
+      "lo": 0.2,
+      "hi": 1.0
+     },
+     "flag_f1": {
+      "value": 0.7477,
+      "lo": 0.64,
+      "hi": 0.8462
+     }
+    },
+    "vs_ref": {
+     "n_common": 100,
+     "units": 32,
+     "verdict": "gain",
+     "flips": 4,
+     "auc": {
+      "a": 0.8019,
+      "b": 0.8325,
+      "diff": 0.0306,
+      "lo": 0.0023,
+      "hi": 0.0719,
+      "real": true
+     },
+     "false_alarm_rate": {
+      "a": 0.3519,
+      "b": 0.3519,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "real": false
+     },
+     "miss_rate": {
+      "a": 0.2174,
+      "b": 0.1304,
+      "diff": -0.087,
+      "lo": -0.1965,
+      "hi": 0.0,
+      "real": false
+     },
+     "review_recall": {
+      "a": 0.4167,
+      "b": 0.75,
+      "diff": 0.3333,
+      "lo": 0.0,
+      "hi": 0.6677,
+      "real": false
+     },
+     "accuracy": {
+      "a": 0.6,
+      "b": 0.64,
+      "diff": 0.04,
+      "lo": 0.0,
+      "hi": 0.0957,
+      "real": false
+     }
+    },
+    "dev_drop": {
+     "a": 0.9187,
+     "b": 0.8325,
+     "diff": -0.0862,
+     "lo": -0.2225,
+     "hi": 0.0696,
+     "real": false,
+     "paired": false,
+     "datasets": [
+      "case",
+      "test50"
      ]
     }
    },
@@ -496,9 +862,215 @@
     },
     "test50": {
      "ref": "test50:test50/kev_facts",
-     "status": "pending",
+     "status": "ok",
      "refs": [
       "test50:test50/kev_facts"
+     ]
+    }
+   },
+   "test50": {
+    "ref": "test50/kev_facts",
+    "dataset": "test50",
+    "n_calls": 100,
+    "n_units": 32,
+    "auc": {
+     "value": 0.849,
+     "lo": 0.7374,
+     "hi": 0.9392
+    },
+    "fixed": {
+     "false_alarm_rate": {
+      "value": 0.1111,
+      "lo": 0.0,
+      "hi": 0.25
+     },
+     "miss_rate": {
+      "value": 0.4565,
+      "lo": 0.2609,
+      "hi": 0.6591
+     },
+     "accuracy": {
+      "value": 0.61,
+      "lo": 0.4796,
+      "hi": 0.734
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.6494,
+      "lo": 0.4571,
+      "hi": 0.8
+     }
+    },
+    "reviews": {
+     "predicted": 14,
+     "expected": 12,
+     "hit": 0,
+     "n": 100
+    },
+    "breakdown": {
+     "types": {
+      "pair": {
+       "n": 60,
+       "label_acc": 0.65,
+       "flag_acc": 0.7833,
+       "expected": {
+        "alarm": 30,
+        "review": 0,
+        "no_alert": 30
+       }
+      },
+      "trap": {
+       "n": 10,
+       "label_acc": 0.9,
+       "flag_acc": 0.9,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 10
+       }
+      },
+      "review": {
+       "n": 10,
+       "label_acc": 0.0,
+       "flag_acc": 0.4,
+       "expected": {
+        "alarm": 0,
+        "review": 10,
+        "no_alert": 0
+       }
+      },
+      "numbers": {
+       "n": 12,
+       "label_acc": 0.75,
+       "flag_acc": 0.75,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 12
+       }
+      },
+      "multi": {
+       "n": 8,
+       "label_acc": 0.5,
+       "flag_acc": 0.5,
+       "expected": {
+        "alarm": 4,
+        "review": 2,
+        "no_alert": 2
+       }
+      }
+     },
+     "audio": {
+      "sauber": {
+       "n": 50,
+       "label_acc": 0.64,
+       "flag_acc": 0.76,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      },
+      "verrauscht": {
+       "n": 50,
+       "label_acc": 0.58,
+       "flag_acc": 0.7,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      }
+     }
+    },
+    "cv": {
+     "false_alarm_rate": {
+      "value": 0.2037,
+      "lo": 0.0435,
+      "hi": 0.371
+     },
+     "miss_rate": {
+      "value": 0.3696,
+      "lo": 0.18,
+      "hi": 0.5652
+     },
+     "accuracy": {
+      "value": 0.59,
+      "lo": 0.4792,
+      "hi": 0.7019
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.6744,
+      "lo": 0.5122,
+      "hi": 0.8052
+     }
+    },
+    "vs_ref": {
+     "n_common": 100,
+     "units": 32,
+     "verdict": "mixed",
+     "flips": 35,
+     "auc": {
+      "a": 0.8019,
+      "b": 0.849,
+      "diff": 0.0471,
+      "lo": -0.0579,
+      "hi": 0.1661,
+      "real": false
+     },
+     "false_alarm_rate": {
+      "a": 0.3519,
+      "b": 0.1111,
+      "diff": -0.2408,
+      "lo": -0.44,
+      "hi": -0.05,
+      "real": true
+     },
+     "miss_rate": {
+      "a": 0.2174,
+      "b": 0.4565,
+      "diff": 0.2391,
+      "lo": 0.0833,
+      "hi": 0.413,
+      "real": true
+     },
+     "review_recall": {
+      "a": 0.4167,
+      "b": 0.0,
+      "diff": -0.4167,
+      "lo": -0.75,
+      "hi": -0.125,
+      "real": true
+     },
+     "accuracy": {
+      "a": 0.6,
+      "b": 0.61,
+      "diff": 0.01,
+      "lo": -0.125,
+      "hi": 0.1481,
+      "real": false
+     }
+    },
+    "dev_drop": {
+     "a": 0.8566,
+     "b": 0.849,
+     "diff": -0.0076,
+     "lo": -0.1819,
+     "hi": 0.2093,
+     "real": false,
+     "paired": false,
+     "datasets": [
+      "case",
+      "test50"
      ]
     }
    },
@@ -1468,9 +2040,215 @@
     },
     "test50": {
      "ref": "test50:test50/q38q6_facts",
-     "status": "pending",
+     "status": "ok",
      "refs": [
       "test50:test50/q38q6_facts"
+     ]
+    }
+   },
+   "test50": {
+    "ref": "test50/q38q6_facts",
+    "dataset": "test50",
+    "n_calls": 100,
+    "n_units": 32,
+    "auc": {
+     "value": 0.8669,
+     "lo": 0.7553,
+     "hi": 0.9571
+    },
+    "fixed": {
+     "false_alarm_rate": {
+      "value": 0.0741,
+      "lo": 0.0,
+      "hi": 0.1923
+     },
+     "miss_rate": {
+      "value": 0.3913,
+      "lo": 0.1999,
+      "hi": 0.5871
+     },
+     "accuracy": {
+      "value": 0.73,
+      "lo": 0.5957,
+      "hi": 0.847
+     },
+     "review_recall": {
+      "value": 0.1667,
+      "lo": 0.0,
+      "hi": 0.5
+     },
+     "flag_f1": {
+      "value": 0.7179,
+      "lo": 0.5517,
+      "hi": 0.8571
+     }
+    },
+    "reviews": {
+     "predicted": 8,
+     "expected": 12,
+     "hit": 2,
+     "n": 100
+    },
+    "breakdown": {
+     "types": {
+      "pair": {
+       "n": 60,
+       "label_acc": 0.75,
+       "flag_acc": 0.8,
+       "expected": {
+        "alarm": 30,
+        "review": 0,
+        "no_alert": 30
+       }
+      },
+      "trap": {
+       "n": 10,
+       "label_acc": 1.0,
+       "flag_acc": 1.0,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 10
+       }
+      },
+      "review": {
+       "n": 10,
+       "label_acc": 0.2,
+       "flag_acc": 0.4,
+       "expected": {
+        "alarm": 0,
+        "review": 10,
+        "no_alert": 0
+       }
+      },
+      "numbers": {
+       "n": 12,
+       "label_acc": 1.0,
+       "flag_acc": 1.0,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 12
+       }
+      },
+      "multi": {
+       "n": 8,
+       "label_acc": 0.5,
+       "flag_acc": 0.5,
+       "expected": {
+        "alarm": 4,
+        "review": 2,
+        "no_alert": 2
+       }
+      }
+     },
+     "audio": {
+      "sauber": {
+       "n": 50,
+       "label_acc": 0.74,
+       "flag_acc": 0.78,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      },
+      "verrauscht": {
+       "n": 50,
+       "label_acc": 0.72,
+       "flag_acc": 0.78,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      }
+     }
+    },
+    "cv": {
+     "false_alarm_rate": {
+      "value": 0.1111,
+      "lo": 0.0,
+      "hi": 0.2414
+     },
+     "miss_rate": {
+      "value": 0.3043,
+      "lo": 0.1304,
+      "hi": 0.5
+     },
+     "accuracy": {
+      "value": 0.74,
+      "lo": 0.6249,
+      "hi": 0.8469
+     },
+     "review_recall": {
+      "value": 0.1667,
+      "lo": 0.0,
+      "hi": 0.5
+     },
+     "flag_f1": {
+      "value": 0.7619,
+      "lo": 0.6172,
+      "hi": 0.875
+     }
+    },
+    "vs_ref": {
+     "n_common": 100,
+     "units": 32,
+     "verdict": "gain",
+     "flips": 36,
+     "auc": {
+      "a": 0.8019,
+      "b": 0.8669,
+      "diff": 0.065,
+      "lo": -0.0479,
+      "hi": 0.1833,
+      "real": false
+     },
+     "false_alarm_rate": {
+      "a": 0.3519,
+      "b": 0.0741,
+      "diff": -0.2778,
+      "lo": -0.4444,
+      "hi": -0.1296,
+      "real": true
+     },
+     "miss_rate": {
+      "a": 0.2174,
+      "b": 0.3913,
+      "diff": 0.1739,
+      "lo": -0.0238,
+      "hi": 0.375,
+      "real": false
+     },
+     "review_recall": {
+      "a": 0.4167,
+      "b": 0.1667,
+      "diff": -0.25,
+      "lo": -0.75,
+      "hi": 0.3333,
+      "real": false
+     },
+     "accuracy": {
+      "a": 0.6,
+      "b": 0.73,
+      "diff": 0.13,
+      "lo": 0.01,
+      "hi": 0.25,
+      "real": true
+     }
+    },
+    "dev_drop": {
+     "a": 0.8514,
+     "b": 0.8669,
+     "diff": 0.0155,
+     "lo": -0.1626,
+     "hi": 0.2426,
+     "real": false,
+     "paired": false,
+     "datasets": [
+      "case",
+      "test50"
      ]
     }
    },
@@ -1750,9 +2528,215 @@
     },
     "test50": {
      "ref": "test50:test50/qwen_general",
-     "status": "pending",
+     "status": "ok",
      "refs": [
       "test50:test50/qwen_general"
+     ]
+    }
+   },
+   "test50": {
+    "ref": "test50/qwen_general",
+    "dataset": "test50",
+    "n_calls": 100,
+    "n_units": 32,
+    "auc": {
+     "value": 0.7003,
+     "lo": 0.592,
+     "hi": 0.8136
+    },
+    "fixed": {
+     "false_alarm_rate": {
+      "value": 0.2963,
+      "lo": 0.1452,
+      "hi": 0.4783
+     },
+     "miss_rate": {
+      "value": 0.3478,
+      "lo": 0.15,
+      "hi": 0.5556
+     },
+     "accuracy": {
+      "value": 0.58,
+      "lo": 0.4681,
+      "hi": 0.6852
+     },
+     "review_recall": {
+      "value": 0.0833,
+      "lo": 0.0,
+      "hi": 0.3
+     },
+     "flag_f1": {
+      "value": 0.6522,
+      "lo": 0.5057,
+      "hi": 0.7797
+     }
+    },
+    "reviews": {
+     "predicted": 3,
+     "expected": 12,
+     "hit": 1,
+     "n": 100
+    },
+    "breakdown": {
+     "types": {
+      "pair": {
+       "n": 60,
+       "label_acc": 0.6167,
+       "flag_acc": 0.6333,
+       "expected": {
+        "alarm": 30,
+        "review": 0,
+        "no_alert": 30
+       }
+      },
+      "trap": {
+       "n": 10,
+       "label_acc": 0.6,
+       "flag_acc": 0.6,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 10
+       }
+      },
+      "review": {
+       "n": 10,
+       "label_acc": 0.1,
+       "flag_acc": 0.8,
+       "expected": {
+        "alarm": 0,
+        "review": 10,
+        "no_alert": 0
+       }
+      },
+      "numbers": {
+       "n": 12,
+       "label_acc": 0.8333,
+       "flag_acc": 0.8333,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 12
+       }
+      },
+      "multi": {
+       "n": 8,
+       "label_acc": 0.5,
+       "flag_acc": 0.75,
+       "expected": {
+        "alarm": 4,
+        "review": 2,
+        "no_alert": 2
+       }
+      }
+     },
+     "audio": {
+      "sauber": {
+       "n": 50,
+       "label_acc": 0.62,
+       "flag_acc": 0.7,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      },
+      "verrauscht": {
+       "n": 50,
+       "label_acc": 0.54,
+       "flag_acc": 0.66,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      }
+     }
+    },
+    "cv": {
+     "false_alarm_rate": {
+      "value": 0.3889,
+      "lo": 0.22,
+      "hi": 0.5833
+     },
+     "miss_rate": {
+      "value": 0.2826,
+      "lo": 0.1,
+      "hi": 0.4762
+     },
+     "accuracy": {
+      "value": 0.55,
+      "lo": 0.4186,
+      "hi": 0.6667
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.66,
+      "lo": 0.5274,
+      "hi": 0.7732
+     }
+    },
+    "vs_ref": {
+     "n_common": 100,
+     "units": 32,
+     "verdict": "loss",
+     "flips": 42,
+     "auc": {
+      "a": 0.8019,
+      "b": 0.7003,
+      "diff": -0.1016,
+      "lo": -0.2031,
+      "hi": -0.0011,
+      "real": true
+     },
+     "false_alarm_rate": {
+      "a": 0.3519,
+      "b": 0.2963,
+      "diff": -0.0556,
+      "lo": -0.2586,
+      "hi": 0.1407,
+      "real": false
+     },
+     "miss_rate": {
+      "a": 0.2174,
+      "b": 0.3478,
+      "diff": 0.1304,
+      "lo": -0.0652,
+      "hi": 0.3333,
+      "real": false
+     },
+     "review_recall": {
+      "a": 0.4167,
+      "b": 0.0833,
+      "diff": -0.3334,
+      "lo": -0.75,
+      "hi": 0.125,
+      "real": false
+     },
+     "accuracy": {
+      "a": 0.6,
+      "b": 0.58,
+      "diff": -0.02,
+      "lo": -0.1346,
+      "hi": 0.09,
+      "real": false
+     }
+    },
+    "dev_drop": {
+     "a": 0.722,
+     "b": 0.7003,
+     "diff": -0.0217,
+     "lo": -0.2134,
+     "hi": 0.1733,
+     "real": false,
+     "paired": false,
+     "datasets": [
+      "case",
+      "test50"
      ]
     }
    },
@@ -2012,9 +2996,215 @@
     },
     "test50": {
      "ref": "test50:test50/kev_general",
-     "status": "pending",
+     "status": "ok",
      "refs": [
       "test50:test50/kev_general"
+     ]
+    }
+   },
+   "test50": {
+    "ref": "test50/kev_general",
+    "dataset": "test50",
+    "n_calls": 100,
+    "n_units": 32,
+    "auc": {
+     "value": 0.7512,
+     "lo": 0.6487,
+     "hi": 0.8448
+    },
+    "fixed": {
+     "false_alarm_rate": {
+      "value": 0.2593,
+      "lo": 0.1094,
+      "hi": 0.4334
+     },
+     "miss_rate": {
+      "value": 0.5,
+      "lo": 0.3055,
+      "hi": 0.6945
+     },
+     "accuracy": {
+      "value": 0.58,
+      "lo": 0.4651,
+      "hi": 0.6875
+     },
+     "review_recall": {
+      "value": 0.1667,
+      "lo": 0.0,
+      "hi": 0.4
+     },
+     "flag_f1": {
+      "value": 0.5542,
+      "lo": 0.388,
+      "hi": 0.6818
+     }
+    },
+    "reviews": {
+     "predicted": 10,
+     "expected": 12,
+     "hit": 2,
+     "n": 100
+    },
+    "breakdown": {
+     "types": {
+      "pair": {
+       "n": 60,
+       "label_acc": 0.5667,
+       "flag_acc": 0.5833,
+       "expected": {
+        "alarm": 30,
+        "review": 0,
+        "no_alert": 30
+       }
+      },
+      "trap": {
+       "n": 10,
+       "label_acc": 0.8,
+       "flag_acc": 0.8,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 10
+       }
+      },
+      "review": {
+       "n": 10,
+       "label_acc": 0.2,
+       "flag_acc": 0.5,
+       "expected": {
+        "alarm": 0,
+        "review": 10,
+        "no_alert": 0
+       }
+      },
+      "numbers": {
+       "n": 12,
+       "label_acc": 0.9167,
+       "flag_acc": 0.9167,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 12
+       }
+      },
+      "multi": {
+       "n": 8,
+       "label_acc": 0.375,
+       "flag_acc": 0.5,
+       "expected": {
+        "alarm": 4,
+        "review": 2,
+        "no_alert": 2
+       }
+      }
+     },
+     "audio": {
+      "sauber": {
+       "n": 50,
+       "label_acc": 0.6,
+       "flag_acc": 0.64,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      },
+      "verrauscht": {
+       "n": 50,
+       "label_acc": 0.56,
+       "flag_acc": 0.62,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      }
+     }
+    },
+    "cv": {
+     "false_alarm_rate": {
+      "value": 0.5556,
+      "lo": 0.3833,
+      "hi": 0.7391
+     },
+     "miss_rate": {
+      "value": 0.1087,
+      "lo": 0.0,
+      "hi": 0.2391
+     },
+     "accuracy": {
+      "value": 0.51,
+      "lo": 0.4215,
+      "hi": 0.6
+     },
+     "review_recall": {
+      "value": 0.25,
+      "lo": 0.0,
+      "hi": 0.625
+     },
+     "flag_f1": {
+      "value": 0.7009,
+      "lo": 0.6094,
+      "hi": 0.7874
+     }
+    },
+    "vs_ref": {
+     "n_common": 100,
+     "units": 32,
+     "verdict": "loss",
+     "flips": 49,
+     "auc": {
+      "a": 0.8019,
+      "b": 0.7512,
+      "diff": -0.0507,
+      "lo": -0.1573,
+      "hi": 0.0754,
+      "real": false
+     },
+     "false_alarm_rate": {
+      "a": 0.3519,
+      "b": 0.2593,
+      "diff": -0.0926,
+      "lo": -0.3096,
+      "hi": 0.1207,
+      "real": false
+     },
+     "miss_rate": {
+      "a": 0.2174,
+      "b": 0.5,
+      "diff": 0.2826,
+      "lo": 0.0624,
+      "hi": 0.5,
+      "real": true
+     },
+     "review_recall": {
+      "a": 0.4167,
+      "b": 0.1667,
+      "diff": -0.25,
+      "lo": -0.5,
+      "hi": 0.1667,
+      "real": false
+     },
+     "accuracy": {
+      "a": 0.6,
+      "b": 0.58,
+      "diff": -0.02,
+      "lo": -0.1445,
+      "hi": 0.1146,
+      "real": false
+     }
+    },
+    "dev_drop": {
+     "a": 0.7885,
+     "b": 0.7512,
+     "diff": -0.0373,
+     "lo": -0.2065,
+     "hi": 0.1625,
+     "real": false,
+     "paired": false,
+     "datasets": [
+      "case",
+      "test50"
      ]
     }
    },
@@ -2500,9 +3690,215 @@
     },
     "test50": {
      "ref": "test50:test50/q38q6_general",
-     "status": "pending",
+     "status": "ok",
      "refs": [
       "test50:test50/q38q6_general"
+     ]
+    }
+   },
+   "test50": {
+    "ref": "test50/q38q6_general",
+    "dataset": "test50",
+    "n_calls": 100,
+    "n_units": 32,
+    "auc": {
+     "value": 0.8257,
+     "lo": 0.7152,
+     "hi": 0.9204
+    },
+    "fixed": {
+     "false_alarm_rate": {
+      "value": 0.2407,
+      "lo": 0.0961,
+      "hi": 0.4167
+     },
+     "miss_rate": {
+      "value": 0.2826,
+      "lo": 0.1111,
+      "hi": 0.4706
+     },
+     "accuracy": {
+      "value": 0.68,
+      "lo": 0.5472,
+      "hi": 0.7885
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.7174,
+      "lo": 0.5789,
+      "hi": 0.8333
+     }
+    },
+    "reviews": {
+     "predicted": 2,
+     "expected": 12,
+     "hit": 0,
+     "n": 100
+    },
+    "breakdown": {
+     "types": {
+      "pair": {
+       "n": 60,
+       "label_acc": 0.7333,
+       "flag_acc": 0.7333,
+       "expected": {
+        "alarm": 30,
+        "review": 0,
+        "no_alert": 30
+       }
+      },
+      "trap": {
+       "n": 10,
+       "label_acc": 0.8,
+       "flag_acc": 0.8,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 10
+       }
+      },
+      "review": {
+       "n": 10,
+       "label_acc": 0.0,
+       "flag_acc": 0.6,
+       "expected": {
+        "alarm": 0,
+        "review": 10,
+        "no_alert": 0
+       }
+      },
+      "numbers": {
+       "n": 12,
+       "label_acc": 0.8333,
+       "flag_acc": 0.8333,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 12
+       }
+      },
+      "multi": {
+       "n": 8,
+       "label_acc": 0.75,
+       "flag_acc": 0.75,
+       "expected": {
+        "alarm": 4,
+        "review": 2,
+        "no_alert": 2
+       }
+      }
+     },
+     "audio": {
+      "sauber": {
+       "n": 50,
+       "label_acc": 0.7,
+       "flag_acc": 0.76,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      },
+      "verrauscht": {
+       "n": 50,
+       "label_acc": 0.66,
+       "flag_acc": 0.72,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      }
+     }
+    },
+    "cv": {
+     "false_alarm_rate": {
+      "value": 0.3704,
+      "lo": 0.2,
+      "hi": 0.5556
+     },
+     "miss_rate": {
+      "value": 0.1739,
+      "lo": 0.04,
+      "hi": 0.3333
+     },
+     "accuracy": {
+      "value": 0.62,
+      "lo": 0.5098,
+      "hi": 0.7292
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.7308,
+      "lo": 0.6182,
+      "hi": 0.8302
+     }
+    },
+    "vs_ref": {
+     "n_common": 100,
+     "units": 32,
+     "verdict": "noise",
+     "flips": 45,
+     "auc": {
+      "a": 0.8019,
+      "b": 0.8257,
+      "diff": 0.0238,
+      "lo": -0.0694,
+      "hi": 0.1296,
+      "real": false
+     },
+     "false_alarm_rate": {
+      "a": 0.3519,
+      "b": 0.2407,
+      "diff": -0.1112,
+      "lo": -0.3333,
+      "hi": 0.1034,
+      "real": false
+     },
+     "miss_rate": {
+      "a": 0.2174,
+      "b": 0.2826,
+      "diff": 0.0652,
+      "lo": -0.1818,
+      "hi": 0.3,
+      "real": false
+     },
+     "review_recall": {
+      "a": 0.4167,
+      "b": 0.0,
+      "diff": -0.4167,
+      "lo": -0.75,
+      "hi": -0.125,
+      "real": true
+     },
+     "accuracy": {
+      "a": 0.6,
+      "b": 0.68,
+      "diff": 0.08,
+      "lo": -0.0417,
+      "hi": 0.2,
+      "real": false
+     }
+    },
+    "dev_drop": {
+     "a": 0.861,
+     "b": 0.8257,
+     "diff": -0.0353,
+     "lo": -0.2018,
+     "hi": 0.1536,
+     "real": false,
+     "paired": false,
+     "datasets": [
+      "case",
+      "test50"
      ]
     }
    },
@@ -2937,7 +4333,7 @@
     "cost": {
      "s_per_call": 19.71,
      "llm_calls_per_call": 21.65,
-     "wall_s_per_call": 0.001
+     "wall_s_per_call": null
     },
     "tags": [],
     "description": "R1 label agreement, tuned table",
@@ -3514,9 +4910,156 @@
      "refs": []
     },
     "test50": {
-     "ref": "test50:test50/champion",
-     "refs": [],
-     "status": "pending"
+     "ref": "trivial/flag_all@test50",
+     "status": "ok",
+     "refs": []
+    }
+   },
+   "test50": {
+    "ref": "trivial/flag_all@test50",
+    "dataset": "test50",
+    "n_calls": 100,
+    "n_units": 32,
+    "auc": {
+     "value": 0.5,
+     "lo": 0.5,
+     "hi": 0.5
+    },
+    "fixed": {
+     "false_alarm_rate": {
+      "value": 1.0,
+      "lo": 1.0,
+      "hi": 1.0
+     },
+     "miss_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "accuracy": {
+      "value": 0.34,
+      "lo": 0.2449,
+      "hi": 0.4231
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.6301,
+      "lo": 0.5294,
+      "hi": 0.7222
+     }
+    },
+    "reviews": {
+     "predicted": 0,
+     "expected": 12,
+     "hit": 0,
+     "n": 100
+    },
+    "breakdown": {
+     "types": {
+      "pair": {
+       "n": 60,
+       "label_acc": 0.5,
+       "flag_acc": 0.5,
+       "expected": {
+        "alarm": 30,
+        "review": 0,
+        "no_alert": 30
+       }
+      },
+      "trap": {
+       "n": 10,
+       "label_acc": 0.0,
+       "flag_acc": 0.0,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 10
+       }
+      },
+      "review": {
+       "n": 10,
+       "label_acc": 0.0,
+       "flag_acc": 1.0,
+       "expected": {
+        "alarm": 0,
+        "review": 10,
+        "no_alert": 0
+       }
+      },
+      "numbers": {
+       "n": 12,
+       "label_acc": 0.0,
+       "flag_acc": 0.0,
+       "expected": {
+        "alarm": 0,
+        "review": 0,
+        "no_alert": 12
+       }
+      },
+      "multi": {
+       "n": 8,
+       "label_acc": 0.5,
+       "flag_acc": 0.75,
+       "expected": {
+        "alarm": 4,
+        "review": 2,
+        "no_alert": 2
+       }
+      }
+     },
+     "audio": {
+      "sauber": {
+       "n": 50,
+       "label_acc": 0.34,
+       "flag_acc": 0.46,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      },
+      "verrauscht": {
+       "n": 50,
+       "label_acc": 0.34,
+       "flag_acc": 0.46,
+       "expected": {
+        "alarm": 17,
+        "review": 6,
+        "no_alert": 27
+       }
+      }
+     }
+    },
+    "cv": {
+     "false_alarm_rate": {
+      "value": 1.0,
+      "lo": 1.0,
+      "hi": 1.0
+     },
+     "miss_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "accuracy": {
+      "value": 0.34,
+      "lo": 0.2449,
+      "hi": 0.4231
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.6301,
+      "lo": 0.5294,
+      "hi": 0.7222
+     }
     }
    },
    "tuned": {
@@ -3639,7 +5182,7 @@
    }
   }
  ],
- "fingerprint": 1791632009.0915391,
+ "fingerprint": 1791639208.7812285,
  "evidence_note": "Beleg hit@1 = Anteil der richtig markierten Anrufe, deren erste angezeigte Passage eine annotierte Beleg-Zeile trifft (`callguard evidence-eval`-Methode, Dev). „Zufall“ = was eine gleich lange Passage an zufälliger Stelle träfe: lange Passagen (Kev allgemein, ~48 s) treffen schon zufällig oft. Anrufe ohne Passage zählen als Fehltreffer.",
  "best": {
   "auc": {
@@ -3739,30 +5282,54 @@
    "real_vs_ref": {
     "gen_kev": false
    }
+  },
+  "t50_auc": {
+   "ids": [
+    "q38q6"
+   ],
+   "value": 0.8669,
+   "real_vs_ref": {
+    "q38q6": false
+   }
+  },
+  "t50_far": {
+   "ids": [
+    "q38q6"
+   ],
+   "value": 0.0741,
+   "real_vs_ref": {
+    "q38q6": true
+   }
+  },
+  "t50_miss": {
+   "ids": [
+    "champion_v3"
+   ],
+   "value": 0.1304,
+   "real_vs_ref": {
+    "champion_v3": false
+   }
+  },
+  "t50_acc": {
+   "ids": [
+    "q38q6"
+   ],
+   "value": 0.73,
+   "real_vs_ref": {
+    "q38q6": true
+   }
+  },
+  "t50_rr": {
+   "ids": [
+    "champion_v3"
+   ],
+   "value": 0.75,
+   "real_vs_ref": {
+    "champion_v3": false
+   }
   }
  },
  "pending": [
-  {
-   "candidate": "champion",
-   "label": "Champion: Qwen2.5-7B Fakten, Tabelle v1",
-   "slot": "test50",
-   "ref": "test50:test50/champion",
-   "status": "pending"
-  },
-  {
-   "candidate": "champion_v3",
-   "label": "Champion mit Tabelle v3",
-   "slot": "test50",
-   "ref": "test50:test50/champion_v3",
-   "status": "pending"
-  },
-  {
-   "candidate": "kev",
-   "label": "Kev-4B Fakten, Tabelle v1",
-   "slot": "test50",
-   "ref": "test50:test50/kev_facts",
-   "status": "pending"
-  },
   {
    "candidate": "q38q6",
    "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v1",
@@ -3775,13 +5342,6 @@
    "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v1",
    "slot": "rerecorded",
    "ref": "perturbed:qwen38_q6_perturbed/q38q6_facts",
-   "status": "pending"
-  },
-  {
-   "candidate": "q38q6",
-   "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v1",
-   "slot": "test50",
-   "ref": "test50:test50/q38q6_facts",
    "status": "pending"
   },
   {
@@ -3799,20 +5359,6 @@
    "status": "pending"
   },
   {
-   "candidate": "gen_qwen",
-   "label": "Allgemeine Fragen auf Qwen2.5-7B",
-   "slot": "test50",
-   "ref": "test50:test50/qwen_general",
-   "status": "pending"
-  },
-  {
-   "candidate": "gen_kev",
-   "label": "Allgemeine Fragen auf Kev-4B (Teamkollege)",
-   "slot": "test50",
-   "ref": "test50:test50/kev_general",
-   "status": "pending"
-  },
-  {
    "candidate": "gen_q38q6",
    "label": "Allgemeine Fragen auf Qwen3.8 6-bit",
    "slot": "reworded",
@@ -3824,20 +5370,6 @@
    "label": "Allgemeine Fragen auf Qwen3.8 6-bit",
    "slot": "rerecorded",
    "ref": "perturbed:qwen38_q6_perturbed/q38q6_general",
-   "status": "pending"
-  },
-  {
-   "candidate": "gen_q38q6",
-   "label": "Allgemeine Fragen auf Qwen3.8 6-bit",
-   "slot": "test50",
-   "ref": "test50:test50/q38q6_general",
-   "status": "pending"
-  },
-  {
-   "candidate": "flag_all",
-   "label": "Alles markieren (Alarm)",
-   "slot": "test50",
-   "ref": "test50:test50/champion",
    "status": "pending"
   }
  ]

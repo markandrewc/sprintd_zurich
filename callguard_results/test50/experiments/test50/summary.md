@@ -2,7 +2,7 @@
 
 External held-out test50 (FHNW TTS, 8 dialects) - fixed candidate list, one run each
 
-RQ: RQ10 · base profile `recommended-test50` · split **external** · baseline `champion` · commit 4d318d2b77 · 2026-10-10T13:52:54+0200 · bootstrap 2000x over twin groups / dialogues (seed 13)
+RQ: RQ10 · base profile `recommended-test50` · split **external** · baseline `champion` · commit 98bd55751a · 2026-10-10T15:33:28+0200 · bootstrap 2000x over twin groups / dialogues (seed 13)
 
 Flag = alarm or review (a human listens). FAR = flagged harmless / harmless. miss = unflagged flaggable / flaggable. CV = threshold chosen on the other dev folds (primary number); fixed = the variant's configured threshold. With ~24 dev dialogues (~18 independent units once the Stufe2 twins are paired), CIs are wide: a difference counts only if its CI excludes 0.
 
@@ -22,6 +22,8 @@ AUC is not decision-consistent: it ranks the fused call score, but the label als
 | qwen_general | 0.70 [0.59, 0.81] | 0.64 [0.51, 0.78] | 46/54 |  |
 | kev_facts | 0.85 [0.74, 0.94] | 0.85 [0.73, 0.94] | 46/54 |  |
 | kev_general | 0.75 [0.65, 0.84] | 0.72 [0.59, 0.84] | 46/54 |  |
+| q38q6_facts | 0.87 [0.76, 0.96] | 0.90 [0.78, 0.98] | 46/54 |  |
+| q38q6_general | 0.83 [0.72, 0.92] | 0.81 [0.67, 0.93] | 46/54 |  |
 
 ## Out-of-fold (CV) - primary
 
@@ -33,6 +35,8 @@ AUC is not decision-consistent: it ranks the fused call score, but the label als
 | qwen_general | 100 | 0.66 [0.53, 0.77] | 61% | 72% | 39% [22%, 58%] | 28% [10%, 48%] | 0.53 | 0% | 55% | 0.66 [0.56, 0.77] |  |
 | kev_facts | 100 | 0.67 [0.51, 0.81] | 72% | 63% | 20% [4%, 37%] | 37% [18%, 57%] | 0.53 | 0% | 59% | 0.71 [0.59, 0.83] |  |
 | kev_general | 100 | 0.70 [0.61, 0.79] | 58% | 89% | 56% [38%, 74%] | 11% [0%, 24%] | 0.55 | 25% | 51% | 0.67 [0.59, 0.75] |  |
+| q38q6_facts | 100 | 0.76 [0.62, 0.88] | 84% | 70% | 11% [0%, 24%] | 30% [13%, 50%] | 0.76 | 17% | 74% | 0.79 [0.69, 0.89] |  |
+| q38q6_general | 100 | 0.73 [0.62, 0.83] | 66% | 83% | 37% [20%, 56%] | 17% [4%, 33%] | 0.62 | 0% | 62% | 0.73 [0.63, 0.83] |  |
 
 ## Out-of-fold at the FAR cap (CV@FAR20)
 
@@ -46,6 +50,8 @@ Threshold per fold = highest flag recall with FAR <= 20% on the other dev folds 
 | qwen_general | 100 | 0.59 [0.43, 0.72] | 62% | 57% | 30% [15%, 48%] | 43% [24%, 64%] | 0.26 | 42% | 49% | 0.63 [0.54, 0.74] |  |
 | kev_facts | 100 | 0.74 [0.56, 0.86] | 78% | 70% | 17% [4%, 33%] | 30% [14%, 50%] | 0.53 | 8% | 62% | 0.76 [0.64, 0.87] |  |
 | kev_general | 100 | 0.52 [0.34, 0.67] | 70% | 41% | 15% [4%, 30%] | 59% [39%, 77%] | 0.48 | 0% | 59% | 0.63 [0.54, 0.72] |  |
+| q38q6_facts | 100 | 0.78 [0.63, 0.89] | 85% | 72% | 11% [0%, 24%] | 28% [11%, 48%] | 0.76 | 17% | 74% | 0.80 [0.69, 0.90] |  |
+| q38q6_general | 100 | 0.75 [0.62, 0.85] | 79% | 72% | 17% [4%, 33%] | 28% [11%, 46%] | 0.66 | 8% | 70% | 0.78 [0.67, 0.87] |  |
 
 **Can the cap be met at all?** The review rules (uncertainty escalation, "undetermined" verdicts, review band, abstention) flag calls whatever the threshold. *FAR floor* = FAR at threshold 1.0 on these calls (review rules only); above 20% no threshold reaches the cap. *Folds cap reachable* = training folds where some threshold met the cap; the other folds fell back to the lowest-FAR threshold (marked `!` in the fold thresholds below). *Compliant* = out-of-fold CV@FAR20 FAR <= 20%.
 
@@ -57,6 +63,8 @@ Threshold per fold = highest flag recall with FAR <= 20% on the other dev folds 
 | qwen_general | 26% (!) | 0/5 | 30% | **no** | - |
 | kev_facts | 11% | 5/5 | 17% | yes | - |
 | kev_general | 7% | 5/5 | 15% | yes | - |
+| q38q6_facts | 6% | 5/5 | 11% | yes | - |
+| q38q6_general | 15% | 4/5 | 17% | yes | - |
 
 ## Fixed threshold
 
@@ -68,6 +76,8 @@ Threshold per fold = highest flag recall with FAR <= 20% on the other dev folds 
 | qwen_general | 100 | 0.65 [0.51, 0.78] | 65% | 65% | 30% [15%, 48%] | 35% [15%, 56%] | 0.49 | 8% | 58% | 0.68 [0.58, 0.78] |  |
 | kev_facts | 100 | 0.65 [0.46, 0.80] | 81% | 54% | 11% [0%, 25%] | 46% [26%, 66%] | 0.51 | 0% | 61% | 0.72 [0.60, 0.82] |  |
 | kev_general | 100 | 0.55 [0.39, 0.68] | 62% | 50% | 26% [11%, 43%] | 50% [31%, 69%] | 0.52 | 17% | 58% | 0.62 [0.52, 0.72] |  |
+| q38q6_facts | 100 | 0.72 [0.55, 0.86] | 88% | 61% | 7% [0%, 19%] | 39% [20%, 59%] | 0.72 | 17% | 73% | 0.77 [0.66, 0.87] |  |
+| q38q6_general | 100 | 0.72 [0.58, 0.83] | 72% | 72% | 24% [10%, 42%] | 28% [11%, 47%] | 0.69 | 0% | 68% | 0.74 [0.62, 0.85] |  |
 
 ## Threshold, cost, errors
 
@@ -79,6 +89,8 @@ Threshold per fold = highest flag recall with FAR <= 20% on the other dev folds 
 | qwen_general | 0.70 | 0.20 | 0.20, 0.40, 0.20, 0.20, 0.20 (FAR20: 0.80!, 1.00!, 1.00!, 1.00!, 1.00!) | 1.8 | asr 0.0, diarize 0.0, checks 1.8 | 1.8 | 15.0 | 0 | 0 | 4d318d2b77 |
 | kev_facts | 0.55 | 0.20 | 0.20, 0.25, 0.20, 0.20, 0.20 (FAR20: 0.25, 0.20, 0.25, 0.25, 0.20) | 7.2 | asr 0.0, diarize 0.0, checks 7.1 | 7.2 | 20.0 | 0 | 0 | 4d318d2b77 |
 | kev_general | 0.70 | 0.35 | 0.35, 0.35, 0.35, 0.45, 0.35 (FAR20: 0.90, 0.75, 0.80, 0.80, 0.85) | 1.0 | asr 0.0, diarize 0.0, checks 1.0 | 1.0 | 3.2 | 0 | 0 | 4d318d2b77 |
+| q38q6_facts | 0.55 | 0.25 | 0.25, 0.20, 0.30, 0.25, 0.25 (FAR20: 0.25, 0.20, 0.20, 0.20, 0.20) | 110.6 | asr 0.0, diarize 0.0, checks 110.5 | 110.5 | 20.0 | 0 | 0 | 9b3cbfd28d |
+| q38q6_general | 0.70 | 0.25 | 0.25, 0.25, 0.25, 0.65, 0.25 (FAR20: 0.95!, 0.65, 0.65, 0.95, 0.95) | 96.8 | asr 0.0, diarize 0.0, checks 96.7 | 96.7 | 15.0 | 0 | 0 | 9b3cbfd28d |
 
 `!` after a FAR20 fold threshold: no threshold met the 20% cap on that fold's training folds; the lowest-FAR threshold was used (fallback).
 
@@ -92,6 +104,8 @@ Threshold per fold = highest flag recall with FAR <= 20% on the other dev folds 
 | qwen_general | 0.00 / 60% / - | 0.66 / 34% / 31% | 0.89 / - / 20% | 0.64 / 41% / 30% | 0.68 / 37% / 26% |
 | kev_facts | 0.00 / 20% / - | 0.71 / 20% / 31% | 0.57 / - / 60% | 0.70 / 19% / 35% | 0.65 / 22% / 39% |
 | kev_general | 0.00 / 50% / - | 0.67 / 57% / 14% | 1.00 / - / 0% | 0.70 / 52% / 13% | 0.70 / 59% / 9% |
+| q38q6_facts | - / 0% / - | 0.80 / 14% / 22% | 0.57 / - / 60% | 0.73 / 11% / 35% | 0.79 / 11% / 26% |
+| q38q6_general | 0.00 / 20% / - | 0.71 / 41% / 17% | 0.89 / - / 20% | 0.73 / 37% / 17% | 0.73 / 37% / 17% |
 
 ## `champion_v3` vs `champion`
 
@@ -527,4 +541,208 @@ Flips (cv, 59 calls):
 | T50-trade-03-B-K2 | no_alert | no_alert | alarm | 0.00/0.60 | broken | 00:00-00:36 trade: Guten Tag, Herr Welty, hier ist Nina Kadob. Sie haben heute Morgen angerufen, als ich in einer Sitzung war. Was kann ich für Sie machen? Guten Tag, Frau Kadob. Es geht um zwei Sache... | Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
 | T50-trade-review-K1 | review | review | alarm | 0.84/0.98 | same | 00:15-00:46 trade: Ein Freund der Garderube hat erzählt, dass die Kelsa ein neues Hörgerät herausbringt, das viel kleiner ist als alle anderen. Die Aktie soll darum stark steigen. Wissen Sie, wie er d... | facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.60) - Die Kunde berichtet von Informationen, die ihr Freundin aus dem Fitnesscenter mitgeteilt hat. (Regel: trade.alarm_1) |
 | T50-trade-review-K2 | review | review | alarm | 0.50/0.98 | same | 00:15-00:40 trade: Ein Freund der Garderube hat erzählt, dass die Kelsa ein neues Hörgerät herausbringt, das viel kleiner ist als alle anderen. Die Aktie soll darum stark steigen. Wissen Sie, wie er d... | facts: Fakt: Eigener Handelswunsch geäussert = ja (1.00) - Der Kunde möchte Aktien von Kelsa für 5'000 Franken kaufen. (Regel: trade.review_1) |
+
+## `q38q6_facts` vs `champion`
+
+**Threshold-free (ROC AUC of the call score)** - 100 calls; difference = q38q6_facts - champion
+
+| metric | champion | q38q6_facts | diff | 95% CI |  |
+|---|---|---|---|---|---|
+| flag AUC | 0.80 | 0.87 | +0.065 | [-0.048, +0.183] | no detectable difference |
+| alarm AUC | 0.80 | 0.90 | +0.097 | [-0.028, +0.246] | no detectable difference |
+
+**Out-of-fold (CV, max-F1 threshold)** - 100 calls / 50 dialogues (32 resampling units: twins together); difference = q38q6_facts - champion
+
+| metric | champion | q38q6_facts | diff | 95% CI |  |
+|---|---|---|---|---|---|
+| flag_f1 | 0.70 | 0.76 | +0.063 | [-0.102, +0.227] | no detectable difference |
+| alarm_f1 | 0.65 | 0.76 | +0.113 | [-0.068, +0.309] | no detectable difference |
+| false_alarm_rate | 39% | 11% | -28pp | [-45pp, -13pp] | **real**: q38q6_facts better |
+| miss_rate | 22% | 30% | +9pp | [-14pp, +31pp] | no detectable difference |
+| accuracy | 61% | 74% | +13pp | [+2pp, +25pp] | **real**: q38q6_facts better |
+| review_recall | 33% | 17% | -17pp | [-60pp, +25pp] | no detectable difference |
+| flag_balanced_accuracy | 0.70 | 0.79 | +0.095 | [-0.035, +0.230] | no detectable difference |
+
+McNemar exact (calls): flag correct only-champion 10 vs only-q38q6_facts 21, p=0.0708; 3-class only-champion 10 vs only-q38q6_facts 23, p=0.0351.
+
+**Out-of-fold (CV@FAR20: max recall with FAR <= 20%)** - 100 calls / 50 dialogues (32 resampling units: twins together); difference = q38q6_facts - champion
+
+| metric | champion | q38q6_facts | diff | 95% CI |  |
+|---|---|---|---|---|---|
+| flag_f1 | 0.68 | 0.78 | +0.096 | [-0.065, +0.269] | no detectable difference |
+| alarm_f1 | 0.30 | 0.76 | +0.462 | [+0.186, +0.740] | **real**: q38q6_facts better |
+| false_alarm_rate | 33% | 11% | -22pp | [-40pp, -8pp] | **real**: q38q6_facts better |
+| miss_rate | 28% | 28% | +0pp | [-25pp, +24pp] | no detectable difference |
+| accuracy | 48% | 74% | +26pp | [+12pp, +39pp] | **real**: q38q6_facts better |
+| review_recall | 50% | 17% | -33pp | [-86pp, +33pp] | no detectable difference |
+| flag_balanced_accuracy | 0.69 | 0.80 | +0.111 | [-0.021, +0.246] | no detectable difference |
+
+McNemar exact (calls): flag correct only-champion 10 vs only-q38q6_facts 22, p=0.0501; 3-class only-champion 8 vs only-q38q6_facts 34, p=0.0001.
+
+**Fixed threshold** - 100 calls / 50 dialogues (32 resampling units: twins together); difference = q38q6_facts - champion
+
+| metric | champion | q38q6_facts | diff | 95% CI |  |
+|---|---|---|---|---|---|
+| flag_f1 | 0.71 | 0.72 | +0.005 | [-0.159, +0.161] | no detectable difference |
+| alarm_f1 | 0.62 | 0.72 | +0.099 | [-0.053, +0.278] | no detectable difference |
+| false_alarm_rate | 35% | 7% | -28pp | [-44pp, -13pp] | **real**: q38q6_facts better |
+| miss_rate | 22% | 39% | +17pp | [-2pp, +38pp] | no detectable difference |
+| accuracy | 60% | 73% | +13pp | [+1pp, +25pp] | **real**: q38q6_facts better |
+| review_recall | 42% | 17% | -25pp | [-75pp, +33pp] | no detectable difference |
+| flag_balanced_accuracy | 0.72 | 0.77 | +0.052 | [-0.065, +0.177] | no detectable difference |
+
+McNemar exact (calls): flag correct only-champion 11 vs only-q38q6_facts 18, p=0.2649; 3-class only-champion 8 vs only-q38q6_facts 21, p=0.0241.
+
+Flips (cv, 39 calls):
+
+| call | expected | champion | q38q6_facts | score a/b | flag | decisive passage / reason (b) | reason (a) |
+|---|---|---|---|---|---|---|---|
+| T50-access-01-A-K2 | alarm | no_alert | review | 0.01/0.18 | fixed | Prüfen (knapp unter Schwelle): Score 0.18 für 'Zugangsinformation preisgegeben' liegt zwischen 0.15 und der Schwelle 0.30. | Kein Alarm: höchster Score 0.01 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-access-02-A-K1 | no_alert | review | no_alert | 0.15/0.00 | fixed | 00:54-01:02 access: Ich lese Ihnen die sechs Ziffern, die ich vorhin vor mir hatte, einfach vor. Fünf, drei, acht, null, eins, sieben. Sagen Sie mir, ob das ins zweite Feld gehört. - Kein Alarm: höchs... | facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde las die sechs Ziffern vor, die er vorher vor sich hatte. (Regel: access.no_alert) |
+| T50-access-02-A-K2 | no_alert | alarm | no_alert | 0.85/0.00 | fixed | 00:57-01:02 access: Fünf, drei, acht, null, eins, sieben. Sagen Sie mir, ob das ins zweite Feld gehört. - Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.10 (Schwelle... | facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde las den Wert von sechs Ziffern vor, obwohl der Berater ihn nicht benötigte. (Regel: access.alarm_1) |
+| T50-access-02-B-K2 | alarm | alarm | review | 0.99/0.18 | same | 00:54-01:01 access: lese Ihnen die sechs Ziffern, die ich vorhin vor mir hatte, einfach vor. 5, 3, 8, 0, 1, 7. Das ist das zweite Feld gehört. - Prüfen (knapp unter Schwelle): Score 0.18 für 'Zugangsi... | facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde las den Aktivierungscode vor, der für das Online-Banking verwendet wird. (Regel: access.alarm_1) |
+| T50-access-03-A-K1 | alarm | alarm | no_alert | 0.50/0.07 | broken | 01:06-01:13 disclosure: Die vier Ziffern aus dem Brief von vorhin lauten sechs, eins, neun, drei. Ist das die richtige Zahl für den Laden? - Kein Alarm: höchster Score 0.07 ('Zugangsinformation preisg... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.52) - Der Advisor gibt die vier Ziffern aus dem Brief an, die zu einer anderen Karte gehören. (Regel: disclosure.review_1) |
+| T50-access-03-A-K2 | alarm | review | no_alert | 0.47/0.09 | broken | 01:06-01:18 access: Die vier Ziffern aus dem Brief von vorhin lauten sechs, eins, neun, drei. Ist das die richtige Zahl für den Laden? Bitte sagt ihr mir solche Zahlen nie am Telefon. Ihr könnt den Bi... | facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde gibt die vier Ziffern aus dem Brief zum Laden am Telefon preis. (Regel: access.review_1) |
+| T50-access-review-K2 | review | no_alert | review | 0.17/0.51 | fixed | 01:03-01:04 access: 492806. Vielleicht hilft Ihnen das ja. - patterns: Kundschaft liest möglichen Zugangscode (6 Ziffern) vor, Stichwort «Code» | Kein Alarm: höchster Score 0.17 ('Zugangsinformation preisgegeben') liegt unter 0.70 (Schwelle 0.85 minus Band 0.15). |
+| T50-access-trap-K2 | no_alert | review | no_alert | 0.06/0.02 | fixed | 00:03-00:10 access: Guten Tag, Frau Stalder, hier ist der Daniel Vogt. Sie haben Ihr Passwort vergessen, habe ich gelesen. Ja, schlicht. Ich habe es aus letzter Woche geändert und jetzt fällt es mir n... | keywords: Stichwort K10 «Passwort» (Zugangswörter) |
+| T50-disclosure-01-A-K1 | alarm | alarm | review | 0.85/0.85 | same | 00:22-00:23 disclosure: Für das Konto ihrer Mutter ist bei uns keine Vollmacht für sie eingetragen, sie haben dort also keinen Zugang. - keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigu... | facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (0.78) - Die Mitarbeiterin sagt explizit, dass keine Vollmacht für die Klientin eingetragen ist. (Regel: disclosure.alarm_1) |
+| T50-disclosure-01-A-K2 | alarm | alarm | review | 0.90/0.84 | same | 00:22-00:23 disclosure: Für das Konto ihrer Mutter ist bei uns keine Vollmacht für sie eingefragen. Sie haben dort also keinen Zugang. - keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigu... | facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (0.87) - Die Kunde sagt, dass sie keine Vollmacht für das Konto ihrer Mutter eingefragen hat. (Regel: disclosure.alarm_1) |
+| T50-disclosure-01-B-K1 | no_alert | review | no_alert | 0.47/0.04 | fixed | 00:05-01:03 disclosure: Guten Tag, hier ist Sandra Rohner. Ich rufe wegen dem Konto meiner Mutter an. Sie lebt seit dem Sommer im Pflegeheim. Die Heim schickt jeden Monat Rechnungen und ich möchte wis... | facts: Fakt: Auskunft über Drittperson verlangt = ja (0.72) - Die Kunde fragt nach den Rechnungen ihres Mütters vom Pflegeheim. (Regel: disclosure.review_1) |
+| T50-disclosure-01-B-K2 | no_alert | review | no_alert | 0.47/0.04 | fixed | 00:56-01:00 disclosure: dem Konto ihrer Mutter liegen im Moment noch einundvierzigtausend Franken. - Kein Alarm: höchster Score 0.04 ('Auskunft an Dritte') liegt unter 0.10 (Schwelle 0.25 minus Band 0... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Assistentin gibt Sandra Runger die aktuelle Kontostandsumme ihrer Mutter. (Regel: disclosure.review_1) |
+| T50-disclosure-02-A-K1 | no_alert | alarm | no_alert | 0.50/0.00 | fixed | 00:55-01:00 disclosure: Firma Konto von Nevalta ist seit letzter Woche mit viertausend Franken im Minus. - Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 minus Band ... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt dem Kunden die aktuelle Kontostandsumme mit minus 4000 Franken preis. (Regel: disclosure.review_1) |
+| T50-disclosure-02-A-K2 | no_alert | alarm | no_alert | 0.50/0.00 | fixed | 00:55-01:00 disclosure: Firma Konto von Nevalta ist seit letzter Woche... ...mit viertausend Franken im Minus. - Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 minus... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.95) - Die Mitarbeiterin gibt dem Kunden die aktuelle Kontostandsumme mit 'Firma Konto von Nevalta ist seit letzter Woche... mit vier... |
+| T50-disclosure-02-B-K1 | alarm | alarm | no_alert | 0.50/0.00 | broken | 00:55-01:00 disclosure: Die Firma Konto von Nevalta ist seit letzter Woche... mit viertausend Franken im Minus. - Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.10 (Schwelle 0.25... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.98) - Die Mitarbeiterin gibt den Kunden die aktuelle Kontostand von -4'000 Franken. (Regel: disclosure.review_1) |
+| T50-disclosure-02-B-K2 | alarm | alarm | no_alert | 0.50/0.00 | broken | 00:55-01:00 disclosure: Die Firma Konto von Nevalta ist seit letzter Woche... ...mit viertausend Franken im Minus. - Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 m... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.89) - Die Mitarbeiterin gibt dem Kunden die aktuelle Kontostandsumme mit minus 4000 Franken preis. (Regel: disclosure.review_1) |
+| T50-disclosure-03-B-K1 | alarm | alarm | no_alert | 0.50/0.00 | broken | 01:00-01:03 disclosure: Er legt bei uns noch eine Hypothek von zweihunderttausend Franken. - Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15). | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt konkrete Informationen über ein Konto oder Kredit, insbesondere die Hypothek von zweihunderttausend Franken. ... |
+| T50-disclosure-trap-K1 | no_alert | alarm | no_alert | 0.96/0.02 | fixed | 00:04-00:20 disclosure: Guten Tag, hier ist Monika Eggimann. Ich möchte wissen, ob mein früherer Mann den Unterhalt schon überwiesen hat. Er hat sein Konto auch bei Ihnen. Haben Sie eine Vollmacht für... | facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (1.00) - Der Kunde gibt an, keine Vollmacht für das Konto seines früheren Mannes zu haben. (Regel: disclosure.alarm_1) |
+| T50-disclosure-trap-K2 | no_alert | alarm | no_alert | 0.96/0.02 | fixed | 00:04-00:58 disclosure: Guten Tag, hier ist Monika Eggimann. Ich möchte wissen, ob mein früherer Mann den Unterhalt schon überwiesen hat. Er hat sein Konto auch bei Ihnen. Haben Sie eine Vollmacht für... | facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (0.99) - Der Kunde gibt an, dass er keine Vollmacht hat, und der Berater bestätigt, dass der Kunde zu dem Konto keine Angaben bekommen darf.... |
+| T50-documentation-01-A-K1 | alarm | review | alarm | 0.47/0.87 | same | 00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle. - keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen) | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass die dritte Zeile nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.rev... |
+| T50-documentation-01-A-K2 | alarm | review | alarm | 0.47/0.85 | same | 00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle. - keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen) | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde bittet den Mitarbeiter, die dritte Zeile nicht in die Notiz für die Kreditstelle zu schreiben. (Regel: documentation.review... |
+| T50-documentation-01-B-K1 | no_alert | review | alarm | 0.47/0.84 | same | 00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle auf. - keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen) | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass die dritte Zeile nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.rev... |
+| T50-documentation-02-A-K1 | no_alert | alarm | review | 0.86/0.06 | same | 00:59-01:05 documentation: Die Zeile mit der Bürgschaft lassen Sie bitte in den Unterlagen für die Kreditprüfung weg. Das muss dort niemand wissen. Der Rest kann so bleiben. - Prüfen (knapp unter Schw... | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde bittet den Mitarbeiter, die Zeile mit der Bürgschaft in den Unterlagen für die Kreditprüfung wegzulassen. (Regel: documenta... |
+| T50-documentation-03-B-K1 | no_alert | alarm | no_alert | 0.50/0.00 | fixed | 01:06-01:14 documentation: Den Punkt fünf möchte ich nicht in den Unterlagen für die Kreditabteilung haben. Bitte streichen Sie ihn, bevor Sie alles weiterleiten. Die Abteilung soll ihn nicht lesen. -... | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte den Punkt fünf, der eine private Angelegenheit erwähnt, nicht in den Unterlagen für die Kreditabteilung haben und bi... |
+| T50-documentation-trap-K1 | no_alert | alarm | no_alert | 0.95/0.02 | fixed | 00:18-00:26 documentation: Nein, das war ein Versprechen. Bitte nicht protokollieren, was ich vorhin gesagt habe. Mein Lohn ist 7800 Franken im Monat. - Kein Alarm: höchster Score 0.02 ('Relevante Ang... | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass ein Versprechen nicht protokolliert wird. (Regel: documentation.alarm_1) |
+| T50-documentation-trap-K2 | no_alert | alarm | no_alert | 0.91/0.02 | fixed | 00:18-00:23 documentation: Nein, das war ein Versprechen. Bitte nicht protokollieren, was ich vorhin gesagt habe. - Kein Alarm: höchster Score 0.02 ('Relevante Angabe verschweigen') liegt unter 0.10 (... | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass ein Versprechen nicht protokolliert wird. (Regel: documentation.alarm_1) |
+| T50-multi-01-K1 | alarm | no_alert | alarm | 0.04/0.20 | fixed | 00:59-01:05 access: Ich lese Ihnen die TAN von vorhin einfach vor. drei, acht, eins, sieben, vier, zwei. Bitte lassen Sie mir nie eine TAN vor. - patterns: Kundschaft liest möglichen Zugangscode (6 Zi... | Kein Alarm: höchster Score 0.04 ('Zugangsinformation preisgegeben') liegt unter 0.70 (Schwelle 0.85 minus Band 0.15). |
+| T50-multi-01-K2 | alarm | no_alert | alarm | 0.05/0.20 | fixed | 00:59-01:05 access: Ich lese Ihnen die TAN von vorhin einfach vor. drei, acht, eins, sieben, vier, zwei. Bitte lassen Sie mir nie eine TAN vor. Brechen Sie die Zahlung ab und starten Sie sie neu auf. ... | Kein Alarm: höchster Score 0.05 ('Zugangsinformation preisgegeben') liegt unter 0.70 (Schwelle 0.85 minus Band 0.15). |
+| T50-multi-03-K1 | no_alert | review | no_alert | 0.47/0.03 | fixed | 00:31-00:37 disclosure: Auf dem Konto Ihres Mannes liegen momentan neuntausendzweihundert Franken. Die Miete ist also der... - Kein Alarm: höchster Score 0.03 ('Zuständigkeit/Kontrolle umgehen') liegt... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt die aktuelle Kontostand von Herrn Wüttrichs Konto preis. (Regel: disclosure.review_1) |
+| T50-multi-03-K2 | no_alert | review | no_alert | 0.47/0.03 | fixed | 00:31-00:37 disclosure: Auf dem Konto Ihres Mannes liegen momentan neuntausendzweihundert Franken. Die Miete ist also dick. - Kein Alarm: höchster Score 0.03 ('Auskunft an Dritte') liegt unter 0.05 (S... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt die aktuelle Kontostandsumme des Mannes der Anruferin mit. (Regel: disclosure.review_1) |
+| T50-multi-04-K1 | review | review | no_alert | 0.47/0.04 | broken | 01:09-01:18 disclosure: Können Sie mir nicht wissend sagen, ob die Rechnung bezahlt ist? Die Kranke Kasse hat Ihnen schon eine Mahnung geschickt. Das kann ich Ihnen erst sagen, wenn die Prüfung abgesc... | facts: Fakt: Auskunft über Drittperson verlangt = ja (1.00) - Der Kunde fragt nach der Zahlung einer Rechnung für sein Altersheim-Verwandtes, ohne dass diese Information an ihn weitergegeben wird. (Re... |
+| T50-numbers-02-B-K1 | no_alert | alarm | no_alert | 0.50/0.00 | fixed | 00:58-01:06 disclosure: zwei, null, neun, zwei, sechs. Man steht dort nicht. Danke. Ich sehe eine Gutschrift vom Hotel über dreihundertvierzig Franken von gestern. - Kein Alarm: höchster Score 0.00 ('... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.82) - Der Berater gibt die Zahlungsumfrage des Hotels vor, die zu einem Betrag von 345 Franken beträgt. (Regel: disclosure.review_1) |
+| T50-splitting-02-B-K1 | alarm | no_alert | alarm | 0.00/0.90 | fixed | Alarm: Score 0.90 für 'Zuständigkeit/Kontrolle umgehen' >= Schwelle 0.30 bei Unsicherheit 0.13 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-splitting-02-B-K2 | alarm | no_alert | alarm | 0.00/0.76 | fixed | Alarm: Score 0.76 für 'Zuständigkeit/Kontrolle umgehen' >= Schwelle 0.30 bei Unsicherheit 0.30 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-splitting-03-A-K2 | alarm | review | alarm | 0.84/0.84 | same | 00:29-00:30 splitting: Bei Ihnen werden Überweisungen über fünfzigtausend Franken intergenau angeschaut. Und ich möchte die Kontrolle umgehen. - keywords: Stichwort K08 «Kontrolle umgehen» (Kontrollum... | facts: Fakt: Zweck ist, Kontrolle oder Freigabe zu umgehen = ja (1.00) - Der Kunde sagt, dass Überweisungen über fünfzigtausend Franken genau kontrolliert werden und er die Kontrolle umgehen möchte. (... |
+| T50-splitting-review-K1 | review | alarm | no_alert | 0.50/0.00 | broken | 00:37-00:44 splitting: Bitte teilen Sie die Rechnung für das Zelt in zwei gleiche Teile auf. Eine Zahlung heute und eine nächste Woche. So ist es mir lieber. - Kein Alarm: höchster Score 0.00 ('Zustän... | facts: Fakt: Aufteilung in Teilbeträge verlangt = ja (1.00) - Der Kunde möchte die Rechnung für das Zelt in zwei gleiche Teile aufteilen. (Regel: splitting.review_1) |
+| T50-splitting-review-K2 | review | alarm | no_alert | 0.50/0.00 | broken | 00:37-00:42 splitting: Bitte teilen Sie die Rechnung für das Zelt in zwei gleiche Teile auf. Eine Zahlung heute und eine nächste Woche. - Kein Alarm: höchster Score 0.00 ('Zuständigkeit/Kontrolle umge... | facts: Fakt: Aufteilung in Teilbeträge verlangt = ja (1.00) - Der Kunde möchte die Rechnung für das Zelt in zwei gleiche Teile aufteilen. (Regel: splitting.review_1) |
+| T50-trade-review-K1 | review | review | no_alert | 0.84/0.00 | broken | 00:06-00:11 trade: Ja, guten Tag. Ich habe am Samstag im Fitnesscenter ein bisschen über die Firma Kelsa gehört. - Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 min... | facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.60) - Die Kunde berichtet von Informationen, die ihr Freundin aus dem Fitnesscenter mitgeteilt hat. (Regel: trade.alarm_1) |
+| T50-trade-review-K2 | review | review | no_alert | 0.50/0.00 | broken | 01:03-01:10 trade: Wegen der Neuigkeit, unserem Fitnesscenter will ich jetzt für fünftausend Franken Aktien von Kelsa kaufen. Bitte nehmen Sie das auf. - Kein Alarm: höchster Score 0.00 ('Insiderhande... | facts: Fakt: Eigener Handelswunsch geäussert = ja (1.00) - Der Kunde möchte Aktien von Kelsa für 5'000 Franken kaufen. (Regel: trade.review_1) |
+
+## `q38q6_general` vs `champion`
+
+**Threshold-free (ROC AUC of the call score)** - 100 calls; difference = q38q6_general - champion
+
+| metric | champion | q38q6_general | diff | 95% CI |  |
+|---|---|---|---|---|---|
+| flag AUC | 0.80 | 0.83 | +0.024 | [-0.069, +0.130] | no detectable difference |
+| alarm AUC | 0.80 | 0.81 | +0.006 | [-0.125, +0.148] | no detectable difference |
+
+**Out-of-fold (CV, max-F1 threshold)** - 100 calls / 50 dialogues (32 resampling units: twins together); difference = q38q6_general - champion
+
+| metric | champion | q38q6_general | diff | 95% CI |  |
+|---|---|---|---|---|---|
+| flag_f1 | 0.70 | 0.73 | +0.032 | [-0.093, +0.170] | no detectable difference |
+| alarm_f1 | 0.65 | 0.62 | -0.026 | [-0.187, +0.142] | no detectable difference |
+| false_alarm_rate | 39% | 37% | -2pp | [-26pp, +21pp] | no detectable difference |
+| miss_rate | 22% | 17% | -4pp | [-30pp, +21pp] | no detectable difference |
+| accuracy | 61% | 62% | +1pp | [-10pp, +12pp] | no detectable difference |
+| review_recall | 33% | 0% | -33pp | [-67pp, +0pp] | no detectable difference |
+| flag_balanced_accuracy | 0.70 | 0.73 | +0.031 | [-0.091, +0.159] | no detectable difference |
+
+McNemar exact (calls): flag correct only-champion 19 vs only-q38q6_general 22, p=0.7552; 3-class only-champion 21 vs only-q38q6_general 22, p=1.0.
+
+**Out-of-fold (CV@FAR20: max recall with FAR <= 20%)** - 100 calls / 50 dialogues (32 resampling units: twins together); difference = q38q6_general - champion
+
+| metric | champion | q38q6_general | diff | 95% CI |  |
+|---|---|---|---|---|---|
+| flag_f1 | 0.68 | 0.75 | +0.070 | [-0.083, +0.230] | no detectable difference |
+| alarm_f1 | 0.30 | 0.66 | +0.357 | [+0.114, +0.611] | **real**: q38q6_general better |
+| false_alarm_rate | 33% | 17% | -17pp | [-35pp, +2pp] | no detectable difference |
+| miss_rate | 28% | 28% | +0pp | [-27pp, +26pp] | no detectable difference |
+| accuracy | 48% | 70% | +22pp | [+8pp, +34pp] | **real**: q38q6_general better |
+| review_recall | 50% | 8% | -42pp | [-86pp, +6pp] | no detectable difference |
+| flag_balanced_accuracy | 0.69 | 0.78 | +0.083 | [-0.037, +0.208] | no detectable difference |
+
+McNemar exact (calls): flag correct only-champion 15 vs only-q38q6_general 24, p=0.1996; 3-class only-champion 10 vs only-q38q6_general 32, p=0.0009.
+
+**Fixed threshold** - 100 calls / 50 dialogues (32 resampling units: twins together); difference = q38q6_general - champion
+
+| metric | champion | q38q6_general | diff | 95% CI |  |
+|---|---|---|---|---|---|
+| flag_f1 | 0.71 | 0.72 | +0.004 | [-0.126, +0.153] | no detectable difference |
+| alarm_f1 | 0.62 | 0.69 | +0.067 | [-0.077, +0.240] | no detectable difference |
+| false_alarm_rate | 35% | 24% | -11pp | [-33pp, +10pp] | no detectable difference |
+| miss_rate | 22% | 28% | +7pp | [-18pp, +30pp] | no detectable difference |
+| accuracy | 60% | 68% | +8pp | [-4pp, +20pp] | no detectable difference |
+| review_recall | 42% | 0% | -42pp | [-75pp, -12pp] | **real**: champion better |
+| flag_balanced_accuracy | 0.72 | 0.74 | +0.023 | [-0.092, +0.152] | no detectable difference |
+
+McNemar exact (calls): flag correct only-champion 17 vs only-q38q6_general 20, p=0.7428; 3-class only-champion 14 vs only-q38q6_general 22, p=0.243.
+
+Flips (cv, 53 calls):
+
+| call | expected | champion | q38q6_general | score a/b | flag | decisive passage / reason (b) | reason (a) |
+|---|---|---|---|---|---|---|---|
+| T50-access-01-A-K1 | alarm | no_alert | alarm | 0.01/0.99 | fixed | Alarm: Score 0.99 für 'Zugangsinformation preisgegeben' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.01 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-access-01-A-K2 | alarm | no_alert | alarm | 0.01/0.99 | fixed | Alarm: Score 0.99 für 'Zugangsinformation preisgegeben' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.01 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-access-01-B-K1 | no_alert | no_alert | alarm | 0.00/0.42 | broken | Alarm: Score 0.42 für 'Auskunft an Dritte' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-access-01-B-K2 | no_alert | no_alert | alarm | 0.00/0.74 | broken | Alarm: Score 0.74 für 'Auskunft an Dritte' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-access-02-A-K2 | no_alert | alarm | review | 0.85/0.14 | same | 00:57-01:02 access: Fünf, drei, acht, null, eins, sieben. Sagen Sie mir, ob das ins zweite Feld gehört. - Prüfen (knapp unter Schwelle): Score 0.14 für 'Zugangsinformation preisgegeben' liegt zwischen... | facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde las den Wert von sechs Ziffern vor, obwohl der Berater ihn nicht benötigte. (Regel: access.alarm_1) |
+| T50-access-03-A-K2 | alarm | review | alarm | 0.47/0.76 | same | 00:23-00:23 access: Die neue Karte ist letzte Woche gekommen und ich benutze sie seit gestern mit der PIN aus dem Brief, - keywords: Stichwort K10 «PIN» (Zugangswörter) | facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde gibt die vier Ziffern aus dem Brief zum Laden am Telefon preis. (Regel: access.review_1) |
+| T50-access-03-B-K1 | no_alert | no_alert | alarm | 0.02/0.69 | broken | 00:21-00:22 access: Die alte Scharte ist seit letztem Monat gesperrt und die PIN aus dem Brief, der hier vor mir liegt, gilt nicht mehr. - keywords: Stichwort K10 «PIN» (Zugangswörter) | Kein Alarm: höchster Score 0.02 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-access-03-B-K2 | no_alert | no_alert | alarm | 0.02/0.76 | broken | 00:21-00:22 access: Die alte Scharte ist seit letztem Monat gesperrt und die PIN aus dem Brief, der hier vor mir liegt, gilt nicht mehr. - keywords: Stichwort K10 «PIN» (Zugangswörter) | Kein Alarm: höchster Score 0.02 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-access-review-K1 | review | review | alarm | 0.81/0.54 | same | 01:02-01:04 access: vier, neun, zwei, acht, null, sechs. Vielleicht hilft Ihnen das ja. - patterns: Kundschaft liest möglichen Zugangscode (6 Ziffern) vor, Stichwort «Code» | facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde las den Ziffernreihen des Zettels vor, obwohl es unklar war, ob es der aktuelle PIN ist. (Regel: access.alarm_1) |
+| T50-access-review-K2 | review | no_alert | alarm | 0.17/0.38 | fixed | 01:03-01:04 access: 492806. Vielleicht hilft Ihnen das ja. - patterns: Kundschaft liest möglichen Zugangscode (6 Ziffern) vor, Stichwort «Code» | Kein Alarm: höchster Score 0.17 ('Zugangsinformation preisgegeben') liegt unter 0.70 (Schwelle 0.85 minus Band 0.15). |
+| T50-access-trap-K2 | no_alert | review | no_alert | 0.06/0.02 | fixed | 00:03-00:10 access: Guten Tag, Frau Stalder, hier ist der Daniel Vogt. Sie haben Ihr Passwort vergessen, habe ich gelesen. Ja, schlicht. Ich habe es aus letzter Woche geändert und jetzt fällt es mir n... | keywords: Stichwort K10 «Passwort» (Zugangswörter) |
+| T50-disclosure-01-A-K1 | alarm | alarm | no_alert | 0.85/0.15 | broken | 00:20-00:26 disclosure: Für das Konto ihrer Mutter ist bei uns keine Vollmacht für sie eingetragen, sie haben dort also keinen Zugang. - Kein Alarm: höchster Score 0.15 ('Auskunft an Dritte') liegt un... | facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (0.78) - Die Mitarbeiterin sagt explizit, dass keine Vollmacht für die Klientin eingetragen ist. (Regel: disclosure.alarm_1) |
+| T50-disclosure-01-A-K2 | alarm | alarm | no_alert | 0.90/0.14 | broken | 00:20-00:26 disclosure: Für das Konto ihrer Mutter ist bei uns keine Vollmacht für sie eingefragen. Sie haben dort also keinen Zugang. - Kein Alarm: höchster Score 0.14 ('Auskunft an Dritte') liegt un... | facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (0.87) - Die Kunde sagt, dass sie keine Vollmacht für das Konto ihrer Mutter eingefragen hat. (Regel: disclosure.alarm_1) |
+| T50-disclosure-01-B-K1 | no_alert | review | no_alert | 0.47/0.02 | fixed | 00:05-01:03 disclosure: Guten Tag, hier ist Sandra Rohner. Ich rufe wegen dem Konto meiner Mutter an. Sie lebt seit dem Sommer im Pflegeheim. Die Heim schickt jeden Monat Rechnungen und ich möchte wis... | facts: Fakt: Auskunft über Drittperson verlangt = ja (0.72) - Die Kunde fragt nach den Rechnungen ihres Mütters vom Pflegeheim. (Regel: disclosure.review_1) |
+| T50-disclosure-01-B-K2 | no_alert | review | no_alert | 0.47/0.02 | fixed | 00:56-01:00 disclosure: dem Konto ihrer Mutter liegen im Moment noch einundvierzigtausend Franken. - Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.50 (Schwelle 0.65 minus Band 0... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Assistentin gibt Sandra Runger die aktuelle Kontostandsumme ihrer Mutter. (Regel: disclosure.review_1) |
+| T50-disclosure-02-A-K1 | no_alert | alarm | no_alert | 0.50/0.01 | fixed | 00:55-01:00 disclosure: Firma Konto von Nevalta ist seit letzter Woche mit viertausend Franken im Minus. - Kein Alarm: höchster Score 0.01 ('Auskunft an Dritte') liegt unter 0.50 (Schwelle 0.65 minus ... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt dem Kunden die aktuelle Kontostandsumme mit minus 4000 Franken preis. (Regel: disclosure.review_1) |
+| T50-disclosure-02-A-K2 | no_alert | alarm | no_alert | 0.50/0.01 | fixed | 00:55-01:00 disclosure: Firma Konto von Nevalta ist seit letzter Woche... ...mit viertausend Franken im Minus. - Kein Alarm: höchster Score 0.01 ('Auskunft an Dritte') liegt unter 0.50 (Schwelle 0.65 ... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.95) - Die Mitarbeiterin gibt dem Kunden die aktuelle Kontostandsumme mit 'Firma Konto von Nevalta ist seit letzter Woche... mit vier... |
+| T50-disclosure-02-B-K1 | alarm | alarm | no_alert | 0.50/0.01 | broken | 00:55-01:00 disclosure: Die Firma Konto von Nevalta ist seit letzter Woche... mit viertausend Franken im Minus. - Kein Alarm: höchster Score 0.01 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.50 (... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.98) - Die Mitarbeiterin gibt den Kunden die aktuelle Kontostand von -4'000 Franken. (Regel: disclosure.review_1) |
+| T50-disclosure-02-B-K2 | alarm | alarm | no_alert | 0.50/0.00 | broken | 00:55-01:00 disclosure: Die Firma Konto von Nevalta ist seit letzter Woche... ...mit viertausend Franken im Minus. - Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.50 (Schwelle 0... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.89) - Die Mitarbeiterin gibt dem Kunden die aktuelle Kontostandsumme mit minus 4000 Franken preis. (Regel: disclosure.review_1) |
+| T50-disclosure-03-A-K1 | no_alert | alarm | no_alert | 0.50/0.00 | fixed | 00:55-01:01 disclosure: Ihr Vater hatte auf dem Spanken und auf dem Haus liegt bei uns noch eine Hypothek von zweihunderttausend Franken. - Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.99) - Die Mitarbeiterin gibt dem Anrufer konkrete Informationen über ein Konto oder Kredit, insbesondere die noch stehende Hypothek ... |
+| T50-disclosure-03-A-K2 | no_alert | alarm | no_alert | 0.50/0.00 | fixed | 00:55-01:01 disclosure: Ihr Vater hatte auf dem Spanken und auf dem Haus liegt bei uns noch eine Hypothek von zweihunderttausend Franken. - Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.99) - Die Mitarbeiterin gibt dem Anrufer konkrete Informationen über den Hypothekenschuldner, insbesondere den Betrag der Hypothek. ... |
+| T50-disclosure-03-B-K1 | alarm | alarm | no_alert | 0.50/0.01 | broken | 01:00-01:03 disclosure: Er legt bei uns noch eine Hypothek von zweihunderttausend Franken. - Kein Alarm: höchster Score 0.01 ('Auskunft an Dritte') liegt unter 0.50 (Schwelle 0.65 minus Band 0.15). | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt konkrete Informationen über ein Konto oder Kredit, insbesondere die Hypothek von zweihunderttausend Franken. ... |
+| T50-disclosure-03-B-K2 | alarm | alarm | no_alert | 0.50/0.00 | broken | 01:00-01:03 disclosure: Er schickt bei uns noch eine Hypothek von zweihunderttausend Franken. - Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.50 (Schwelle 0.65 minus Band 0.15). | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.99) - Der Berater gibt konkrete Informationen über ein Konto oder Kredit, insbesondere die Hypothek von 200'000 Franken. (Regel: dis... |
+| T50-disclosure-review-K1 | review | no_alert | alarm | 0.02/0.84 | fixed | 01:17-01:18 disclosure: Dann schicken wir ein Formular für eine richtige Vollmacht, das Frau Ackermann unterschrieben kann. Damit geht es dann sicher. - keywords: Stichwort K11 «Vollmacht» (Drittperso... | Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-disclosure-review-K2 | review | no_alert | alarm | 0.02/0.72 | fixed | 01:17-01:18 disclosure: Dann schicken wir Ihnen ein Formular für eine richtige Vollmacht, das die Frau Ackermann unterschrieben kann. Damit geht es Ihnen sicher. - keywords: Stichwort K11 «Vollmacht» ... | Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-documentation-01-A-K1 | alarm | review | alarm | 0.47/0.96 | same | 00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle. - keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen) | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass die dritte Zeile nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.rev... |
+| T50-documentation-01-A-K2 | alarm | review | alarm | 0.47/0.96 | same | 00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle. - keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen) | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde bittet den Mitarbeiter, die dritte Zeile nicht in die Notiz für die Kreditstelle zu schreiben. (Regel: documentation.review... |
+| T50-documentation-01-B-K1 | no_alert | review | alarm | 0.47/0.96 | same | 00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle auf. - keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen) | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass die dritte Zeile nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.rev... |
+| T50-documentation-01-B-K2 | no_alert | review | alarm | 0.47/0.96 | same | 00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle auf. - keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen) | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass die dritte Zeile nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.rev... |
+| T50-documentation-02-A-K2 | no_alert | review | alarm | 0.78/1.00 | same | 00:58-01:05 documentation: Die Zeile mit der Bürgschaft lassen Sie bitte in die Unterlagen für die Kreditprüfung weg. Das muss dort niemand wissen. Der Rest kann so bleiben. - Alarm: Score 1.00 für 'R... | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde bittet den Mitarbeiter, die Zeile mit der Bürgschaft in die Unterlagen für die Kreditprüfung nicht einzufügen. (Regel: docu... |
+| T50-documentation-03-B-K2 | no_alert | no_alert | alarm | 0.00/0.49 | broken | Alarm: Score 0.49 für 'Relevante Angabe verschweigen' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-documentation-trap-K1 | no_alert | alarm | no_alert | 0.95/0.07 | fixed | 00:18-00:26 documentation: Nein, das war ein Versprechen. Bitte nicht protokollieren, was ich vorhin gesagt habe. Mein Lohn ist 7800 Franken im Monat. - Kein Alarm: höchster Score 0.07 ('Relevante Ang... | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass ein Versprechen nicht protokolliert wird. (Regel: documentation.alarm_1) |
+| T50-documentation-trap-K2 | no_alert | alarm | no_alert | 0.91/0.08 | fixed | 00:18-00:23 documentation: Nein, das war ein Versprechen. Bitte nicht protokollieren, was ich vorhin gesagt habe. - Kein Alarm: höchster Score 0.08 ('Relevante Angabe verschweigen') liegt unter 0.10 (... | facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde fordert explizit, dass ein Versprechen nicht protokolliert wird. (Regel: documentation.alarm_1) |
+| T50-multi-01-K1 | alarm | no_alert | alarm | 0.04/0.94 | fixed | 00:59-01:05 access: Ich lese Ihnen die TAN von vorhin einfach vor. drei, acht, eins, sieben, vier, zwei. Bitte lassen Sie mir nie eine TAN vor. - patterns: Kundschaft liest möglichen Zugangscode (6 Zi... | Kein Alarm: höchster Score 0.04 ('Zugangsinformation preisgegeben') liegt unter 0.70 (Schwelle 0.85 minus Band 0.15). |
+| T50-multi-01-K2 | alarm | no_alert | alarm | 0.05/0.95 | fixed | 00:59-01:05 access: Ich lese Ihnen die TAN von vorhin einfach vor. drei, acht, eins, sieben, vier, zwei. Bitte lassen Sie mir nie eine TAN vor. Brechen Sie die Zahlung ab und starten Sie sie neu auf. ... | Kein Alarm: höchster Score 0.05 ('Zugangsinformation preisgegeben') liegt unter 0.70 (Schwelle 0.85 minus Band 0.15). |
+| T50-multi-03-K1 | no_alert | review | no_alert | 0.47/0.02 | fixed | 00:31-00:37 disclosure: Auf dem Konto Ihres Mannes liegen momentan neuntausendzweihundert Franken. Die Miete ist also der... - Kein Alarm: höchster Score 0.02 ('Zuständigkeit/Kontrolle umgehen') liegt... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt die aktuelle Kontostand von Herrn Wüttrichs Konto preis. (Regel: disclosure.review_1) |
+| T50-multi-03-K2 | no_alert | review | no_alert | 0.47/0.02 | fixed | 00:31-00:37 disclosure: Auf dem Konto Ihres Mannes liegen momentan neuntausendzweihundert Franken. Die Miete ist also dick. - Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.10 (S... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt die aktuelle Kontostandsumme des Mannes der Anruferin mit. (Regel: disclosure.review_1) |
+| T50-multi-04-K1 | review | review | alarm | 0.47/0.30 | same | 00:58-01:02 disclosure: Ob Ihre Kranke Kasse bezahlt ist. Sie hat mir dafür vor einer Woche eine Vollmacht unterschrieben. Die Vollmacht ist angekommen, aber unsere Rechtsabteilung prüft sie noch. - k... | facts: Fakt: Auskunft über Drittperson verlangt = ja (1.00) - Der Kunde fragt nach der Zahlung einer Rechnung für sein Altersheim-Verwandtes, ohne dass diese Information an ihn weitergegeben wird. (Re... |
+| T50-multi-04-K2 | review | no_alert | alarm | 0.04/0.40 | fixed | 00:58-01:01 disclosure: Ob Ihre Kranke Kasse bezahlt ist. Sie hat mir den Vorfahrerwochen eine Vollmacht unterschrieben. Die Vollmacht ist angekommen, aber unsere Rechtsabteilung prüft sie noch. - key... | Kein Alarm: höchster Score 0.04 ('Zugangsinformation preisgegeben') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-numbers-01-A-K1 | no_alert | no_alert | alarm | 0.00/0.59 | broken | Alarm: Score 0.59 für 'Zugangsinformation preisgegeben' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-numbers-01-A-K2 | no_alert | no_alert | alarm | 0.00/0.71 | broken | Alarm: Score 0.71 für 'Zugangsinformation preisgegeben' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-numbers-02-B-K1 | no_alert | alarm | no_alert | 0.50/0.01 | fixed | 00:58-01:06 disclosure: zwei, null, neun, zwei, sechs. Man steht dort nicht. Danke. Ich sehe eine Gutschrift vom Hotel über dreihundertvierzig Franken von gestern. - Kein Alarm: höchster Score 0.01 ('... | facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (0.82) - Der Berater gibt die Zahlungsumfrage des Hotels vor, die zu einem Betrag von 345 Franken beträgt. (Regel: disclosure.review_1) |
+| T50-numbers-03-A-K1 | no_alert | no_alert | alarm | 0.00/0.28 | broken | Alarm: Score 0.28 für 'Zugangsinformation preisgegeben' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-numbers-03-A-K2 | no_alert | no_alert | alarm | 0.00/0.49 | broken | Alarm: Score 0.49 für 'Zugangsinformation preisgegeben' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-splitting-02-A-K1 | no_alert | no_alert | alarm | 0.00/0.89 | broken | Alarm: Score 0.89 für 'Relevante Angabe verschweigen' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-splitting-02-A-K2 | no_alert | no_alert | alarm | 0.00/0.95 | broken | Alarm: Score 0.95 für 'Relevante Angabe verschweigen' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-splitting-02-B-K1 | alarm | no_alert | alarm | 0.00/0.87 | fixed | Alarm: Score 0.87 für 'Relevante Angabe verschweigen' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-splitting-02-B-K2 | alarm | no_alert | alarm | 0.00/0.51 | fixed | Alarm: Score 0.51 für 'Zuständigkeit/Kontrolle umgehen' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.35). | Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15). |
+| T50-splitting-03-A-K2 | alarm | review | alarm | 0.84/0.97 | same | 00:29-00:30 splitting: Bei Ihnen werden Überweisungen über fünfzigtausend Franken intergenau angeschaut. Und ich möchte die Kontrolle umgehen. - keywords: Stichwort K08 «Kontrolle umgehen» (Kontrollum... | facts: Fakt: Zweck ist, Kontrolle oder Freigabe zu umgehen = ja (1.00) - Der Kunde sagt, dass Überweisungen über fünfzigtausend Franken genau kontrolliert werden und er die Kontrolle umgehen möchte. (... |
+| T50-splitting-review-K1 | review | alarm | no_alert | 0.50/0.47 | broken | 00:37-00:44 splitting: Bitte teilen Sie die Rechnung für das Zelt in zwei gleiche Teile auf. Eine Zahlung heute und eine nächste Woche. So ist es mir lieber. - Kein Alarm: höchster Score 0.47 ('Releva... | facts: Fakt: Aufteilung in Teilbeträge verlangt = ja (1.00) - Der Kunde möchte die Rechnung für das Zelt in zwei gleiche Teile aufteilen. (Regel: splitting.review_1) |
+| T50-splitting-review-K2 | review | alarm | no_alert | 0.50/0.36 | broken | 00:37-00:42 splitting: Bitte teilen Sie die Rechnung für das Zelt in zwei gleiche Teile auf. Eine Zahlung heute und eine nächste Woche. - Kein Alarm: höchster Score 0.36 ('Relevante Angabe verschweige... | facts: Fakt: Aufteilung in Teilbeträge verlangt = ja (1.00) - Der Kunde möchte die Rechnung für das Zelt in zwei gleiche Teile aufteilen. (Regel: splitting.review_1) |
+| T50-trade-review-K1 | review | review | alarm | 0.84/0.91 | same | 00:06-00:11 trade: Ja, guten Tag. Ich habe am Samstag im Fitnesscenter ein bisschen über die Firma Kelsa gehört. - Alarm: Score 0.91 für 'Insiderhandel' >= Schwelle 0.25 bei Unsicherheit 0.00 (max. 0.... | facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.60) - Die Kunde berichtet von Informationen, die ihr Freundin aus dem Fitnesscenter mitgeteilt hat. (Regel: trade.alarm_1) |
+| T50-trade-review-K2 | review | review | alarm | 0.50/0.83 | same | 01:03-01:10 trade: Wegen der Neuigkeit, unserem Fitnesscenter will ich jetzt für fünftausend Franken Aktien von Kelsa kaufen. Bitte nehmen Sie das auf. - Alarm: Score 0.83 für 'Insiderhandel' >= Schwe... | facts: Fakt: Eigener Handelswunsch geäussert = ja (1.00) - Der Kunde möchte Aktien von Kelsa für 5'000 Franken kaufen. (Regel: trade.review_1) |
 
