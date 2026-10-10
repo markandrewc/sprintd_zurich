@@ -482,3 +482,53 @@ def write_contrib_fixture(env: FixtureEnv) -> Path:
     write_contrib_variant(root, "checks_ablation/keywords", contrib_rows(0.5, seed=5))
     write_contrib_variant(root, "synth_stress/facts7b_v1", contrib_rows(0.75, seed=6, prefix="Synth_x_"))
     return root
+
+
+# --------------------------------------------------------------------------------------------
+# dual readers (profile dual-facts: Qwen `facts` + Kev `facts_kev`, fusion two_readers rule policy)
+# --------------------------------------------------------------------------------------------
+
+# (call, family, fact) -> (Qwen p(yes), Qwen p(no), Kev p(yes)); every other fact: both clearly "no"
+DUAL_ANSWERS = {
+    (ALARM_ID, "trade", "wish"): (0.97, 0.02, 0.95),
+    (ALARM_ID, "trade", "inside_info"): (0.93, 0.03, 0.9),
+    (REVIEW_ID, "access", "spoken"): (0.9, 0.05, 0.85),
+    (REVIEW_ID, "access", "current"): (0.8, 0.1, 0.5),  # Kev unsure -> «Einigkeit» makes it unklar
+    (HARMLESS_ID, "trade", "wish"): (0.9, 0.05, 0.2),  # readers contradict: Qwen ja, Kev nein
+}
+
+
+def write_dual_env(root: Path) -> FixtureEnv:
+    """The fixture calls with both readers' fact answers for every fact of a tmp copy of the active table and a
+    tmp fact policy (so tests never write into config/)."""
+    import yaml
+
+    from callguard import fact_policy as fpol
+    from callguard.checks.facts import parse_policy_table
+
+    env = write_fixture_env(root, config="dual-facts")
+    cfg_dir = Path(root) / "config"
+    table_path, pol_path = cfg_dir / "policy_table.yaml", cfg_dir / "fact_policy.yaml"
+    shutil.copy(ROOT / "config" / "policy_table.yaml", table_path)
+    pol_path.write_text(fpol.dump_fact_policy(fpol.default_policy()))
+    table = parse_policy_table(yaml.safe_load(table_path.read_text()))
+    for f in sorted(env.runs_dir.glob("*/result.json")):
+        r = CallResult.model_validate_json(f.read_text())
+        r.checks = {k: v for k, v in r.checks.items() if k in ("keywords", "patterns")}  # the profile's light checks
+        for name, kev in (("facts", False), ("facts_kev", True)):
+            fss = {}
+            for fam, ft in table.families.items():
+                facts = {}
+                for fact in ft.facts:
+                    qy, qn, ky = DUAL_ANSWERS.get((r.call_id, fam, fact.id), (0.03, 0.95, 0.04))
+                    p = {"yes": ky, "no": round(1 - ky, 4), "unclear": 0.0} if kev else \
+                        {"yes": qy, "no": qn, "unclear": round(1 - qy - qn, 4)}
+                    facts[fact.id] = {"label": fact.label, "role": fact.role, "question": fact.question("en"), "p": p,
+                                      "value": "yes" if p["yes"] >= 0.5 else ("no" if p["no"] >= 0.5 else "unclear")}
+                fss[fam] = FamilyScore(score=0.0, confidence=1.0, verdict="absent", detail={"facts": facts})
+            r.checks[name] = CheckResult(check=name, type="facts", family_scores=fss,
+                                         meta={"model": "kev-4b" if kev else "qwen2.5-7b"})
+        f.write_text(r.model_dump_json(indent=1))
+    env.sets += [f"checks.2.policy_table={table_path}", f"checks.3.policy_table={table_path}",
+                 f"fusion.fact_policy={pol_path}", "llms.kev={type: fake}"]
+    return env
