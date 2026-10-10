@@ -28,6 +28,9 @@ st.caption("Jede Zeile vergleicht zwei gespeicherte Experiment-Varianten **auf d
            "Differenz B − A mit 95%-Bootstrap-Intervall über Zwillingsgruppen/Dialoge. **Grün = belegter Gewinn, "
            "rot = belegter Verlust, grau = Rauschen** (Intervall enthält 0). Nur Dev-Split; der Holdout ist "
            "verbraucht. Es läuft kein Modell: alles wird aus den gespeicherten Ergebnissen gerechnet.")
+if "team" in app.pages:
+    st.page_link(app.pages["team"], label="Alle Kandidaten und offenen Team-Entscheide nebeneinander → "
+                 "Team-Entscheidungen", icon=":material/groups:")
 
 default_root = os.environ.get(cb.ENV_DATA) or str(app.runs_root / "experiments")
 with st.expander("Datenquelle", icon=":material/folder_open:"):

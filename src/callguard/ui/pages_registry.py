@@ -58,6 +58,7 @@ PAGES: list[PageSpec] = [
     PageSpec("quality", "Qualität", ":material/insights:", _V + "quality", order=50),
     PageSpec("experiments", "Experimente", ":material/science:", _V + "experiments", order=60),
     PageSpec("decisions", "Entscheidungshilfe", ":material/balance:", _V + "decisions", order=62),
+    PageSpec("team", "Team-Entscheidungen", ":material/groups:", _V + "team", order=63),
     # other teams: add your PageSpec lines below (order 70+), e.g. routing / feedback / patterns / audit
     PageSpec("notifications", "Meldungen", ":material/notifications:", _V + "notifications", order=70),
     PageSpec("feedback", "Feedback & Tuning", ":material/rate_review:", _V + "feedback", order=72),

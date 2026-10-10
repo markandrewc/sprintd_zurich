@@ -1,0 +1,220 @@
+# Open team decisions, shown on the UI page "Team-Entscheidungen" and in docs/TEAM_OPTIONS.md
+# (regenerate: uv run callguard candidates). Edit the texts here; no code change needed.
+#
+# Placeholders {{<candidate id>.<key>}} are filled from runs/candidates/candidates.json (ids: experiments/contrib/
+# candidates.yaml). Keys: auc far miss rr acc reworded blind rerecorded hit1 cost reviews label status,
+# vs_<key> (paired delta against the champion with 95% CI, "belegt" only if the CI excludes 0, else "≈"),
+# drop_<reworded|blind|rerecorded> (paired drop against the candidate's own tuned run).
+# Missing data renders as "ausstehend" / "läuft noch" and fills in automatically.
+#
+# The team's choice per decision is recorded in experiments/contrib/team_decisions.yaml (UI form or by hand).
+intro: >-
+  Alle Zahlen: Dev-Split (48 Anrufe, 24 Dialoge), 95%-KI. Bei 48 Anrufen sind Unterschiede von 1-2 Anrufen
+  Rauschen; „belegt“ heisst: das gepaarte Intervall gegen den Champion schliesst 0 aus. Der Holdout ist verbraucht.
+
+decisions:
+  - id: policy_table
+    title: "1. Policy-Tabelle für Sonntag: v1 oder v3?"
+    question: "Welche Regel-Tabelle entscheidet aus den Fakten Alarm / Prüfen / Kein Alarm?"
+    context: >-
+      v3 ergänzt v1 um aus den Kriterien abgeleitete Regeln „entscheidender Fakt offen → Prüfen“ und Nachfragen
+      beim Aufteilen (research/DECISIONS.md D2b). Umschalten = Profil `recommended-v3`, kein Code.
+    options:
+      - name: "v1 (eingefroren)"
+        summary: "Flag-AUC {{champion.auc}}, Fehlalarme {{champion.far}}, verpasst {{champion.miss}}, Prüf-Recall {{champion.rr}}."
+        pros:
+          - "Einzige Tabelle mit Holdout-Lauf (12 Anrufe, 0 Fehlalarme, Alarm-F1 0.67; 3 Blicke, nur Plausibilität)."
+          - "Weniger LLM-Aufrufe: {{champion.cost}} Prüfzeit pro Anruf."
+        cons:
+          - "Verpasst mehr: {{champion.miss}} gegen {{champion_v3.miss}} (v3)."
+          - "Neu aufgenommenes Audio: AUC {{champion.rerecorded}} gegen {{champion_v3.rerecorded}} (v3)."
+        cost: "keiner (Stand heute)"
+      - name: "v3"
+        summary: "Flag-AUC {{champion_v3.auc}}, Fehlalarme {{champion_v3.far}}, verpasst {{champion_v3.miss}}, Prüf-Recall {{champion_v3.rr}}."
+        pros:
+          - "Drei unabhängige Dev-Tests zeigen in dieselbe Richtung: Dev verpasst {{champion_v3.vs_miss}}, neu aufgenommen AUC {{champion_v3.vs_rerecorded}}, synthetisch Prüf-Recall 38% → 48% (D2b)."
+          - "Fehlalarme unverändert ({{champion_v3.vs_far}})."
+          - "Mehr „Prüfen“ statt stillem „Kein Alarm“, passt zur Antwort der Organisatoren (Konfigurierbarkeit)."
+        cons:
+          - "Jede einzelne Differenz liegt im Rauschen (gepaart: AUC {{champion_v3.vs_auc}}, exakt {{champion_v3.vs_acc}})."
+          - "In Kenntnis eines Holdout-Fehlers (Aufteilen) entworfen; kein Holdout-Lauf möglich."
+          - "Keine Paraphrasen-Probe für v3; mehr LLM-Aufrufe ({{champion_v3.cost}} pro Anruf)."
+          - "Auf Kev / Qwen3.8: Kev v3 {{kev_v3.auc}}, Q3.8 3-bit v3 {{q38_v3.auc}}, Q3.8 6-bit v3 {{q38q6_v3.auc}}."
+        cost: "`-c recommended-v3` bzw. `scripts/run_staged.sh recommended-v3`; 5 min Doctor + Smoke-Test."
+    recommendation: >-
+      v3 übernehmen (Stand D2b): weniger Verpasste bei gleichen Fehlalarmen in drei unabhängigen Tests; ehrlich
+      kommunizieren, dass keine Einzeldifferenz belegt ist.
+    would_change:
+      - "v3 erhöht auf Kev oder Qwen3.8 die Fehlalarme deutlich (Zeilen Kev v3 / Q3.8 v3, sobald gerechnet)."
+      - "Die Organisatoren werten „Prüfen“ als Fehler (dann zählt exakte 3-Klassen-Genauigkeit, nicht Verpasste)."
+      - "Ein Smoke-Test von recommended-v3 auf neuen Dateien schlägt fehl."
+    sources: [research/DECISIONS.md, research/findings/RQ10.md, config/recommended-v3.yaml]
+
+  - id: backend
+    title: "2. Standard-Entscheider für das versteckte Set und die Demo"
+    question: "Welches Modell liest die Fakten im Standardprofil? (Champion 7B / Qwen3.8 6-bit / Kev / zwei Leser)"
+    context: >-
+      Antwort der Organisatoren (Sa ~13:00, docs/CASE.md): exakte Werte zählen weniger als dass das Verhalten
+      konfigurierbar ist. Alle Kandidaten unten sind Profile derselben Pipeline; der Standard sollte der sein, der
+      auf neuen Dateien sicher durchläuft, die anderen bleiben umschaltbar.
+    options:
+      - name: "Champion Qwen2.5-7B"
+        summary: "AUC {{champion.auc}}, exakt {{champion.acc}}, Beleg hit@1 {{champion.hit1}}."
+        pros:
+          - "Einziger Kandidat, der auf neuen Dateien end-to-end getestet ist (gestaffelt, ~30 s pro Anruf)."
+          - "Liefert Passagen mit Begründung; Prüf-Recall {{champion.rr}}."
+        cons:
+          - "Hängt an der Formulierung: umformuliert {{champion.reworded}} ({{champion.drop_reworded}}), blinde Tabelle {{champion.blind}}."
+        cost: "keiner"
+      - name: "Qwen3.8-27B 6-bit"
+        summary: "AUC {{q38q6.auc}} (gepaart {{q38q6.vs_auc}}), Fehlalarme {{q38q6.far}}, verpasst {{q38q6.miss}}, exakt {{q38q6.acc}}."
+        pros:
+          - "Allgemeine Fragen ohne Regelschicht: nur auf 6-bit ist kein Mass belegt schlechter als der Champion (Fehlalarme {{gen_q38q6.far}}, gepaart {{gen_q38q6.vs_far}}; exakt {{gen_q38q6.vs_acc}})."
+          - "Die 3-bit-Variante ist formulierungsrobust (umformuliert {{q38.reworded}}, {{q38.drop_reworded}}); 6-bit: {{q38q6.reworded}}."
+        cons:
+          - "Braucht den 24 GB A5000 (Verfügbarkeit Sonntag offen); ~{{q38q6.cost}} Prüfzeit pro Anruf."
+          - "Keine Prüfen-Fälle (Prüf-Recall {{q38q6.rr}}), keine Fakten-Passagen (evidence aus)."
+          - "Nie end-to-end auf neuen Dateien gelaufen."
+        cost: "llama-server + Profil qwen38-q6 auf dem A5000; Rollen brauchen vorher vLLM 7B."
+      - name: "Kev-4B Fakten"
+        summary: "AUC {{kev.auc}}, Fehlalarme {{kev.far}}, verpasst {{kev.miss}}, exakt {{kev.acc}}."
+        pros:
+          - "Formulierungsrobust: umformuliert {{kev.reworded}}, gepaart gegen Champion {{kev.vs_reworded}}."
+          - "Klein (~8 GB), läuft auf dem 4070 (gestaffelt)."
+        cons:
+          - "Kein „unklar“: {{kev.reviews}}; verpasst {{kev.miss}}."
+          - "Keine Fakten-Passagen: Beleg hit@1 {{kev.hit1}}."
+          - "Drei Stufen auf 12 GB (ASR, vLLM für Rollen, Kev); nie end-to-end getestet."
+        cost: "serve_kev.py + Profil kev; Runbook docs/KEV.md."
+      - name: "Zwei Leser R1"
+        summary: "AUC {{r1.auc}} (gepaart {{r1.vs_auc}}), exakt {{r1.acc}} (gepaart {{r1.vs_acc}})."
+        pros:
+          - "Bester Rang (AUC) und robuster bei Umformulierung: {{r1.reworded}} (gepaart {{r1.vs_reworded}})."
+          - "„Uneinig → Prüfen“ ist eine einleuchtende Officer-Einstellung."
+        cons:
+          - "Vorregistriert nicht bestanden: exakte 3-Klassen-Genauigkeit belegt schlechter, Prüf-Recall {{r1.rr}}."
+          - "Live nur auf 24 GB (nie getestet), sonst gestaffelt + Zusammenführen."
+        cost: "Profil two-readers; auf dem 4070 nur gestaffelt."
+    recommendation: >-
+      Champion 7B als Standard für das versteckte Set (einziger end-to-end getesteter Weg, liefert Passagen).
+      In der Demo die anderen als umschaltbare Profile mit ihren gemessenen Zahlen zeigen (Konfigurierbarkeit ist
+      laut Organisatoren wichtiger als der exakte Wert).
+    would_change:
+      - "Qwen3.8 6-bit schlägt den Champion auf umformulierten Fragen oder neu aufgenommenem Audio belegt (Zellen oben, sobald gerechnet) UND der A5000 ist Sonntag sicher verfügbar."
+      - "Die Organisatoren bewerten nur Alarm ja/nein (dann zählen Fehlalarme/Verpasste mehr als Prüfen)."
+    sources: [docs/CASE.md, research/findings/two_readers.md, experiments/kev_vs_facts.yaml, experiments/qwen38_q6.yaml]
+
+  - id: hardware
+    title: "3. Demo-Hardware: A5000 (24 GB) oder deben 4070 (12 GB)?"
+    question: "Auf welcher Maschine läuft die Live-Demo am Sonntag?"
+    options:
+      - name: "A5000 24 GB VM"
+        summary: "Alle Modelle gleichzeitig; Verfügbarkeit Sonntag unbestätigt."
+        pros:
+          - "Live: Champion, Kev, zwei Leser (Qwen 7B + Kev + large-v3 zusammen), Qwen3.8 6-bit (allein)."
+          - "Kein Umschalten zwischen ASR und LLM nötig."
+        cons:
+          - "Zwei-Leser-Profil auf 24 GB nie getestet; Qwen3.8 6-bit füllt die Karte allein (~{{q38q6.cost}} pro Anruf)."
+          - "Verfügbarkeit Sonntag offen."
+        cost: "Setup + Doctor auf der VM (~30 min), wenn verfügbar."
+      - name: "deben RTX 4070 12 GB"
+        summary: "Bewährt; Modelle gestaffelt."
+        pros:
+          - "Champion end-to-end getestet (`scripts/run_staged.sh recommended`, ~30 s pro Anruf; Fallback `recommended-turbo` in einem Durchgang)."
+          - "Qwen3.8 3-bit läuft allein; Kev läuft allein."
+        cons:
+          - "Kev und Qwen nicht gleichzeitig: zwei Leser nur gestaffelt; Qwen3.8 6-bit gar nicht."
+        cost: "keiner"
+      - name: "Laptop ohne GPU (nur gespeicherte Ergebnisse)"
+        summary: "UI mit gespeicherten Ergebnissen, Schwelle/Prüfband/Stichwörter live (Re-Fusion ohne Modell)."
+        pros: ["Kein Ausfallrisiko"]
+        cons: ["Keine neuen Anrufe live"]
+        cost: "keiner"
+    recommendation: >-
+      Demo-Basis: gespeicherte Ergebnisse (Laptop/4070, kein Risiko) plus ein neuer Anruf live auf dem 4070 mit
+      dem Champion. A5000 nur als Bonus (zwei Leser / Qwen3.8 live), wenn er Sonntag früh bestätigt ist.
+    would_change:
+      - "A5000 Sonntag bestätigt und ein Smoke-Test von two-readers dort grün."
+    sources: [docs/KEV.md, config/two-readers.yaml, config/qwen38-q6.yaml, docs/SUNDAY_RUNBOOK.md]
+
+  - id: github
+    title: "4. GitHub: Integrations-Branch wohin pushen?"
+    question: "Wie kommt der heutige Stand (Integrations-Branch) zum Team und in die Abgabe?"
+    options:
+      - name: "als eigener Branch + PR auf main"
+        pros: ["Team kann reviewen; main bleibt bis zum Merge unverändert", "PR zeigt alle Änderungen auf einen Blick"]
+        cons: ["Ein Merge-Schritt mehr vor der Abgabe"]
+        cost: "push + PR (~5 min), Review durch das Team"
+      - name: "nach overnight"
+        pros: ["Passt zur Regel „Forschungsergebnisse → overnight“ (CLAUDE.md)"]
+        cons: ["Code (UI, Plugins), den das Team braucht, liegt dann nicht auf main"]
+        cost: "push"
+      - name: "direkt auf main"
+        pros: ["Sofort für alle und für die Abgabe verfügbar"]
+        cons: ["Kein Review; main muss bis Sonntag 08:30 grün bleiben"]
+        cost: "push (Tests vorher grün)"
+    recommendation: >-
+      Eigener Branch + PR auf main, nach grüner Offline-Testsuite; Merge nach kurzem Team-Review, spätestens
+      Samstagabend (main = Abgabe).
+    would_change:
+      - "Teammitglieder brauchen den Code sofort auf dem GPU-Rechner → direkt main (Tests grün)."
+    sources: [CLAUDE.md]
+
+  - id: teammate
+    title: "5. Abstimmung mit dem Teamkollegen (Kev / allgemeine Fragen)"
+    question: "Wie führen wir unsere Pipeline und den Prototyp sprintd_zurich zusammen?"
+    context: >-
+      Messungen auf unseren Transkripten: Kev ist formulierungsrobust (umformuliert {{kev.reworded}} gegen
+      Champion {{champion.reworded}}, gepaart {{kev.vs_reworded}}), kennt aber kein „unklar“
+      ({{kev.reviews}}) und liefert mit den Fakten keine Passagen. Die allgemeinen Fragen markieren ohne Regelschicht
+      zu viel: Fehlalarme Kev {{gen_kev.far}} (gepaart {{gen_kev.vs_far}}), Qwen 7B {{gen_qwen.far}}
+      ({{gen_qwen.vs_far}}); Qwen3.8 3-bit {{gen_q38.far}} ({{gen_q38.vs_far}}, exakt {{gen_q38.vs_acc}}).
+      Ausnahme Qwen3.8 6-bit: Fehlalarme {{gen_q38q6.far}} ({{gen_q38q6.vs_far}}), exakt {{gen_q38q6.vs_acc}},
+      also nichts belegt schlechter als der Champion.
+    options:
+      - name: "kombinieren"
+        summary: "Unsere Pipeline als Standard, Kev als umschaltbarer Leser, ihre Stärken übernehmen."
+        pros:
+          - "Ein Produkt; Kev-Robustheit als Option sichtbar"
+          - "Übernehmen: Rechtsgrundlage je Prüfpunkt, Feedback je Fund + Label-Export, Fragen-Versionierung"
+        cons: ["Integrationsaufwand am Samstagnachmittag"]
+        cost: "~2-3 h (Felder in policy table/UI, Export-Format)"
+      - name: "getrennt lassen"
+        pros: ["Kein Integrationsrisiko"]
+        cons: ["Zwei Demos, keine gemeinsame Zahl; Jury sieht zwei halbe Lösungen"]
+        cost: "keiner"
+      - name: "ihr Design übernehmen"
+        pros: ["Einfacher (eine Frage-Liste, eine Schwelle)"]
+        cons:
+          - "Allgemeine Fragen auf Kev: Fehlalarme {{gen_kev.far}}, exakt {{gen_kev.acc}} (gepaart {{gen_kev.vs_acc}})"
+          - "Keine Prüfen-Klasse, keine Stichwortliste (Jury-Anforderung)"
+        cost: "Umbau"
+    recommendation: >-
+      Kombinieren: unsere Pipeline (ASR, Rollen, Fakten + Tabelle, Stichwörter, UI) als Standard, Kev als
+      optionaler, formulierungsrobuster Leser; Rechtsgrundlage, Feedback-Export und Fragen-Versionierung aus
+      sprintd_zurich übernehmen. Details: Abschnitt „Unser Ansatz vs. sprintd_zurich“.
+    would_change:
+      - "Kev mit einer „unklar“-Antwort, die Prüfen-Fälle erzeugt, oder Kev-Passagen mit gutem hit@1."
+      - "Qwen3.8 6-bit allgemein bleibt auf umformulierten Fragen und neuem Audio gleich gut ({{gen_q38q6.reworded}}, {{gen_q38q6.rerecorded}})."
+    sources: [experiments/kev_vs_facts.yaml, research/findings/two_readers.md, experiments/contrib/comparison_zurich.yaml]
+
+  - id: organisers
+    title: "6. Fragen an die Organisatoren am Sonntag"
+    question: "Was müssen wir vor 08:30 wissen?"
+    options:
+      - name: "Ablauf"
+        pros:
+          - "Wer verarbeitet das versteckte Set: wir auf ihren Dateien oder sie mit unserem Code?"
+          - "Zeitlimit und Anzahl Anrufe? (Champion gestaffelt ~30 s pro Anruf auf dem 4070)"
+          - "Hardware vor Ort (GPU, VRAM, Internet für Modell-Downloads)?"
+      - name: "Format"
+        pros:
+          - "Eingabe: nur .wav, Dateinamen, gleiche TTS-Stimmen und Stufenstruktur?"
+          - "Ausgabe: result.json pro Anruf, CSV mit call_id,expected, oder Trigger-API?"
+          - "Wird „Prüfen“ als Treffer, eigene Klasse oder ignoriert gewertet? (Antwort Sa: Konfigurierbarkeit zählt mehr)"
+      - name: "Regeln"
+        pros:
+          - "Fine-Tuning auf den gegebenen Anrufen erlaubt?"
+          - "Dürfen wir unsere Schwelle / unseren Prüfmodus vorab fest wählen und begründen?"
+    recommendation: "Fragen 1-3 Sonntag früh vor dem Lauf klären; Antworten in docs/CASE.md festhalten."
+    sources: [docs/CASE.md, docs/SUNDAY_RUNBOOK.md]

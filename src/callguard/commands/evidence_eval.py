@@ -11,6 +11,19 @@ from typing import Annotated, Optional
 import typer
 
 
+def results_summary(results_dir: Path, calls, holdout, n_boot: int = 2000, seed: int = 13) -> Optional[dict]:
+    """Overall evidence hit rate of one stored variant (``results.jsonl`` folder), for ``callguard candidates``."""
+    from callguard import eval_evidence as ee
+    from callguard.experiments import load_results
+
+    results = load_results(results_dir)
+    if not results:
+        return None
+    ev = ee.evaluate_variant(str(results_dir), results, calls, holdout=holdout, n_boot=n_boot, seed=seed)
+    a = ev.summary.get("all") or {}
+    return {k: a.get(k) for k in ("n", "no_passage", "chance1", "median_len1", "hit1", "hit3")}
+
+
 def register(app: typer.Typer) -> None:
     from callguard import cli
 
