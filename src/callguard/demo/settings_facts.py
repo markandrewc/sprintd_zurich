@@ -123,7 +123,7 @@ def _ai_phrase(app: Any, names: dict[str, str]) -> None:
                                 "selbst: eine Sache, mit Ja oder Nein beantwortbar.")
             return
         state.update(question=q, nonce=state["nonce"] + 1, ai_note="Von der KI formuliert — bitte lesen und anpassen.")
-        st.rerun(scope="fragment")
+        st.rerun()  # the dialog stays open (its flag is in the session)
     if state.get("ai_note"):
         st.info(state["ai_note"], icon=":material/smart_toy:")
 

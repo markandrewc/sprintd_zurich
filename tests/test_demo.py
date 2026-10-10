@@ -30,8 +30,8 @@ from callguard.types import (CallResult, CheckResult, Decision, FamilyScore, Fus
 from callguard.ui import backend as be
 
 APP = Path(__file__).resolve().parents[1] / "src" / "callguard" / "demo" / "app.py"
-PAGES = {"cases": None, "call": "pages/call.py", "settings": "pages/rules.py", "quality": "pages/quality.py",
-         "process": "pages/process.py", "facts": "pages/facts.py", "keywords": "pages/keywords.py"}
+PAGES = {"cases": None, "call": "pages/call.py", "settings": "pages/settings.py", "quality": "pages/quality.py",
+         "process": "pages/process.py"}
 
 
 
@@ -81,16 +81,16 @@ def _find_html(node) -> list[str]:
 # --------------------------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("page", [p for p in PAGES if p not in ("settings", "facts")])
+@pytest.mark.parametrize("page", [p for p in PAGES if p != "settings"])
 def test_every_demo_page_renders(env: FixtureEnv, page: str):
     at = run_demo(PAGES[page])
     assert at.title, f"{page} has no title"
 
 
 def test_facts_and_rules_tabs_single_reader_profile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Profile with ONE reader (recommended): «Regeln» keeps «Wie streng?» (threshold + Prüfmodus) and points to the
-    dual-reader profile for rule editing; «Fakten» shows the questions and the four-eyes governance (Regelwerk
-    sections, embedded layout) on a tmp copy of the table, so its version store never writes into the repo."""
+    """Profile with ONE reader (recommended): «Einstellungen» with its three tabs; «Regeln» points to the dual-reader
+    profile for rule editing, «Fakten» lists the questions with «+ Neuer Fakt» (four eyes), on a tmp copy of the table,
+    so the version store never writes into the repo."""
     import shutil
 
     import yaml
@@ -106,15 +106,13 @@ def test_facts_and_rules_tabs_single_reader_profile(tmp_path: Path, monkeypatch:
     monkeypatch.setenv(be.ENV_ARGS, env.args + f" --set paths.tuning={tmp_path / 'tuning.yaml'}"
                        + f" --set checks.{idx}.policy_table={active}")
     at = run_demo(PAGES["settings"])
-    assert at.title[0].value == "Regeln"
-    assert [h.value for h in at.header] == ["Wie streng?"]
-    assert at.slider(key="dm_threshold") is not None
-    assert "dual-facts" in texts(at)
-    at = run_demo(PAGES["facts"])
-    assert at.title[0].value == "Fakten"
-    assert [h.value for h in at.header] == ["Fakten je Prüfart", "Fakten ändern: Freigabe durch zweite Person nötig"]
+    assert at.title[0].value == "Einstellungen"
+    assert [t.label for t in at.tabs][:3] == [":material/rule: Regeln", ":material/fact_check: Fakten",
+                                              ":material/label: Stichwörter"]
+    assert at.slider(key="dm_threshold") is not None  # «Erweitert: Score-Alarmschwelle»
     body = texts(at)
-    assert "Aktiv: **Version" in body and "einem** KI-Leser" in body
+    assert "dual-facts" in body and "Ein **Fakt** ist eine kleine Ja/Nein-Frage" in body
+    assert any(b.label == "Neuer Fakt" for b in at.button)
     assert (active.parent / "policy_versions").is_dir()
     assert sorted(p.name for p in (ROOT / "config" / "policy_versions").glob("*")) == repo_versions
 

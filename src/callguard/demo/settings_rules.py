@@ -186,14 +186,14 @@ def _ai_panel(app: Any, work: dict[str, Any], names: dict[str, str]) -> None:
         except rd.NeedsNewFamily:
             state["ai_note"] = ("Diese Regel passt zu keiner bestehenden Prüfart. Eine neue Prüfart braucht neue Fakten "
                                 "und eine Freigabe (Tab «Fakten»).")
-            return
+            st.rerun()
         except rd.DraftError as e:
             state["ai_note"] = f"Die KI konnte keinen gültigen Vorschlag machen: {e}"
-            return
+            st.rerun()
         except Exception as e:  # LLM down / refused: the wizard works without it
             state["ai_note"] = (f"Sprachmodell nicht erreichbar ({type(e).__name__}). Der Assistent links funktioniert "
                                 "auch ohne KI.")
-            return
+            st.rerun()
         labels = pe.fact_labels(work, draft.family)
         with st.status("Die KI füllt den Assistenten aus …", expanded=True) as status:
             st.write(f"Prüfart: **{names.get(draft.family, draft.family)}**")
@@ -209,7 +209,7 @@ def _ai_panel(app: Any, work: dict[str, Any], names: dict[str, str]) -> None:
                                    "durch eine zweite Person im Tab «Fakten»); danach lässt sich die Regel bauen.",
                            nonce=state["nonce"] + 1, ai_request=draft.request, ai_rule=dict(draft.rule))
                 ss[WIZ] = new
-                return
+                st.rerun()
             filled = state_from_draft(draft, work)
             for key in filled["facts"]:
                 c = filled["conds"][key]
@@ -225,7 +225,7 @@ def _ai_panel(app: Any, work: dict[str, Any], names: dict[str, str]) -> None:
                                                         "Ende selbst speichern.")
         ss[WIZ] = filled
         time.sleep(AI_DELAY)
-        st.rerun(scope="fragment")
+        st.rerun()  # the dialog stays open (its flag is in the session)
     if state.get("ai_note"):
         st.info(state["ai_note"], icon=":material/smart_toy:")
     if state.get("ai_missing"):
