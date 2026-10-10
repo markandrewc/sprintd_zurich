@@ -530,5 +530,6 @@ def write_dual_env(root: Path) -> FixtureEnv:
                                          meta={"model": "kev-4b" if kev else "qwen2.5-7b"})
         f.write_text(r.model_dump_json(indent=1))
     env.sets += [f"checks.2.policy_table={table_path}", f"checks.3.policy_table={table_path}",
-                 f"fusion.fact_policy={pol_path}", "llms.kev={type: fake}"]
+                 f"fusion.fact_policy={pol_path}", "llms.kev={type: fake}",
+                 "llms.assistant={type: fake}"]  # the KI-Assistent LLM: offline fake in tests
     return env
