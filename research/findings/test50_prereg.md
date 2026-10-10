@@ -19,3 +19,4 @@ trap / review / numbers / multi) and clean vs noisy; paired comparisons against 
 ## Look log
 | time | what | why |
 |---|---|---|
+| 2026-10-10 16:38 | dual-reader facts, ONE look: pre-registered default (Qwen three-way, Kev band [0.3, 0.7], Einigkeit) vs champion v3 (Qwen alone, table v3), fixed threshold 0.55, pure re-fusion of stored answers (`callguard dualfacts eval --set test50 --test50-look`; research/evidence/dual_facts_test50.md) | pre-registered read-out of research/findings/dual_facts_prereg.md; nothing tuned on it |

@@ -1,0 +1,6966 @@
+{
+ "meta": {
+  "set": "test50",
+  "profile": "dual-facts-test50",
+  "runs_dir": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a76e4f47529e630c2/runs/test50/dual-facts/dual-facts-test50",
+  "policy_table": "config/policy_table.yaml",
+  "n_results": 100,
+  "missing": [],
+  "threshold": 0.55,
+  "n_boot": 2000,
+  "seed": 13,
+  "created": "2026-10-10T16:38:50",
+  "bootstrap_unit": "twin group (case: config/splits.yaml groups; test50: data_test50 dataset.yaml groups)",
+  "look": "test50 one look (research/findings/test50_prereg.md)"
+ },
+ "policies": {
+  "default": {
+   "readers": [
+    {
+     "id": "qwen",
+     "check": "facts",
+     "label": "Qwen",
+     "model": "Qwen2.5-7B",
+     "mode": "three_way",
+     "band": [
+      0.3,
+      0.7
+     ]
+    },
+    {
+     "id": "kev",
+     "check": "facts_kev",
+     "label": "Kev",
+     "model": "Kev-4B",
+     "mode": "band",
+     "band": [
+      0.3,
+      0.7
+     ]
+    }
+   ],
+   "combination": "agree"
+  },
+  "champion_v3": {
+   "readers": [
+    {
+     "id": "qwen",
+     "check": "facts",
+     "label": "Qwen",
+     "model": "Qwen2.5-7B",
+     "mode": "three_way",
+     "band": [
+      0.3,
+      0.7
+     ]
+    },
+    {
+     "id": "kev",
+     "check": "facts_kev",
+     "label": "Kev",
+     "model": "Kev-4B",
+     "mode": "band",
+     "band": [
+      0.3,
+      0.7
+     ]
+    }
+   ],
+   "combination": "only_a"
+  }
+ },
+ "blocks": {
+  "default": {
+   "fixed": {
+    "n": 100,
+    "units": 32,
+    "flagged": 50,
+    "alarms": 21,
+    "reviews": 29,
+    "expected": {
+     "alarm": 34,
+     "review": 12,
+     "no_alert": 54
+    },
+    "false_alarm_rate": {
+     "value": 0.2593,
+     "lo": 0.1094,
+     "hi": 0.4259
+    },
+    "miss_rate": {
+     "value": 0.2174,
+     "lo": 0.0682,
+     "hi": 0.4
+    },
+    "accuracy": {
+     "value": 0.68,
+     "lo": 0.55,
+     "hi": 0.7942
+    },
+    "review_recall": {
+     "value": 0.75,
+     "lo": 0.5,
+     "hi": 1.0
+    },
+    "auc": {
+     "value": 0.8768,
+     "lo": 0.7928,
+     "hi": 0.9453
+    }
+   }
+  },
+  "champion_v3": {
+   "fixed": {
+    "n": 100,
+    "units": 32,
+    "flagged": 59,
+    "alarms": 30,
+    "reviews": 29,
+    "expected": {
+     "alarm": 34,
+     "review": 12,
+     "no_alert": 54
+    },
+    "false_alarm_rate": {
+     "value": 0.3519,
+     "lo": 0.1833,
+     "hi": 0.5278
+    },
+    "miss_rate": {
+     "value": 0.1304,
+     "lo": 0.0,
+     "hi": 0.2917
+    },
+    "accuracy": {
+     "value": 0.64,
+     "lo": 0.5,
+     "hi": 0.766
+    },
+    "review_recall": {
+     "value": 0.75,
+     "lo": 0.5,
+     "hi": 1.0
+    },
+    "auc": {
+     "value": 0.8325,
+     "lo": 0.7156,
+     "hi": 0.9229
+    }
+   }
+  }
+ },
+ "paired": {
+  "fixed": {
+   "false_alarm_rate": {
+    "a": 0.3519,
+    "b": 0.2593,
+    "diff": -0.0926,
+    "lo": -0.2069,
+    "hi": 0.0,
+    "real": false
+   },
+   "miss_rate": {
+    "a": 0.1304,
+    "b": 0.2174,
+    "diff": 0.087,
+    "lo": 0.0,
+    "hi": 0.2,
+    "real": false
+   },
+   "accuracy": {
+    "a": 0.64,
+    "b": 0.68,
+    "diff": 0.04,
+    "lo": 0.0,
+    "hi": 0.1,
+    "real": false
+   },
+   "review_recall": {
+    "a": 0.75,
+    "b": 0.75,
+    "diff": 0.0,
+    "lo": 0.0,
+    "hi": 0.0,
+    "real": false
+   },
+   "auc": {
+    "a": 0.8325,
+    "b": 0.8768,
+    "diff": 0.0443,
+    "lo": -0.0043,
+    "hi": 0.1105,
+    "real": false
+   },
+   "n": {
+    "calls": 100,
+    "units": 32,
+    "dialogues": 50
+   },
+   "changed": 13,
+   "flips": [
+    {
+     "call_id": "T50-access-02-A-K2",
+     "expected": "no_alert",
+     "a": "alarm",
+     "b": "no_alert",
+     "flag_change": "fixed",
+     "label_change": "fixed"
+    },
+    {
+     "call_id": "T50-access-02-B-K2",
+     "expected": "alarm",
+     "a": "alarm",
+     "b": "no_alert",
+     "flag_change": "broken",
+     "label_change": "broken"
+    },
+    {
+     "call_id": "T50-access-review-K1",
+     "expected": "review",
+     "a": "alarm",
+     "b": "no_alert",
+     "flag_change": "broken",
+     "label_change": "same"
+    },
+    {
+     "call_id": "T50-disclosure-03-A-K1",
+     "expected": "no_alert",
+     "a": "review",
+     "b": "no_alert",
+     "flag_change": "fixed",
+     "label_change": "fixed"
+    },
+    {
+     "call_id": "T50-disclosure-03-A-K2",
+     "expected": "no_alert",
+     "a": "review",
+     "b": "no_alert",
+     "flag_change": "fixed",
+     "label_change": "fixed"
+    },
+    {
+     "call_id": "T50-disclosure-03-B-K1",
+     "expected": "alarm",
+     "a": "review",
+     "b": "no_alert",
+     "flag_change": "broken",
+     "label_change": "same"
+    },
+    {
+     "call_id": "T50-disclosure-03-B-K2",
+     "expected": "alarm",
+     "a": "review",
+     "b": "no_alert",
+     "flag_change": "broken",
+     "label_change": "same"
+    },
+    {
+     "call_id": "T50-disclosure-trap-K1",
+     "expected": "no_alert",
+     "a": "alarm",
+     "b": "no_alert",
+     "flag_change": "fixed",
+     "label_change": "fixed"
+    },
+    {
+     "call_id": "T50-disclosure-trap-K2",
+     "expected": "no_alert",
+     "a": "alarm",
+     "b": "no_alert",
+     "flag_change": "fixed",
+     "label_change": "fixed"
+    },
+    {
+     "call_id": "T50-documentation-02-A-K1",
+     "expected": "no_alert",
+     "a": "alarm",
+     "b": "review",
+     "flag_change": "same",
+     "label_change": "same"
+    },
+    {
+     "call_id": "T50-documentation-02-A-K2",
+     "expected": "no_alert",
+     "a": "alarm",
+     "b": "review",
+     "flag_change": "same",
+     "label_change": "same"
+    },
+    {
+     "call_id": "T50-documentation-trap-K1",
+     "expected": "no_alert",
+     "a": "alarm",
+     "b": "review",
+     "flag_change": "same",
+     "label_change": "same"
+    },
+    {
+     "call_id": "T50-documentation-trap-K2",
+     "expected": "no_alert",
+     "a": "alarm",
+     "b": "review",
+     "flag_change": "same",
+     "label_change": "same"
+    }
+   ],
+   "mcnemar_flag": {
+    "n": 100,
+    "a_only": 4,
+    "b_only": 5,
+    "both": 71,
+    "neither": 20,
+    "p": 1.0
+   },
+   "mcnemar_label": {
+    "n": 100,
+    "a_only": 1,
+    "b_only": 5,
+    "both": 63,
+    "neither": 31,
+    "p": 0.2188
+   }
+  }
+ },
+ "agreement": {
+  "test50, Kev 0.3-0.7": {
+   "answers": 2800,
+   "both": 2800,
+   "disagree": 1364,
+   "contradict": 42,
+   "a": {
+    "yes": 186,
+    "no": 1280,
+    "unclear": 1334
+   },
+   "b": {
+    "yes": 247,
+    "no": 2377,
+    "unclear": 176
+   },
+   "combined": {
+    "yes": 152,
+    "no": 1190,
+    "unclear": 1458
+   }
+  }
+ },
+ "sanity": {
+  "only_a_vs_rule_a": {
+   "n": 100,
+   "differ": 0,
+   "calls": [],
+   "max_score_diff": 0.0,
+   "missing": []
+  }
+ },
+ "rows": {
+  "default": {
+   "fixed": [
+    {
+     "call_id": "T50-access-01-A-K1",
+     "dialogue_id": "T50-access-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-01",
+     "predicted": "no_alert",
+     "score": 0.0177,
+     "uncertainty": 0.1048,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.66
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-01-A-K2",
+     "dialogue_id": "T50-access-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-01",
+     "predicted": "no_alert",
+     "score": 0.0179,
+     "uncertainty": 0.0953,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.01,
+      "checks": 1.69
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-01-B-K1",
+     "dialogue_id": "T50-access-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-01",
+     "predicted": "no_alert",
+     "score": 0.0066,
+     "uncertainty": 0.1032,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.65
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-01-B-K2",
+     "dialogue_id": "T50-access-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-01",
+     "predicted": "no_alert",
+     "score": 0.0125,
+     "uncertainty": 0.1109,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.01,
+      "checks": 1.65
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-02-A-K1",
+     "dialogue_id": "T50-access-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-02",
+     "predicted": "no_alert",
+     "score": 0.1,
+     "uncertainty": 0.125,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.10 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-02-A-K2",
+     "dialogue_id": "T50-access-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-02",
+     "predicted": "no_alert",
+     "score": 0.139,
+     "uncertainty": 0.1737,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.14 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-02-B-K1",
+     "dialogue_id": "T50-access-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-02",
+     "predicted": "alarm",
+     "score": 0.8955,
+     "uncertainty": 0.1306,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.90 für 'Zugangsinformation preisgegeben' >= Schwelle 0.55 bei Unsicherheit 0.13 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-02-B-K2",
+     "dialogue_id": "T50-access-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-02",
+     "predicted": "no_alert",
+     "score": 0.2655,
+     "uncertainty": 0.3319,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.27 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.48
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-03-A-K1",
+     "dialogue_id": "T50-access-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-03",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:23-00:23 access: Die neue Karte ist letzte Woche gekommen und ich benutze sie seit gestern mit der PIN aus dem Brief,",
+     "reason": "keywords: Stichwort K10 «PIN» (Zugangswörter)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.65
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-03-A-K2",
+     "dialogue_id": "T50-access-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-03",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:23-00:23 access: Die neue Karte ist letzte Woche gekommen und ich benutze sie seit gestern mit der PIN aus dem Brief,",
+     "reason": "keywords: Stichwort K10 «PIN» (Zugangswörter)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.65
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-03-B-K1",
+     "dialogue_id": "T50-access-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-03",
+     "predicted": "no_alert",
+     "score": 0.0264,
+     "uncertainty": 0.2029,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.03 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-03-B-K2",
+     "dialogue_id": "T50-access-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-03",
+     "predicted": "no_alert",
+     "score": 0.0265,
+     "uncertainty": 0.2078,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.03 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-review-K1",
+     "dialogue_id": "T50-access-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "access",
+     "group": "T50-access-review",
+     "predicted": "no_alert",
+     "score": 0.1362,
+     "uncertainty": 0.409,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.14 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.02,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.48
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-review-K2",
+     "dialogue_id": "T50-access-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "access",
+     "group": "T50-access-review",
+     "predicted": "review",
+     "score": 0.5104,
+     "uncertainty": 0.3783,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": "01:03-01:04 access: 492806. Vielleicht hilft Ihnen das ja.",
+     "reason": "patterns: Kundschaft liest möglichen Zugangscode (6 Ziffern) vor, Stichwort «Code»",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-trap-K1",
+     "dialogue_id": "T50-access-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-trap",
+     "predicted": "no_alert",
+     "score": 0.0206,
+     "uncertainty": 0.1208,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-trap-K2",
+     "dialogue_id": "T50-access-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-trap",
+     "predicted": "no_alert",
+     "score": 0.0327,
+     "uncertainty": 0.1323,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.03 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.31
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-01-A-K1",
+     "dialogue_id": "T50-disclosure-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-01",
+     "predicted": "alarm",
+     "score": 0.889,
+     "uncertainty": 0.3083,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 disclosure: Für das Konto ihrer Mutter ist bei uns keine Vollmacht für sie eingetragen, sie haben dort also keinen Zugang.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung) – verneint («keine»)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.48
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-01-A-K2",
+     "dialogue_id": "T50-disclosure-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-01",
+     "predicted": "alarm",
+     "score": 0.8933,
+     "uncertainty": 0.304,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 disclosure: Für das Konto ihrer Mutter ist bei uns keine Vollmacht für sie eingefragen. Sie haben dort also keinen Zugang.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung) – verneint («keine»)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-01-B-K1",
+     "dialogue_id": "T50-disclosure-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:23-00:24 disclosure: Für das Konto ihrer Mutter ist bei uns seit März eine Vollmacht für sie eingetragen. Sie haben dort also vollen Zugang.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-01-B-K2",
+     "dialogue_id": "T50-disclosure-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:23-00:24 disclosure: Für das Konto ihrer Mutter ist bei uns seit März eine Vollmacht für sie eingetragen. Sie haben dort also vollen Zugang.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-02-A-K1",
+     "dialogue_id": "T50-disclosure-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-02-A-K2",
+     "dialogue_id": "T50-disclosure-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.63
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-02-B-K1",
+     "dialogue_id": "T50-disclosure-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.64
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-02-B-K2",
+     "dialogue_id": "T50-disclosure-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-03-A-K1",
+     "dialogue_id": "T50-disclosure-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-03",
+     "predicted": "no_alert",
+     "score": 0.0166,
+     "uncertainty": 0.1941,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-03-A-K2",
+     "dialogue_id": "T50-disclosure-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-03",
+     "predicted": "no_alert",
+     "score": 0.0217,
+     "uncertainty": 0.1897,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-03-B-K1",
+     "dialogue_id": "T50-disclosure-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-03",
+     "predicted": "no_alert",
+     "score": 0.0809,
+     "uncertainty": 0.3885,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.08 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-03-B-K2",
+     "dialogue_id": "T50-disclosure-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-03",
+     "predicted": "no_alert",
+     "score": 0.041,
+     "uncertainty": 0.3982,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.04 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.63
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-review-K1",
+     "dialogue_id": "T50-disclosure-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-review",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "01:17-01:18 disclosure: Dann schicken wir ein Formular für eine richtige Vollmacht, das Frau Ackermann unterschrieben kann. Damit geht es dann sicher.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-review-K2",
+     "dialogue_id": "T50-disclosure-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-review",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "01:17-01:18 disclosure: Dann schicken wir Ihnen ein Formular für eine richtige Vollmacht, das die Frau Ackermann unterschrieben kann. Damit geht es Ihnen sicher.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-trap-K1",
+     "dialogue_id": "T50-disclosure-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-trap",
+     "predicted": "no_alert",
+     "score": 0.2163,
+     "uncertainty": 0.3033,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.22 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-trap-K2",
+     "dialogue_id": "T50-disclosure-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-trap",
+     "predicted": "no_alert",
+     "score": 0.2163,
+     "uncertainty": 0.3043,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.22 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-01-A-K1",
+     "dialogue_id": "T50-documentation-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle.",
+     "reason": "keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-01-A-K2",
+     "dialogue_id": "T50-documentation-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle.",
+     "reason": "keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-01-B-K1",
+     "dialogue_id": "T50-documentation-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle auf.",
+     "reason": "keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-01-B-K2",
+     "dialogue_id": "T50-documentation-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle auf.",
+     "reason": "keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-02-A-K1",
+     "dialogue_id": "T50-documentation-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Relevante Angabe verschweigen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-02-A-K2",
+     "dialogue_id": "T50-documentation-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-02",
+     "predicted": "review",
+     "score": 0.7042,
+     "uncertainty": 0.3698,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (unsicher): Score 0.70 für 'Relevante Angabe verschweigen' erreicht die Schwelle 0.55, aber die Unsicherheit 0.37 liegt über 0.35.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-02-B-K1",
+     "dialogue_id": "T50-documentation-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-02",
+     "predicted": "alarm",
+     "score": 0.8476,
+     "uncertainty": 0.1905,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.85 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.19 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-02-B-K2",
+     "dialogue_id": "T50-documentation-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-02",
+     "predicted": "alarm",
+     "score": 0.8424,
+     "uncertainty": 0.1971,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.84 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.20 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-03-A-K1",
+     "dialogue_id": "T50-documentation-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-03",
+     "predicted": "alarm",
+     "score": 0.8765,
+     "uncertainty": 0.1544,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.88 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.15 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-03-A-K2",
+     "dialogue_id": "T50-documentation-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-03",
+     "predicted": "alarm",
+     "score": 0.8518,
+     "uncertainty": 0.1852,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.85 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.19 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-03-B-K1",
+     "dialogue_id": "T50-documentation-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-03",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Relevante Angabe verschweigen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-03-B-K2",
+     "dialogue_id": "T50-documentation-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-03",
+     "predicted": "no_alert",
+     "score": 0.003,
+     "uncertainty": 0.0247,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-review-K1",
+     "dialogue_id": "T50-documentation-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "documentation",
+     "group": "T50-documentation-review",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Relevante Angabe verschweigen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-review-K2",
+     "dialogue_id": "T50-documentation-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "documentation",
+     "group": "T50-documentation-review",
+     "predicted": "alarm",
+     "score": 0.8466,
+     "uncertainty": 0.1918,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.85 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.19 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-trap-K1",
+     "dialogue_id": "T50-documentation-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-trap",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:21-00:22 documentation: Nein, das war ein Versprechen. Bitte nicht protokollieren, was ich vorhin gesagt habe. Mein Lohn ist 7800 Franken im Monat.",
+     "reason": "keywords: Stichwort K06 «nicht protokollieren» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-trap-K2",
+     "dialogue_id": "T50-documentation-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-trap",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:21-00:22 documentation: Nein, das war ein Versprechen. Bitte nicht protokollieren, was ich vorhin gesagt habe.",
+     "reason": "keywords: Stichwort K06 «nicht protokollieren» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-01-K1",
+     "dialogue_id": "T50-multi-01",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-multi-01",
+     "predicted": "no_alert",
+     "score": 0.0605,
+     "uncertainty": 0.2382,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.06 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-01-K2",
+     "dialogue_id": "T50-multi-01",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-multi-01",
+     "predicted": "no_alert",
+     "score": 0.0627,
+     "uncertainty": 0.2342,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.06 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-02-K1",
+     "dialogue_id": "T50-multi-02",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-multi-02",
+     "predicted": "alarm",
+     "score": 0.9282,
+     "uncertainty": 0.0898,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.93 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.09 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-02-K2",
+     "dialogue_id": "T50-multi-02",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-multi-02",
+     "predicted": "alarm",
+     "score": 0.9179,
+     "uncertainty": 0.1026,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.92 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.10 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-03-K1",
+     "dialogue_id": "T50-multi-03",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-multi-03",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 disclosure: Für das Konto Ihres Mannes ist seit zwei Jahren Vollmacht für Sie hinterlegt, das ist in Ordnung. Was möchten Sie wissen?",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-03-K2",
+     "dialogue_id": "T50-multi-03",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-multi-03",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 disclosure: Für das Konto Ihres Mannes ist seit zwei Jahren Vollmacht für Sie hinterlegt. Das ist in Ordnung. Was möchten Sie wissen?",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-04-K1",
+     "dialogue_id": "T50-multi-04",
+     "level": 2,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "disclosure",
+     "group": "T50-multi-04",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-01:02 disclosure: Ob Ihre Kranke Kasse bezahlt ist. Sie hat mir dafür vor einer Woche eine Vollmacht unterschrieben. Die Vollmacht ist angekommen, aber unsere Rechtsabteilung prüft sie noch.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-04-K2",
+     "dialogue_id": "T50-multi-04",
+     "level": 2,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "disclosure",
+     "group": "T50-multi-04",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-01:01 disclosure: Ob Ihre Kranke Kasse bezahlt ist. Sie hat mir den Vorfahrerwochen eine Vollmacht unterschrieben. Die Vollmacht ist angekommen, aber unsere Rechtsabteilung prüft sie noch.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-01-A-K1",
+     "dialogue_id": "T50-numbers-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-01",
+     "predicted": "no_alert",
+     "score": 0.0029,
+     "uncertainty": 0.0068,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-01-A-K2",
+     "dialogue_id": "T50-numbers-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-01",
+     "predicted": "no_alert",
+     "score": 0.0046,
+     "uncertainty": 0.0129,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-01-B-K1",
+     "dialogue_id": "T50-numbers-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-01",
+     "predicted": "no_alert",
+     "score": 0.0008,
+     "uncertainty": 0.0274,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.42
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-01-B-K2",
+     "dialogue_id": "T50-numbers-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-01",
+     "predicted": "no_alert",
+     "score": 0.0007,
+     "uncertainty": 0.0238,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.42
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-02-A-K1",
+     "dialogue_id": "T50-numbers-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-02",
+     "predicted": "no_alert",
+     "score": 0.0075,
+     "uncertainty": 0.1538,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-02-A-K2",
+     "dialogue_id": "T50-numbers-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-02",
+     "predicted": "no_alert",
+     "score": 0.0043,
+     "uncertainty": 0.16,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.48
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-02-B-K1",
+     "dialogue_id": "T50-numbers-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-02-B-K2",
+     "dialogue_id": "T50-numbers-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-02",
+     "predicted": "no_alert",
+     "score": 0.0079,
+     "uncertainty": 0.1889,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-03-A-K1",
+     "dialogue_id": "T50-numbers-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-03",
+     "predicted": "no_alert",
+     "score": 0.0021,
+     "uncertainty": 0.0282,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-03-A-K2",
+     "dialogue_id": "T50-numbers-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-03",
+     "predicted": "no_alert",
+     "score": 0.0025,
+     "uncertainty": 0.0363,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-03-B-K1",
+     "dialogue_id": "T50-numbers-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-03",
+     "predicted": "no_alert",
+     "score": 0.001,
+     "uncertainty": 0.0243,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-03-B-K2",
+     "dialogue_id": "T50-numbers-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-03",
+     "predicted": "no_alert",
+     "score": 0.0013,
+     "uncertainty": 0.0343,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-01-A-K1",
+     "dialogue_id": "T50-splitting-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-01",
+     "predicted": "alarm",
+     "score": 0.7677,
+     "uncertainty": 0.2903,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.77 für 'Zuständigkeit/Kontrolle umgehen' >= Schwelle 0.55 bei Unsicherheit 0.29 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-01-A-K2",
+     "dialogue_id": "T50-splitting-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-01",
+     "predicted": "alarm",
+     "score": 0.7975,
+     "uncertainty": 0.2531,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.80 für 'Zuständigkeit/Kontrolle umgehen' >= Schwelle 0.55 bei Unsicherheit 0.25 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-01-B-K1",
+     "dialogue_id": "T50-splitting-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-01",
+     "predicted": "no_alert",
+     "score": 0.0072,
+     "uncertainty": 0.0388,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-01-B-K2",
+     "dialogue_id": "T50-splitting-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-01",
+     "predicted": "no_alert",
+     "score": 0.0115,
+     "uncertainty": 0.0503,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-02-A-K1",
+     "dialogue_id": "T50-splitting-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-02",
+     "predicted": "no_alert",
+     "score": 0.0616,
+     "uncertainty": 0.0771,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.06 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.31
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-02-A-K2",
+     "dialogue_id": "T50-splitting-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-02",
+     "predicted": "no_alert",
+     "score": 0.1302,
+     "uncertainty": 0.1628,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.13 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-02-B-K1",
+     "dialogue_id": "T50-splitting-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-02",
+     "predicted": "no_alert",
+     "score": 0.1358,
+     "uncertainty": 0.1697,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.14 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.42
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-02-B-K2",
+     "dialogue_id": "T50-splitting-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-02",
+     "predicted": "no_alert",
+     "score": 0.1517,
+     "uncertainty": 0.1896,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.15 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-03-A-K1",
+     "dialogue_id": "T50-splitting-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-03",
+     "predicted": "alarm",
+     "score": 0.7708,
+     "uncertainty": 0.3303,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:29-00:30 splitting: Bei Ihnen werden Überweisungen über fünfzigtausend Franken intergenau angeschaut. Und ich will die Kontrolle umgehen, weil mir das zu lange dauert. Das habe ich von einem Kollegen gehört.",
+     "reason": "keywords: Stichwort K08 «Kontrolle umgehen» (Kontrollumgehung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-03-A-K2",
+     "dialogue_id": "T50-splitting-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-03",
+     "predicted": "alarm",
+     "score": 0.753,
+     "uncertainty": 0.3464,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:29-00:30 splitting: Bei Ihnen werden Überweisungen über fünfzigtausend Franken intergenau angeschaut. Und ich möchte die Kontrolle umgehen.",
+     "reason": "keywords: Stichwort K08 «Kontrolle umgehen» (Kontrollumgehung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-03-B-K1",
+     "dialogue_id": "T50-splitting-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-03",
+     "predicted": "no_alert",
+     "score": 0.0339,
+     "uncertainty": 0.1682,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.03 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-03-B-K2",
+     "dialogue_id": "T50-splitting-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-03",
+     "predicted": "no_alert",
+     "score": 0.0336,
+     "uncertainty": 0.1668,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.03 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-review-K1",
+     "dialogue_id": "T50-splitting-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "splitting",
+     "group": "T50-splitting-review",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Zuständigkeit/Kontrolle umgehen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-review-K2",
+     "dialogue_id": "T50-splitting-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "splitting",
+     "group": "T50-splitting-review",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Zuständigkeit/Kontrolle umgehen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-trap-K1",
+     "dialogue_id": "T50-splitting-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-trap",
+     "predicted": "no_alert",
+     "score": 0.0399,
+     "uncertainty": 0.2185,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.04 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-trap-K2",
+     "dialogue_id": "T50-splitting-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-trap",
+     "predicted": "no_alert",
+     "score": 0.0362,
+     "uncertainty": 0.2081,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.04 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-01-A-K1",
+     "dialogue_id": "T50-trade-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-01",
+     "predicted": "alarm",
+     "score": 0.9619,
+     "uncertainty": 0.1907,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 trade: Es geht um Orimet. Mein Schwager arbeitet in der Finanzabteilung und hat mir gestern erzählt, dass die Firma übernommen wird, was noch nicht bekannt ist.",
+     "reason": "keywords: Stichwort K02 «Finanzabteilung» (Interne Quelle)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-01-A-K2",
+     "dialogue_id": "T50-trade-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-01",
+     "predicted": "alarm",
+     "score": 0.9618,
+     "uncertainty": 0.1907,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 trade: Es geht um Orimet. Mein Schwager arbeitet heute in der Finanzabteilung und hat mir gestern erzählt,",
+     "reason": "keywords: Stichwort K02 «Finanzabteilung» (Interne Quelle)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-01-B-K1",
+     "dialogue_id": "T50-trade-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-01",
+     "predicted": "no_alert",
+     "score": 0.0036,
+     "uncertainty": 0.0786,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.64
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-01-B-K2",
+     "dialogue_id": "T50-trade-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-01",
+     "predicted": "no_alert",
+     "score": 0.0072,
+     "uncertainty": 0.1012,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.64
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-02-A-K1",
+     "dialogue_id": "T50-trade-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-02",
+     "predicted": "no_alert",
+     "score": 0.0002,
+     "uncertainty": 0.0037,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-02-A-K2",
+     "dialogue_id": "T50-trade-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-02",
+     "predicted": "no_alert",
+     "score": 0.0002,
+     "uncertainty": 0.004,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-02-B-K1",
+     "dialogue_id": "T50-trade-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-02",
+     "predicted": "alarm",
+     "score": 0.9843,
+     "uncertainty": 0.0196,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.98 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.02 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-02-B-K2",
+     "dialogue_id": "T50-trade-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-02",
+     "predicted": "alarm",
+     "score": 0.992,
+     "uncertainty": 0.01,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.99 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.01 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-03-A-K1",
+     "dialogue_id": "T50-trade-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-03",
+     "predicted": "alarm",
+     "score": 0.9593,
+     "uncertainty": 0.0509,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.96 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.05 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-03-A-K2",
+     "dialogue_id": "T50-trade-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-03",
+     "predicted": "alarm",
+     "score": 0.9775,
+     "uncertainty": 0.0281,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.98 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.03 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-03-B-K1",
+     "dialogue_id": "T50-trade-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-03",
+     "predicted": "no_alert",
+     "score": 0.0049,
+     "uncertainty": 0.007,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-03-B-K2",
+     "dialogue_id": "T50-trade-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-03",
+     "predicted": "no_alert",
+     "score": 0.0042,
+     "uncertainty": 0.0074,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-review-K1",
+     "dialogue_id": "T50-trade-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "trade",
+     "group": "T50-trade-review",
+     "predicted": "alarm",
+     "score": 0.9136,
+     "uncertainty": 0.108,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.91 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.11 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-review-K2",
+     "dialogue_id": "T50-trade-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "trade",
+     "group": "T50-trade-review",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Insiderhandel' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-trap-K1",
+     "dialogue_id": "T50-trade-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-trap",
+     "predicted": "no_alert",
+     "score": 0.0372,
+     "uncertainty": 0.1911,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.04 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-trap-K2",
+     "dialogue_id": "T50-trade-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-trap",
+     "predicted": "no_alert",
+     "score": 0.0372,
+     "uncertainty": 0.1911,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.04 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    }
+   ]
+  },
+  "champion_v3": {
+   "fixed": [
+    {
+     "call_id": "T50-access-01-A-K1",
+     "dialogue_id": "T50-access-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-01",
+     "predicted": "no_alert",
+     "score": 0.0072,
+     "uncertainty": 0.009,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.66
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-01-A-K2",
+     "dialogue_id": "T50-access-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-01",
+     "predicted": "no_alert",
+     "score": 0.0089,
+     "uncertainty": 0.0111,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.01 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.01,
+      "checks": 1.69
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-01-B-K1",
+     "dialogue_id": "T50-access-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-01",
+     "predicted": "no_alert",
+     "score": 0.0001,
+     "uncertainty": 0.0036,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.65
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-01-B-K2",
+     "dialogue_id": "T50-access-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-01",
+     "predicted": "no_alert",
+     "score": 0.0041,
+     "uncertainty": 0.0051,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.01,
+      "checks": 1.65
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-02-A-K1",
+     "dialogue_id": "T50-access-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-02",
+     "predicted": "no_alert",
+     "score": 0.1527,
+     "uncertainty": 0.1909,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.15 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-02-A-K2",
+     "dialogue_id": "T50-access-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-02",
+     "predicted": "alarm",
+     "score": 0.8492,
+     "uncertainty": 0.1886,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.85 für 'Zugangsinformation preisgegeben' >= Schwelle 0.55 bei Unsicherheit 0.19 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-02-B-K1",
+     "dialogue_id": "T50-access-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-02",
+     "predicted": "alarm",
+     "score": 0.9756,
+     "uncertainty": 0.0304,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.98 für 'Zugangsinformation preisgegeben' >= Schwelle 0.55 bei Unsicherheit 0.03 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-02-B-K2",
+     "dialogue_id": "T50-access-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-02",
+     "predicted": "alarm",
+     "score": 0.9919,
+     "uncertainty": 0.0101,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.99 für 'Zugangsinformation preisgegeben' >= Schwelle 0.55 bei Unsicherheit 0.01 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.48
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-03-A-K1",
+     "dialogue_id": "T50-access-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-03",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:23-00:23 access: Die neue Karte ist letzte Woche gekommen und ich benutze sie seit gestern mit der PIN aus dem Brief,",
+     "reason": "keywords: Stichwort K10 «PIN» (Zugangswörter)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.65
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-03-A-K2",
+     "dialogue_id": "T50-access-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-access-03",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:23-00:23 access: Die neue Karte ist letzte Woche gekommen und ich benutze sie seit gestern mit der PIN aus dem Brief,",
+     "reason": "keywords: Stichwort K10 «PIN» (Zugangswörter)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.65
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-03-B-K1",
+     "dialogue_id": "T50-access-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-03",
+     "predicted": "no_alert",
+     "score": 0.0204,
+     "uncertainty": 0.1344,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-03-B-K2",
+     "dialogue_id": "T50-access-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-03",
+     "predicted": "no_alert",
+     "score": 0.0203,
+     "uncertainty": 0.1319,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-review-K1",
+     "dialogue_id": "T50-access-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "access",
+     "group": "T50-access-review",
+     "predicted": "alarm",
+     "score": 0.8064,
+     "uncertainty": 0.2866,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": "01:02-01:04 access: vier, neun, zwei, acht, null, sechs. Vielleicht hilft Ihnen das ja.",
+     "reason": "patterns: Kundschaft liest möglichen Zugangscode (6 Ziffern) vor, Stichwort «Code»",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.02,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.48
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-review-K2",
+     "dialogue_id": "T50-access-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "access",
+     "group": "T50-access-review",
+     "predicted": "review",
+     "score": 0.5104,
+     "uncertainty": 0.3783,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": "01:03-01:04 access: 492806. Vielleicht hilft Ihnen das ja.",
+     "reason": "patterns: Kundschaft liest möglichen Zugangscode (6 Ziffern) vor, Stichwort «Code»",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-trap-K1",
+     "dialogue_id": "T50-access-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-trap",
+     "predicted": "no_alert",
+     "score": 0.0223,
+     "uncertainty": 0.1223,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-access-trap-K2",
+     "dialogue_id": "T50-access-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "access",
+     "group": "T50-access-trap",
+     "predicted": "no_alert",
+     "score": 0.0588,
+     "uncertainty": 0.1571,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.06 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.31
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-01-A-K1",
+     "dialogue_id": "T50-disclosure-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-01",
+     "predicted": "alarm",
+     "score": 0.8539,
+     "uncertainty": 0.344,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 disclosure: Für das Konto ihrer Mutter ist bei uns keine Vollmacht für sie eingetragen, sie haben dort also keinen Zugang.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung) – verneint («keine»)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.48
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-01-A-K2",
+     "dialogue_id": "T50-disclosure-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-01",
+     "predicted": "alarm",
+     "score": 0.8953,
+     "uncertainty": 0.3019,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 disclosure: Für das Konto ihrer Mutter ist bei uns keine Vollmacht für sie eingefragen. Sie haben dort also keinen Zugang.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung) – verneint («keine»)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-01-B-K1",
+     "dialogue_id": "T50-disclosure-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:23-00:24 disclosure: Für das Konto ihrer Mutter ist bei uns seit März eine Vollmacht für sie eingetragen. Sie haben dort also vollen Zugang.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-01-B-K2",
+     "dialogue_id": "T50-disclosure-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:23-00:24 disclosure: Für das Konto ihrer Mutter ist bei uns seit März eine Vollmacht für sie eingetragen. Sie haben dort also vollen Zugang.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-02-A-K1",
+     "dialogue_id": "T50-disclosure-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-02-A-K2",
+     "dialogue_id": "T50-disclosure-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.63
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-02-B-K1",
+     "dialogue_id": "T50-disclosure-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.64
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-02-B-K2",
+     "dialogue_id": "T50-disclosure-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-03-A-K1",
+     "dialogue_id": "T50-disclosure-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-03",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-03-A-K2",
+     "dialogue_id": "T50-disclosure-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-03",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-03-B-K1",
+     "dialogue_id": "T50-disclosure-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-03",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-03-B-K2",
+     "dialogue_id": "T50-disclosure-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-03",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.63
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-review-K1",
+     "dialogue_id": "T50-disclosure-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-review",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "01:17-01:18 disclosure: Dann schicken wir ein Formular für eine richtige Vollmacht, das Frau Ackermann unterschrieben kann. Damit geht es dann sicher.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-review-K2",
+     "dialogue_id": "T50-disclosure-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-review",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "01:17-01:18 disclosure: Dann schicken wir Ihnen ein Formular für eine richtige Vollmacht, das die Frau Ackermann unterschrieben kann. Damit geht es Ihnen sicher.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-trap-K1",
+     "dialogue_id": "T50-disclosure-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-trap",
+     "predicted": "alarm",
+     "score": 0.9604,
+     "uncertainty": 0.1921,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:14-00:14 disclosure: Haben Sie eine Vollmacht für das Konto Ihres früheren Mannes gehabt?",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-disclosure-trap-K2",
+     "dialogue_id": "T50-disclosure-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-disclosure-trap",
+     "predicted": "alarm",
+     "score": 0.9591,
+     "uncertainty": 0.1935,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:14-00:14 disclosure: Haben Sie eine Vollmacht für das Konto Ihres früheren Mannes?",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-01-A-K1",
+     "dialogue_id": "T50-documentation-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle.",
+     "reason": "keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-01-A-K2",
+     "dialogue_id": "T50-documentation-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle.",
+     "reason": "keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-01-B-K1",
+     "dialogue_id": "T50-documentation-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle auf.",
+     "reason": "keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-01-B-K2",
+     "dialogue_id": "T50-documentation-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-01",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-00:59 documentation: Bitte nehmen Sie die dritte Zeile nicht in die Notiz für die Kreditstelle auf.",
+     "reason": "keywords: Stichwort K06 «nicht in die Notiz» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-02-A-K1",
+     "dialogue_id": "T50-documentation-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-02",
+     "predicted": "alarm",
+     "score": 0.8591,
+     "uncertainty": 0.1761,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.86 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.18 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-02-A-K2",
+     "dialogue_id": "T50-documentation-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-02",
+     "predicted": "alarm",
+     "score": 0.7842,
+     "uncertainty": 0.2697,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.78 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.27 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-02-B-K1",
+     "dialogue_id": "T50-documentation-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-02",
+     "predicted": "alarm",
+     "score": 0.9011,
+     "uncertainty": 0.1237,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.90 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.12 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-02-B-K2",
+     "dialogue_id": "T50-documentation-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-02",
+     "predicted": "alarm",
+     "score": 0.9105,
+     "uncertainty": 0.1119,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.91 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.11 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-03-A-K1",
+     "dialogue_id": "T50-documentation-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-03",
+     "predicted": "alarm",
+     "score": 0.986,
+     "uncertainty": 0.0175,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.99 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.02 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-03-A-K2",
+     "dialogue_id": "T50-documentation-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-documentation-03",
+     "predicted": "alarm",
+     "score": 0.982,
+     "uncertainty": 0.0225,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.98 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.02 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-03-B-K1",
+     "dialogue_id": "T50-documentation-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-03",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Relevante Angabe verschweigen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-03-B-K2",
+     "dialogue_id": "T50-documentation-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-03",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-review-K1",
+     "dialogue_id": "T50-documentation-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "documentation",
+     "group": "T50-documentation-review",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Relevante Angabe verschweigen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-review-K2",
+     "dialogue_id": "T50-documentation-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "documentation",
+     "group": "T50-documentation-review",
+     "predicted": "alarm",
+     "score": 0.8517,
+     "uncertainty": 0.1854,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.85 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.19 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-trap-K1",
+     "dialogue_id": "T50-documentation-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-trap",
+     "predicted": "alarm",
+     "score": 0.954,
+     "uncertainty": 0.1985,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:21-00:22 documentation: Nein, das war ein Versprechen. Bitte nicht protokollieren, was ich vorhin gesagt habe. Mein Lohn ist 7800 Franken im Monat.",
+     "reason": "keywords: Stichwort K06 «nicht protokollieren» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-documentation-trap-K2",
+     "dialogue_id": "T50-documentation-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "documentation",
+     "group": "T50-documentation-trap",
+     "predicted": "alarm",
+     "score": 0.909,
+     "uncertainty": 0.243,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:21-00:22 documentation: Nein, das war ein Versprechen. Bitte nicht protokollieren, was ich vorhin gesagt habe.",
+     "reason": "keywords: Stichwort K06 «nicht protokollieren» (Dokumentation auslassen)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-01-K1",
+     "dialogue_id": "T50-multi-01",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-multi-01",
+     "predicted": "no_alert",
+     "score": 0.041,
+     "uncertainty": 0.1936,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.04 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-01-K2",
+     "dialogue_id": "T50-multi-01",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "access",
+     "group": "T50-multi-01",
+     "predicted": "no_alert",
+     "score": 0.0518,
+     "uncertainty": 0.203,
+     "top_family": "access",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.05 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-02-K1",
+     "dialogue_id": "T50-multi-02",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-multi-02",
+     "predicted": "alarm",
+     "score": 0.9954,
+     "uncertainty": 0.0057,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 1.00 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.01 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-02-K2",
+     "dialogue_id": "T50-multi-02",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "documentation",
+     "group": "T50-multi-02",
+     "predicted": "alarm",
+     "score": 0.9981,
+     "uncertainty": 0.0024,
+     "top_family": "documentation",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 1.00 für 'Relevante Angabe verschweigen' >= Schwelle 0.55 bei Unsicherheit 0.00 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-03-K1",
+     "dialogue_id": "T50-multi-03",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-multi-03",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 disclosure: Für das Konto Ihres Mannes ist seit zwei Jahren Vollmacht für Sie hinterlegt, das ist in Ordnung. Was möchten Sie wissen?",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-03-K2",
+     "dialogue_id": "T50-multi-03",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "disclosure",
+     "group": "T50-multi-03",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 disclosure: Für das Konto Ihres Mannes ist seit zwei Jahren Vollmacht für Sie hinterlegt. Das ist in Ordnung. Was möchten Sie wissen?",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-04-K1",
+     "dialogue_id": "T50-multi-04",
+     "level": 2,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "disclosure",
+     "group": "T50-multi-04",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-01:02 disclosure: Ob Ihre Kranke Kasse bezahlt ist. Sie hat mir dafür vor einer Woche eine Vollmacht unterschrieben. Die Vollmacht ist angekommen, aber unsere Rechtsabteilung prüft sie noch.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-multi-04-K2",
+     "dialogue_id": "T50-multi-04",
+     "level": 2,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "disclosure",
+     "group": "T50-multi-04",
+     "predicted": "review",
+     "score": 0.475,
+     "uncertainty": 0.3994,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:58-01:01 disclosure: Ob Ihre Kranke Kasse bezahlt ist. Sie hat mir den Vorfahrerwochen eine Vollmacht unterschrieben. Die Vollmacht ist angekommen, aber unsere Rechtsabteilung prüft sie noch.",
+     "reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-01-A-K1",
+     "dialogue_id": "T50-numbers-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-01",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-01-A-K2",
+     "dialogue_id": "T50-numbers-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-01",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-01-B-K1",
+     "dialogue_id": "T50-numbers-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-01",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.42
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-01-B-K2",
+     "dialogue_id": "T50-numbers-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-01",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.42
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-02-A-K1",
+     "dialogue_id": "T50-numbers-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-02",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-02-A-K2",
+     "dialogue_id": "T50-numbers-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-02",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.48
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-02-B-K1",
+     "dialogue_id": "T50-numbers-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-02",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "disclosure",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Auskunft an Dritte' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-02-B-K2",
+     "dialogue_id": "T50-numbers-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-02",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-03-A-K1",
+     "dialogue_id": "T50-numbers-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-03",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-03-A-K2",
+     "dialogue_id": "T50-numbers-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-03",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-03-B-K1",
+     "dialogue_id": "T50-numbers-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-03",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.01,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-numbers-03-B-K2",
+     "dialogue_id": "T50-numbers-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "numbers",
+     "group": "T50-numbers-03",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-01-A-K1",
+     "dialogue_id": "T50-splitting-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-01",
+     "predicted": "alarm",
+     "score": 0.8563,
+     "uncertainty": 0.1796,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.86 für 'Zuständigkeit/Kontrolle umgehen' >= Schwelle 0.55 bei Unsicherheit 0.18 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-01-A-K2",
+     "dialogue_id": "T50-splitting-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-01",
+     "predicted": "alarm",
+     "score": 0.9491,
+     "uncertainty": 0.0636,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.95 für 'Zuständigkeit/Kontrolle umgehen' >= Schwelle 0.55 bei Unsicherheit 0.06 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-01-B-K1",
+     "dialogue_id": "T50-splitting-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-01",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-01-B-K2",
+     "dialogue_id": "T50-splitting-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-01",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-02-A-K1",
+     "dialogue_id": "T50-splitting-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-02",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.31
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-02-A-K2",
+     "dialogue_id": "T50-splitting-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-02",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-02-B-K1",
+     "dialogue_id": "T50-splitting-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-02",
+     "predicted": "no_alert",
+     "score": 0.0006,
+     "uncertainty": 0.0129,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.42
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-02-B-K2",
+     "dialogue_id": "T50-splitting-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-02",
+     "predicted": "no_alert",
+     "score": 0.076,
+     "uncertainty": 0.0949,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.08 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-03-A-K1",
+     "dialogue_id": "T50-splitting-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-03",
+     "predicted": "alarm",
+     "score": 0.9085,
+     "uncertainty": 0.2016,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:29-00:30 splitting: Bei Ihnen werden Überweisungen über fünfzigtausend Franken intergenau angeschaut. Und ich will die Kontrolle umgehen, weil mir das zu lange dauert. Das habe ich von einem Kollegen gehört.",
+     "reason": "keywords: Stichwort K08 «Kontrolle umgehen» (Kontrollumgehung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-03-A-K2",
+     "dialogue_id": "T50-splitting-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "splitting",
+     "group": "T50-splitting-03",
+     "predicted": "alarm",
+     "score": 0.8362,
+     "uncertainty": 0.2698,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:29-00:30 splitting: Bei Ihnen werden Überweisungen über fünfzigtausend Franken intergenau angeschaut. Und ich möchte die Kontrolle umgehen.",
+     "reason": "keywords: Stichwort K08 «Kontrolle umgehen» (Kontrollumgehung)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-03-B-K1",
+     "dialogue_id": "T50-splitting-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-03",
+     "predicted": "no_alert",
+     "score": 0.0282,
+     "uncertainty": 0.2708,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.03 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-03-B-K2",
+     "dialogue_id": "T50-splitting-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-03",
+     "predicted": "no_alert",
+     "score": 0.0287,
+     "uncertainty": 0.2776,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.03 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-review-K1",
+     "dialogue_id": "T50-splitting-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "splitting",
+     "group": "T50-splitting-review",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Zuständigkeit/Kontrolle umgehen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.3
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-review-K2",
+     "dialogue_id": "T50-splitting-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "splitting",
+     "group": "T50-splitting-review",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Zuständigkeit/Kontrolle umgehen' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-trap-K1",
+     "dialogue_id": "T50-splitting-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-trap",
+     "predicted": "no_alert",
+     "score": 0.0235,
+     "uncertainty": 0.1354,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-splitting-trap-K2",
+     "dialogue_id": "T50-splitting-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "splitting",
+     "group": "T50-splitting-trap",
+     "predicted": "no_alert",
+     "score": 0.0235,
+     "uncertainty": 0.1354,
+     "top_family": "splitting",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.02 ('Zuständigkeit/Kontrolle umgehen') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-01-A-K1",
+     "dialogue_id": "T50-trade-01-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-01",
+     "predicted": "alarm",
+     "score": 0.9631,
+     "uncertainty": 0.1894,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 trade: Es geht um Orimet. Mein Schwager arbeitet in der Finanzabteilung und hat mir gestern erzählt, dass die Firma übernommen wird, was noch nicht bekannt ist.",
+     "reason": "keywords: Stichwort K02 «Finanzabteilung» (Interne Quelle)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-01-A-K2",
+     "dialogue_id": "T50-trade-01-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-01",
+     "predicted": "alarm",
+     "score": 0.9628,
+     "uncertainty": 0.1898,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": "00:22-00:23 trade: Es geht um Orimet. Mein Schwager arbeitet heute in der Finanzabteilung und hat mir gestern erzählt,",
+     "reason": "keywords: Stichwort K02 «Finanzabteilung» (Interne Quelle)",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-01-B-K1",
+     "dialogue_id": "T50-trade-01-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-01",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.64
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-01-B-K2",
+     "dialogue_id": "T50-trade-01-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-01",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.64
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-02-A-K1",
+     "dialogue_id": "T50-trade-02-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-02",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-02-A-K2",
+     "dialogue_id": "T50-trade-02-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-02",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-02-B-K1",
+     "dialogue_id": "T50-trade-02-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-02",
+     "predicted": "alarm",
+     "score": 1.0,
+     "uncertainty": 0.0,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 1.00 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.00 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-02-B-K2",
+     "dialogue_id": "T50-trade-02-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-02",
+     "predicted": "alarm",
+     "score": 1.0,
+     "uncertainty": 0.0,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 1.00 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.00 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.49
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-03-A-K1",
+     "dialogue_id": "T50-trade-03-A",
+     "level": 2,
+     "noisy": false,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-03",
+     "predicted": "alarm",
+     "score": 0.9423,
+     "uncertainty": 0.0722,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.94 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.07 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-03-A-K2",
+     "dialogue_id": "T50-trade-03-A",
+     "level": 2,
+     "noisy": true,
+     "expected": "alarm",
+     "expected_family": "trade",
+     "group": "T50-trade-03",
+     "predicted": "alarm",
+     "score": 0.9814,
+     "uncertainty": 0.0232,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.98 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.02 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.45
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-03-B-K1",
+     "dialogue_id": "T50-trade-03-B",
+     "level": 2,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-03",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-03-B-K2",
+     "dialogue_id": "T50-trade-03-B",
+     "level": 2,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-03",
+     "predicted": "no_alert",
+     "score": 0.0,
+     "uncertainty": 0.0,
+     "top_family": null,
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.00 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-review-K1",
+     "dialogue_id": "T50-trade-review",
+     "level": 3,
+     "noisy": false,
+     "expected": "review",
+     "expected_family": "trade",
+     "group": "T50-trade-review",
+     "predicted": "alarm",
+     "score": 0.8418,
+     "uncertainty": 0.1978,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Alarm: Score 0.84 für 'Insiderhandel' >= Schwelle 0.55 bei Unsicherheit 0.20 (max. 0.35).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.5
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-review-K2",
+     "dialogue_id": "T50-trade-review",
+     "level": 3,
+     "noisy": true,
+     "expected": "review",
+     "expected_family": "trade",
+     "group": "T50-trade-review",
+     "predicted": "review",
+     "score": 0.5,
+     "uncertainty": 0.35,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Prüfen (knapp unter Schwelle): Score 0.50 für 'Insiderhandel' liegt zwischen 0.40 und der Schwelle 0.55.",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.51
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-trap-K1",
+     "dialogue_id": "T50-trade-trap",
+     "level": 1,
+     "noisy": false,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-trap",
+     "predicted": "no_alert",
+     "score": 0.0372,
+     "uncertainty": 0.1911,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.04 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.43
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    },
+    {
+     "call_id": "T50-trade-trap-K2",
+     "dialogue_id": "T50-trade-trap",
+     "level": 1,
+     "noisy": true,
+     "expected": "no_alert",
+     "expected_family": "trade",
+     "group": "T50-trade-trap",
+     "predicted": "no_alert",
+     "score": 0.0372,
+     "uncertainty": 0.1911,
+     "top_family": "trade",
+     "error": null,
+     "failed_checks": [],
+     "passage": null,
+     "reason": "Kein Alarm: höchster Score 0.04 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+     "llm_calls": 0,
+     "check_seconds": {
+      "keywords": 0.01,
+      "patterns": 0.0,
+      "facts": 0.0
+     },
+     "asr_seconds": null,
+     "timings": {
+      "asr": 0.0,
+      "diarize": 0.0,
+      "checks": 1.44
+     },
+     "models": [
+      "Qwen/Qwen2.5-7B-Instruct-AWQ"
+     ],
+     "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2"
+    }
+   ]
+  }
+ }
+}
