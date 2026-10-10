@@ -12,6 +12,7 @@ import streamlit as st
 
 from callguard.types import LABELS
 from callguard.ui import render as ui
+from callguard.ui import workload
 from callguard.ui.backend import LABEL_RANK, LABEL_TEXT, label_counts
 from callguard.ui.session import current_app
 
@@ -31,7 +32,8 @@ if not app.loaded.results:
 
 changed = app.customized
 counts, base = label_counts(app.decided), label_counts(app.baseline)
-st.caption(f"{len(app.loaded.results)} Anrufe · {app.source.label if app.source else ''} · Alarm ab "
+mode_txt = f" · Prüfmodus **{app.modes.mode.label}**" if app.modes is not None else ""
+st.caption(f"{len(app.loaded.results)} Anrufe · {app.source.label if app.source else ''}{mode_txt} · Alarm ab "
            f"**{s.threshold:.2f}**, Prüfen ab **{max(0.0, s.review_floor):.2f}**"
            + (" · *Einstellungen weichen vom Profil ab*" if changed else ""))
 
@@ -138,3 +140,5 @@ c1.download_button("Tabelle herunterladen (CSV)", df.to_csv(index=False).encode(
 if "keywords" in app.pages and not app.read_only:
     c2.page_link(app.pages["keywords"], label="Stichwortliste bearbeiten und sofort anwenden",
                  icon=":material/tune:")
+
+workload.render(app)  # «Was heisst das für Ihr Team?»: the Prüfmodi as daily workload
