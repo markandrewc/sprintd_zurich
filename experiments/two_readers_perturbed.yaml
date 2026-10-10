@@ -1,0 +1,15 @@
+# Two readers on the re-recorded dev audio (A5 of research/findings/two_readers_prereg.md, informative only).
+# Needs kev_perturbed/perturbed AND kev_perturbed/kev_facts (experiments/kev_perturbed.yaml, docs/KEV.md stages 2+3)
+# and data_perturbed/v1 (labels), then:  uv run callguard agreement run --only perturbed
+name: two_readers_perturbed
+description: Two readers on re-recorded dev audio (speed 0.96, -3 dB)
+rq: [RQ8, RQ10]
+base: two-readers-perturbed
+split: dev
+compare_to: perturbed
+variants:
+  - {name: perturbed_src, description: "JOINED: kev_perturbed/perturbed (A) + kev_perturbed/kev_facts (B)"}
+  - {name: perturbed, refuse_from: perturbed_src, set: [fusion.rule=a], description: "reader A alone (= kev_perturbed/perturbed)"}
+  - {name: kev, refuse_from: perturbed_src, set: [fusion.rule=b], description: "reader B alone (= kev_perturbed/kev_facts)"}
+  - {name: r1, refuse_from: perturbed_src, set: [fusion.rule=labels]}
+  - {name: r2, refuse_from: perturbed_src, set: [fusion.rule=facts]}
