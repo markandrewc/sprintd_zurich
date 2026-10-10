@@ -299,3 +299,27 @@ pushing stages as they land (see docs/STATUS.md). First CPU-only numbers in READ
 - No detectable difference; translation costs an extra LLM pass per call and loses a little. DECISION: keep the
   Standard German view. (en_speech = Whisper speech translation not run: vanilla large-v3 next to vLLM does not fit
   and the de/en comparison already shows no gain.)
+
+## 2026-10-10T04:09 champion on its own profile (experiments/champion.yaml, dev) + FREEZE
+- champion (config/recommended.yaml): flag AUC 0.87 [0.72, 0.99], CV flag F1 0.86 [0.73, 0.96], FAR 14% [0, 35],
+  miss 15% [0, 36], alarm F1 0.86, review recall 67%, 3-class acc 79%. Identical for thresholds 0.45-0.65 and with
+  review band 0.25 / no uncertainty escalation (facts scores are near-discrete -> robust threshold plateau).
+- table_v2 (access.review_2): miss 15% -> 8% but FAR 14% -> 36% (C01/C02 harmless "4242..." test card numbers count as
+  a spoken code; C10). REJECTED for the default; documented as a stricter access policy option.
+- DECISION 04:09: FREEZE champion = config/recommended.yaml (table v1, threshold 0.55). Run the holdout ONCE now
+  (12 calls / 6 dialogues). Also one logged holdout look at the v1 baseline (gpu-12gb, all 4 checks) purely as a
+  reference point for "how much better than v1" — not a candidate, nothing is tuned on it. Total holdout looks: 2.
+
+## 2026-10-10T04:12 Z1 HOLDOUT (logged in runs/holdout_log.jsonl; 2 looks in total, both listed here)
+Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, no_alert 6, review 2.
+| system | flag F1 | flag recall | FAR | miss | alarm F1 | 3-class acc |
+|---|---|---|---|---|---|---|
+| **champion** (config/recommended.yaml, frozen 04:09) | 0.67 | 50% | **0%** | 50% | **0.67** | **67%** |
+| v1 baseline (gpu-12gb, reference only) | 0.67 | 100% | 100% | 0% | 0.00 | 17% |
+- champion per call: D07 disclosure alarm K1/K2 -> alarm (both); harmless C03, C04, C15 (both versions) -> no_alert;
+  C16 splitting alarm -> K3 no_alert (score 0.17), K4 review; C19 documentation review -> no_alert (both).
+- v1 sends all 12 calls to review (scores 0.43-0.71): "flag everything" — same flag F1, useless for an officer.
+- Weak spots on unseen calls = the dev weak spots: open review cases (Stufe3) and the splitting family. n = 6
+  dialogues: every number here has a huge CI; it is a sanity check, not a measurement.
+- Holdout results kept in runs/experiments/champion_holdout/ and runs/experiments/holdout_v1/ (the experiment runner
+  writes holdout variants into the dev directory; moved and the dev champion re-run from cache).
