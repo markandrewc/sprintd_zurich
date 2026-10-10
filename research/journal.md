@@ -562,3 +562,9 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   which kills the `= unclear` review rules (review recall 67% -> 0%, as every robustness lever so far) and does not
   rescue the paraphrase misses. Wording robustness on dev only came from the 14B (R3 on 14B). Possible but untested
   follow-up: balanced yes/no examples for every fact (needs human-labelled fact answers, not champion silver labels).
+
+## 2026-10-10T05:28 C2/RQ7 keyword_context + quote_judge (experiments/new_checks.yaml, gpu-12gb v1 base, 7B, dev 48 calls)
+- added to the v1 check set: keyword_context window +-3: flag AUC 0.67 vs base 0.68; keyword_context anchored full-call:
+  0.70 (diff +0.012 [-0.009, +0.046]); quote_judge replacing llm_judge: 0.69 (FAR 55% vs 45%, miss 19% vs 31%).
+- CV FAR unchanged at 45% for both keyword_context variants -> on top of the free judge, keyword-window G-Eval does
+  NOT fix the harmless keyword calls; facts does (RQ7: FAR 86% -> 18%). No errors; ~11 LLM calls/call.

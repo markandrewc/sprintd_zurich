@@ -72,3 +72,15 @@ for D03-type calls.
 ## What would change our mind
 New harmless keyword-heavy calls (the hidden set; on the holdout the harmless C03, C04 and C15 were all cleared) that facts flags. Or a standalone
 keyword_context run that matches facts on these calls at lower cost.
+
+
+## Update 05:28: keyword_context measured (experiments/new_checks.yaml)
+| variant (added to v1: keywords + patterns + free judge + G-Eval, 7B, turbo) | flag AUC [95% CI] | CV FAR | CV miss |
+|---|---|---|---|
+| v1 base | 0.68 [0.54, 0.83] | 45% | 31% |
+| + keyword_context (window +-3 segments) | 0.67 [0.53, 0.83] | 45% | 31% |
+| + keyword_context (anchored, whole call as context) | 0.70 [0.55, 0.85] | 45% | 31% |
+| quote_judge instead of llm_judge | 0.69 [0.53, 0.86] | 55% | 19% |
+
+keyword_context does not move the false-alarm rate on top of the free judge (diff AUC +0.012 [-0.009, +0.046]);
+the borderline-keyword problem is solved by `facts`, not by keyword-window G-Eval.
