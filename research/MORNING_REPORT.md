@@ -50,6 +50,8 @@ _Last update: 04:35. Everything below is reproducible from `experiments/*.yaml` 
   worthless as a final test** — we made two candidate looks + one reference look; treat all holdout numbers as
   sanity checks (n = 6 dialogues), not as the test-set result. The hidden set on Sunday is the real test.
 
+![Headline evidence: flag AUC with 95% CI and false-alarm rate per system (dev)](report/headline.png)
+
 ## Leaderboard (dev, flag AUC; full table `research/leaderboard.md`)
 | system | ASR | LLM | flag AUC [95% CI] | CV FAR | CV miss | 3-class acc |
 |---|---|---|---|---|---|---|
