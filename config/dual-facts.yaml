@@ -1,0 +1,37 @@
+# Both readers answer EVERY fact of the active table (Qwen2.5-7B: check `facts`, Kev-4B: check `facts_kev`); the
+# per-fact combination (agreement, bands) is decided afterwards from the stored probabilities (no model needed).
+# Staged for one 12 GB card: Qwen's answers come from the cache (llms.default is the `pinned` stand-in with the
+# vLLM identity that computed them; it refuses requests), Kev runs live behind scripts/remote/serve_kev.py (:8003).
+#   1. vLLM up:  uv run callguard batch -c recommended          (Qwen facts + roles cached)
+#   2. Kev up:   uv run callguard batch -c dual-facts           (Kev facts; Qwen from cache)
+extends: two-readers.yaml
+description: Qwen + Kev both answer every fact (staged; Qwen from cache) -> runs/dual-facts
+
+llms:
+  default:
+    type: pinned
+    identity: {type: openai_compat, model: Qwen/Qwen2.5-7B-Instruct-AWQ, json_mode: json_schema, seed: null, extra_body: {}}
+    note: Qwen fact answers and roles come from the cache (computed with vLLM by `callguard batch -c recommended`)
+
+  assistant:   # the KI-Assistent in Einstellungen (drafts rules / phrases facts): a LIVE Qwen, not the cache stand-in
+    type: openai_compat
+    base_url: ${CALLGUARD_LLM_URL:-http://127.0.0.1:8000/v1}
+    model: callguard-llm
+    timeout: 120
+    json_mode: json_schema
+
+app:
+  base_url: http://localhost:8502
+  assistant_llm: assistant
+  assistant_enabled: false   # KI-Assistent off for now (no GPU use): manual wizards only, no LLM call
+
+paths:
+  runs_dir: runs/dual-facts
+
+# The officer's fact policy decides (callguard.fact_policy; demo tabs «Fakten» / «Regeln»): per fact, each reader's
+# p -> ja / unklar / nein (Qwen three-way, Kev band [0.3, 0.7]), combined «Einigkeit" (pre-registered defaults,
+# research/findings/dual_facts_prereg.md), then the rules of config/policy_table.yaml. Pure re-fusion: the stored
+# answers of both readers are reused, a changed band or rule never runs a model.
+fusion:
+  rule: policy
+  fact_policy: config/fact_policy.yaml

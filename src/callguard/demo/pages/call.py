@@ -4,6 +4,7 @@ provenance, audit log). Deep link ``?call=<id>&t=<seconds>`` starts the recordin
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 import streamlit as st
@@ -11,11 +12,13 @@ import streamlit as st
 from callguard import misheard
 from callguard.demo import card as cd
 from callguard.demo import common as cm
-from callguard.demo import media
+from callguard.demo import media, original_script
 from callguard.demo import review
 from callguard.demo import state as ds
-from callguard.demo.transcript import keyword_terms, player_html
-from callguard.types import fmt_ts
+from callguard.demo.original_script import OriginalScript
+from callguard.demo.transcript import ROLE_DE, keyword_terms, player_html
+from callguard.fact_policy import combination_label
+from callguard.types import Transcript, fmt_ts
 from callguard.ui import render as ui
 from callguard.ui.backend import LABEL_RANK, parse_seconds, short_label
 from callguard.ui.session import current_app
@@ -30,6 +33,13 @@ s = app.settings
 def _audio(audio_path: str | None, run_dir: str, mtime: float) -> tuple[str | None, str]:
     a = media.player_audio(audio_path, run_dir)
     return a.src, a.note
+
+
+@st.cache_data(show_spinner=False, max_entries=32)
+def _original(call_id: str, audio_path: str | None, data_dir: str, _transcript: Transcript,
+              transcript_key: str) -> OriginalScript | None:
+    """The Swiss German original script of a test call, DISPLAY ONLY (never goes back into the pipeline)."""
+    return original_script.load(call_id, audio_path, _transcript, [data_dir])
 
 
 def _order() -> list[str]:
@@ -98,17 +108,75 @@ bits.append(":green-badge[:material/task_alt: bearbeitet]" if call_id in judged 
 st.markdown(" · ".join(bits))
 
 left, right = st.columns([7, 5], gap="large")
+seek_key = f"dm_seek_{call_id}"
+seek = st.session_state.get(seek_key)  # (seconds, nonce) set by a fact's «Stelle anhören»
+segs_by_id = {x.id: x for x in result.transcript.segments}
+
+
+def _seek(seconds: float) -> None:
+    prev = st.session_state.get(seek_key)
+    st.session_state[seek_key] = (max(0.0, float(seconds)), (prev[1] + 1) if prev else 1)
+
+
+def fact_explained(f: cd.FactRow, where: str) -> None:
+    """One fact: the answer in the title; inside the full question, the probabilities and the passage of the
+    call the answer rests on, with a button that plays it (10 s early)."""
+    agreement = f.agreement
+    title = f"{f.label}: **{cd.VALUE_DE.get(f.value, f.value)}**"
+    if agreement is None:
+        title += f" ({f.confidence:.2f})" if f.confidence is not None else ""
+    else:
+        title += f" · {agreement}"
+    with st.expander(title, icon=review.VALUE_ICON.get(f.value)):
+        st.markdown(f"**Frage an die KI:** {ui.esc(f.question_de or f.question or f.label)}")
+        if f.readers:  # two readers side by side: p(ja), the rule that turns it into a value, the value
+            cols = st.columns(len(f.readers) + 1)
+            for col, rd_ in zip(cols, f.readers.values()):
+                p = rd_.get("p") or {}
+                col.metric(f"{rd_.get('label', '?')} p(ja)", "–" if not p else f"{float(p.get('yes', 0.0)):.2f}",
+                           help=f"Regel dieses Lesers: {rd_.get('rule', '')}")
+                col.markdown(f"→ **{cd.VALUE_DE.get(str(rd_.get('value')), '?')}**  \n:small[{rd_.get('rule', '')}]")
+            badge = {"einig": ":green-badge[einig]", "uneinig → unklar": ":orange-badge[uneinig → unklar]"}.get(
+                agreement or "", f":orange-badge[{agreement}]")
+            cols[-1].metric("zusammen", cd.VALUE_DE.get(f.value, f.value))
+            names = [str(r.get("label") or "?") for r in f.readers.values()] + ["A", "B"]
+            comb = combination_label(str(f.combination or ""), names[0], names[1]) if f.combination else ""
+            cols[-1].markdown(f"{badge}  \n:small[{ui.esc(comb)}]")
+        elif f.p:
+            st.caption("Antwort der KI: " + " · ".join(
+                f"{'**' if k == f.value else ''}{cd.VALUE_DE[k]} {f.p.get(k, 0.0):.2f}{'**' if k == f.value else ''}"
+                for k in ("yes", "no", "unclear")))
+        found = [segs_by_id[sid] for sid in f.evidence if sid in segs_by_id]
+        if not found:
+            st.caption(":material/description: Die KI hat das ganze Gespräch gelesen; keine einzelne Stelle markiert.")
+            return
+        st.markdown("**Stelle im Gespräch:**  \n" + "  \n".join(
+            f"`{fmt_ts(x.start)}` {ui.esc(ROLE_DE.get(x.role or '', x.speaker or 'Sprecher'))}: "
+            f"«{ui.esc(x.text.strip()[:220])}»" for x in found[:3])
+            + ("  \n…" if len(found) > 3 else ""))
+        start = min(x.start for x in found)
+        st.button(f"Stelle anhören (ab {fmt_ts(max(0.0, start - app.link_pad))})", icon=":material/play_arrow:",
+                  key=f"dm_seekbtn_{call_id}_{where}_{f.fact}", on_click=_seek, args=(start - app.link_pad,))
+
 
 with left:
     run_dir = app.result_dir(call_id)
     ap = result.audio_path
     mtime = Path(ap).stat().st_mtime if ap and Path(ap).is_file() else 0.0
     src, note = _audio(ap, str(run_dir), mtime)
-    doc = player_html(result.transcript, live.decision.passages, audio_src=src, colors=colors, labels=labels,
-                      start_at=t, link_pad=app.link_pad, misheard_below=app.misheard_below,
-                      terms=keyword_terms(result), height=PLAYER_HEIGHT - 8, audio_note=note)
+    start_at = seek[0] if seek else t
+    tr = result.transcript
+    original = _original(call_id, ap, str(app.cfg.paths.resolve("data_dir")), tr,
+                         hashlib.sha1(tr.model_dump_json(include={"segments"}).encode()).hexdigest())
+    doc = player_html(tr, live.decision.passages, audio_src=src, colors=colors, labels=labels,
+                      start_at=start_at, link_pad=app.link_pad, misheard_below=app.misheard_below,
+                      terms=keyword_terms(result), height=PLAYER_HEIGHT - 8, audio_note=note,
+                      autoplay=bool(seek), nonce=seek[1] if seek else 0, original=original,
+                      view="ch" if st.query_params.get("ansicht") == "ch" else "de")
     st.iframe(doc, height=PLAYER_HEIGHT)
-    if t is not None:
+    if seek:
+        st.caption(f":material/play_circle: Aufnahme bei {fmt_ts(seek[0])} (Stelle eines Fakts, 10 s davor).")
+    elif t is not None:
         st.caption(f":material/link: Über einen Alarm-Link geöffnet: die Aufnahme beginnt bei {fmt_ts(t)}.")
 
 with right:
@@ -123,29 +191,39 @@ with right:
             st.warning("**Warum Prüfen?**  \n" + "  \n".join(f"- {ui.esc(c)}" for c in card.open_causes),
                        icon=":material/person_search:")
         if card.rule_plain and card.label != "no_alert":
-            st.markdown(f":material/rule: **Regel** `{(card.rule_id or '').replace('`', '')}`")
-            st.caption(ui.esc(card.rule_plain))
+            st.markdown(f":material/rule: **Regel** `{(card.rule_id or '').replace('`', '')}`  \n"
+                        f"{ui.esc(card.rule_plain)}")
+            st.caption("So zu lesen: Alle Bedingungen erfüllt → diese Regel entscheidet (erste passende Regel "
+                       "von oben).")
         decisive = [f for f in card.facts if f.decisive]
-        others = [f for f in card.facts if not f.decisive]
         if decisive and card.label != "no_alert":
-            st.markdown("**Fakten** · was das Sprachmodell im Gespräch erkannt hat")
-            st.markdown(review.fact_lines(decisive))
+            st.markdown("**Fakten** · was die KI im Gespräch erkannt hat (aufklappen: Frage, Antwort, Stelle)")
+            for f in decisive:
+                fact_explained(f, "d")
         if card.why_not is not None:
             w = card.why_not
-            with st.expander("Warum kein Alarm?", icon=":material/help:", expanded=card.label == "no_alert"):
-                if w.is_trap:
-                    st.markdown(":orange-badge[:material/warning: Stichwort-Falle] "
-                                + " ".join(f":gray-badge[{ui.esc(k)}]" for k in w.keywords[:8]))
-                st.markdown(ui.esc(w.lead or w.summary))
-                if w.blocking:
-                    st.markdown(review.fact_lines(w.blocking))
-                if w.rule and card.label == "no_alert":
-                    st.caption(f":material/rule: Regel: {ui.esc(w.rule)}")
-                for n in w.harmless_notes[:2]:
-                    st.caption(f":material/info: Laut Stichwortliste harmlos, wenn: {ui.esc(n)}")
-        if others:
-            with st.expander(f"Weitere Fakten ({len(others)})", icon=":material/list:"):
-                st.markdown(review.fact_lines(others))
+            st.markdown("**Warum kein Alarm?**" if card.label == "no_alert" else "**Warum (noch) kein Alarm?**")
+            if w.is_trap:
+                st.markdown(":orange-badge[:material/warning: Stichwort-Falle] "
+                            + " ".join(f":gray-badge[{ui.esc(k)}]" for k in w.keywords[:8]))
+            st.markdown(ui.esc(w.lead or w.summary))
+            for rid, text, conds in card.failed_rules[:3]:
+                st.markdown(f":material/block: Alarm-Regel `{rid}` greift nicht: "
+                            + "; ".join(f"{ui.esc(c)}" for c in conds) + " → kein Alarm"
+                            + (f"  \n:small[{ui.esc(text)}]" if text else ""))
+            if card.label == "no_alert":
+                for f in w.blocking:
+                    fact_explained(f, "w")
+            if w.rule and card.label == "no_alert":
+                st.caption(f":material/rule: Entschieden hat: {ui.esc(w.rule)}")
+            for n in w.harmless_notes[:2]:
+                st.caption(f":material/info: Laut Stichwortliste harmlos, wenn: {ui.esc(n)}")
+        shown = {f.fact for f in decisive} if card.label != "no_alert" else {
+            f.fact for f in (card.why_not.blocking if card.why_not else [])}
+        rest = [f for f in card.facts if f.fact not in shown]
+        if rest and st.toggle(f"Weitere Fakten zeigen ({len(rest)})", key=f"dm_more_{call_id}"):
+            for f in rest:
+                fact_explained(f, "o")
         if card.basis:
             st.caption(f":material/gavel: **Rechtsgrundlage:** {ui.esc(card.basis)}")
         teams = cm.routed_to(app, live) if card.label != "no_alert" else []

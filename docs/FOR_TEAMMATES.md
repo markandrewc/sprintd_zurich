@@ -47,6 +47,23 @@ facts with probabilities, passages, reasons). No audio, no models, no caches. Da
 Never pool numbers across these folders (`src/callguard/datasets.py` refuses to).
 Read one call: `zcat callguard_results/experiments/kev_vs_facts/champion/results.jsonl.gz | head -1 | python -m json.tool`.
 
+## Run the demo dashboard locally (no GPU, ~5 minutes) — for frontend work
+```bash
+uv sync --extra ui --extra dev
+git clone https://github.com/Outcept/inventx-case-study data_upstream/inventx-case-study   # the case audio + scripts
+mkdir -p runs && cp -r callguard_results/dual-facts runs/dual-facts                        # stored decisions (Qwen + Kev facts)
+uv run callguard demo -c dual-facts --port 8502          # -> http://localhost:8502 (needs ffmpeg for the audio player)
+uv run callguard ui -c recommended --port 8501           # internal/research UI (copy callguard_results/recommended to runs/recommended)
+```
+Everything in the demo runs on the stored results: no ASR, no LLM (the KI-Assistent is switched off in `dual-facts`:
+`app.assistant_enabled: false`). Rule changes, the «Sicherheit der KI» slider and the wizards work offline.
+test50 with the Swiss German view: `python3 scripts/data/import_test50.py <sprintd_zurich>/data/test50 data_test50/v1`
+and `cp -r callguard_results/test50/dual-facts runs/test50/dual-facts`.
+Frontend code: `src/callguard/demo/` (app.py = navigation; pages/cases.py = Fälle; pages/call.py + transcript.py =
+Anruf prüfen with the synced player; pages/settings.py + settings_rules.py / settings_facts.py / keyword_editor.py =
+Einstellungen; card.py = decision card; review.py = the officer's review form). Tests: `tests/test_demo*.py`.
+Note: opening Einstellungen writes a version snapshot into `config/policy_versions/` — don't commit those.
+
 ## Running it
 `uv sync --extra asr --extra diarize --extra ui --extra dev`, then `uv run callguard --help`.
 Offline (no models): `uv run callguard batch -c demo-offline`. With the snapshot as `runs/` the UIs work offline:

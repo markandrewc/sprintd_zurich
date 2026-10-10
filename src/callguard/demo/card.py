@@ -41,7 +41,23 @@ class FactRow:
     confidence: float | None  # p of that value
     role: str | None = None
     decisive: bool = False  # used by the rule that fired (or blocks every alarm rule, for "Kein Alarm")
-    question: str | None = None
+    question: str | None = None  # what the model was asked (as stored; often the English wording)
+    question_de: str | None = None  # the full German question of the policy table (what the officer reads)
+    p: dict[str, float] = field(default_factory=dict)  # yes / no / unclear probabilities
+    evidence: list[str] = field(default_factory=list)  # segment ids the answer rests on (empty: whole call)
+    # two readers (fact policy profiles): reader id -> {label, p, value, rule, band?}; agree: same value
+    readers: dict[str, dict[str, Any]] = field(default_factory=dict)
+    agree: bool | None = None
+    combination: str | None = None
+
+    @property
+    def agreement(self) -> str | None:
+        """«einig» / «uneinig → unklar» / «uneinig» (None: one reader only)."""
+        if self.agree is None:
+            return None
+        if self.agree:
+            return "einig"
+        return "uneinig → unklar" if self.value == "unclear" else "uneinig"
 
     @property
     def text(self) -> str:
@@ -84,6 +100,9 @@ class Card:
     open_causes: list[str] = field(default_factory=list)  # review without an open fact: why (fusion)
     why_not: WhyNot | None = None
     passages: int = 0
+    # not an alarm: per alarm rule of the family, which of its conditions failed (rule id, rule text, conditions
+    # as «Fakt» = value)
+    failed_rules: list[tuple[str, str, list[str]]] = field(default_factory=list)
 
 
 def plain_question(question: str) -> str:
@@ -153,10 +172,18 @@ def fact_rows(detail: Mapping[str, Any], ft: FamilyTable | None, decisive: Seque
         if not e:
             continue
         v = str(e.get("value") or "unclear")
-        p = (e.get("p") or {}).get(v)
+        probs = {k: float(x) for k, x in (e.get("p") or {}).items() if isinstance(x, (int, float))}
+        p = probs.get(v)
+        de = None
+        if ft is not None and any(f.id == fid for f in ft.facts):
+            de = plain_question(ft.fact(fid).question("de")) or None
         rows.append(FactRow(fact=fid, label=str(e.get("label") or fid), value=v,
                             confidence=None if p is None else float(p), role=e.get("role"),
-                            decisive=fid in decisive, question=e.get("question")))
+                            decisive=fid in decisive, question=e.get("question"), question_de=de, p=probs,
+                            evidence=[str(s) for s in (e.get("evidence") or [])],
+                            readers=dict(e.get("readers") or {}),
+                            agree=e.get("agree") if isinstance(e.get("agree"), bool) else None,
+                            combination=e.get("combination")))
     return sorted(rows, key=lambda r: not r.decisive)
 
 
@@ -254,7 +281,25 @@ def build_card(result: CallResult, decision: Decision, families: Sequence[Family
 
     if decision.label != "alarm":
         card.why_not = _why_not(result, card, why_raw, ft, detail)
+        if ft is not None and detail.get("facts"):
+            card.failed_rules = failed_alarm_rules(ft, detail)
     return card
+
+
+def failed_alarm_rules(ft: FamilyTable, detail: Mapping[str, Any]) -> list[tuple[str, str, list[str]]]:
+    """Per enabled alarm rule: (id, text, failed conditions as «Fakt» = value), from the stored fact values."""
+    stored = detail.get("facts") or {}
+    values = {k: str((v or {}).get("value") or "unclear") for k, v in stored.items()}
+    labels = {k: str((v or {}).get("label") or k) for k, v in stored.items()}
+    out = []
+    for r in ft.rules:
+        if r.label != "alarm":
+            continue
+        fids = list(dict.fromkeys(failing_facts(r.node, values)))
+        if fids:
+            out.append((r.id, r.text, [f"«{labels.get(f, f)}» = {VALUE_DE.get(values.get(f, 'unclear'), 'unklar')}"
+                                       for f in fids]))
+    return out
 
 
 def _why_not(result: CallResult, card: Card, why: Any, ft: FamilyTable | None,

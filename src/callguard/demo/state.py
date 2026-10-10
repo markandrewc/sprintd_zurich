@@ -1,6 +1,6 @@
 """Shared state of the demo app: the same :class:`callguard.ui.session.AppState` the officer UI builds (so its
 pages, panels and backend work unchanged), but without the officer UI's sidebar. The knobs live on the
-pages: Alarmschwelle + Prüfmodus on «Fälle», the Prüfarten on «Einstellungen»; their values persist for
+pages: Alarmschwelle + Prüfmodus on «Fälle» and «Regeln & Einstellungen»; their values persist for
 the session (``persist_state="session"``) and are read here before any page draws.
 
 Mode changes are saved per profile and audit-logged exactly like in the officer UI (``ui_prefs.json``,
@@ -87,7 +87,9 @@ def bootstrap(pages: Mapping[str, Any]) -> AppState:
     default_weights = be.check_weights(cfg)
     all_families = engine.families()
     try:
-        modes = ses._mode_state(cfg, engine, loaded, runs_root)
+        # fact policy profiles (two_readers rule policy): the combination of the two readers per fact
+        # (tab «Fakten») replaces the Prüfmodus
+        modes = None if uses_fact_policy(cfg) else ses._mode_state(cfg, engine, loaded, runs_root)
     except Exception:  # a broken mode spec must not take the demo down
         modes = None
 
@@ -107,7 +109,8 @@ def bootstrap(pages: Mapping[str, Any]) -> AppState:
     on = [f.id for f in all_families if ss.get(family_key(f.id), True)]
     settings = Settings(threshold=float(ss[THRESHOLD_KEY]), review_band=defaults["review_band"],
                         max_uncertainty=min(1.0, max(0.0, defaults["max_uncertainty"])),
-                        weights=dict(default_weights), families_on=on, mode=mode)
+                        weights=dict(default_weights), families_on=on, mode=mode,
+                        fact_policy=session_fact_policy(cfg))
 
     base_engine = engine
     if modes is not None:
@@ -136,6 +139,41 @@ def bootstrap(pages: Mapping[str, Any]) -> AppState:
 # --------------------------------------------------------------------------------------------
 # small shared helpers for the pages
 # --------------------------------------------------------------------------------------------
+
+
+def uses_fact_policy(cfg: AppConfig) -> bool:
+    f = cfg.fusion or {}
+    return f.get("type") == "two_readers" and f.get("rule") == "policy"
+
+
+CERTAINTY_KEY = "dm_certainty"  # «Sicherheit der KI» on Fälle (session; the file holds the approved default)
+
+
+def live_fact_policy(cfg: AppConfig) -> Any:
+    from callguard import fact_policy as fpol
+
+    return fpol.load_fact_policy((cfg.fusion or {}).get("fact_policy") or fpol.DEFAULT_PATH)
+
+
+def certainty_readers(pol: Any) -> str:
+    """The knob moves both readers when reader A is on a band, else reader B only (A keeps three-way)."""
+    return "both" if pol.a.mode == "band" else "b"
+
+
+def session_fact_policy(cfg: AppConfig) -> dict[str, Any] | None:
+    """The fact policy this session decides with: the approved file with the session's certainty c applied."""
+    if not uses_fact_policy(cfg):
+        return None
+    try:
+        live = live_fact_policy(cfg)
+    except Exception:
+        return None
+    ss = st.session_state
+    ss.setdefault(CERTAINTY_KEY, live.certainty())
+    c = float(ss[CERTAINTY_KEY])
+    if abs(c - live.certainty()) < 1e-9:
+        return None  # the approved default: decided exactly as the file says (no override)
+    return live.with_certainty(c, certainty_readers(live)).as_dict()
 
 
 def profile_threshold(app: AppState) -> float:

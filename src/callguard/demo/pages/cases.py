@@ -1,5 +1,5 @@
-"""Fälle: the worklist. Alarms first, then reviews, then the rest; Alarmschwelle and Prüfmodus right above the
-list, with the live counts, so changing either is one move with a visible effect."""
+"""Fälle: the worklist. Alarms first, then reviews, then the rest; above the list the four status boxes, the
+«Sicherheit der KI» slider (dual-reader profiles; else the Alarmschwelle) and the spread of all fact answers."""
 
 from __future__ import annotations
 
@@ -7,8 +7,9 @@ import pandas as pd
 import streamlit as st
 
 from callguard.demo import common as cm
+from callguard.demo import controls as ctl
+from callguard.demo import facts_ui as fu
 from callguard.demo import state as ds
-from callguard.ui import modes as md
 from callguard.ui import render as ui
 from callguard.ui.backend import label_counts
 from callguard.ui.session import current_app
@@ -16,7 +17,10 @@ from callguard.ui.session import current_app
 app = current_app()
 s = app.settings
 
-st.title("Fälle")
+head, new = st.columns([5, 1.3], vertical_alignment="bottom")
+head.title("Fälle")
+new.page_link(app.pages["process"], label="Neuen Anruf prüfen", icon=":material/upload_file:",
+              help="Eine Aufnahme hochladen: von der Spracherkennung bis zum Alarm (braucht den GPU-Rechner).")
 if not app.loaded.results:
     st.info("Noch keine verarbeiteten Anrufe. Einen Anruf auf **Anruf verarbeiten** hochladen.",
             icon=":material/inbox:")
@@ -24,46 +28,61 @@ else:
     judged = {i.call_id for i in ds.feedback_items(app)}
     counts, base = label_counts(app.decided), label_counts(app.baseline)
     open_flagged = sum(1 for cid, d in app.decided.items() if d.decision.label != "no_alert" and cid not in judged)
+    ps = cm.policy_status(app)
+    rule_note = ""
+    if ps["version"] is not None and ps["same"]:
+        rule_note = (f" · entschieden mit dem aktiven Regelwerk (Version {ps['version']})" if not ps["other"]
+                     else f" · {ps['same']} mit dem aktiven Regelwerk (Version {ps['version']}) entschieden")
     st.caption(f"{len(app.loaded.results)} Anrufe · {open_flagged} davon brauchen noch einen Menschen "
-               "(Alarm oder Prüfen, noch nicht bearbeitet)")
+               f"(Alarm oder Prüfen, noch nicht bearbeitet){rule_note}")
+    if ps["other"]:
+        st.warning(f"{len(ps['other'])} Anrufe wurden mit einer älteren Regelwerk-Version entschieden; ihre Zahlen "
+                   "können vom aktiven Regelwerk abweichen (Einstellungen → Regeln; «Gespeicherte Anrufe neu "
+                   "entscheiden» nach einer Freigabe).", icon=":material/history:")
 
-    with st.container(border=True):
-        c1, c2, c3 = st.columns([4, 4, 5], gap="large")
-        with c1:
-            st.slider("Alarmschwelle", 0.0, 1.0, step=0.01, key=ds.THRESHOLD_KEY, persist_state="session",
-                      help="Ab diesem Score löst ein Anruf Alarm aus; knapp darunter geht er zur Prüfung an einen "
-                           "Menschen. Wirkt sofort auf alle Anrufe (keine Spracherkennung, kein Sprachmodell).")
-            st.caption(f"Alarm ab **{s.threshold:.2f}** · Prüfen ab **{max(0.0, s.review_floor):.2f}** · "
-                       f"Standard {app.defaults['threshold']:.2f}")
-        with c2:
-            if app.modes is not None:
-                modes = app.modes
-                by = {m.id: m for m in modes.spec.modes}
-                st.segmented_control(
-                    "Prüfmodus", ds.available_modes(modes), key=ds.MODE_KEY, required=True,
-                    format_func=lambda k: by[k].label, persist_state="session",
-                    on_change=ds.on_mode_change,
-                    args=(str(app.runs_root), app.source.key, str(app.runs_dir), ds.profile_threshold(app)),
-                    help="Wie streng callguard entscheidet. Die Wahl gilt für dieses Profil und wird im "
-                         "Audit-Log vermerkt.")
-                cur = by.get(s.mode or modes.spec.default)
-                if cur is not None:
-                    note = md.consequence_short(modes.metrics.get(cur.id))
-                    st.caption(cur.text + (f" Gemessen: {note}." if note else ""))
-                off = [m for m in modes.spec.modes if not modes.avail.get(m.id, md.Availability(True)).ok]
-                if off:
-                    st.caption(":material/block: " + ", ".join(f"«{m.label}»" for m in off) + " brauchen die "
-                               "Zweitmeinung eines zweiten Modells; für diese Anrufe nicht verfügbar.")
-            else:
-                st.caption("Prüfmodi sind in diesem Profil nicht eingerichtet.")
-        with c3:
-            m = st.columns(3)
-            for col, lbl in zip(m, ("alarm", "review", "no_alert")):
-                delta = counts[lbl] - base[lbl]
-                col.metric(cm.cd.LABEL_DE[lbl], counts[lbl], delta=f"{delta:+d} zum Standard" if delta else None,
-                           delta_color="off", border=False)
-            st.caption(f"Ein Mensch hört **{counts['alarm'] + counts['review']}** von {len(app.decided)} Anrufen "
-                       "(Alarm + Prüfen). Schwelle oder Modus verschieben: die Zahlen folgen sofort.")
+    # 1. the four boxes (as on the internal Eingang page)
+    help_text = {
+        "alarm": "Score ab der Schwelle und die Prüfungen sind sich sicher genug.",
+        "review": "Knapp unter der Schwelle oder die Prüfungen sind unsicher: ein Mensch muss zuhören.",
+        "no_alert": "Nichts ausreichend Verdächtiges gefunden.",
+    }
+    boxes = st.columns(4)
+    for col, lbl in zip(boxes, ("alarm", "review", "no_alert")):
+        delta = counts[lbl] - base[lbl]
+        col.metric(cm.cd.LABEL_DE[lbl], counts[lbl], delta=f"{delta:+d} zum Standard" if delta else None,
+                   delta_color="off", delta_arrow="auto" if delta else "off", border=True, help=help_text[lbl])
+    flagged, flagged_base = counts["alarm"] + counts["review"], base["alarm"] + base["review"]
+    boxes[3].metric("Mensch nötig", flagged,
+                    delta=f"{flagged - flagged_base:+d} zum Standard" if flagged != flagged_base else None,
+                    delta_color="off", delta_arrow="auto" if flagged != flagged_base else "off", border=True,
+                    help="Alarm + Prüfen: Anrufe, die jemand anhören muss.")
+
+    fus = fu.fusion(app)
+    if fus is not None:
+        # 2. «Sicherheit der KI», full width: how sure a reader must be for ja / nein (else unklar -> Prüfen)
+        live = fu.live_policy(app)
+        c_default = live.certainty()
+        st.slider("Sicherheit der KI", 0.5, 0.95, step=0.05, key=ds.CERTAINTY_KEY, persist_state="session",
+                  format="%.2f",
+                  help="Pro Fakt und KI-Leser: ja, wenn die KI mindestens so sicher ist; nein, wenn sie höchstens "
+                       "1 − Wert sicher ist; dazwischen unklar. Höher = mehr «unklar» = weniger Alarme, mehr Prüfen. "
+                       f"Standard {c_default:.2f} (auf den Dev-Anrufen gemessen). Wirkt sofort, nur für Sie.")
+        pol = fu.session_policy(app)
+        c = pol.certainty()
+        spread = fu.answer_spread(app.loaded.results, pol, fus.tables(), sig=app.loaded.signature)
+        comb = spread["combined"]
+        st.caption(f"**ja ab {c:.2f} · nein bis {1 - c:.2f} · dazwischen unklar → eher Prüfen** · beide KI-Leser "
+                   f"({pol.a.label}, {pol.b.label}), danach «{pol.combination_de()}» je Fakt · Standard {c_default:.2f}")
+        # 3. the spread of all fact answers under this certainty
+        st.altair_chart(fu.spread_chart(spread["rows"], round(1 - c, 4), c), width="stretch")
+        st.markdown(f":material/fact_check: **Fakten** (je Anruf und Fakt, beide Leser zusammen): "
+                    f"ja **{comb['yes']}** · unklar **{comb['unclear']}** · nein **{comb['no']}** → Anrufe: "
+                    f"Alarm **{counts['alarm']}** · Prüfen **{counts['review']}** · Kein Alarm **{counts['no_alert']}**")
+    else:
+        # 2. the Alarmschwelle, full width (profiles with one reader)
+        ctl.threshold_slider(app)
+        # 3. the score distribution: bars recolour as the threshold moves
+        st.altair_chart(ui.score_bars(app.rows(), s.threshold, max(0.0, s.review_floor)), width="stretch")
 
     rows = cm.case_rows(app, judged)
     f1, f2, f3 = st.columns([3, 3, 4], vertical_alignment="bottom")

@@ -123,7 +123,8 @@ def render_node(node: Node, labels: dict[str, str], top: bool = True) -> str:
     if kind == "cmp" or (kind == "not" and node[1][0] == "cmp"):
         c = _atom(node)
         fid = node[1] if kind == "cmp" else node[1][1]
-        lab = f"«{labels.get(fid, fid)}»"
+        lab = labels.get(fid, fid)
+        lab = lab if "«" in lab else f"«{lab}»"  # cross rules: «Prüfart: «Fakt»» comes pre-quoted
         if c is None:
             return f"{lab} beliebig"
         return f"{lab} {'≠' if c.negate else '='} {VALUE_DE[c.value]}"
@@ -238,6 +239,9 @@ def clean_rule(rule: dict[str, Any]) -> dict[str, Any]:
     """Key order as in the shipped file, empty optional keys dropped."""
     out: dict[str, Any] = {"id": str(rule["id"]), "label": str(rule["label"]), "when": str(rule.get("when") or "true"),
                            "text": str(rule.get("text") or "").strip()}
+    if str(rule.get("title") or "").strip():
+        out = {"id": out["id"], "title": " ".join(str(rule["title"]).split()), **{k: v for k, v in out.items()
+                                                                                 if k != "id"}}
     if str(rule.get("basis") or "").strip():
         out["basis"] = str(rule["basis"]).strip()
     if rule.get("enabled", True) is False:
@@ -299,6 +303,9 @@ def clean_fact(fact: dict[str, Any]) -> dict[str, Any]:
     en = " ".join(str(fact.get("en") or "").split())
     if en:
         out["en"] = en
+    desc = " ".join(str(fact.get("description") or "").split())
+    if desc:
+        out["description"] = desc
     if out["role"] not in FACT_ROLES:
         raise PolicyTableError(f"Rolle {out['role']!r} nicht in {FACT_ROLES}")
     return out
@@ -416,4 +423,94 @@ def diff_docs(old: dict[str, Any], new: dict[str, Any], family_names: dict[str, 
         common_n = [rid for rid in nrules if rid in orules]
         if common_o != common_n:
             out.append(f"{name}: Reihenfolge der Regeln geändert: {' → '.join(common_n)}")
+    out += diff_cross(old, new, names)
+    return out
+
+
+# --------------------------------------------------------------------------------------------
+# cross rules (section ``cross_rules``): rules over facts of several Prüfarten, qualified ``family.fact``
+# --------------------------------------------------------------------------------------------
+
+CROSS_NAME = "Eigene Regeln (übergreifend)"
+
+
+def cross_rules(doc: dict[str, Any]) -> list[dict[str, Any]]:
+    return doc.setdefault("cross_rules", [])
+
+
+def cross_labels(doc: dict[str, Any], family_names: dict[str, str] | None = None) -> dict[str, str]:
+    """``family.fact`` -> «Prüfart: «Fakt»» for every fact of the table (pre-quoted for :func:`render_rule`)."""
+    names = family_names or {}
+    return {f"{fam}.{f.get('id')}": f"{names.get(fam, fam)}: «{f.get('label') or f.get('id')}»"
+            for fam, fd in (doc.get("families") or {}).items() for f in (fd or {}).get("facts") or []}
+
+
+def clean_cross_rule(rule: dict[str, Any]) -> dict[str, Any]:
+    out: dict[str, Any] = {"id": str(rule["id"])}
+    if str(rule.get("title") or "").strip():
+        out["title"] = " ".join(str(rule["title"]).split())
+    out.update(label=str(rule["label"]), when=str(rule.get("when") or ""), text=str(rule.get("text") or "").strip())
+    if str(rule.get("report_as") or "").strip():
+        out["report_as"] = str(rule["report_as"]).strip()
+    if rule.get("enabled", True) is False:
+        out["enabled"] = False
+    return out
+
+
+def new_cross_rule_id(doc: dict[str, Any], label: str) -> str:
+    taken = {str(r.get("id")) for r in doc.get("cross_rules") or []}
+    n = 1
+    while f"eigene.{label}_{n}" in taken:
+        n += 1
+    return f"eigene.{label}_{n}"
+
+
+def add_cross_rule(doc: dict[str, Any], rule: dict[str, Any]) -> int:
+    """Alarm rules first (first match decides), then the others, in the order added."""
+    rules = cross_rules(doc)
+    new = clean_cross_rule(rule)
+    pos = 0 if new["label"] == "alarm" else len(rules)
+    rules.insert(pos, new)
+    return pos
+
+
+def _cross_index(doc: dict[str, Any], rule_id: str) -> int:
+    for i, r in enumerate(doc.get("cross_rules") or []):
+        if str(r.get("id")) == rule_id:
+            return i
+    raise KeyError(f"übergreifende Regel {rule_id!r} nicht gefunden")
+
+
+def set_cross_enabled(doc: dict[str, Any], rule_id: str, on: bool) -> None:
+    r = cross_rules(doc)[_cross_index(doc, rule_id)]
+    if on:
+        r.pop("enabled", None)
+    else:
+        r["enabled"] = False
+
+
+def delete_cross_rule(doc: dict[str, Any], rule_id: str) -> None:
+    del cross_rules(doc)[_cross_index(doc, rule_id)]
+    if not doc["cross_rules"]:
+        doc.pop("cross_rules")
+
+
+def diff_cross(old: dict[str, Any], new: dict[str, Any], family_names: dict[str, str] | None = None) -> list[str]:
+    labels = {**cross_labels(old, family_names), **cross_labels(new, family_names)}
+    o = {str(r.get("id")): r for r in old.get("cross_rules") or []}
+    n = {str(r.get("id")): r for r in new.get("cross_rules") or []}
+    out = []
+    for rid, r in n.items():
+        b = o.get(rid)
+        title = f"«{r.get('title')}» " if r.get("title") else ""
+        if b is None:
+            out.append(f"{CROSS_NAME}: neue Regel {title}{render_rule(r, labels)}"
+                       + ("" if is_enabled(r) else " (ausgeschaltet)"))
+        elif is_enabled(b) != is_enabled(r):
+            out.append(f"{CROSS_NAME}: Regel {title or rid} {'eingeschaltet' if is_enabled(r) else 'ausgeschaltet'}")
+        elif b != r:
+            out.append(f"{CROSS_NAME}: Regel {title or rid} geändert: {render_rule(r, labels)}")
+    for rid, b in o.items():
+        if rid not in n:
+            out.append(f"{CROSS_NAME}: Regel «{b.get('title') or rid}» gelöscht")
     return out

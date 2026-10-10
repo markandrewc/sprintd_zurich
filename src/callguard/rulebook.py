@@ -31,10 +31,11 @@ import yaml
 from callguard import policy_edit as pe
 from callguard.checks.facts import PolicyTableError
 
-EXTRA_NAMES = ("criteria", "keywords", "routing", "tuning")
+EXTRA_NAMES = ("criteria", "keywords", "routing", "tuning", "fact_policy")
 NAMES = ("policy_table", *EXTRA_NAMES)
 FILE_DE = {"policy_table": "Regeltabelle", "criteria": "Kriterien", "keywords": "Stichwortliste",
-           "routing": "Meldewege", "tuning": "Prüfungen an/aus"}
+           "routing": "Meldewege", "tuning": "Prüfungen an/aus",
+           "fact_policy": "Fakten-Einstellungen (KI-Leser, Bänder, Kombination)"}
 CHECK_KIND_DE = {"keywords": "Stichwörter", "patterns": "Muster (Ziffernfolgen, Codes)", "facts": "KI-Faktenprüfung",
                  "llm_judge": "KI-Gesamturteil", "geval": "KI-Bewertung (G-Eval)", "geval_cot": "KI-Bewertung",
                  "quote_judge": "KI-Zitatprüfung", "semantic": "Semantische Suche", "entities": "Entitäten"}
@@ -268,6 +269,43 @@ def diff_bundle(old: dict[str, dict], new: dict[str, dict], family_names: dict[s
         out.append(f"Prüfung «{(check_kinds or {}).get(c, c)}» ausgeschaltet (Profil {profile})")
     for c in sorted(a - b):
         out.append(f"Prüfung «{(check_kinds or {}).get(c, c)}» wieder eingeschaltet (Profil {profile})")
+    out += diff_fact_policy(old.get("fact_policy") or {}, new.get("fact_policy") or {}, names)
     if not out and changed_names(old, new):
         out.append("Formale Änderungen an: " + ", ".join(FILE_DE[n] for n in changed_names(old, new)))
+    return out
+
+
+def diff_fact_policy(old: dict[str, Any], new: dict[str, Any], family_names: dict[str, str] | None = None) -> list[str]:
+    """Plain German lines for a changed fact policy (readers, bands, combination, per-fact overrides)."""
+    if old == new or not new:
+        return []
+    from callguard import fact_policy as fpol
+
+    try:
+        a, b = fpol.parse_fact_policy(old) if old else None, fpol.parse_fact_policy(new)
+    except fpol.FactPolicyError:
+        return ["Fakten-Einstellungen geändert"]
+    out: list[str] = []
+    for i, rb_ in enumerate(b.readers):
+        ra = a.readers[i] if a else None
+        if ra is None or (ra.mode, ra.lo, ra.hi, ra.check) != (rb_.mode, rb_.lo, rb_.hi, rb_.check):
+            out.append(f"KI-Leser {rb_.label}: {rb_.describe()}" + (f" (vorher {ra.describe()})" if ra else ""))
+    if a is None or a.combination != b.combination:
+        out.append(f"Kombination der Leser: {b.combination_de()}" + (f" (vorher {a.combination_de()})" if a else ""))
+    names = family_names or {}
+    old_ov = a.overrides if a else {}
+    for key in sorted(set(old_ov) | set(b.overrides)):
+        if old_ov.get(key) == b.overrides.get(key):
+            continue
+        fam, _, fact = key.partition(".")
+        where = f"Fakt {fact} («{names.get(fam, fam)}»)"
+        ov = b.overrides.get(key)
+        if ov is None or ov.empty():
+            out.append(f"{where}: eigene Einstellung entfernt (gilt wieder die allgemeine)")
+            continue
+        bits = [f"{b.reader(i, fam, fact).label} {b.reader(i, fam, fact).describe()}"
+                for i, r in enumerate(b.readers) if r.id in ov.readers]
+        if ov.combination:
+            bits.append(f"Kombination {b.combination_de(ov.combination)}")
+        out.append(f"{where}: eigene Einstellung – " + ", ".join(bits))
     return out

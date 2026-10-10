@@ -8,7 +8,11 @@ marks, keyword hits, and jump buttons «Passage 1 · 00:37» that start ``link_p
 * ``timeupdate`` highlights the segment being spoken and scrolls it into view smoothly, unless the reader
   scrolled by hand in the last seconds (then a «Zur aktuellen Stelle» button appears instead);
 * clicking a segment seeks there and plays; clicking the passage strip above seeks to that point;
-* ``start_at`` (deep link ``?t=``) positions the recording and the transcript there on load.
+* ``start_at`` (deep link ``?t=``) positions the recording and the transcript there on load;
+* a switch «Hochdeutsch (KI-Transkript) | Schweizerdeutsch (Originalskript)» flips between the ASR transcript
+  and, for test calls only, the dialect script the recording was made from (``original``; display only, see
+  :mod:`callguard.demo.original_script`). Both panes follow the same audio element, so switching keeps the
+  playback position; passages map onto the script turns by time. Without a script the option is disabled.
 
 Without audio (recording not on this machine) the transcript still renders, with a note. Pure Python, no
 Streamlit import: unit-tested directly (tests/test_demo.py).
@@ -22,6 +26,7 @@ import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 
+from callguard.demo.original_script import NO_SCRIPT_DE, OriginalScript, turns_in
 from callguard.misheard import passage_segments
 from callguard.types import CallResult, Passage, Transcript, fmt_ts
 
@@ -118,25 +123,93 @@ def passage_marks(transcript: Transcript, passages: Sequence[Passage], colors: M
 
 
 def start_segment(transcript: Transcript, t: float | None) -> str | None:
-    """Id of the segment playing at ``t`` (the last one starting at or before it); None without ``t``."""
-    if t is None or not transcript.segments:
+    """Id of the segment that contains ``t`` (the last one starting at or before it); in a pause between two
+    segments the next one (about to be spoken); None without ``t``. The player's script uses the same rule."""
+    return _item_at(transcript.segments, t)
+
+
+def _item_at(items: Sequence, t: float | None) -> str | None:
+    """:func:`start_segment` on anything with ``id`` / ``start`` / ``end`` sorted by start (segments, turns)."""
+    if t is None or not items:
         return None
-    current = transcript.segments[0].id
-    for s in transcript.segments:
-        if s.start <= t + 1e-6:
-            current = s.id
+    i = 0
+    for k, s in enumerate(items):
+        if s.start <= t + 1e-3:
+            i = k
         else:
             break
-    return current
+    if t > items[i].end + 1e-3 and i + 1 < len(items):
+        i += 1
+    return items[i].id
+
+
+VIEW_DE = "Hochdeutsch (KI-Transkript)"
+VIEW_CH = "Schweizerdeutsch (Originalskript)"
+
+
+def dialect_rows(script: OriginalScript, marks: Sequence[Mark], start_at: float | None = None) -> str:
+    """The Swiss German original script's turns as player rows (same classes as the ASR rows, so the script
+    highlights, scrolls and seeks the same way). Passages map to the turns their time span overlaps."""
+    turn_mark: dict[str, Mark] = {}
+    first_of: dict[str, Mark] = {}
+    for m in marks:
+        ids = turns_in(script.turns, m.start, m.end)
+        for tid in ids:
+            turn_mark.setdefault(tid, m)
+        if ids and ids[0] not in first_of:
+            first_of[ids[0]] = m
+    current = _item_at(script.turns, start_at)
+    rows = []
+    for t in script.turns:
+        m = turn_mark.get(t.id)
+        role_cls = t.role if t.role in ROLE_DE else "other"
+        head = first_of.get(t.id)
+        tags = [f'<span class="cg-tag" style="background:{head.color}">Passage {head.number} · '
+                f'{html.escape(head.label)}</span>'] if head is not None else []
+        if not t.aligned:
+            tags.append('<span class="cg-est" title="Kein Abschnitt des KI-Transkripts passt zu diesem Satz; '
+                        'die Zeit liegt zwischen den Nachbarn.">Zeit geschätzt</span>')
+        style = f' style="--fam:{m.color};background:{_rgba(m.color, 0.10)}"' if m is not None else ""
+        cls = ["cg-seg", f"role-{role_cls}"] + (["in-passage"] if m is not None else []) \
+            + (["is-current"] if t.id == current else [])
+        rows.append(
+            f'<div class="{" ".join(cls)}" id="ch-{html.escape(t.id)}" data-start="{_num(t.start)}" '
+            f'data-end="{_num(t.end)}"{style} title="Klicken: Aufnahme springt hierher">'
+            f'<div class="cg-meta"><span class="cg-time">{fmt_ts(t.start)}</span>'
+            f'<span class="cg-role">{html.escape(t.speaker or ROLE_DE.get(t.role, "Sprecher"))}</span>'
+            f'{"".join(tags)}</div><div class="cg-text">{html.escape(t.text)}</div></div>')
+    return "\n".join(rows)
+
+
+def view_switch(script: OriginalScript | None, view: str = "de") -> tuple[str, str]:
+    """(the switch above the transcript, the note under it for the Swiss German view)."""
+    ch_on = script is not None and view == "ch"
+    de = (f'<button type="button" class="cg-view{"" if ch_on else " is-on"}" data-view="de" '
+          f'aria-pressed="{"false" if ch_on else "true"}" title="Was callguard aus der Aufnahme erkannt hat und '
+          f'was die KI auswertet">{VIEW_DE}</button>')
+    if script is None:
+        ch = (f'<button type="button" class="cg-view" data-view="ch" disabled aria-disabled="true" '
+              f'title="{html.escape(NO_SCRIPT_DE)}">{VIEW_CH}</button>'
+              f'<span class="cg-viewmsg">{html.escape(NO_SCRIPT_DE)}</span>')
+        note = ""
+    else:
+        ch = (f'<button type="button" class="cg-view{" is-on" if ch_on else ""}" data-view="ch" '
+              f'aria-pressed="{"true" if ch_on else "false"}" title="Das Skript, aus dem die Testaufnahme entstand">'
+              f'{VIEW_CH}</button>')
+        note = f'<div class="cg-orignote" id="cg-orignote"{"" if ch_on else " hidden"}>{html.escape(script.note)}</div>'
+    return f'<div class="cg-views" role="group" aria-label="Transkript-Ansicht">{de}{ch}</div>', note
 
 
 def player_html(transcript: Transcript, passages: Sequence[Passage], *, audio_src: str | None,
                 colors: Mapping[str, str] | None = None, labels: Mapping[str, str] | None = None,
                 start_at: float | None = None, link_pad: float = 10.0, misheard_below: float | None = None,
                 terms: Mapping[str, list[str]] | None = None, height: int = 660, accent: str = DEFAULT_ACCENT,
-                audio_note: str = "") -> str:
+                audio_note: str = "", autoplay: bool = False, nonce: int = 0,
+                original: OriginalScript | None = None, view: str = "de") -> str:
     """The whole component document. ``audio_src``: a data URI or URL, None = no recording here
-    (``audio_note`` says why). ``start_at``: deep-link time in seconds. ``height``: iframe height in px."""
+    (``audio_note`` says why). ``start_at``: deep-link time in seconds. ``height``: iframe height in px.
+    ``original``: the Swiss German original script of a test call (display only; None = a new call, the switch
+    shows that option disabled). ``view``: the view shown first, ``de`` (ASR) or ``ch`` (original script)."""
     colors, labels, terms = colors or {}, labels or {}, terms or {}
     accent = _color(accent, DEFAULT_ACCENT)
     marks = passage_marks(transcript, passages, colors, labels, link_pad)
@@ -198,15 +271,24 @@ def player_html(transcript: Transcript, passages: Sequence[Passage], *, audio_sr
                   f'{": " + html.escape(audio_note) if audio_note else ""}. Das Transkript bleibt lesbar.</div>')
     hint = (f"Passagen: {len(marks)} · Klick auf einen Abschnitt spielt ihn ab" if marks
             else "Keine verdächtige Passage · Klick auf einen Abschnitt spielt ihn ab")
-    config = json.dumps({"startAt": start_at, "duration": duration, "hasAudio": bool(audio_src)})
+    view = "ch" if (view == "ch" and original is not None) else "de"
+    switch, note = view_switch(original, view)
+    ch_box = ""
+    if original is not None:
+        ch_box = (f'<div class="cg-transcript" data-view="ch"{"" if view == "ch" else " hidden"} lang="gsw">\n'
+                  f'{dialect_rows(original, marks, start_at)}\n  </div>')
+    config = json.dumps({"startAt": start_at, "duration": duration, "hasAudio": bool(audio_src),
+                         "autoplay": bool(autoplay), "nonce": int(nonce), "view": view,
+                         "hasOriginal": original is not None})
     slots = {"HEIGHT": str(int(height)), "ACCENT": accent, "ACCENT_SOFT": _rgba(accent, 0.16), "PLAYER": player,
              "JUMPS": jumps, "STRIP": strip, "HINT": html.escape(hint), "ROWS": "\n".join(rows),
-             "CONFIG": html.escape(config, quote=True)}
+             "CONFIG": html.escape(config, quote=True), "SWITCH": switch, "NOTE": note, "CHBOX": ch_box,
+             "DEHIDDEN": " hidden" if view == "ch" else ""}
     # one pass: text that happens to contain a slot name is never substituted a second time
     return _SLOT.sub(lambda m: slots[m.group(1)], _TEMPLATE)
 
 
-_SLOT = re.compile(r"__(HEIGHT|ACCENT_SOFT|ACCENT|PLAYER|JUMPS|STRIP|HINT|ROWS|CONFIG)__")
+_SLOT = re.compile(r"__(HEIGHT|ACCENT_SOFT|ACCENT|PLAYER|JUMPS|STRIP|HINT|ROWS|CONFIG|SWITCH|NOTE|CHBOX|DEHIDDEN)__")
 
 
 _TEMPLATE = """<!doctype html>
@@ -259,6 +341,19 @@ _TEMPLATE = """<!doctype html>
   mark.cg-kw { background: none; font-weight: 700; text-decoration: underline; text-decoration-color: var(--accent);
                text-decoration-thickness: 2px; text-underline-offset: 3px; color: inherit; }
   .cg-empty { color: var(--muted); padding: 16px; }
+  .cg-views { display: flex; flex-wrap: wrap; align-items: center; gap: 0; padding: 8px 16px 0; }
+  .cg-view { border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-size: 13px;
+             padding: 4px 12px; cursor: pointer; margin-right: -1px; }
+  .cg-view:first-child { border-radius: 8px 0 0 8px; }
+  .cg-view:nth-child(2) { border-radius: 0 8px 8px 0; }
+  .cg-view.is-on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .cg-view:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .cg-view[disabled] { color: #9aa1a9; background: var(--plane); cursor: not-allowed; }
+  .cg-viewmsg { margin-left: 10px; font-size: 12px; color: var(--muted); flex: 1 1 260px; padding: 2px 0; }
+  .cg-orignote { margin: 6px 16px 2px; padding: 6px 10px; border-left: 3px solid #c98500; background: #fff8e8;
+                 color: #5c4300; font-size: 12.5px; border-radius: 0 6px 6px 0; }
+  .cg-est { border: 1px dashed var(--muted); color: var(--muted); border-radius: 999px; padding: 0 8px; font-size: 11.5px; }
+  [hidden] { display: none !important; }
 </style></head>
 <body>
 <div class="cg-root" id="cg-root" data-config="__CONFIG__">
@@ -267,55 +362,74 @@ _TEMPLATE = """<!doctype html>
     <div class="cg-track" id="cg-track" title="Klicken: an diese Stelle springen">__STRIP__<div class="cg-head" id="cg-head"></div></div>
     <div class="cg-jumps">__JUMPS__</div>
   </div>
+  __SWITCH__
   <div class="cg-bar"><span>__HINT__</span>
     <span><button type="button" class="cg-now" id="cg-now">Zur aktuellen Stelle</button>
     <label><input type="checkbox" id="cg-follow" checked> Mitlaufen</label></span></div>
-  <div class="cg-transcript" id="cg-transcript">
+  __NOTE__
+  <div class="cg-transcript" id="cg-transcript" data-view="de"__DEHIDDEN__>
 __ROWS__
   </div>
+  __CHBOX__
 </div>
 <script>
 (function () {
   var root = document.getElementById("cg-root");
   var cfg = JSON.parse(root.getAttribute("data-config"));
   var audio = document.getElementById("cg-audio");
-  var box = document.getElementById("cg-transcript");
   var follow = document.getElementById("cg-follow");
   var nowBtn = document.getElementById("cg-now");
   var head = document.getElementById("cg-head");
   var track = document.getElementById("cg-track");
-  var segs = Array.prototype.slice.call(document.querySelectorAll(".cg-seg"));
-  var starts = segs.map(function (s) { return parseFloat(s.getAttribute("data-start")); });
-  var current = -1, userScrollAt = 0, stopAt = null, ours = false;
+  var note = document.getElementById("cg-orignote");
+  var toArr = function (l) { return Array.prototype.slice.call(l); };
+  // one view per transcript pane (de = ASR, ch = original script); all follow the audio, the shown one scrolls
+  var views = {}, names = [];
+  toArr(document.querySelectorAll(".cg-transcript")).forEach(function (box) {
+    var segs = toArr(box.querySelectorAll(".cg-seg"));
+    var v = { name: box.getAttribute("data-view"), box: box, segs: segs, current: -1,
+              starts: segs.map(function (s) { return parseFloat(s.getAttribute("data-start")); }),
+              ends: segs.map(function (s) { return parseFloat(s.getAttribute("data-end")); }) };
+    var first = box.querySelector(".cg-seg.is-current");
+    if (first) v.current = segs.indexOf(first);
+    views[v.name] = v; names.push(v.name);
+  });
+  var active = views[cfg.view] ? cfg.view : "de";
+  var userScrollAt = 0, stopAt = null, ours = false;
   var duration = cfg.duration || 0;
 
-  function indexAt(t) {
+  function indexAt(v, t) {
+    var starts = v.starts, ends = v.ends;
     var lo = 0, hi = starts.length - 1, best = -1;
     while (lo <= hi) { var mid = (lo + hi) >> 1; if (starts[mid] <= t + 1e-3) { best = mid; lo = mid + 1; } else { hi = mid - 1; } }
-    return best < 0 && starts.length ? 0 : best;
+    if (best < 0) return starts.length ? 0 : -1;
+    if (t > ends[best] + 1e-3 && best + 1 < starts.length) return best + 1;  // pause: the next one is coming
+    return best;
   }
-  function inView(el) {
-    var top = el.offsetTop - box.scrollTop, h = box.clientHeight;
+  function inView(v, el) {
+    var box = v.box, top = el.offsetTop - box.scrollTop, h = box.clientHeight;
     return top > h * 0.08 && top + Math.min(el.offsetHeight, h * 0.5) < h * 0.75;
   }
-  function scrollTo(el, smooth) {
-    var top = Math.max(0, el.offsetTop - box.clientHeight * 0.25);
+  function scrollTo(v, el, smooth) {
+    var box = v.box, top = Math.max(0, el.offsetTop - box.clientHeight * 0.25);
     try { box.scrollTo({ top: top, behavior: smooth ? "smooth" : "auto" }); } catch (e) { box.scrollTop = top; }
   }
-  function setCurrent(i, force) {
-    if (i === current && !force) return;
-    if (current >= 0 && segs[current]) segs[current].classList.remove("is-current");
-    current = i;
-    if (i < 0 || !segs[i]) return;
-    segs[i].classList.add("is-current");
+  function setCurrent(v, i, force) {
+    if (i === v.current && !force) return;
+    if (v.current >= 0 && v.segs[v.current]) v.segs[v.current].classList.remove("is-current");
+    v.current = i;
+    if (i < 0 || !v.segs[i]) return;
+    v.segs[i].classList.add("is-current");
+    if (v.name !== active) return;  // a hidden pane only keeps its highlight; it scrolls when shown
     var reading = Date.now() - userScrollAt < 6000;
     if (force || (follow.checked && !reading)) {
-      if (force || !inView(segs[i])) scrollTo(segs[i], !force);
+      if (force || !inView(v, v.segs[i])) scrollTo(v, v.segs[i], !force);
       nowBtn.classList.remove("show");
-    } else if (!inView(segs[i])) {
+    } else if (!inView(v, v.segs[i])) {
       nowBtn.classList.add("show");
     }
   }
+  function setAll(t, force) { names.forEach(function (n) { setCurrent(views[n], indexAt(views[n], t), force && n === active); }); }
   function moveHead(t) {
     var d = (audio && isFinite(audio.duration) && audio.duration > 0) ? audio.duration : duration;
     if (d > 0) head.style.left = Math.min(100, 100 * t / d) + "%";
@@ -324,22 +438,46 @@ __ROWS__
     t = Math.max(0, t);
     stopAt = (stop === undefined) ? null : stop;
     userScrollAt = 0;
-    setCurrent(indexAt(t), true);
+    setAll(t, true);
     moveHead(t);
     if (!audio) return;
     ours = true;
     audio.currentTime = t;
     var p = audio.play(); if (p && p.catch) p.catch(function () {});
   }
+  function show(name) {
+    if (!views[name]) return;
+    active = name;
+    names.forEach(function (n) { views[n].box.hidden = (n !== name); });
+    if (note) note.hidden = (name !== "ch");
+    toArr(document.querySelectorAll(".cg-view")).forEach(function (b) {
+      var on = b.getAttribute("data-view") === name;
+      b.classList.toggle("is-on", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    var v = views[name];
+    var playing = audio && (audio.currentTime > 0 || !audio.paused);
+    if (playing) setCurrent(v, indexAt(v, audio.currentTime), false);
+    userScrollAt = 0;
+    if (v.current >= 0 && v.segs[v.current]) scrollTo(v, v.segs[v.current], false);
+    else v.box.scrollTop = 0;
+    nowBtn.classList.remove("show");
+    try { window.sessionStorage.setItem("cg-view", name); } catch (e) {}
+  }
 
-  ["wheel", "touchmove"].forEach(function (ev) {
-    box.addEventListener(ev, function () { userScrollAt = Date.now(); }, { passive: true });
+  names.forEach(function (n) {
+    var v = views[n];
+    ["wheel", "touchmove"].forEach(function (ev) {
+      v.box.addEventListener(ev, function () { userScrollAt = Date.now(); }, { passive: true });
+    });
+    v.box.addEventListener("keydown", function () { userScrollAt = Date.now(); });
+    v.segs.forEach(function (el, i) { el.addEventListener("click", function () { seek(v.starts[i]); }); });
   });
-  box.addEventListener("keydown", function () { userScrollAt = Date.now(); });
-  nowBtn.addEventListener("click", function () { userScrollAt = 0; if (current >= 0) setCurrent(current, true); });
-  follow.addEventListener("change", function () { if (follow.checked) { userScrollAt = 0; if (current >= 0) setCurrent(current, true); } });
-  segs.forEach(function (el, i) { el.addEventListener("click", function () { seek(starts[i]); }); });
-  Array.prototype.forEach.call(document.querySelectorAll(".cg-jump"), function (b) {
+  toArr(document.querySelectorAll(".cg-view")).forEach(function (b) {
+    b.addEventListener("click", function () { if (!b.disabled) show(b.getAttribute("data-view")); });
+  });
+  nowBtn.addEventListener("click", function () { userScrollAt = 0; var v = views[active]; if (v.current >= 0) setCurrent(v, v.current, true); });
+  follow.addEventListener("change", function () { if (follow.checked) { userScrollAt = 0; var v = views[active]; if (v.current >= 0) setCurrent(v, v.current, true); } });
+  toArr(document.querySelectorAll(".cg-jump")).forEach(function (b) {
     b.addEventListener("click", function () { seek(parseFloat(b.getAttribute("data-seek")), parseFloat(b.getAttribute("data-stop"))); });
   });
   track.addEventListener("click", function (e) {
@@ -352,20 +490,28 @@ __ROWS__
     audio.addEventListener("timeupdate", function () {
       var t = audio.currentTime;
       moveHead(t);
-      setCurrent(indexAt(t), false);
+      setAll(t, false);
       if (stopAt !== null && t >= stopAt) { stopAt = null; audio.pause(); }
     });
     audio.addEventListener("seeking", function () {
-      if (!ours) { stopAt = null; setCurrent(indexAt(audio.currentTime), false); }
+      if (!ours) { stopAt = null; setAll(audio.currentTime, false); }
       ours = false;
     });
     if (cfg.startAt !== null && cfg.startAt !== undefined) {
-      var place = function () { ours = true; audio.currentTime = Math.max(0, cfg.startAt); moveHead(cfg.startAt); };
+      var place = function () {
+        ours = true; audio.currentTime = Math.max(0, cfg.startAt); moveHead(cfg.startAt);
+        if (cfg.autoplay) { var pp = audio.play(); if (pp && pp.catch) pp.catch(function () {}); }
+      };
       if (audio.readyState >= 1) { place(); } else { audio.addEventListener("loadedmetadata", place, { once: true }); }
     }
   }
-  var first = document.querySelector(".cg-seg.is-current");
-  if (first) { current = segs.indexOf(first); scrollTo(first, false); if (cfg.startAt) moveHead(cfg.startAt); }
+  // the reader's last choice survives a rerun of the page (when the browser allows storage in this frame)
+  var stored = null;
+  try { stored = window.sessionStorage.getItem("cg-view"); } catch (e) {}
+  if (stored && stored !== active && views[stored] && cfg.view === "de") { show(stored); }
+  var v0 = views[active];
+  if (v0 && v0.current >= 0) { scrollTo(v0, v0.segs[v0.current], false); }
+  if (cfg.startAt) moveHead(cfg.startAt);
 })();
 </script>
 </body></html>

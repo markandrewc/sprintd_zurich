@@ -1,0 +1,27 @@
+# Fact policy: how the two AI readers' answers become ja / nein / unklar (src/callguard/fact_policy.py).
+# Part of the fact bundle: changing it needs four-eyes approval (demo tab «Fakten»; versions in config/policy_versions/).
+# Pre-registered defaults (research/findings/dual_facts_prereg.md): Qwen three-way, Kev band [0.3, 0.7], Einigkeit.
+# Active demo default since 2026-10-10 17:50: «Sicherheit der KI» c = 0.60 for BOTH readers (band [0.4, 0.6]), chosen
+# on DEV only (callguard dualfacts certainty; research/evidence/dual_facts_certainty.md); test50 not re-looked.
+#   readers      A (primary, with evidence) and B; mode three_way (ja if p(ja) >= 0.5, nein if p(nein) >= 0.5,
+#                else unklar) or band [lo, hi] on p(ja) (ja if >= hi, nein if <= lo, else unklar)
+#   combination  only_a (Nur Qwen) | only_b (Nur Kev) | agree (Einigkeit) | a_checked (Qwen, Kev als Kontrolle)
+#   overrides    "<family>.<fact>": {<reader id>: {band: [lo, hi], mode: ...}, combination: ...}
+readers:
+- id: qwen
+  check: facts
+  label: Qwen
+  model: Qwen2.5-7B
+  mode: band
+  band:
+  - 0.4
+  - 0.6
+- id: kev
+  check: facts_kev
+  label: Kev
+  model: Kev-4B
+  mode: band
+  band:
+  - 0.4
+  - 0.6
+combination: agree

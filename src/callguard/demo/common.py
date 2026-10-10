@@ -31,13 +31,41 @@ def badge(label: str, text: str | None = None) -> str:
 
 
 def active_table(app: AppState) -> PolicyTable | None:
-    spec = next((c for c in app.cfg.checks if c.get("type") == "facts"), {})
-    rel = str(spec.get("policy_table") or DEFAULT_TABLE)
-    path = Path(rel) if Path(rel).is_absolute() else ROOT / rel
     try:
-        return load_policy_table(path)
+        return load_policy_table(active_table_path(app))
     except Exception:
         return None
+
+
+def active_table_path(app: AppState) -> Path:
+    spec = next((c for c in app.cfg.checks if c.get("type") == "facts"), {})
+    rel = str(spec.get("policy_table") or DEFAULT_TABLE)
+    return Path(rel) if Path(rel).is_absolute() else ROOT / rel
+
+
+def policy_status(app: AppState) -> dict[str, Any]:
+    """Which Regelwerk the shown decisions come from: the active version number and how many calls were decided
+    with exactly the active table (per-family hash, as the facts check records it) vs an older one."""
+    from callguard.policy_versions import VersionStore
+
+    out: dict[str, Any] = {"version": None, "same": 0, "other": [], "without": 0}
+    path = active_table_path(app)
+    try:
+        table = load_policy_table(path)
+        act = VersionStore(path).active()
+        out["version"] = act.n if act is not None else None
+    except Exception:
+        return out
+    for cid, r in app.loaded.results.items():
+        cr = next((c for c in r.checks.values() if c.type == "facts" and not (c.meta or {}).get("error")), None)
+        stored = ((cr.meta or {}).get("policy_table") or {}).get("hash") if cr is not None else None
+        if not stored:
+            out["without"] += 1
+        elif stored == table.key(list(cr.family_scores)):
+            out["same"] += 1
+        else:
+            out["other"].append(cid)
+    return out
 
 
 def table_for(app: AppState, result: CallResult) -> PolicyTable | None:
@@ -51,8 +79,28 @@ def table_for(app: AppState, result: CallResult) -> PolicyTable | None:
     return active_table(app)
 
 
+def with_fact_policy(app: AppState, result: CallResult) -> CallResult:
+    """Profiles deciding with the fact policy (two readers): the call with both readers replaced by the combined
+    facts result the live fusion decides on (per fact both readers' p, their values, the band, agreement)."""
+    from callguard.demo import facts_ui as fu
+    from callguard.fact_policy import combined_checks, has_both
+
+    fus = fu.fusion(app)
+    if fus is None:
+        return result
+    try:
+        pol = fu.session_policy(app)
+        if not has_both(result, pol):
+            return result
+        checks = combined_checks(result, fus.table(), pol, family_names=fus._names(app.all_families), **fus.scoring)
+        return result.model_copy(update={"checks": checks})
+    except Exception as e:  # the card falls back to the stored first reader
+        log.warning("card: fact policy view of %s failed: %s", result.call_id, e)
+        return result
+
+
 def card_for(app: AppState, call_id: str, decision: Decision | None = None) -> cd.Card:
-    result = app.loaded.results[call_id]
+    result = with_fact_policy(app, app.loaded.results[call_id])
     d = decision or app.decided[call_id].decision
     s = app.settings
     try:

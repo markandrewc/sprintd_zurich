@@ -163,3 +163,6 @@ def test_pipeline_code_never_imports_the_label_reading_evaluation():
                  if p.name not in ("eval_evidence.py", "evidence_eval.py")
                  and re.search(r"\beval_evidence\b", p.read_text(encoding="utf-8"))]
     assert offenders == []
+    # the alignment lives in the label-free callguard.align (the demo uses it from there); same objects here
+    from callguard import align as al
+    assert ee.align is al.align and ee.content_tokens is al.content_tokens and ee.TurnSpan is al.TurnSpan

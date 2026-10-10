@@ -1,0 +1,716 @@
+{
+ "meta": {
+  "set": "dev",
+  "profile": "dual-facts",
+  "runs_dir": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a76e4f47529e630c2/runs/dual-facts/dual-facts",
+  "policy_table": "config/policy_table.yaml",
+  "n_results": 48,
+  "missing": [],
+  "threshold": 0.55,
+  "n_boot": 2000,
+  "seed": 13,
+  "created": "2026-10-10T17:39:21",
+  "bootstrap_unit": "twin group (case: config/splits.yaml groups; test50: data_test50 dataset.yaml groups)"
+ },
+ "criterion": "max 3-class accuracy (dev, fixed threshold); ties -> lower false-alarm rate -> lower miss rate -> both readers on the band before Kev only -> lower c",
+ "entries": [
+  {
+   "setting": "default (Qwen three-way, Kev 0.3-0.7)",
+   "readers": "default",
+   "c": null,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "three_way",
+      "band": [
+       0.3,
+       0.7
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.3,
+       0.7
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 26,
+   "alarms": 11,
+   "reviews": 15,
+   "accuracy": 0.75,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "auc": 0.9205,
+   "ci": {
+    "auc": [
+     0.8242,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.587,
+     0.9167
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "both readers c=0.60",
+   "readers": "both",
+   "c": 0.6,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "band",
+      "band": [
+       0.4,
+       0.6
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.4,
+       0.6
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 27,
+   "alarms": 12,
+   "reviews": 15,
+   "accuracy": 0.7708,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "auc": 0.9336,
+   "ci": {
+    "auc": [
+     0.8408,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3571
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.62,
+     0.9167
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "Kev only c=0.60",
+   "readers": "b",
+   "c": 0.6,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "three_way",
+      "band": [
+       0.3,
+       0.7
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.4,
+       0.6
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 27,
+   "alarms": 12,
+   "reviews": 15,
+   "accuracy": 0.7708,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "auc": 0.9257,
+   "ci": {
+    "auc": [
+     0.8313,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.6042,
+     0.9348
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "both readers c=0.65",
+   "readers": "both",
+   "c": 0.65,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "band",
+      "band": [
+       0.35,
+       0.65
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.35,
+       0.65
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 26,
+   "alarms": 11,
+   "reviews": 15,
+   "accuracy": 0.75,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "auc": 0.9283,
+   "ci": {
+    "auc": [
+     0.8353,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3571
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.5962,
+     0.9091
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "Kev only c=0.65",
+   "readers": "b",
+   "c": 0.65,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "three_way",
+      "band": [
+       0.3,
+       0.7
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.35,
+       0.65
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 27,
+   "alarms": 12,
+   "reviews": 15,
+   "accuracy": 0.7708,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "auc": 0.9257,
+   "ci": {
+    "auc": [
+     0.8313,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.6042,
+     0.9348
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "both readers c=0.70",
+   "readers": "both",
+   "c": 0.7,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "band",
+      "band": [
+       0.3,
+       0.7
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.3,
+       0.7
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 27,
+   "alarms": 11,
+   "reviews": 16,
+   "accuracy": 0.7292,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "auc": 0.9135,
+   "ci": {
+    "auc": [
+     0.8159,
+     0.9909
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.4
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.5625,
+     0.9001
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "Kev only c=0.70",
+   "readers": "b",
+   "c": 0.7,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "three_way",
+      "band": [
+       0.3,
+       0.7
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.3,
+       0.7
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 26,
+   "alarms": 11,
+   "reviews": 15,
+   "accuracy": 0.75,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "auc": 0.9205,
+   "ci": {
+    "auc": [
+     0.8242,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.587,
+     0.9167
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "both readers c=0.75",
+   "readers": "both",
+   "c": 0.75,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "band",
+      "band": [
+       0.25,
+       0.75
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.25,
+       0.75
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 27,
+   "alarms": 11,
+   "reviews": 16,
+   "accuracy": 0.7292,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "auc": 0.9135,
+   "ci": {
+    "auc": [
+     0.8159,
+     0.9909
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.4
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.5625,
+     0.9001
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "Kev only c=0.75",
+   "readers": "b",
+   "c": 0.75,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "three_way",
+      "band": [
+       0.3,
+       0.7
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.25,
+       0.75
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 26,
+   "alarms": 11,
+   "reviews": 15,
+   "accuracy": 0.75,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "auc": 0.9205,
+   "ci": {
+    "auc": [
+     0.8242,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.587,
+     0.9167
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "both readers c=0.80",
+   "readers": "both",
+   "c": 0.8,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "band",
+      "band": [
+       0.2,
+       0.8
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.2,
+       0.8
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 27,
+   "alarms": 11,
+   "reviews": 16,
+   "accuracy": 0.7292,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "auc": 0.9135,
+   "ci": {
+    "auc": [
+     0.8159,
+     0.9909
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.4
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.5625,
+     0.9001
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "setting": "Kev only c=0.80",
+   "readers": "b",
+   "c": 0.8,
+   "policy": {
+    "readers": [
+     {
+      "id": "qwen",
+      "check": "facts",
+      "label": "Qwen",
+      "model": "Qwen2.5-7B",
+      "mode": "three_way",
+      "band": [
+       0.3,
+       0.7
+      ]
+     },
+     {
+      "id": "kev",
+      "check": "facts_kev",
+      "label": "Kev",
+      "model": "Kev-4B",
+      "mode": "band",
+      "band": [
+       0.2,
+       0.8
+      ]
+     }
+    ],
+    "combination": "agree"
+   },
+   "n": 48,
+   "flagged": 26,
+   "alarms": 11,
+   "reviews": 15,
+   "accuracy": 0.75,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "auc": 0.9205,
+   "ci": {
+    "auc": [
+     0.8242,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.587,
+     0.9167
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   }
+  }
+ ],
+ "chosen": {
+  "c": 0.6,
+  "readers": "both",
+  "setting": "both readers c=0.60"
+ }
+}

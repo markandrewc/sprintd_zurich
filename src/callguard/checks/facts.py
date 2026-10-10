@@ -89,7 +89,8 @@ class PolicyTableError(ValueError):
 
 _VALUE_ALIASES = {"yes": "yes", "ja": "yes", "no": "no", "nein": "no", "unclear": "unclear",
                   "unklar": "unclear", "unknown": "unclear"}
-_TOKEN = re.compile(r"\s*(?:(!=|==|=|\(|\)|\[|\]|,)|([A-Za-z_][A-Za-z0-9_]*))")
+# names may be qualified ``family.fact`` (cross rules, section ``cross_rules``)
+_TOKEN = re.compile(r"\s*(?:(!=|==|=|\(|\)|\[|\]|,)|([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?))")
 _KEYWORDS = {"and", "or", "not", "in", "true"}
 
 # AST nodes are tuples: ("true",) | ("cmp", fact, frozenset(values)) | ("not", node)
@@ -175,7 +176,7 @@ class _Parser:
             return node
         if low == "true":
             return ("true",)
-        if low in _KEYWORDS or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", tok):
+        if low in _KEYWORDS or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?", tok):
             raise self.error(f"expected a fact name, got {tok!r}")
         if self.facts is not None and tok not in self.facts:
             raise self.error(f"unknown fact {tok!r} (facts of this family: {sorted(self.facts)})")
@@ -303,6 +304,8 @@ class Rule:
     node: Node = field(default=("true",), repr=False)
     enabled: bool = True  # `enabled: false` in the table: kept and validated, but never decides
     basis: str = ""  # optional legal basis shown to the officer (display only, not in the cache key)
+    title: str = ""  # optional short title shown on the rule list (display only, not in the cache key)
+    report_as: str = ""  # cross rules only: the Prüfart the decision is reported / routed as (display only)
 
 
 @dataclass
@@ -321,10 +324,18 @@ class FamilyTable:
         return next((r for r in self.rules if eval_hard(r.node, values)), None)
 
 
+CROSS_FAMILY = "eigene_regeln"  # the virtual family cross rules decide
+CROSS_LABEL = "Eigene Regeln"
+
+
 @dataclass
 class PolicyTable:
     families: dict[str, FamilyTable]
     path: str = ""
+    # section ``cross_rules``: rules over qualified facts of several families (``access.spoken = yes and ...``),
+    # evaluated after every family resolved its facts; None when the table has no such section. Not part of
+    # :meth:`key` (the facts check never reads them: they are pure logic in the fusion), so cache keys are stable.
+    cross: FamilyTable | None = None
 
     def key(self, family_ids: list[str]) -> str:
         """Hash of the parsed entries of these families (comment / formatting edits don't count)."""
@@ -346,7 +357,7 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
         for i, f in enumerate(entry.get("facts") or []):
             if not isinstance(f, dict):
                 raise PolicyTableError(f"{where}: fact #{i} is not a mapping")
-            bad = set(f) - {"id", "label", "role", "de", "en"}
+            bad = set(f) - {"id", "label", "role", "de", "en", "description"}  # description: display only
             if bad:
                 raise PolicyTableError(f"{where}: fact #{i}: unknown keys {sorted(bad)}")
             fact_id = str(f.get("id") or "")
@@ -369,7 +380,7 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
         for i, r in enumerate(entry.get("rules") or []):
             if not isinstance(r, dict):
                 raise PolicyTableError(f"{where}: rule #{i} is not a mapping")
-            bad = set(r) - {"id", "label", "when", "text", "enabled", "basis"}
+            bad = set(r) - {"id", "label", "when", "text", "enabled", "basis", "title"}
             if bad:
                 raise PolicyTableError(f"{where}: rule #{i}: unknown keys {sorted(bad)}")
             rid = str(r.get("id") or f"{fid}.rule_{i + 1}")
@@ -388,7 +399,7 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
             if enabled not in (True, False):
                 raise PolicyTableError(f"{where}: rule {rid}: enabled must be true or false, got {enabled!r}")
             rule = Rule(id=rid, label=label, when=when, text=str(r.get("text") or ""), node=node,  # type: ignore[arg-type]
-                        enabled=enabled, basis=str(r.get("basis") or ""))
+                        enabled=enabled, basis=str(r.get("basis") or ""), title=str(r.get("title") or ""))
             all_rules.append(rule)
             if enabled:
                 rules.append(rule)
@@ -401,7 +412,62 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
                                                    for r in all_rules]},
                                     disabled=[r for r in all_rules if not r.enabled],
                                     basis=str(entry.get("basis") or ""))
-    return PolicyTable(families=out, path=source)
+    cross = parse_cross_rules(raw.get("cross_rules"), out, source)
+    return PolicyTable(families=out, path=source, cross=cross)
+
+
+CROSS_RULE_KEYS = {"id", "label", "when", "text", "enabled", "basis", "title", "report_as"}
+
+
+def parse_cross_rules(raw: Any, families: dict[str, FamilyTable], source: str = "policy table") -> FamilyTable | None:
+    """The ``cross_rules`` section as a FamilyTable of the virtual family :data:`CROSS_FAMILY` whose facts are the
+    qualified facts (``family.fact``) the rules use; None without the section."""
+    if raw is None:
+        return None
+    where = f"{source}: cross_rules"
+    if not isinstance(raw, list):
+        raise PolicyTableError(f"{where}: expected a list of rules")
+    known = {f"{fid}.{f.id}": (fid, f) for fid, ft in families.items() for f in ft.facts}
+    rules: list[Rule] = []
+    all_rules: list[Rule] = []
+    used: list[str] = []
+    for i, r in enumerate(raw):
+        if not isinstance(r, dict):
+            raise PolicyTableError(f"{where}: rule #{i} is not a mapping")
+        bad = set(r) - CROSS_RULE_KEYS
+        if bad:
+            raise PolicyTableError(f"{where}: rule #{i}: unknown keys {sorted(bad)}")
+        rid = str(r.get("id") or f"{CROSS_FAMILY}.rule_{i + 1}")
+        if any(x.id == rid for x in all_rules):
+            raise PolicyTableError(f"{where}: duplicate rule id {rid!r}")
+        label = str(r.get("label") or "")
+        if label not in RULE_LABELS:
+            raise PolicyTableError(f"{where}: rule {rid}: label {label!r} not in {RULE_LABELS}")
+        when = str(r.get("when") or "")
+        try:
+            node = parse_rule(when, set(known))
+        except PolicyTableError as e:
+            raise PolicyTableError(f"{where}: rule {rid}: {e} (cross rules name facts as family.fact)") from None
+        if node == ("true",):
+            raise PolicyTableError(f"{where}: rule {rid}: a cross rule needs a condition")
+        report_as = str(r.get("report_as") or "")
+        if report_as and report_as not in families:
+            raise PolicyTableError(f"{where}: rule {rid}: report_as {report_as!r} is not a family")
+        enabled = r.get("enabled", True)
+        if enabled not in (True, False):
+            raise PolicyTableError(f"{where}: rule {rid}: enabled must be true or false")
+        rule = Rule(id=rid, label=label, when=when, text=str(r.get("text") or ""), node=node,  # type: ignore[arg-type]
+                    enabled=enabled, basis=str(r.get("basis") or ""), title=str(r.get("title") or ""),
+                    report_as=report_as)
+        all_rules.append(rule)
+        if enabled:
+            rules.append(rule)
+        used += [q for q in rule_facts(node) if q not in used]
+    facts = [Fact(id=q, label=known[q][1].label, role=known[q][1].role, de=known[q][1].de, en=known[q][1].en)
+             for q in used]
+    return FamilyTable(family=CROSS_FAMILY, facts=facts, rules=rules,
+                       raw={"rules": [{"id": r.id, "label": r.label, "when": r.when} for r in all_rules]},
+                       disabled=[r for r in all_rules if not r.enabled])
 
 
 _TABLE_MEMO: dict[str, tuple[float, PolicyTable]] = {}

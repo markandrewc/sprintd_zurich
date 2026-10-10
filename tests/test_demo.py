@@ -31,7 +31,8 @@ from callguard.ui import backend as be
 
 APP = Path(__file__).resolve().parents[1] / "src" / "callguard" / "demo" / "app.py"
 PAGES = {"cases": None, "call": "pages/call.py", "settings": "pages/settings.py", "quality": "pages/quality.py",
-         "process": "pages/process.py", "rules": "../ui/views/rules.py"}
+         "process": "pages/process.py"}
+
 
 
 @pytest.fixture
@@ -80,38 +81,48 @@ def _find_html(node) -> list[str]:
 # --------------------------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("page", [p for p in PAGES if p != "rules"])
+@pytest.mark.parametrize("page", [p for p in PAGES if p != "settings"])
 def test_every_demo_page_renders(env: FixtureEnv, page: str):
     at = run_demo(PAGES[page])
     assert at.title, f"{page} has no title"
 
 
-def test_regelwerk_page_mounts_in_the_demo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """The officer UI's Regelwerk page, mounted unchanged, on a tmp copy of the table (its version store
-    writes next to the active table: never into the repo's config/)."""
+def test_facts_and_rules_tabs_single_reader_profile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """Profile with ONE reader (recommended): «Einstellungen» with its three tabs; «Regeln» points to the dual-reader
+    profile for rule editing, «Fakten» lists the questions with «+ Neuer Fakt» (four eyes), on a tmp copy of the table,
+    so the version store never writes into the repo."""
     import shutil
 
     import yaml
 
     from callguard.config import ROOT
 
+    repo_versions = sorted(p.name for p in (ROOT / "config" / "policy_versions").glob("*"))
     env = write_fixture_env(tmp_path, config="recommended")
     active = tmp_path / "config" / "policy_table.yaml"
-    shutil.copy(ROOT / "config" / "policy_table_v1.yaml", active)
+    shutil.copy(ROOT / "config" / "policy_table.yaml", active)
     idx = next(i for i, c in enumerate(yaml.safe_load((ROOT / "config/recommended.yaml").read_text())["checks"])
                if c["type"] == "facts")
     monkeypatch.setenv(be.ENV_ARGS, env.args + f" --set paths.tuning={tmp_path / 'tuning.yaml'}"
                        + f" --set checks.{idx}.policy_table={active}")
-    at = run_demo(PAGES["rules"])
-    assert at.title[0].value == "Regelwerk"
+    at = run_demo(PAGES["settings"])
+    assert at.title[0].value == "Einstellungen"
+    assert [t.label for t in at.tabs][:3] == [":material/rule: Regeln", ":material/fact_check: Fakten",
+                                              ":material/label: Stichwörter"]
+    assert at.slider(key="dm_threshold") is not None  # «Erweitert: Score-Alarmschwelle»
+    body = texts(at)
+    assert "dual-facts" in body and "Ein **Fakt** ist eine kleine Ja/Nein-Frage" in body
+    assert any(b.label == "Neuer Fakt" for b in at.button)
     assert (active.parent / "policy_versions").is_dir()
+    assert sorted(p.name for p in (ROOT / "config" / "policy_versions").glob("*")) == repo_versions
 
 
 def test_worklist_orders_alarm_then_review_and_threshold_moves_counts(env: FixtureEnv):
     at = run_demo()
     assert at.title[0].value == "Fälle"
     shown = {m.label: m.value for m in at.metric}
-    assert shown == {"Alarm": "1", "Prüfen": "1", "Kein Alarm": "1"}
+    assert shown == {"Alarm": "1", "Prüfen": "1", "Kein Alarm": "1", "Mensch nötig": "2"}  # boxes as on 8501
+    assert at.slider(key="dm_threshold") is not None  # full-width Alarmschwelle under the boxes
     df = at.dataframe[0].value
     data = df.data if hasattr(df, "data") else df
     assert list(data["Anruf"])[:2] == [ALARM_ID, REVIEW_ID]
@@ -125,7 +136,9 @@ def test_worklist_orders_alarm_then_review_and_threshold_moves_counts(env: Fixtu
                                                           "max_uncertainty": d["max_uncertainty"],
                                                           "weights": be.check_weights(engine.cfg)}, engine.families()))
     shown = {m.label: m.value for m in at.metric}
-    assert shown == {be.LABEL_TEXT[k]: str(v) for k, v in want.items()} and shown["Alarm"] != "1"
+    want_shown = {be.LABEL_TEXT[k]: str(v) for k, v in want.items()}
+    want_shown["Mensch nötig"] = str(want["alarm"] + want["review"])
+    assert shown == want_shown and shown["Alarm"] != "1"
 
 
 def test_deep_link_opens_call_page_with_synced_player(env: FixtureEnv):
@@ -136,12 +149,32 @@ def test_deep_link_opens_call_page_with_synced_player(env: FixtureEnv):
     assert "Ihre Beurteilung" in [h.value for h in at.subheader]
 
 
+def test_card_explains_each_fact_and_seeks_the_player_to_its_passage(env: FixtureEnv):
+    table = load_policy_table("config/policy_table.yaml")
+    path = env.result_path(ALARM_ID)
+    r = CallResult.model_validate_json(path.read_text())
+    fx = facts_result(table, ALARM_ID, "trade", {"wish": "yes", "inside_info": "yes", "public": "no"},
+                      evidence={"wish": ["S007"]})
+    r.checks["facts"] = fx.checks["facts"]
+    path.write_text(r.model_dump_json(indent=1))
+    at = run_demo(PAGES["call"], query={"call": ALARM_ID})
+    body = texts(at)
+    assert "Alle Bedingungen erfüllt → diese Regel entscheidet (erste passende Regel von oben)." in body
+    assert "Frage an die KI:" in body and "keine einzelne Stelle markiert" in body  # public: no evidence
+    assert any("ja 0.97" in c.value for c in at.caption)
+    seek = next(b for b in at.button if b.label.startswith("Stelle anhören"))
+    assert seek.label == "Stelle anhören (ab 00:48)"  # S007 starts 58.5 s, minus 10 s
+    seek.click().run()
+    assert not at.exception
+    assert any("Aufnahme bei 00:48" in c.value for c in at.caption)
+    assert at.session_state[f"dm_seek_{ALARM_ID}"][0] == pytest.approx(48.5)
+
+
 def test_review_call_shows_open_point_and_harmless_call_explains_keyword_trap(env: FixtureEnv):
     at = run_demo(query={"call": REVIEW_ID})
     assert "Warum Prüfen?" in texts(at) or "Offen:" in texts(at)
     at = run_demo(query={"call": HARMLESS_ID})
-    exp = [e for e in at.expander if e.label == "Warum kein Alarm?"]
-    assert exp, "no «Warum kein Alarm?»"
+    assert "**Warum kein Alarm?**" in texts(at), "no «Warum kein Alarm?»"
     assert "Stichwort-Falle" in texts(at) and "Quartalszahlen" in texts(at)
 
 
@@ -262,7 +295,8 @@ def test_player_without_audio_and_without_passages():
 def test_start_segment_and_mark_terms():
     tr = _transcript()
     assert start_segment(tr, None) is None and start_segment(tr, 0.0) == "S001"
-    assert start_segment(tr, 8.4) == "S001" and start_segment(tr, 100) == "S004"
+    assert start_segment(tr, 7.9) == "S001" and start_segment(tr, 8.4) == "S002"  # pause: the next one
+    assert start_segment(tr, 25.0) == "S003" and start_segment(tr, 100) == "S004"
     assert mark_terms("A <b> a", ["a"]) == '<mark class="cg-kw">A</mark> &lt;b&gt; <mark class="cg-kw">a</mark>'
 
 
@@ -290,14 +324,16 @@ def table():
 
 
 def facts_result(table, call_id: str, family: str, values: dict[str, str], label: str = "alarm",
-                 score: float = 0.9) -> CallResult:
+                 score: float = 0.9, evidence: dict[str, list[str]] | None = None) -> CallResult:
     ft = table.families[family]
     probs = {k: {"yes": 0.0, "no": 0.0, "unclear": 0.0, v: 0.97} for k, v in values.items()}
     full = {f.id: values.get(f.id, "unclear") for f in ft.facts}
     fprobs = {f.id: probs.get(f.id, {"unclear": 1.0}) for f in ft.facts}
     fd = decide_family(ft, full, fprobs)
     detail = {"decision": fd.label, "facts": {k: {"label": ft.fact(k).label, "role": ft.fact(k).role, "value": full[k],
-                                                  "p": fprobs[k], "question": ft.fact(k).question("en")} for k in full},
+                                                  "p": fprobs[k], "question": ft.fact(k).question("en"),
+                                                  **({"evidence": evidence[k]} if evidence and k in evidence else {})}
+                        for k in full},
               "rule": {"id": fd.rule.id if fd.rule else None, "label": fd.label,
                        "when": fd.rule.when if fd.rule else "true", "text": fd.rule.text if fd.rule else ""}}
     t = Transcript(call_id=call_id, segments=[
@@ -316,13 +352,22 @@ def facts_result(table, call_id: str, family: str, values: dict[str, str], label
 
 
 def test_card_alarm_names_rule_facts_and_basis(table):
-    r = facts_result(table, "T-K1", "trade", {"wish": "yes", "inside_info": "yes", "public": "no"})
+    r = facts_result(table, "T-K1", "trade", {"wish": "yes", "inside_info": "yes", "public": "no"},
+                     evidence={"wish": ["S002"]})
     c = cd.build_card(r, r.decision, [], table=table)
     assert c.label_de == "Alarm" and c.rule_id and c.rule_plain.startswith("WENN") and c.rule_plain.endswith("ALARM")
     assert [f.fact for f in c.facts if f.decisive][:3] == ["wish", "inside_info", "public"]
-    assert c.facts[0].text == f"{table.families['trade'].fact('wish').label}: ja (0.97)"
+    wish = c.facts[0]
+    assert wish.text == f"{table.families['trade'].fact('wish').label}: ja (0.97)"
+    # the explanation behind a fact: the full German question (not the English one the model read, no model
+    # instructions), the probabilities, the segments the answer rests on
+    assert wish.question_de == cd.plain_question(table.families["trade"].fact("wish").question("de"))
+    assert "Antworte" not in wish.question_de and wish.question_de != wish.question
+    assert wish.p == {"yes": 0.97, "no": 0.0, "unclear": 0.0} and wish.evidence == ["S002"]
+    assert c.facts[1].evidence == []
     assert "FinfraG" in c.basis and cd.short_basis(c.basis) == "FinfraG Art. 142"
-    assert c.why_not is None
+    assert c.why_not is None and c.failed_rules == []
+    assert cd.plain_question('Ist es so? Antworte "unknown", wenn offen.') == "Ist es so?"
 
 
 def test_card_keyword_trap_explains_what_blocks_the_alarm(table):
@@ -343,6 +388,9 @@ def test_card_keyword_trap_explains_what_blocks_the_alarm(table):
     blocking = {f.fact for f in c.why_not.blocking}
     assert {"wish", "public"} <= blocking
     assert "kein Verstoss" in c.why_not.summary and cd.one_liner(c).startswith("Stichwort-Falle")
+    # which condition of each alarm rule failed, in words
+    public = table.families["trade"].fact("public").label
+    assert c.failed_rules and any(f"«{public}» = ja" in conds for _, _, conds in c.failed_rules)
 
 
 def test_blocking_and_failing_facts(table):

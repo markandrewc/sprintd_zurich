@@ -187,6 +187,10 @@ class VersionStore:
                 families_from_raw(bundle.get("keywords") or {}, (bundle.get("criteria") or {}).get("families") or {})
             if bundle.get("routing"):
                 RoutingConfig.from_dict(bundle["routing"])
+            if bundle.get("fact_policy"):
+                from callguard import fact_policy as fpol
+
+                fpol.parse_fact_policy(bundle["fact_policy"])
         except (ValueError, KeyError, TypeError, AttributeError) as e:
             raise PolicyTableError(f"Konfiguration ungültig: {e}") from None
 
@@ -264,11 +268,20 @@ class VersionStore:
         base = self.get(v.meta["parent"]) if v.meta.get("parent") else None
         live = self.live_texts()
         conflicts = [c for c in changed if base is not None and base.stored(c) and base.text_of(c) != live[c]]
+        merged_text: str | None = None
+        if "policy_table" in conflicts and base is not None:
+            # rules applied instantly meanwhile (Regeln tab) + a facts draft: merge per family and part
+            merged = merge_tables(base.doc(), pe.load_doc(self.active_path), v.doc())
+            if merged is not None:
+                conflicts.remove("policy_table")
+                merged_text = pe.dump_doc(merged, pe.header_of(v.text()))
         if conflicts:
             raise FourEyesError("Seit dem Entwurf wurde ausserhalb geändert: " + ", ".join(rb.FILE_DE[c] for c in conflicts)
                                 + f". Bitte Version {n} verwerfen und den Entwurf auf der aktuellen Version neu erstellen.")
         before = self.active()
         texts = {name: (v.text_of(name) if name in changed else live[name]) for name in self.paths}
+        if merged_text is not None:
+            texts["policy_table"] = merged_text
         for name in changed:
             if texts[name] is None:
                 self.paths[name].unlink(missing_ok=True)
@@ -300,3 +313,103 @@ class VersionStore:
         draft = self.save_draft(self.get(n).bundle(), author, comment=f"Zurücksetzen auf Version {n}",
                                 family_names=family_names, profile=profile)
         return draft
+
+    # -- rules: instant (no approval), audit-logged, versioned, one-click undo ----------------------------
+
+    def apply_rules(self, doc: dict[str, Any], user: str, comment: str = "",
+                    family_names: dict[str, str] | None = None, kind: str = "rules") -> Version:
+        """Apply a RULES-only change to the live table at once (demo tab «Regeln»): no second person needed,
+        but a version (status approved, ``instant: true``) and an audit event (``policy_rules_applied``) are
+        written, so :meth:`undo_rules` can revert it. Any change to facts (questions, new or removed facts,
+        Prüfarten) is refused: facts go through :meth:`save_draft` + :meth:`approve` (four eyes)."""
+        from callguard import fact_policy as fpol
+
+        if not str(user or "").strip():
+            raise FourEyesError("Bitte Ihren Namen angeben (wird im Audit-Log protokolliert).")
+        self.ensure_initial()
+        live_doc = pe.load_doc(self.active_path)
+        if not fpol.only_rules_changed(live_doc, doc):
+            raise FourEyesError("Fakten ändern: Freigabe durch zweite Person nötig. Diese Änderung betrifft nicht "
+                                "nur Regeln (Fragen, Fakten oder Prüfarten); bitte als Entwurf im Tab «Fakten» speichern.")
+        pe.validate(doc)
+        if fpol.rules_part(live_doc) == fpol.rules_part(doc):
+            raise FourEyesError("Keine Änderung an den Regeln.")
+        before = self.active()
+        old_text = self.active_path.read_text(encoding="utf-8")
+        header = "\n".join(line for line in pe.header_of(old_text).splitlines()
+                           if not line.startswith("# Regelwerk-Version"))
+        n = self.next_n()
+        header = (header + "\n" if header else "") + f"# Regelwerk-Version {n} · Regeln geändert von {user.strip()}"
+        text = pe.dump_doc(doc, header)
+        diff = pe.diff_docs(live_doc, doc, family_names)
+        _atomic_write(self.active_path, text)
+        texts = {**self.live_texts(), "policy_table": text}
+        now = audit.now_iso()
+        v = self._write(n, texts, {
+            "status": "approved", "kind": kind, "instant": True, "author": user.strip(), "approver": None,
+            "created": now, "approved_at": now, "comment": comment.strip() or "Regeln geändert (sofort wirksam)",
+            "parent": before.n if before else None, "diff": diff, "changed_files": ["policy_table"]})
+        self._log("policy_rules_applied", user.strip(), version=n, previous=before.n if before else None,
+                  change=kind, comment=comment.strip(), diff=diff, active_hash=audit.file_hash(self.active_path))
+        return v
+
+    def last_rule_change(self) -> Version | None:
+        """The active version if it is an instant rule change (what «Rückgängig» reverts), else None."""
+        act = self.active()
+        return act if act is not None and act.meta.get("instant") and act.meta.get("parent") else None
+
+    def undo_rules(self, user: str, family_names: dict[str, str] | None = None) -> Version:
+        """One-click undo of the last instant rule change: the rules of its parent version, facts as live."""
+        from callguard import fact_policy as fpol
+
+        last = self.last_rule_change()
+        if last is None:
+            raise FourEyesError("Keine sofort wirksame Regeländerung zum Rückgängigmachen.")
+        parent = self.get(int(last.meta["parent"]))
+        live_doc = pe.load_doc(self.active_path)
+        target = fpol.with_rules(live_doc, fpol.rules_part(parent.doc()))
+        return self.apply_rules(target, user, comment=f"Rückgängig: Version {last.n} (Regeln wie Version {parent.n})",
+                                family_names=family_names, kind="rules_undo")
+
+
+def merge_tables(base: dict[str, Any], live: dict[str, Any], draft: dict[str, Any]) -> dict[str, Any] | None:
+    """Three-way merge of a policy table per family and part (facts / rules / other keys): a part changed on
+    one side only takes that side; changed on both sides (differently) = conflict (None). Used when a facts
+    draft is approved after rules were applied instantly. The result must validate, else None."""
+    bf, lf, df = (dict((d or {}).get("families") or {}) for d in (base, live, draft))
+    if set(bf) != set(lf):  # a Prüfart added / removed outside this draft
+        return None
+    out = {k: v for k, v in draft.items() if k not in ("families", "cross_rules")}
+    bc, lc, dc = (d.get("cross_rules") for d in (base, live, draft))  # cross rules: three-way like a family part
+    if lc == bc:
+        cross = dc
+    elif dc in (bc, lc):
+        cross = lc
+    else:
+        return None
+    if cross:
+        out["cross_rules"] = cross
+    fams: dict[str, Any] = {}
+    for fid, dfam in df.items():
+        if fid not in bf:
+            fams[fid] = dfam
+            continue
+        b, lv = bf[fid] or {}, lf[fid] or {}
+        merged: dict[str, Any] = {}
+        for key in dict.fromkeys([*dfam, *lv, *b]):
+            bv, lvv, dv = b.get(key), lv.get(key), dfam.get(key)
+            if lvv == bv:
+                val = dv
+            elif dv in (bv, lvv):
+                val = lvv
+            else:
+                return None
+            if val is not None:
+                merged[key] = val
+        fams[fid] = merged
+    out["families"] = fams
+    try:
+        pe.validate(out)
+    except PolicyTableError:
+        return None
+    return out

@@ -479,8 +479,8 @@ def engine_for(base: Any, spec: ModeSpec, mode_id: str | None, second_present: b
         return base
     if ftype == "weighted" and mode.rule == "a" and not second_present:
         return base
-    if ftype == "two_readers" and str(cfg.fusion.get("rule", "labels")) == mode.rule:
-        return base
+    if ftype == "two_readers" and str(cfg.fusion.get("rule", "labels")) in (mode.rule, "policy"):
+        return base  # rule policy: the officer's fact policy (bands + combination per fact) replaces the modes
     readers = readers_of(spec, cfg)
     key = stable_hash([base.key, mode.id, mode.rule, list(readers)])
     hit = _ENGINES.get(key)
