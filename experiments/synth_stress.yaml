@@ -46,3 +46,12 @@ variants:
     refuse_from: v1
     checks: [facts_blind]
     set: [checks.facts_blind.weight=1.0]
+  # R2 (table v3) with the champion's LLM: both computed fresh on Qwen2.5-7B (the stored v1/facts rows are 14B).
+  - name: facts7b_v1
+    description: facts alone with the tuned table v1, computed on the served Qwen2.5-7B (paired control for facts7b_v3)
+    checks: [facts]
+    set: [checks.facts.weight=1.0]
+  - name: facts7b_v3
+    description: facts alone with config/policy_table_v3.yaml (R2 open-fact review rules + splitting re-check), Qwen2.5-7B
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.policy_table=config/policy_table_v3.yaml]

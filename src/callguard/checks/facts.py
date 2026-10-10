@@ -28,6 +28,14 @@ out of an act that already happened (context and exculpatory facts always read t
 
 Fact probes are cached per prompt (namespace ``fact_probe``), so editing a rule or one question
 reruns only the cheap rule evaluation or that one question.
+
+Robustness (research R6): ``paraphrase_tables: [path, ...]`` asks every fact that also exists (same
+family + fact id) in one of these tables once per wording and averages p(yes), p(no), p(unclear) over
+the wordings before the fact is discretized; the main table's rules decide, the per-wording
+probabilities are kept in the detail (``facts.<id>.wordings``). ``unclear_band: [lo, hi]`` decides a
+fact from p(yes) alone (yes if p(yes) >= hi, no if p(yes) < lo, else unclear), so a rule that tests
+``= unclear`` no longer depends on how the remaining mass splits between the "no" and "unknown" tokens.
+Both default to off, and then neither the behaviour nor the cache key changes.
 """
 
 from __future__ import annotations
@@ -246,6 +254,19 @@ def rule_facts(node: Node) -> list[str]:
     return out
 
 
+def average_probs(dists: list[dict[str, float]]) -> dict[str, float]:
+    """Mean of several yes / no / unclear distributions (missing keys count as 0)."""
+    keys = [k for k in ("yes", "no", "unclear") if any(k in d for d in dists)]
+    keys += sorted({k for d in dists for k in d} - set(keys))
+    return {k: round(sum(float(d.get(k, 0.0)) for d in dists) / len(dists), 4) for k in keys}
+
+
+def discretize_band(p: dict[str, float], lo: float, hi: float) -> str:
+    """From p(yes) alone: yes if p(yes) >= hi, no if p(yes) < lo, else unclear."""
+    py = p.get("yes", 0.0)
+    return "yes" if py >= hi else ("no" if py < lo else "unclear")
+
+
 def discretize(p: dict[str, float], decide_at: float = 0.5) -> str:
     """yes if p(yes) >= decide_at, no if p(no) >= decide_at, else unclear."""
     if p.get("yes", 0.0) >= decide_at:
@@ -430,7 +451,25 @@ class FactSheetCheck(LLMCheck):
                  alarm_base: float = 0.6, review_score: float = 0.5, review_confidence: float = 0.3,
                  no_alert_scale: float = 0.4, max_tokens: int = 300, reason_language: str = "de",
                  include_non_alarm: bool = False, max_transcript_chars: int = 24000, parallel: int = 1,
+                 paraphrase_tables: list[str] | None = None, unclear_band: list[float] | None = None,
                  name: str | None = None, weight: float = 1.0, enabled: bool = True):
+        if isinstance(paraphrase_tables, str):
+            paraphrase_tables = [paraphrase_tables]
+        band: tuple[float, float] | None = None
+        if unclear_band is not None:
+            try:
+                lo, hi = (float(x) for x in unclear_band)
+            except (TypeError, ValueError):
+                raise ValueError(f"unclear_band must be [lo, hi], got {unclear_band!r}") from None
+            if not 0.0 <= lo < hi <= 1.0:
+                raise ValueError(f"unclear_band needs 0 <= lo < hi <= 1, got {unclear_band!r}")
+            band = (lo, hi)
+        # R6 params enter the cache params only when set: existing configs keep their cache keys
+        extra: dict[str, Any] = {}
+        if paraphrase_tables:
+            extra["paraphrase_tables"] = [str(t) for t in paraphrase_tables]
+        if band is not None:
+            extra["unclear_band"] = list(band)
         if question_lang not in ("en", "de"):
             raise ValueError(f"question_lang must be en or de, got {question_lang!r}")
         if not 1 / 3 < float(decide_at) <= 1.0:
@@ -452,8 +491,10 @@ class FactSheetCheck(LLMCheck):
                          prefix_roles=prefix_roles, prefix_families=prefix_families,
                          fallback_samples=fallback_samples, alarm_base=alarm_base,
                          review_score=review_score, review_confidence=review_confidence,
-                         no_alert_scale=no_alert_scale, max_tokens=max_tokens)
+                         no_alert_scale=no_alert_scale, max_tokens=max_tokens, **extra)
         self.policy_table = str(policy_table)
+        self.paraphrase_tables = tuple(str(t) for t in paraphrase_tables or ())
+        self.unclear_band = band
         self.question_lang = question_lang
         self.roles = bool(roles)
         self.decide_at = float(decide_at)
@@ -470,9 +511,37 @@ class FactSheetCheck(LLMCheck):
         self.no_alert_scale = float(no_alert_scale)
         self.max_tokens = int(max_tokens)
         self.table()  # a broken table fails at startup, not on the first call
+        main = self.table()
+        for path in self.paraphrase_tables:
+            para = load_policy_table(path)
+            shared = [(fid, f.id) for fid, ft in main.families.items() if fid in para.families
+                      for f in ft.facts if any(x.id == f.id for x in para.families[fid].facts)]
+            if not shared:
+                raise PolicyTableError(f"paraphrase table {path} shares no (family, fact id) with {self.policy_table}")
 
     def table(self) -> PolicyTable:
         return load_policy_table(self.policy_table)
+
+    def wordings(self, family_id: str) -> dict[str, list[tuple[str, Fact]]]:
+        """Per fact id of the main table: (source table, fact) for the main wording and every
+        paraphrase table that has the same family + fact id (identical questions count once)."""
+        ft = self.table().families[family_id]
+        out = {f.id: [(self.policy_table, f)] for f in ft.facts}
+        for path in self.paraphrase_tables:
+            para = load_policy_table(path).families.get(family_id)
+            if para is None:
+                continue
+            for pf in para.facts:
+                ws = out.get(pf.id)
+                if ws is not None and all(w.question(self.question_lang) != pf.question(self.question_lang)
+                                          for _, w in ws):
+                    ws.append((path, pf))
+        return out
+
+    def _decide(self, p: dict[str, float]) -> str:
+        if self.unclear_band is not None:
+            return discretize_band(p, *self.unclear_band)
+        return discretize(p, self.decide_at)
 
     def select_families(self, families: list[Family]) -> list[Family]:
         table = self.table()
@@ -480,13 +549,18 @@ class FactSheetCheck(LLMCheck):
 
     def cache_key(self, families: list[Family]) -> dict[str, Any]:
         fams = self.select_families(families)
-        return {
+        key = {
             "params": self.cache_params(),
             "llm": self.llm_identity,
             "families": [{"id": f.id, "label": f.label} for f in fams],
             "policy_table": self.table().key([f.id for f in fams]),
             "prompt_version": fp.PROMPT_VERSION,
         }
+        if self.paraphrase_tables:  # only the extra wordings matter (the main table's rules decide)
+            key["paraphrases"] = stable_hash({
+                f.id: {fid: [w.question(self.question_lang) for _, w in ws[1:]]
+                       for fid, ws in self.wordings(f.id).items()} for f in fams})
+        return key
 
     def run(self, transcript: Transcript, families: list[Family]) -> CheckResult:
         if not self.roles:  # N12 "neutral": speaker clusters stay, advisor/customer labels go
@@ -498,6 +572,8 @@ class FactSheetCheck(LLMCheck):
         table = self.table()  # families without a fact sheet are in meta["skipped_families"] already
         meta["policy_table"] = {"path": self.policy_table,
                                 "hash": table.key(list(result.family_scores))}
+        if self.paraphrase_tables:
+            meta["policy_table"]["paraphrase_tables"] = list(self.paraphrase_tables)
         details = [fs.detail for fs in result.family_scores.values()]
         meta["llm_calls"] = sum(int(d.get("llm_calls", 0)) for d in details)
         meta["cached_probes"] = sum(int(d.get("cached_probes", 0)) for d in details)
@@ -565,18 +641,21 @@ class FactSheetCheck(LLMCheck):
         counts = {"llm_calls": 0, "cached_probes": 0}
         lock = threading.Lock()
 
-        # (fact, prefix length or None for the whole call)
+        # (fact, wording index, wording, prefix length or None for the whole call); wording 0 = main table
+        wordings = self.wordings(family.id)
         cuts = prefix_cuts(len(transcript.segments), self.n_prefix_cuts)
-        tasks: list[tuple[Fact, int | None]] = [(f, None) for f in ft.facts]
-        tasks += [(f, m) for f in ft.facts if self._uses_prefix(family, f) for m in cuts]
+        tasks: list[tuple[Fact, int, Fact, int | None]] = [
+            (f, w, wf, None) for f in ft.facts for w, (_, wf) in enumerate(wordings[f.id])]
+        tasks += [(f, w, wf, m) for f in ft.facts if self._uses_prefix(family, f)
+                  for w, (_, wf) in enumerate(wordings[f.id]) for m in cuts]
         renders = {None: rendered}
-        for m in {m for _, m in tasks if m is not None}:
+        for m in {t[3] for t in tasks if t[3] is not None}:
             prefix = transcript.model_copy(update={"segments": transcript.segments[:m]})
             renders[m] = prompts.render_transcript(prefix, self.max_transcript_chars)[0]
 
-        def one(task: tuple[Fact, int | None]) -> FactProbe:
-            fact, m = task
-            return self.probe(llm, self._messages(renders[m], family, fact, transcript.lang), counts, lock)
+        def one(task: tuple[Fact, int, Fact, int | None]) -> FactProbe:
+            _, _, wording, m = task
+            return self.probe(llm, self._messages(renders[m], family, wording, transcript.lang), counts, lock)
 
         if self.parallel > 1 and len(tasks) > 1:
             with ThreadPoolExecutor(max_workers=min(self.parallel, len(tasks))) as ex:
@@ -584,24 +663,34 @@ class FactSheetCheck(LLMCheck):
         else:
             results = [one(t) for t in tasks]
 
-        facts: dict[str, dict[str, Any]] = {}
-        probs: dict[str, dict[str, float]] = {}
-        for (fact, m), res in zip(tasks, results):
+        per: dict[tuple[str, int], dict[str, Any]] = {}  # one entry per (fact, wording)
+        for (fact, w, wording, m), res in zip(tasks, results):
             if m is None:
-                facts[fact.id] = {"label": fact.label, "role": fact.role, "question": fact.question(self.question_lang),
-                                  "p": dict(res.p), "method": res.method, **({"info": res.info} if res.info else {})}
-                probs[fact.id] = dict(res.p)
-        for (fact, m), res in zip(tasks, results):  # N8: max p(yes) over the prefixes and the full call
+                per[(fact.id, w)] = {"question": wording.question(self.question_lang), "p": dict(res.p),
+                                     "method": res.method, **({"info": res.info} if res.info else {})}
+        for (fact, w, _, m), res in zip(tasks, results):  # N8: max p(yes) over the prefixes and the full call
             if m is None:
                 continue
-            d = facts[fact.id]
+            d = per[(fact.id, w)]
             d.setdefault("prefix", {"full": d["p"]["yes"]})[f"{m}/{len(transcript.segments)}"] = res.p["yes"]
-            if res.p["yes"] > probs[fact.id]["yes"]:
-                probs[fact.id] = dict(res.p)
+            if res.p["yes"] > d["p"]["yes"]:
                 d["p"] = dict(res.p)
                 d["prefix_used"] = m
 
-        values = {fid: discretize(p, self.decide_at) for fid, p in probs.items()}
+        facts: dict[str, dict[str, Any]] = {}
+        probs: dict[str, dict[str, float]] = {}
+        for fact in ft.facts:
+            ws = [per[(fact.id, w)] for w in range(len(wordings[fact.id]))]
+            facts[fact.id] = {"label": fact.label, "role": fact.role, **ws[0]}
+            if len(ws) > 1:  # R6: average the answer distribution over the wordings of this fact
+                facts[fact.id]["p"] = average_probs([d["p"] for d in ws])
+                facts[fact.id]["wordings"] = [
+                    {"table": src, "p": d["p"], "method": d["method"],
+                     **({"prefix_used": d["prefix_used"]} if "prefix_used" in d else {})}
+                    for (src, _), d in zip(wordings[fact.id], ws)]
+            probs[fact.id] = dict(facts[fact.id]["p"])
+
+        values = {fid: self._decide(p) for fid, p in probs.items()}
         for fid, v in values.items():
             facts[fid]["value"] = v
         rule = ft.decide(values)
@@ -633,6 +722,8 @@ class FactSheetCheck(LLMCheck):
             "rule_probs": soft, "p_alarm": round(p_alarm, 4), "p_review": round(p_review, 4),
             "question_lang": self.question_lang,
         }
+        if self.unclear_band is not None:
+            detail["unclear_band"] = list(self.unclear_band)
         fs = FamilyScore(score=round(min(1.0, max(0.0, score)), 4), confidence=round(min(1.0, confidence), 4),
                          verdict=verdict, reason=summary, detail=detail)
 

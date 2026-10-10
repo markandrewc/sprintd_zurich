@@ -30,9 +30,12 @@ _Last update: 04:20. Everything below is reproducible from `experiments/*.yaml` 
    - The fact wording was written while reading dev transcripts.
    - Blind control: a table written from the criteria only scores 0.77-0.85 (equal to the tuned table on large-v3
      transcripts with the 14B).
-   - Synthetic out-of-sample test (74 fresh twin scripts): facts keeps its large false-alarm advantage (14% vs 61%),
+   - Synthetic out-of-sample test (74 fresh twin scripts, mostly written by the judging 14B itself = circularity risk): facts keeps its large false-alarm advantage (14% vs 61%),
      but misses more (33%), mostly in access.
    - Open review cases (Stufe3) are the weakest spot everywhere.
+   - **Paraphrase test (R3): rewording the fact questions (same meaning) drops dev AUC 0.87 -> 0.72 (real, -0.15
+     [-0.31, -0.03]) and flips 11/48 labels.** The tuned wording is fragile; a realistic unseen-call AUC is ~0.72-0.79.
+     A paraphrase ensemble (each fact averaged over several wordings) is being tested as the robustness fix.
 
 ## Leaderboard (dev, flag AUC; full table `research/leaderboard.md`)
 | system | ASR | LLM | flag AUC [95% CI] | CV FAR | CV miss | 3-class acc |

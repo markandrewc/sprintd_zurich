@@ -323,3 +323,64 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   dialogues: every number here has a huge CI; it is a sanity check, not a measurement.
 - Holdout results kept in runs/experiments/champion_holdout/ and runs/experiments/holdout_v1/ (the experiment runner
   writes holdout variants into the dev directory; moved and the dev champion re-run from cache).
+
+## 2026-10-10T04:25 R3 paraphrase robustness (champion profile, 7B, large-v3 transcripts, dev 48 calls)
+- config/policy_table_para.yaml (scripts/research/make_para_table.py): every fact question (en + de) reworded blind
+  (no transcripts read), ids/roles/rules identical. Variant `para` in experiments/champion.yaml.
+- para vs champion: flag AUC 0.72 [0.52, 0.88] vs 0.87 [0.72, 0.99], paired diff -0.15 [-0.31, -0.03] (real);
+  CV flag F1 0.68 vs 0.86 (McNemar p=0.008); CV FAR 23% vs 14%; miss 38% vs 15%; review recall 0% vs 67%;
+  3-class acc 67% vs 79%. FAR<=20% cap reachable in 2/4 folds (champion 4/4).
+- Label flips (fixed threshold): 11/48 3-class (23%), 8/48 flag; ALL 11 worse: D05-K1 alarm->no_alert, D05-K2,
+  C06-K3/K4 alarm->review, C07-K4 alarm->no_alert, C17-K3/K4 + C18-K3/K4 review->no_alert, D01-K1 + C14-K4
+  no_alert->review.
+- Fact answers (960): value agreement 73.3%, but mean |dp(yes)| only 0.038. 217/256 disagreements are no<->unclear
+  (p(no) near 0.5); yes-involving changes 39/960; yes-agreement 54/93. Worst facts: documentation.omit_request 31%,
+  trade.inside_info 33% (no/yes->unclear), disclosure.authorized 38% / trade.public 38% / access.validity_open 42%
+  (unclear->no), access.spoken 58% (7 yes->no: C17 lost, the wording tuned on C17 earlier).
+- Mechanism: rules that test `= unclear` (disclosure.review_2, trade.review_1) and the hand-tuned act wordings
+  (access.spoken, trade.inside_info) carry the dev result; the no/unclear boundary is wording-noise.
+- Falsification criteria from ideas_round2 R3 (>15% flips or AUC drop >0.10) both met -> the tuned wording is
+  FRAGILE on rephrasing; consistent with R4/D1 dev-fitting. Expect hidden-set AUC nearer 0.72-0.79 than 0.87.
+  Next: average p over wordings (W3 ensemble) and make review rules depend on p(yes) bands, not on `unclear`.
+
+## 2026-10-10T04:17 R2 review facts (table v3): explicit "decisive fact is open" facts per family (NOT the champion)
+- config/policy_table_v3.yaml = tuned table v1 unchanged + per family an explicit "open" fact worded ONLY from
+  criteria.yaml review_when (trade source_open, access process_open (+ existing validity_open), disclosure
+  authorization_open, documentation relevance_open, splitting link_open + motive_open) with review rules
+  `act in [yes, unclear] and open = yes (and exculpatory != yes) -> review`, + splitting re-check facts from the criteria
+  policy text (split_connected, approval_avoided) with an OR-ed splitting.alarm_2. No transcripts read while writing.
+- DEV (experiments/champion.yaml `table_v3` vs `champion`, 48 calls, paired): flag AUC 0.92 [0.80, 1.00] vs 0.87
+  (diff +0.05 [0.00, +0.17]); CV FAR 14% vs 14%; CV miss 8% vs 15%; review recall 100% vs 67%; 3-class acc 83% vs 79%;
+  CV@FAR20 compliant, FAR floor 14% unchanged. 2 flips, both correct: C20-K3/K4 review (splitting.review_open via
+  link_open; was no_alert). McNemar p=0.5. No difference is detectable (1 dialogue moved; dev has 3 review dialogues).
+- SYNTHETIC (synth_stress `facts7b_v1` vs `facts7b_v3`, both Qwen2.5-7B computed now, ORACLE text, 74 calls / 26
+  scenarios, fixed threshold): flag AUC 0.80 -> 0.83 (diff +0.025 [0.00, +0.06]); FAR 7% -> 7%; miss 48% -> 41%;
+  review recall 38% -> 48%; 3-class 58% -> 61%. Audited 65: AUC 0.80 -> 0.82, FAR 8% -> 8%, miss 45% -> 40%, review
+  recall 38% -> 50%. 3 flips, none harmful: disclosure_003 and trade_015 review (review_open), splitting_003
+  review -> alarm (alarm_2: flagged, wrong class). No harmless call flipped anywhere (dev or synthetic).
+- Splitting re-check: alarm_2 rescued no missed splitting alarm (synthetic splitting_001 stays review; 3 of 4 synthetic
+  splitting review cases still no_alert). Splitting gain comes only from the open-fact review rule.
+- Cost: ~8 extra single-token fact probes per call (~+35-40% fact LLM calls; +~0.3 s/call with prefix caching).
+- RECOMMENDATION for the team: v3 only adds review/alarm paths, cost 0 false alarms on 48 dev + 74 synthetic calls,
+  and moves review recall the right way on both sets, but every gain is within noise (dev: 1 dialogue; synthetic:
+  +2-3 of 21 review cases) and it CANNOT be validated on the used holdout. Option A (conservative, default): keep the
+  frozen champion (table v1) as the scored submission and show v3 in the officer UI as the "strict review" policy
+  (officer-editable table, same facts). Option B: adopt v3 for Sunday only if the team accepts an unvalidated rule-only
+  change with a 0-FAR-cost record on dev+synthetic; if so, say "no holdout validation" on the slide. I lean A+demo:
+  the pitch claim is "the officer adds review rules without code", and v3 is the live proof, without touching the
+  number we report.
+
+## 2026-10-10T04:20 lead decision on table v3 (review facts) — NOT a holdout candidate
+- v3 dev: AUC 0.92 vs 0.87 (diff +0.05 [0.00, +0.17]), FAR 14% = 14%, miss 8% vs 15%, review recall 100% vs 67%;
+  synthetic (7B): AUC 0.83 vs 0.80, review recall 48% vs 38%, FAR unchanged. No harmless call flipped anywhere.
+- CONTAMINATION NOTE: the v3 builder's brief mentioned that the splitting family was missed on the holdout (C16), i.e.
+  v3 was designed with knowledge of a holdout failure mode -> a holdout run of v3 would be biased; not run.
+- DECISION: submission numbers stay with the frozen champion (table v1). v3 is offered to the team as a low-risk
+  option ("strict review": more reviews, no extra false alarms on dev/synthetic), clearly labelled "no holdout
+  validation". Final pick for Sunday = team decision (see DECISIONS.md D2b).
+
+## 2026-10-10T04:22 CORRECTION to the 04:08/04:15 synthetic entries
+- data_synth/v1/manifest.json: 71 of 74 synthetic scripts were written by Qwen2.5-14B-AWQ (the vLLM model had swapped
+  during generation), i.e. the SAME model that judged them, not Qwen3-8B as logged. The circularity risk of RQ10 is
+  therefore higher than stated; labels still come from the scenario file and were audited blind by another family.
+- Findings RQ1, RQ3, RQ7, RQ8, RQ9, RQ10, RQ11, RQ12 written (writer agent; numbers copied from summaries/journal).
