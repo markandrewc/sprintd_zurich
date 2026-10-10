@@ -35,7 +35,9 @@ _Last update: 04:20. Everything below is reproducible from `experiments/*.yaml` 
    - Open review cases (Stufe3) are the weakest spot everywhere.
    - **Paraphrase test (R3): rewording the fact questions (same meaning) drops dev AUC 0.87 -> 0.72 (real, -0.15
      [-0.31, -0.03]) and flips 11/48 labels.** The tuned wording is fragile; a realistic unseen-call AUC is ~0.72-0.79.
-     A paraphrase ensemble (each fact averaged over several wordings) is being tested as the robustness fix.
+     A second independent paraphrase set repeats it (0.74). A paraphrase ensemble halves label flips under rewording
+     (4-5 vs 8-11 of 48) but scores 0.74-0.81 on dev and is level with the tuned wording on synthetic calls (0.81 vs
+     0.80) -> champion kept; expect ~0.75-0.80 AUC on new calls (v1: 0.68, with 86% false alarms).
 
 ## Leaderboard (dev, flag AUC; full table `research/leaderboard.md`)
 | system | ASR | LLM | flag AUC [95% CI] | CV FAR | CV miss | 3-class acc |

@@ -440,3 +440,110 @@ def test_runs_with_the_offline_fake_llm(tmp_path):
     assert res.family_scores["access"].detail["facts"]["spoken"]["value"] == "yes"
     assert res.family_scores["trade"].verdict == "absent"
     assert "errors" not in res.meta
+
+
+# --------------------------------------------------------------------------------------------
+# R6: paraphrase ensemble + p(yes) band
+# --------------------------------------------------------------------------------------------
+
+PARA_TABLE = """
+families:
+  access:
+    facts:
+      - {id: spoken, label: x, role: act, de: "Code vorgelesen? PARA_SPOKEN", en: "Was a code read out? PARA_SPOKEN"}
+      - {id: current, label: x, role: context, de: "Code noch gültig? PARA_CURRENT"}
+      - {id: extra, label: x, role: context, de: "Nicht in der Haupttabelle? PARA_EXTRA"}
+    rules:
+      - {id: access.ignored, label: alarm, when: "true"}
+"""
+
+
+@pytest.fixture
+def para_path(tmp_path) -> Path:
+    p = tmp_path / "policy_table_para.yaml"
+    p.write_text(textwrap.dedent(PARA_TABLE))
+    return p
+
+
+def test_average_probs_and_band():
+    from callguard.checks.facts import average_probs, discretize_band
+    assert average_probs([{"yes": 0.9, "no": 0.05, "unclear": 0.05},
+                          {"yes": 0.5, "no": 0.3, "unclear": 0.2}]) == pytest.approx(
+        {"yes": 0.7, "no": 0.175, "unclear": 0.125})
+    assert discretize_band({"yes": 0.3, "no": 0.6, "unclear": 0.1}, 0.2, 0.6) == "unclear"
+    assert discretize_band({"yes": 0.6, "no": 0.4}, 0.2, 0.6) == "yes"
+    assert discretize_band({"yes": 0.1, "no": 0.1, "unclear": 0.8}, 0.2, 0.6) == "no"
+
+
+def test_paraphrase_tables_average_over_wordings(ctx, monkeypatch, table_path, para_path):
+    llm = use(ctx, monkeypatch, FactLLM({"MARK_SPOKEN": YES, "PARA_SPOKEN": {"yes": 0.5, "no": 0.3, "unknown": 0.2},
+                                         "MARK_CURRENT": UNK, "PARA_CURRENT": {"yes": 0.8, "no": 0.1, "unknown": 0.1}}))
+    res = make(ctx, table_path, evidence=False, paraphrase_tables=[str(para_path)]).run(transcript(), [ACCESS])
+    fs = res.family_scores["access"]
+    facts = fs.detail["facts"]
+    assert facts["spoken"]["p"] == pytest.approx({"yes": 0.7, "no": 0.175, "unclear": 0.125})
+    assert facts["current"]["p"] == pytest.approx({"yes": 0.5, "no": 0.15, "unclear": 0.35})
+    assert [w["table"] for w in facts["spoken"]["wordings"]] == [str(table_path), str(para_path)]
+    assert facts["spoken"]["wordings"][1]["p"] == pytest.approx({"yes": 0.5, "no": 0.3, "unclear": 0.2})
+    assert facts["spoken"]["question"] == "Was a code said? MARK_SPOKEN"  # the main wording is shown
+    assert "wordings" not in facts["expired"] and "extra" not in facts  # main table's facts only
+    # the main table's rules decide: averaged current = yes -> alarm (main wording alone: unclear -> review)
+    assert fs.detail["rule"]["id"] == "access.alarm_1"
+    assert llm.kinds().count("probs") == 5  # 3 main + 2 paraphrased, nothing for `extra`
+    assert res.meta["policy_table"]["paraphrase_tables"] == [str(para_path)]
+
+    # the main wording alone is a cache hit afterwards (shared per-question probe cache)
+    res2 = make(ctx, table_path, evidence=False).run(transcript(), [ACCESS])
+    assert res2.family_scores["access"].detail["rule"]["id"] == "access.review_1"
+    assert res2.meta["cached_probes"] == 3 and res2.meta["llm_calls"] == 0
+
+
+def test_paraphrase_and_band_cache_keys(ctx, table_path, para_path):
+    import os
+    base = make(ctx, table_path).cache_key([ACCESS])
+    assert "paraphrases" not in base and "paraphrase_tables" not in base["params"]
+    assert "unclear_band" not in base["params"]
+    assert make(ctx, table_path, paraphrase_tables=[]).cache_key([ACCESS]) == base  # empty = off
+    k = make(ctx, table_path, paraphrase_tables=[str(para_path)]).cache_key([ACCESS])
+    assert k != base and k["paraphrases"]
+    # rules / comments of the paraphrase table don't matter, its questions do
+    para_path.write_text(textwrap.dedent(PARA_TABLE).replace("access.ignored, label: alarm", "access.x, label: review"))
+    os.utime(para_path, (2, 2))
+    assert make(ctx, table_path, paraphrase_tables=[str(para_path)]).cache_key([ACCESS]) == k
+    para_path.write_text(textwrap.dedent(PARA_TABLE).replace("Code noch gültig?", "Gilt der Code noch?"))
+    os.utime(para_path, (3, 3))
+    assert make(ctx, table_path, paraphrase_tables=[str(para_path)]).cache_key([ACCESS]) != k
+    assert make(ctx, table_path, unclear_band=[0.2, 0.6]).cache_key([ACCESS]) != base
+    with pytest.raises(ValueError):
+        make(ctx, table_path, unclear_band=[0.6, 0.2])
+    with pytest.raises(ValueError):
+        make(ctx, table_path, unclear_band=0.6)
+    other = para_path.parent / "other.yaml"
+    other.write_text("families:\n  trade:\n    facts:\n      - {id: wish, label: w, role: act, de: q}\n")
+    with pytest.raises(PolicyTableError, match="shares no"):
+        make(ctx, table_path, paraphrase_tables=[str(other)])
+
+
+def test_unclear_band_decides_from_p_yes(ctx, monkeypatch, table_path):
+    # current: p(no) 0.55 -> `no` with decide_at 0.5 (no_alert); p(yes) 0.3 is inside the band -> unclear (review)
+    use(ctx, monkeypatch, FactLLM({"MARK_SPOKEN": YES, "MARK_CURRENT": {"yes": 0.3, "no": 0.55, "unknown": 0.15}}))
+    assert make(ctx, table_path, evidence=False).run(transcript(), [ACCESS]) \
+        .family_scores["access"].detail["decision"] == "no_alert"
+    fs = make(ctx, table_path, evidence=False, unclear_band=[0.2, 0.6]).run(transcript(), [ACCESS]) \
+        .family_scores["access"]
+    assert fs.detail["facts"]["current"]["value"] == "unclear" and fs.detail["rule"]["id"] == "access.review_1"
+    assert fs.detail["unclear_band"] == [0.2, 0.6]
+
+
+def test_recommended_facts_cache_key_is_pinned():
+    """R6 must not invalidate cached results of the frozen champion: the facts check key of
+    config/recommended.yaml stays exactly what it was before paraphrase_tables / unclear_band existed.
+    (Changes legitimately if config/policy_table.yaml, criteria/keywords labels, the LLM config or
+    PROMPT_VERSION change - then re-pin deliberately.)"""
+    from callguard.cache import stable_hash
+    from callguard.config import load_config
+    cfg = load_config("recommended")
+    spec = next(c for c in cfg.checks if c["name"] == "facts")
+    check = FactSheetCheck(Context(cfg), **{k: v for k, v in spec.items() if k != "type"})
+    fams = load_families(ROOT / "config/keywords.json", ROOT / "config/criteria.yaml")
+    assert stable_hash(check.cache_key(fams)) == "8b0a7f5f13bf43d9"

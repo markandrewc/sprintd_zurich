@@ -18,3 +18,12 @@ variants:
   - {name: table_v2, set: [checks.facts.policy_table=config/policy_table_v2.yaml], description: "+ access.review_2 (spoken, validity unknown -> review); fact answers cached, only rules re-evaluated"}
   - {name: para, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.parallel=1], description: "R3: every fact question paraphrased (blind, same meaning), ids/rules identical; parallel=1 only to cap vLLM concurrency (speed-only param)"}
   - {name: table_v3, set: [checks.facts.policy_table=config/policy_table_v3.yaml], description: "R2: + per-family explicit open-fact review rules (from criteria review_when) + splitting re-check facts; v1 fact answers cached, new facts computed"}
+  # R6 paraphrase ensemble (checks/facts.py paraphrase_tables / unclear_band): average p(yes/no/unclear) over several
+  # wordings of the SAME fact before thresholding; the tuned table's rules decide. Per-question probes are cached.
+  - {name: para2, set: [checks.facts.policy_table=config/policy_table_para2.yaml, checks.facts.parallel=1], description: "R6: second independent blind paraphrase set alone (second fragility datapoint)"}
+  - {name: ens2, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml]", checks.facts.parallel=1], description: "R6: tuned + para wordings averaged"}
+  - {name: ens3, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: tuned + para + para2 wordings averaged"}
+  - {name: ens3_d06, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", checks.facts.decide_at=0.6, checks.facts.parallel=1], description: "R6: ens3, yes/no need p >= 0.6 (else unclear)"}
+  - {name: ens3_band, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", "checks.facts.unclear_band=[0.2, 0.6]", checks.facts.parallel=1], description: "R6: ens3, fact value from averaged p(yes) alone: yes >= 0.6, no < 0.2, else unclear"}
+  - {name: ens2b, set: ["checks.facts.paraphrase_tables=[config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: tuned + para2 (ens2 with the other paraphrase set: ensemble sensitivity to swapping one wording)"}
+  - {name: ens_blind, set: [checks.facts.policy_table=config/policy_table_para.yaml, "checks.facts.paraphrase_tables=[config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: para + para2 averaged, no tuned wording (ensemble of untuned wordings)"}

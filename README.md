@@ -7,7 +7,8 @@ For every call it
 
 1. transcribes the audio (Swiss German speech -> Standard German text, with word timestamps),
 2. separates the speakers and decides who is the advisor and who is the customer,
-3. runs several independent, pluggable checks (keywords, number patterns, an LLM judge, G-Eval),
+3. runs several independent, pluggable checks (keywords, number patterns, atomic fact questions with an
+   officer-editable policy table, an LLM judge, G-Eval, ...),
 4. fuses their scores into **alarm / review / no_alert** with an adjustable threshold,
 5. cuts audio snippets of the suspicious passages, each with timestamp and reason,
 6. and says when it is unsure: disagreeing or low-confidence checks send the call to **review**
@@ -16,6 +17,31 @@ For every call it
 Everything is configured in YAML profiles. Laptop (CPU) and event GPU differ only in config.
 
 ## Quickstart
+
+### Recommended profile (GPU host; the config for Sunday)
+
+[`config/recommended.yaml`](config/recommended.yaml), frozen by the overnight research (evidence:
+[research/MORNING_REPORT.md](research/MORNING_REPORT.md)): Whisper large-v3 Swiss German
+(`gcoli/whisper-large-v3-swiss-german-mit`, MIT, fp16, beam 1) to Standard German text, Qwen2.5-7B-Instruct-AWQ
+on vLLM, and the `facts` check deciding (yes/no/unknown fact questions scored by logprob plus the officer-editable
+[`config/policy_table.yaml`](config/policy_table.yaml)). Keywords (weight 0.15) and patterns (0.1) stay visible.
+Threshold 0.55.
+
+```bash
+uv run callguard ui -c recommended          # officer UI on the stored results in runs/recommended/ (no GPU or vLLM needed)
+uv run callguard batch -c recommended       # the case calls (transcripts and fact answers are cached)
+scripts/run_staged.sh recommended           # new audio on ONE 12 GB GPU: stop vLLM, ASR for all calls, restart vLLM, checks
+uv run callguard doctor -c recommended      # check servers, models and CUDA before a long run
+```
+
+Whisper large-v3 fp16 (~4 GB) and vLLM with the 7B (~8-9 GB) do not fit on the 12 GB card together, so
+`scripts/run_staged.sh [profile] [llm-model] [batch args]` runs in stages. Stage 1 transcribes every call under the
+profile's `paths.data_dir` with `scripts/research/asr_sweep.py`. Stage 2 serves the LLM alone and runs
+`callguard batch`. Extra args reach stage 2 only, so set a different data dir in the profile, not with `--set`.
+A 14B model id (e.g. `Qwen/Qwen2.5-14B-Instruct-AWQ`) gets the 12 GB settings automatically: util 0.90, 6k context,
+fp8 KV cache. The demo script is [research/DEMO.md](research/DEMO.md). GPU host setup: [GPU host setup](#gpu-host-setup).
+
+### Laptop (CPU; plumbing only, the 1.5B LLM cannot judge)
 
 ```bash
 uv sync --all-extras                # faster-whisper, sherpa-onnx, streamlit, llama-cpp-python (CPU wheel), pytest
@@ -87,11 +113,23 @@ evaluation and the UI's Quality page, never by the pipeline.
 
 | profile | ASR | diarization / roles | checks | LLM | for |
 |---|---|---|---|---|---|
+| **`recommended`** | faster-whisper large-v3 Swiss German (gcoli, MIT), fp16, beam 1, CUDA | sherpa-onnx, roles by LLM | facts (w 1.0) + keywords (0.15) + patterns (0.1), `abstain_on_empty`, threshold 0.55 | Qwen2.5-7B-Instruct-AWQ, vLLM :8000 | **the Sunday config** (frozen 2026-10-10 04:09); new audio via `scripts/run_staged.sh` |
+| `gpu-12gb` | faster-whisper turbo Swiss German, int8_float16, CUDA | sherpa-onnx, roles by LLM | keywords, patterns, llm_judge, geval (= v1) | Qwen2.5-7B-Instruct-AWQ, vLLM :8000 | v1 baseline on the RTX 4070 host; base of the GPU profiles below |
+| `llm-sweep` | as `gpu-12gb` | roles pinned to the cached Qwen2.5-7B decisions | v1 set + geval_cot, facts, anchored, facts_blind (the last four at weight 0, for re-fusion) | whatever vLLM serves (`judge`) | RQ6 LLM comparison; `llm-sweep-oracle` (reference scripts) and `llm-sweep-views` (de + en_from_de) extend it |
+| `oracle-gpu` | reference scripts | none | as `gpu-12gb` | vLLM :8000 | ORACLE ceiling on the GPU host; `oracle-views-gpu` adds views ref_gsw / ref_de / ref_en. Never the submission |
+| `gpu-views` | views de (turbo), de_large (large-v3 MIT), de_vanilla (vanilla turbo), de_fused (LLM repair of the three), en_from_de, en_speech | sherpa-onnx | as `gpu-12gb` on `de` + weight-0 keyword checks per view | vLLM :8000 | view experiments (RQ1/RQ8). Views do not all fit in VRAM at once: fill the caches in passes (file header). en_speech never ran |
+| `synth-oracle` | reference text of `data_synth/v1` | none | v1 set + facts, facts_blind (weight 0) | vLLM :8000 | synthetic out-of-sample stress test (RQ10), split `external` |
+| `remote` (**untested**) | remote Whisper server on the GPU host | sherpa-onnx | keywords, patterns, llm_judge, geval | vLLM on the GPU host over Tailscale | laptop app with the models on the GPU host |
 | `local` (default) | faster-whisper turbo Swiss German, int8, CPU | sherpa-onnx, roles by LLM | keywords, patterns, llm_judge, geval | Qwen2.5-1.5B Q4, llama.cpp on :8001 | laptop demo |
 | `gpu` (**untested**) | faster-whisper large-v3 Swiss German (MIT), fp16, beam 5 | sherpa-onnx, roles by LLM | same; judge with 5 samples at T=0.7 | vLLM on :8000 (Qwen3-30B-A3B) | event GPUs |
 | `oracle` | reference scripts (Swiss German text) | none: roles from the script | all four | local LLM | ceiling study: misses from ASR or from the checks? Never for the submission |
 | `fast` | local ASR (shares its cache) | none | keywords, patterns | - | whole-dataset eval in seconds, tuning keywords and fusion |
-| `demo-offline` | reference scripts | none | all four | `fake` (cue words, deterministic) | UI and plumbing work with zero models |
+| `demo-offline` | reference scripts | none | all four | `fake` (cue words, deterministic) | UI and plumbing work with zero models (`demo-views` adds an identity "en" view) |
+
+Policy table variants for the `facts` check (`--set checks.2.policy_table=config/<file>`, research only):
+`policy_table_blind.yaml` (written from the criteria only, R4), `policy_table_para*.yaml` (reworded questions, R3),
+`policy_table_v2.yaml` (stricter access review rule, rejected for the default), `policy_table_v3.yaml` (explicit
+"open fact" review questions: an option for a stricter review policy, never run on the holdout).
 
 Profiles `extends:` another file. Dicts merge deeply, lists (such as `checks`) are replaced, and a
 plugin block whose `type` changes is replaced whole. `--set` applies after merging:
@@ -248,10 +286,27 @@ uv run callguard eval -c local --split dev --calls Stufe1_D02-K1,Stufe1_D03-K1 #
 uv run callguard eval -c <final> --split holdout                   # ONCE per final candidate, logged
 ```
 
-* `--split` defaults to `dev` (the dev dialogues of the locked `config/splits.yaml`). `holdout` and `all`
-  include the holdout dialogues: every such run (also `callguard experiment --split ...` and
-  `callguard asr-eval --split ...`) is appended to `runs/holdout_log.jsonl`. Under `all` the threshold
-  suggestion and the CV thresholds are still fitted on dev dialogues only; do not tune on its numbers.
+Comparing variants (what the overnight research used; all cached, so re-runs are cheap):
+
+```bash
+uv run callguard splits                                        # the locked holdout + dev folds
+uv run callguard experiment experiments/champion.yaml          # every variant on the dev folds, CV thresholds,
+                                                               # paired bootstrap CIs + McNemar vs the baseline
+uv run callguard experiment experiments/<name>.yaml --dry-run  # what would be computed, which caches exist
+uv run callguard leaderboard                                   # all variants (FAR-cap compliant first) -> research/leaderboard.md
+uv run callguard report                                        # charts + report.md
+uv run callguard asr-eval -c recommended --cached-only         # WER/CER + keyword-spot recall per ASR setup
+uv run callguard fusion-cv --kind calibrated -e <exp> --variant <v>   # nested CV for a fitted fusion (built, not run on real results)
+```
+
+* `--split` defaults to `dev` (the dev dialogues of the locked `config/splits.yaml`) for `eval`,
+  `experiment` and `asr-eval`. `holdout` and `all` include the holdout dialogues, and every such run is
+  appended to `runs/holdout_log.jsonl`. Under `all` the threshold suggestion and the CV thresholds are still
+  fitted on dev dialogues only. Do not tune on its numbers. Overnight the holdout was looked at twice, both
+  logged: the frozen champion and the v1 baseline as a reference.
+* Primary metric for comparing systems (research/DECISIONS.md D0): threshold-free **flag AUC** plus the
+  cross-validated operating point at false-alarm rate <= 20%. Flag F1 is secondary only, because flagging
+  every dev call already scores flag F1 0.70.
 
 * 60 calls = 30 dialogues x (clean, noisy). `data.split_dialogues` assigns **dialogues** to 5 folds,
   stratified by expected label, so the clean and noisy recording of a dialogue are never split.
@@ -272,7 +327,61 @@ uv run callguard eval -c <final> --split holdout                   # ONCE per fi
 
 ## Measured so far
 
-Everything below comes from the artifacts in `runs/` (2026-10-09). Nothing has run on a GPU yet.
+### Overnight on the GPU host (2026-10-10, RTX 4070 12 GB)
+
+Numbers are copied from [research/MORNING_REPORT.md](research/MORNING_REPORT.md). Details are in
+`research/journal.md`, `research/findings/RQ*.md` and `research/leaderboard.md`, and runs in
+`runs/experiments/*/summary.md`. CIs are 95% paired bootstrap over twin groups. With 24 dev dialogues, small
+differences are noise.
+
+**Dev split** (48 calls / 24 dialogues, cross-validated thresholds):
+
+| system | ASR | LLM | flag AUC [95% CI] | CV FAR | CV miss | 3-class acc |
+|---|---|---|---|---|---|---|
+| v1: kw + patterns + free judge + G-Eval | turbo | 7B | 0.68 [0.53, 0.84] | 86% | 15% | 38% |
+| facts (tuned) | turbo | 7B | 0.84 [0.70, 0.95] | 18% | 27% | 73% |
+| facts (tuned) | turbo | 14B | 0.87 [0.76, 0.96] | 14% | 23% | 75% |
+| facts (blind table, R4) | large-v3 | 14B | 0.85 [0.72, 0.96] | 27% | 12% | 58% |
+| **champion = facts + light kw/patterns (`recommended`)** | **large-v3** | **7B** | **0.87 [0.72, 0.99]** | **14%** | **15%** | **79%** |
+| facts ORACLE (dialect reference scripts) | none | 14B | 0.90 [0.79, 1.00] | 0% | 23% | 88% |
+
+The champion also has flag F1 0.86, alarm F1 0.86 and review recall 67%. Its labels are identical anywhere
+from threshold 0.45 to 0.65.
+
+**Holdout** (run once on the frozen config, 12 calls / 6 dialogues, logged in `runs/holdout_log.jsonl`):
+
+- Champion: **0 false alarms** (6/6 harmless correct), both disclosure alarms caught, alarm F1 0.67, 3-class
+  accuracy 67%. It missed the splitting alarm C16 (one version only went to review) and the open
+  documentation case C19.
+- v1 on the same 12 calls sends *everything* to review: 100% false alarms, 3-class accuracy 17%.
+- n = 6 dialogues, so this is a sanity check, not a measurement.
+
+**What drove the gain:**
+
+- Check design matters far more than model size. Facts beat the free judge by +0.16 AUC (real). Qwen2.5-7B,
+  Qwen3-8B and Qwen2.5-14B are within ±0.1 of each other, which is not detectable.
+- Better ASR helps once the checks are good: 7B facts went from 0.84 to 0.89 with large-v3. Perfect transcripts
+  (ORACLE) add only ~0.03.
+- ASR keyword-spot recall: large-v3 MIT 84%, Flix 76%, vanilla turbo ~76%, default turbo 71%.
+- The 7B reads Standard German ASR output better than perfect dialect text (0.89 vs 0.76).
+- No gain from an English view, denoising or 3-way LLM transcript repair. Hybrid check sets add false alarms.
+
+**Caveats:**
+
+- The fact wording was written while reading dev transcripts.
+- A table written blind from the criteria only scores 0.77-0.85.
+- **Paraphrase test (R3):** rewording the fact questions (same meaning) drops dev AUC from 0.87 to 0.72. The
+  drop is real (-0.15 [-0.31, -0.03]) and flips 11/48 labels. The tuned wording is fragile. A realistic
+  unseen-call AUC is ~0.72-0.79. A paraphrase ensemble (each fact averaged over several wordings) is being
+  tested as the fix.
+- Synthetic out-of-sample test (74 fresh twin scripts, mostly written by the judging 14B itself, so there is a
+  circularity risk): facts keeps its large false-alarm advantage (14% vs 61%) but misses more (33%), mostly in
+  access.
+- Open review cases (Stufe3) and the splitting family are the weakest spots everywhere.
+
+### Before the GPU session (2026-10-09, laptop CPU)
+
+Everything in this subsection comes from the artifacts in `runs/` (2026-10-09), before anything ran on a GPU.
 
 **Real chain on the laptop CPU (`local`)**: faster-whisper Swiss German turbo int8, sherpa-onnx
 diarization, Qwen2.5-1.5B Q4 via llama.cpp for roles, `llm_judge` and `geval`. The run was stopped by
@@ -306,7 +415,7 @@ minutes (3.8-5.1x their length). Apart from the ASR outlier, most of that is the
   only because the keyword check disagrees (uncertainty above 0.35). D03, the harmless twin of D02,
   scored higher than D02. The role answers were rejected in all four calls (they follow the speaker
   labels), so the diarizer fell back to "first speaker is the advisor". Quality numbers come from the
-  GPU profile next ([Home GPU over Tailscale](#home-gpu-over-tailscale)).
+  GPU host (see the overnight results above).
 
 **Rule checks only (`fast`: keywords + patterns, no LLM)**, all 60 calls on the reference scripts
 (historical numbers from before the holdout lock; today that run needs `--split all` and is logged as a
@@ -328,11 +437,32 @@ equal the script-based ones: D02 alarm (right), D03 false alarm, C05 right, C06 
 `runs/oracle/eval` (five calls) is **not** an LLM measurement. The LLM server was already stopped, so
 both LLM checks failed on every call. Its report says so at the top; ignore it.
 
-## Home GPU over Tailscale
+## GPU host setup
 
-The laptop is CPU-only, so the real models run on a home machine with a 12 GB GPU, reached over
-Tailscale. Setup, serving and run commands: [docs/REMOTE_GPU.md](docs/REMOTE_GPU.md). Profiles:
-[`config/gpu-12gb.yaml`](config/gpu-12gb.yaml) and [`config/remote.yaml`](config/remote.yaml).
+The overnight session ran everything on one RTX 4070 (12 GB, driver 535 / CUDA 12.2, Debian 12) inside this repo.
+`docs/REMOTE_GPU.md` was never written. These are the facts that made it work (`research/journal.md`, 01:15):
+
+* **vLLM 0.10.1.1 in its own venv `.venv-vllm`** (torch 2.7.1 cu126, transformers 4.55.4; 4.56+ breaks the
+  Qwen2 tokenizer in this vLLM). The newest vLLM needs CUDA 13, which driver 535 cannot run. Install:
+  `uv venv .venv-vllm --python 3.12 && uv pip install --python .venv-vllm vllm==0.10.1.1 transformers==4.55.4`.
+* **cuBLAS 12 + cuDNN 9 for CTranslate2 (faster-whisper) in `.cuda-libs`**, outside `.venv`, because `uv sync`
+  would remove them: `uv pip install --target .cuda-libs nvidia-cublas-cu12 "nvidia-cudnn-cu12==9.*"`. Run
+  `source scripts/remote/cuda_env.sh` (sets `LD_LIBRARY_PATH`) before any GPU ASR. `run_staged.sh` does this itself.
+* **Models:** `scripts/download_models.sh gpu` puts large-v3 MIT into `models/asr/whisper-large-v3-gsw-ct2`.
+  `local` fetches the turbo int8 + diarization models, and `denoise` fetches the optional denoiser.
+* **Serving:** `scripts/remote/serve_llm.sh [hf-model-id]` starts vLLM in the background on :8000, always served
+  as `callguard-llm`. Env: `GPU_UTIL` (0.70), `MAX_LEN` (16384), `PORT`, `EXTRA`. Logs go to
+  `runs/logs/vllm_<model>.log`, and `runs/logs/vllm.log` links the latest. `scripts/remote/swap_llm.sh <hf-model-id>
+  [util] [max_len]` stops the running model, starts the new one and waits until it answers. Check caches key on
+  the real model id, not the alias. Stop with `kill $(cat runs/logs/vllm.pid)` (by PID, never `pkill -f`).
+* **VRAM:** the 7B AWQ at util 0.80 and Whisper large-v3 fp16 do not fit together, so ASR and LLM run in stages
+  (`scripts/run_staged.sh`). A 14B AWQ only fits alone and only for `facts` (util 0.90, 6k context, fp8 KV,
+  2 sequences). Qwen3-14B does not fit.
+* **Speed:** ASR takes 1-2.5 GPU-s per audio minute (turbo: all 60 calls in ~3 min). `facts` with the 7B takes
+  ~2-8 s per call, and the 14B ~25 s. Sizing: `docs/OPERATING_CONCEPT.md` §8.
+* The laptop-over-Tailscale profile `config/remote.yaml` is **untested**. Its header refers to
+  `scripts/remote/serve_models.sh` / `tunnel.sh`, which do not exist. Serve the LLM with `serve_llm.sh` and the
+  ASR with `uv run python -m callguard.serve.asr_server -c <profile> --port 8010` (not started overnight).
 
 ## Roadmap: where the next ideas plug in
 
@@ -359,8 +489,7 @@ Tailscale. Setup, serving and run commands: [docs/REMOTE_GPU.md](docs/REMOTE_GPU
   memory in its comments), then `-c gpu`. **Not run yet**: expect to adjust `llms.default.model`
   to the served name and check that `json_mode: json_schema` and logprobs work on the vLLM version.
   The LLM prompts put the transcript first, so vLLM prefix caching shares it across all family calls
-  (llama.cpp already reuses it on the laptop). For a 12 GB card at home see
-  [Home GPU over Tailscale](#home-gpu-over-tailscale).
+  (llama.cpp already reuses it on the laptop). For a 12 GB card see [GPU host setup](#gpu-host-setup).
 
 ## Development
 
@@ -371,7 +500,8 @@ uv run pytest -q -m slow           # needs models, case audio and the live LLM s
 
 Code map: `src/callguard/{types,plugins,registry,config,context,pipeline,cache,audio,families,data}.py`
 (core), `asr/`, `diarization/`, `checks/`, `llm/`, `fusion/`, `sinks/`, `eval.py`, `cli.py`, `ui/`.
-Scripts: `scripts/download_models.sh`, `scripts/serve_llm_local.sh`, `scripts/serve_vllm.sh`.
+Scripts: `scripts/download_models.sh`, `scripts/serve_llm_local.sh`, `scripts/serve_vllm.sh`,
+`scripts/run_staged.sh`, `scripts/remote/{cuda_env,serve_llm,swap_llm}.sh`, `scripts/research/` (overnight helpers).
 
 ## Known limits
 
@@ -382,7 +512,8 @@ Scripts: `scripts/download_models.sh`, `scripts/serve_llm_local.sh`, `scripts/se
 * A check that fails (e.g. LLM server down) is left out of the fusion with a note. The call is still
   decided on the remaining checks and can come out no_alert. The Inbox, the call page and the eval
   report name such calls; process them again once the check works.
-* `hf_whisper` and the `gpu` profile are untested (no torch, no GPU here).
+* `hf_whisper`, the `gpu` profile (30B-class LLM for event GPUs) and `remote` are untested. `gpu-12gb`,
+  `recommended` and the research profiles ran on the RTX 4070 host.
 * Licences: the local ASR's tokenizer comes from a CC-BY-NC fine-tune (Flurin17). The `gpu` ASR model
   is MIT (see `scripts/download_models.sh`).
 * `oracle` and `demo-offline` read the reference scripts as the transcript. They exist for ceiling

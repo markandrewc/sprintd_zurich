@@ -384,3 +384,46 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   during generation), i.e. the SAME model that judged them, not Qwen3-8B as logged. The circularity risk of RQ10 is
   therefore higher than stated; labels still come from the scenario file and were audited blind by another family.
 - Findings RQ1, RQ3, RQ7, RQ8, RQ9, RQ10, RQ11, RQ12 written (writer agent; numbers copied from summaries/journal).
+
+## 2026-10-10T04:35 R6 paraphrase ensemble (facts averages p(yes/no/unclear) over wordings of the SAME fact)
+- Built (checks/facts.py, backward compatible; recommended.yaml facts cache key pinned in tests/test_facts.py):
+  `paraphrase_tables: [path, ...]` (every fact id of the main table found in a paraphrase table is asked once per
+  wording, probabilities averaged before thresholding, main table's rules decide, per-wording p in
+  `facts.<id>.wordings`); `unclear_band: [lo, hi]` = fact value from averaged p(yes) alone (yes >= hi, no < lo,
+  else unclear). The literal "yes if p(yes) >= hi, no if p(no) >= hi, else unclear" already exists as `decide_at`
+  (run as ens3_d06). config/policy_table_para2.yaml = second blind paraphrase set (scripts/research/make_para2_table.py,
+  no transcript or result read, different style from para). Variants in experiments/champion.yaml + synth_stress.yaml.
+- DEV (48 calls, 7B, large-v3; flag AUC [CI] | CV FAR / miss | review recall | 3-class acc | label flips vs champion):
+  | champion (tuned) | 0.87 [0.72, 0.99] | 14% / 15% | 67% | 79% | - |
+  | para (R3)        | 0.72 [0.52, 0.88] | 23% / 38% | 0%  | 67% | 11/48 |
+  | para2 alone      | 0.74 [0.54, 0.90] | 23% / 31% | 0%  | 71% | 10/48 (all worse) |
+  | ens2 tuned+para  | 0.81 [0.65, 0.94] | 14% / 27% | 0%  | 73% | 4/48 |
+  | ens2b tuned+para2| 0.78 [0.59, 0.94] | 18% / 27% | 0%  | 69% | 4/48 |
+  | ens3 all three   | 0.74 [0.54, 0.92] | 18% / 31% | 0%  | 75% | 7/48 (all worse) |
+  | ens3_d06         | 0.77 [0.59, 0.93] | 18% / 27% | 0%  | 75% | 6/48 |
+  | ens3_band [.2,.6]| 0.73 [0.55, 0.90] |  9% / 38% | 0%  | 71% | 11/48 |
+  | ens_blind para+para2 | 0.75 [0.55, 0.92] | 18% / 31% | 0% | 73% | 8/48 |
+  Paired AUC diff vs champion: para2 -0.13 [-0.29, -0.01] (real), ens3 -0.12 [-0.28, -0.00] (real), ens3_d06 -0.10
+  (real), ens3_band -0.13 (real), ens2 -0.06 [-0.14, 0.00], ens2b -0.09 [-0.22, 0.00] (no detectable difference).
+- Wording sensitivity (label flips when ONE wording is swapped): single tables champion<->para 11/48, champion<->para2
+  10/48, para<->para2 8/48; 2-wording ensembles ens2<->ens2b 4/48, para<->ens_blind 5/48. Fact value agreement
+  73-77% (single) -> 86.7% (ens2 vs ens2b), mean |dp(yes)| 0.027-0.038 -> 0.013. => averaging roughly HALVES the
+  wording noise, as intended.
+- But on dev every ensemble scores below the tuned wording alone: review recall 67% -> 0% (C17/C18 review calls lost
+  in every variant: the tuned access.spoken wording carries them), alarms C06-K4/C07-K4 drop to review. The dev edge
+  of the champion IS its tuned wording; averaging in blind wordings removes the dev-fitting along with the noise.
+  ens3_band (decide from p(yes) only) makes the no/unclear mass irrelevant but turns 469 unclear->no, killing the
+  `= unclear` review rules: FAR 9% but miss 38%. Rejected.
+- SYNTHETIC out-of-sample (74 scripts, 26 scenarios, ORACLE text, 7B, facts alone; flag AUC | CV FAR / miss | flips vs tuned):
+  tuned (facts7b_v1) 0.80 [0.71, 0.89] | 7% / 43% | - ; para 0.70 [0.59, 0.80] | 21% / 54% | 16/74;
+  para2 0.84 [0.74, 0.92] | 11% / 39% | 14/74; ens3 0.81 [0.71, 0.89] | 11% / 43% | 11/74; ens3_band 0.78 | 11% / 46%.
+  para<->para2 15/74 flips. Out of sample the tuned wording has no edge (para2, written blind, is as good or better;
+  para is clearly worse): wording quality varies +-0.07 AUC per table, ens3 lands at/above the median wording and
+  never at the worst one. CIs overlap everywhere; no paired CI between facts7b_* variants (summary compares to v1).
+- Second fragility datapoint: para2 alone on dev 0.74 (vs 0.87), 10/48 flips, all worse -> R3 replicated with an
+  independent paraphrase set. Expect the champion's hidden-set AUC nearer 0.75-0.80 than 0.87.
+- DECISION: keep the frozen champion (tuned table, no ensemble) as the Sunday default: it is the only variant with
+  review recall > 0 on dev, its holdout look is already spent on it, and ens3 shows no detectable gain out of
+  sample (0.81 vs 0.80). ens3 is the documented robustness option (`paraphrase_tables`) — it halves wording
+  sensitivity at ~3x the fact probes; worth switching to only with a new, non-dev-tuned table where no single
+  wording is privileged.
