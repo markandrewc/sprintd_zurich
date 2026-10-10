@@ -16,6 +16,7 @@ from ui_fixtures import FixtureEnv, contrib_rows, write_contrib_variant, write_f
 from callguard import candidates as cd
 from callguard import cli, stats
 from callguard import contrib as cb
+from callguard import datasets as ds
 from callguard.ui import backend as be
 from callguard.ui import team_view as tv
 
@@ -309,8 +310,9 @@ def test_team_page_renders_matrix_chart_decisions_and_records_a_choice(env: Fixt
     at = _run_team()
     assert at.title[0].value == "Team-Entscheidungen"
     heads = [s.value for s in at.subheader]
-    assert heads[:3] == ["Optionen für das Team: Kandidaten-Matrix",
-                         "Abgestimmt gegen andere Bedingungen: wie viel ist Dev-Anpassung?", "Offene Entscheidungen"]
+    assert heads[:4] == ["Optionen für das Team: Kandidaten-Matrix",
+                         "Abgestimmt gegen andere Bedingungen: wie viel ist Dev-Anpassung?",
+                         f"Externer Testsatz {cd.T50_TITLE}", "Offene Entscheidungen"]
     assert "Unser Ansatz vs. sprintd_zurich (Teamkollege)" in heads
     matrix = at.dataframe[0].value
     assert "Champion: Qwen2.5-7B Fakten, Tabelle v1" in matrix["Kandidat"].tolist()
@@ -333,7 +335,9 @@ def test_team_page_renders_matrix_chart_decisions_and_records_a_choice(env: Fixt
 def test_team_page_without_data(env: FixtureEnv):
     at = _run_team()
     assert any("Keine der Kandidaten-Varianten" in i.value for i in at.info)
-    assert [s.value for s in at.subheader][1] == "Offene Entscheidungen"
+    assert [s.value for s in at.subheader][1:3] == [f"Externer Testsatz {cd.T50_TITLE}", "Offene Entscheidungen"]
+    assert any(cd.T50_BANNER in w.value for w in at.warning)
+    assert any("Noch keine test50-Ergebnisse" in i.value for i in at.info)
 
 
 def test_team_page_is_registered_next_to_entscheidungshilfe():
@@ -342,3 +346,133 @@ def test_team_page_is_registered_next_to_entscheidungshilfe():
     keys = [p.key for p in pr.pages()]
     assert keys.index("team") == keys.index("decisions") + 1
     assert next(p for p in pr.pages() if p.key == "team").path().name == "team.py"
+
+
+# --------------------------------------------------------------------------------------------
+# test50: own dataset, never pooled
+# --------------------------------------------------------------------------------------------
+
+
+def t50_rows(quality: float, seed: int = 0) -> list[dict]:
+    """test50-like rows: 6 A/B pairs (twin group per pair), 2 traps, 2 reviews, 1 numbers pair, 2 multi;
+    each dialogue clean (K1) + noisy (K2)."""
+    import numpy as np
+
+    rng = np.random.default_rng(seed)
+    dlgs = []
+    for i in range(1, 7):
+        fam = ("trade", "access", "disclosure")[i % 3]
+        dlgs += [(f"T50-{fam}-{i:02d}-A", "alarm", f"T50-{fam}-{i:02d}"),
+                 (f"T50-{fam}-{i:02d}-B", "no_alert", f"T50-{fam}-{i:02d}")]
+    dlgs += [("T50-trade-trap", "no_alert", "T50-trade-trap"), ("T50-access-trap", "no_alert", "T50-access-trap"),
+             ("T50-trade-review", "review", "T50-trade-review"), ("T50-access-review", "review", "T50-access-review"),
+             ("T50-numbers-01-A", "no_alert", "T50-numbers-01"), ("T50-numbers-01-B", "no_alert", "T50-numbers-01"),
+             ("T50-multi-01", "alarm", "T50-multi-01"), ("T50-multi-02", "no_alert", "T50-multi-02")]
+    rows = []
+    for dlg, exp, grp in dlgs:
+        for k in (1, 2):
+            right = rng.random() < quality
+            flag = exp != "no_alert"
+            pred = exp if right else ("no_alert" if flag else "alarm")
+            high = flag if right else not flag
+            score = round(float(0.6 + 0.35 * rng.random()) if high else float(0.4 * rng.random()), 4)
+            rows.append({"call_id": f"{dlg}-K{k}", "dialogue_id": dlg, "group": grp, "level": 2, "noisy": k == 2,
+                         "expected": exp, "expected_family": "trade", "predicted": pred, "score": score,
+                         "llm_calls": 1, "check_seconds": {"facts": 1.0}})
+    return rows
+
+
+@pytest.fixture
+def world50(world: dict) -> dict:
+    t50 = world["tmp"] / "t50"
+    write_contrib_variant(t50, "test50/champion", t50_rows(0.6, seed=1))
+    write_contrib_variant(t50, "test50/good", _good(t50_rows(0.6, seed=1)))
+    (world["exps"] / "test50.yaml").write_text(yaml.safe_dump({"name": "test50", "variants": [{"name": "v3x"}]}))
+    spec = yaml.safe_load(world["spec_path"].read_text())
+    spec["data_roots"]["test50"] = str(t50)
+    for c in spec["candidates"]:
+        c["test50"] = {"champ": "test50:test50/champion", "good": "test50:test50/good", "v3": "test50:test50/v3x"}.get(c["id"])
+    world["spec_path"].write_text(yaml.safe_dump(spec))
+    world["t50"] = t50
+    return world
+
+
+def test_dataset_keys_and_guard_never_pool():
+    case, t50, syn = contrib_rows(0.6, seed=1), t50_rows(0.6, seed=2), contrib_rows(0.6, seed=3, prefix="Synth_x_")
+    assert ds.rows_dataset(case) == "case" and ds.rows_dataset(t50) == "test50" and ds.rows_dataset(syn) == "synth"
+    assert ds.row_dataset({"call_id": "Stufe1_D01-K1", "dataset": "test50"}) == "test50"
+    with pytest.raises(ds.DatasetMixError):
+        ds.rows_dataset(case + t50)  # one pooled set
+    with pytest.raises(ds.DatasetMixError):
+        ds.same_dataset([case, t50])
+    with pytest.raises(ds.DatasetMixError):
+        cd.mean_auc_delta([case], [t50], n_boot=50)
+    with pytest.raises(ds.DatasetMixError):
+        cd.mean_auc_ci([case, t50], n_boot=50)
+    c = cb.compare_rows({"fixed": case}, {"fixed": t50}, n_boot=50)
+    assert c["paired"] is False and c["datasets"] == ["case", "test50"] and "deltas" not in c
+    with pytest.raises(ds.DatasetMixError):
+        cb.compare_rows({"fixed": case + t50}, {"fixed": case}, n_boot=50)
+    d = cd.unpaired_auc_delta(case, t50, n_boot=200)
+    assert d["paired"] is False and d["datasets"] == ["case", "test50"] and d["diff"] is not None
+
+
+def test_spec_and_roots_keep_test50_in_its_own_slot(world50: dict, tmp_path: Path):
+    spec = yaml.safe_load(world50["spec_path"].read_text())
+    bad = dict(spec, candidates=[dict(spec["candidates"][0], tuned="test50:test50/champion")])
+    p = tmp_path / "bad.yaml"
+    p.write_text(yaml.safe_dump(bad))
+    with pytest.raises(cd.SpecError, match="never in a dev slot"):
+        cd.load_spec(p)
+    bad = dict(spec, candidates=[dict(spec["candidates"][0], test50="e/champ")])
+    p.write_text(yaml.safe_dump(bad))
+    with pytest.raises(cd.SpecError):
+        cd.load_spec(p)
+    # case rows copied into the test50 root by mistake are refused, not silently mixed
+    write_contrib_variant(world50["t50"], "test50/wrong", contrib_rows(0.6, seed=1))
+    data = cd.Data({"default": world50["root"], "test50": world50["t50"]})
+    with pytest.raises(ds.DatasetMixError):
+        data.get("test50:test50/wrong")
+
+
+def test_test50_record_paired_over_pairs_unpaired_drop_breakdown_and_pending(world50: dict):
+    res = cd.analyse(cd.load_spec(world50["spec_path"]))
+    C = {c["id"]: c for c in res["candidates"]}
+    ch, good = C["champ"]["test50"], C["good"]["test50"]
+    assert ch["dataset"] == "test50" and ch["n_calls"] == 40 and ch["n_units"] == 13  # 6 pairs + 2 traps + 2 reviews + 1 numbers pair + 2 multi
+    assert ch["fixed"]["accuracy"]["value"] is not None and "cv" in ch and "vs_ref" not in ch
+    assert good["auc"]["value"] == 1.0 and good["vs_ref"]["auc"]["diff"] > 0 and good["vs_ref"]["units"] == 13
+    assert good["dev_drop"]["paired"] is False and good["dev_drop"]["datasets"] == ["case", "test50"]
+    assert set(ch["breakdown"]["types"]) == {"pair", "trap", "review", "numbers", "multi"}
+    assert ch["breakdown"]["types"]["pair"]["n"] == 24 and ch["breakdown"]["audio"]["verrauscht"]["n"] == 20
+    assert C["all"]["test50"]["auc"]["value"] == 0.5  # flag-all on the champion's test50 calls
+    # the dev columns are untouched by test50 (same numbers as without the slot)
+    assert C["good"]["tuned"]["n_calls"] == 24
+    assert cd.cell(C["v3"], "t50_auc") == "ausstehend" and cd.cell(C["hid"], "t50_auc") == "nicht geplant"
+    assert ("v3", "test50", "pending") in {(p["candidate"], p["slot"], p["status"]) for p in res["pending"]}
+    assert "t50_auc" in res["best"] and res["best"]["t50_auc"]["ids"] == ["good"]
+    txt = cd.fill("{{good.t50_auc}} | {{good.vs_t50_acc}} | {{good.t50_drop}} | {{v3.t50_far}}", res)
+    parts = txt.split(" | ")
+    assert parts[0].startswith("1.00") and parts[2].endswith("(ungepaart)") and parts[3] == "ausstehend"
+    md = cd.render_markdown(res)
+    sec = md.split(f"## {cd.T50_TITLE}")[1]
+    assert cd.T50_BANNER in sec and "| Good | **1.00" in sec and "Stichwort-Falle" in sec
+    t = tv.text_frame(res)
+    assert tv.T50_PREFIX + "Flag-AUC [KI]" in t.columns
+    n = tv.number_frame(res)
+    assert n.loc[n["Kandidat"] == "Good", tv.T50_PREFIX + "Flag-AUC"].iloc[0] == 1.0
+    assert len(tv.breakdown_frame(res)) == 3  # Champ, Good, All
+
+
+def test_team_page_shows_test50_section(env: FixtureEnv):
+    root = env.runs_dir.parent / "experiments"
+    write_contrib_variant(root, "champion/champion", contrib_rows(0.8, seed=2))
+    t50 = env.runs_dir.parent / "test50" / "experiments"
+    write_contrib_variant(t50, "test50/champion", t50_rows(0.7, seed=3))
+    write_contrib_variant(t50, "test50/kev_facts", t50_rows(0.6, seed=4))
+    at = _run_team()
+    assert any(cd.T50_BANNER in w.value for w in at.warning)
+    frames = [df.value for df in at.dataframe]
+    bd = next(f for f in frames if "Stichwort-Falle" in f.columns)
+    assert "Champion: Qwen2.5-7B Fakten, Tabelle v1" in bd["Kandidat"].tolist()
+    assert tv.T50_PREFIX + "Flag-AUC [KI]" in frames[0].columns

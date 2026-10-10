@@ -99,7 +99,8 @@ def test_pairing_uses_only_common_calls_and_unpaired_when_disjoint():
     assert c["n_common"] == len(a) - 4 and c["only_a"] == 4 and c["only_b"] == 0
     other = contrib_rows(0.6, seed=9, prefix="Synth_")
     assert cb.compare_rows({"fixed": a}, {"fixed": other}, n_boot=100) == {
-        "basis": "fixed", "n_common": 0, "only_a": len(a), "only_b": len(other), "paired": False}
+        "basis": "cv", "n_common": 0, "only_a": len(a), "only_b": len(other), "paired": False,
+        "datasets": ["case", "synth"]}  # different datasets: never paired (callguard.datasets)
 
 
 def test_verdict_and_lower_is_better():

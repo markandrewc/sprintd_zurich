@@ -38,7 +38,7 @@ def register(app: typer.Typer) -> None:
             cli.console.print(f"[red]{e}[/red]")
             raise typer.Exit(2) from e
         roots = {**cd.DEFAULT_ROOTS, **(s.get("data_roots") or {})}
-        data = cd.Data(roots, s.get("experiments_dir"))
+        data = cd.Data(roots, s.get("experiments_dir"), cd.root_datasets(s))
         out_dir = out or cd.DEFAULT_OUT
         ev: dict = {}
         if evidence:

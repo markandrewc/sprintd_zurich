@@ -20,6 +20,8 @@ from callguard import candidates as cd
 
 DARK, LIGHT, CONNECT, GRID, INK = "#184f95", "#6da7ec", "#a3a3a3", "#e4e3df", "#0b0b0b"
 GEN_BG = "background-color: #f0efec"  # recessive surface tint that groups the generalisation columns
+T50_BG = "background-color: #e3eefc"  # blue tint (ramp step 100 lighter): test50 = its own dataset, never pooled
+T50_PREFIX = "test50 · "
 TUNED = "abgestimmt (Dev)"
 CONDITIONS = {"reworded": "umformulierte Fragen", "blind": "blinde Tabelle", "rerecorded": "neu aufgenommenes Audio"}
 
@@ -33,6 +35,12 @@ NUM_COLS = {  # sortable view: column -> (key, percent)
 }
 DROP_COLS = {GEN_PREFIX + "Δ umformuliert": "reworded", GEN_PREFIX + "Δ blind": "blind",
              GEN_PREFIX + "Δ neu aufgenommen": "rerecorded"}
+T50_NUM_COLS = {T50_PREFIX + "Flag-AUC": ("t50_auc", False), T50_PREFIX + "Fehlalarme (fix)": ("t50_far", True),
+                T50_PREFIX + "Verpasst (fix)": ("t50_miss", True), T50_PREFIX + "Exakt (fix)": ("t50_acc", True),
+                T50_PREFIX + "Prüf-Recall (fix)": ("t50_rr", True)}
+T50_TEXT_COLS = [T50_PREFIX + x for x in ("Flag-AUC [KI]", "Fehlalarme (fix)", "Verpasst (fix)", "Exakt (fix)",
+                                          "Prüf-Recall (fix)", "CV in test50 (FA / verpasst / exakt)",
+                                          "gepaart vs. Champion", "Dev → test50 AUC (ungepaart)")]
 TEXT_COLS = ["Kandidat", "Flag-AUC [KI]", "Fehlalarme (CV)", "Verpasst (CV)", "Prüf-Recall", "Exakt 3 Klassen",
              "gepaart vs. Champion", GEN_PREFIX + "AUC umformuliert", GEN_PREFIX + "Δ umformuliert",
              GEN_PREFIX + "AUC blinde Tabelle", GEN_PREFIX + "Δ blind", GEN_PREFIX + "AUC neu aufgenommen",
@@ -47,7 +55,9 @@ def _strip_md(s: str) -> str:
 def text_frame(result: dict[str, Any]) -> pd.DataFrame:
     """The matrix as in docs/TEAM_OPTIONS.md: values with CIs, "≈ Champion", pending states as text."""
     rows = cd.matrix_rows(result, bold=False)
-    df = pd.DataFrame([[_strip_md(x) for x in r] for r in rows], columns=TEXT_COLS)
+    t50 = cd.test50_rows(result, bold=False)
+    df = pd.DataFrame([[_strip_md(x) for x in r] + [_strip_md(x) for x in t[1:]] for r, t in zip(rows, t50)],
+                      columns=TEXT_COLS + T50_TEXT_COLS)
     df.insert(1, "Gruppe", [c.get("group") or "" for c in cd.visible(result)])
     return df
 
@@ -64,6 +74,11 @@ def number_frame(result: dict[str, Any]) -> pd.DataFrame:
             d = ((c.get("gen") or {}).get(slot) or {}).get("drop") or {}
             row[col] = d.get("diff")
         row["gepaart vs. Champion"] = "Referenz" if c["id"] == result.get("reference") else cd.vs_text(c)
+        for col, (key, pct) in T50_NUM_COLS.items():  # own dataset: separate columns, never mixed into the above
+            v = (cd.value(c, key) or {}).get("value")
+            row[col] = None if v is None else (100 * v if pct else v)
+        d = (c.get(cd.T50) or {}).get("dev_drop") or {}
+        row[T50_PREFIX + "Dev → test50 (ungepaart)"] = d.get("diff")
         missing = [f"{cd.SLOT_LABELS[s]}: {cd.STATUS_TEXT[st]}" for s, _, st in cd.slot_states(c)
                    if st in ("running", "pending")]
         row["Daten"] = "; ".join(missing) or "vollständig"
@@ -76,8 +91,8 @@ def best_cells(result: dict[str, Any], df: pd.DataFrame) -> dict[str, list[int]]
     best = result.get("best") or {}
     labels = [c.get("label") or c["id"] for c in cd.visible(result)]
     ids = [c["id"] for c in cd.visible(result)]
-    key_to_cols = {"auc": ["Flag-AUC", "Flag-AUC [KI]"]}
-    for col, (key, _) in NUM_COLS.items():
+    key_to_cols = {"auc": ["Flag-AUC", "Flag-AUC [KI]"], "t50_auc": [T50_PREFIX + "Flag-AUC [KI]"]}
+    for col, (key, _) in {**NUM_COLS, **T50_NUM_COLS}.items():
         key_to_cols.setdefault(key, []).append(col)
     out: dict[str, list[int]] = {}
     for key, m in best.items():
@@ -89,9 +104,10 @@ def best_cells(result: dict[str, Any], df: pd.DataFrame) -> dict[str, list[int]]
 
 
 def style(df: pd.DataFrame, result: dict[str, Any]) -> Any:
-    """Bold the best value per column, tint the generalisation columns (visual group)."""
+    """Bold the best value per column; tint the generalisation columns (gray) and the test50 columns (blue)."""
     best = best_cells(result, df)
     gen = [c for c in df.columns if c.startswith(GEN_PREFIX)]
+    t50 = [c for c in df.columns if c.startswith(T50_PREFIX)]
 
     def col_style(s: pd.Series) -> list[str]:
         css = []
@@ -99,6 +115,8 @@ def style(df: pd.DataFrame, result: dict[str, Any]) -> Any:
             parts = []
             if s.name in gen:
                 parts.append(GEN_BG)
+            if s.name in t50:
+                parts.append(T50_BG)
             if i in best.get(s.name, []):
                 parts.append("font-weight: 700")
             css.append("; ".join(parts))
@@ -178,6 +196,17 @@ def comparison_frame(comp: dict[str, Any]) -> pd.DataFrame:
                           "sprintd_zurich": r.get("theirs", ""), "Messung / Beleg": r.get("evidence", ""),
                           "Wirkung": r.get("impact", ""), "Empfehlung": r.get("recommendation", "offen"),
                           "Begründung": r.get("why", "")} for r in comp.get("rows") or []])
+
+
+def breakdown_frame(result: dict[str, Any]) -> pd.DataFrame:
+    """test50: exact label per call type and clean / noisy per candidate (text cells 'xx% (n)')."""
+    rows = cd.breakdown_rows(result)
+    return pd.DataFrame(rows, columns=["Kandidat", *cd.T50_TYPES.values(), "sauber", "verrauscht"])
+
+
+def t50_pending(result: dict[str, Any]) -> list[str]:
+    return [f"{p['label']}: `{p['ref']}` ({cd.STATUS_TEXT[p['status']]})" for p in result.get("pending") or []
+            if p["slot"] == cd.T50]
 
 
 def pending_lines(result: dict[str, Any]) -> list[str]:

@@ -48,6 +48,7 @@ decisions:
       - "v3 erhöht auf Kev oder Qwen3.8 die Fehlalarme deutlich (Zeilen Kev v3 / Q3.8 v3, sobald gerechnet)."
       - "Die Organisatoren werten „Prüfen“ als Fehler (dann zählt exakte 3-Klassen-Genauigkeit, nicht Verpasste)."
       - "Ein Smoke-Test von recommended-v3 auf neuen Dateien schlägt fehl."
+      - "Der externe Testsatz test50 (eigener Datensatz, nie gepoolt) zeigt v3 belegt schlechter: Champion v1 AUC {{champion.t50_auc}}, v3 {{champion_v3.t50_auc}}, gepaart {{champion_v3.vs_t50_auc}}; verpasst {{champion.t50_miss}} gegen {{champion_v3.t50_miss}}."
     sources: [research/DECISIONS.md, research/findings/RQ10.md, config/recommended-v3.yaml]
 
   - id: backend
@@ -102,6 +103,7 @@ decisions:
     would_change:
       - "Qwen3.8 6-bit schlägt den Champion auf umformulierten Fragen oder neu aufgenommenem Audio belegt (Zellen oben, sobald gerechnet) UND der A5000 ist Sonntag sicher verfügbar."
       - "Die Organisatoren bewerten nur Alarm ja/nein (dann zählen Fehlalarme/Verpasste mehr als Prüfen)."
+      - "test50 (extern, 8 Dialekt-Stimmen, eigener Datensatz): ein Kandidat schlägt den Champion dort belegt (gepaart über A/B-Paare): Kev {{kev.vs_t50_auc}}, Qwen3.8 6-bit {{q38q6.vs_t50_auc}}; Champion {{champion.t50_auc}}, Dev → test50 {{champion.t50_drop}}."
     sources: [docs/CASE.md, research/findings/two_readers.md, experiments/kev_vs_facts.yaml, experiments/qwen38_q6.yaml]
 
   - id: hardware
@@ -195,6 +197,7 @@ decisions:
       sprintd_zurich übernehmen. Details: Abschnitt „Unser Ansatz vs. sprintd_zurich“.
     would_change:
       - "Kev mit einer „unklar“-Antwort, die Prüfen-Fälle erzeugt, oder Kev-Passagen mit gutem hit@1."
+      - "Auf test50 (ihr Testsatz, extern): allgemeine Fragen auf Kev {{gen_kev.t50_auc}}, Fehlalarme {{gen_kev.t50_far}}, gegen Champion {{gen_kev.vs_t50_far}}."
       - "Qwen3.8 6-bit allgemein bleibt auf umformulierten Fragen und neuem Audio gleich gut ({{gen_q38q6.reworded}}, {{gen_q38q6.rerecorded}})."
     sources: [experiments/kev_vs_facts.yaml, research/findings/two_readers.md, experiments/contrib/comparison_zurich.yaml]
 

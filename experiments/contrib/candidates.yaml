@@ -13,6 +13,9 @@
 #   runs/experiments/perturbed/* == runs/perturbed/experiments/perturbed/* (copies; the perturbed root is primary).
 #   Qwen3.8 (both quantisations) and Kev read the facts with `evidence: false`: their passages come from the
 #   keyword/pattern hits only. Roles (advisor/customer) of every candidate come from the Qwen2.5-7B cache.
+# `test50`: the teammate's EXTERNAL held-out set (runs/test50/experiments/test50/<variant>, pre-registered candidate
+#   list in experiments/test50.yaml). Its own column group; never pooled with dev / holdout / synthetic / re-recorded
+#   numbers (callguard.datasets raises if rows of different datasets would be combined). Unmapped -> "nicht geplant".
 name: candidates
 description: Candidate matrix for the team decisions (dev split, paired against the champion)
 reference: champion
@@ -22,6 +25,11 @@ seed: 13
 data_roots:
   default: runs/experiments
   perturbed: runs/perturbed/experiments
+  test50: runs/test50/experiments          # EXTERNAL held-out set (experiments/test50.yaml): own dataset, own column
+root_datasets:                             # every root holds exactly one dataset; rows are checked (callguard.datasets)
+  default: case
+  perturbed: case
+  test50: test50
 evidence_note: >-
   Beleg hit@1 = Anteil der richtig markierten Anrufe, deren erste angezeigte Passage eine annotierte Beleg-Zeile
   trifft (`callguard evidence-eval`-Methode, Dev). „Zufall“ = was eine gleich lange Passage an zufälliger Stelle
@@ -42,6 +50,7 @@ candidates:
     reworded: [kev_vs_facts/qwen_facts_para, kev_vs_facts/qwen_facts_para2]
     blind: kev_vs_facts/qwen_facts_blind
     rerecorded: [perturbed:perturbed/perturbed, perturbed/perturbed]
+    test50: test50:test50/champion
     passages: ja
     hardware: "12 GB 4070 gestaffelt (ASR, dann vLLM); 24 GB: alles zusammen"
     licence: "LLM Apache-2.0, ASR MIT"
@@ -58,6 +67,7 @@ candidates:
     reworded: na                                 # no paraphrase of the v3 table exists
     blind: na                                    # the blind table replaces the whole table (see champion row)
     rerecorded: [perturbed:perturbed/table_v3, perturbed/table_v3]
+    test50: test50:test50/champion_v3
     passages: ja
     hardware: "wie Champion"
     licence: "LLM Apache-2.0, ASR MIT"
@@ -74,6 +84,7 @@ candidates:
     reworded: [kev_vs_facts/kev_facts_para, kev_vs_facts/kev_facts_para2]
     blind: kev_vs_facts/kev_facts_blind
     rerecorded: perturbed:kev_perturbed/kev_facts
+    test50: test50:test50/kev_facts
     passages: "nein (nur Stichwort-/Muster-Treffer)"
     hardware: "12 GB gestaffelt: ASR, vLLM 7B für Rollen, dann Kev (~8 GB); 24 GB zusammen"
     licence: "Kev Apache-2.0 (LoRA auf Qwen3.5-4B), ASR MIT"
@@ -134,6 +145,7 @@ candidates:
     reworded: [qwen38_q6/q38q6_facts_para]
     blind: qwen38_q6/q38q6_facts_blind
     rerecorded: perturbed:qwen38_q6_perturbed/q38q6_facts
+    test50: test50:test50/q38q6_facts
     passages: "nein (evidence aus; nur Stichwort-/Muster-Treffer)"
     hardware: "24 GB A5000 (22 GB GGUF füllt die Karte); ASR + Rollen in eigenen Stufen"
     licence: "Qwen3.8: nicht geprüft, ASR MIT"
@@ -165,6 +177,7 @@ candidates:
     reworded: [kev_vs_facts/qwen_general_para]
     blind: na                                    # the general questions are written without data already
     rerecorded: perturbed:kev_perturbed/qwen_general
+    test50: test50:test50/qwen_general
     passages: "nein (nur Stichwort-/Muster-Treffer)"
     hardware: "wie Champion"
     licence: "LLM Apache-2.0, ASR MIT"
@@ -179,6 +192,7 @@ candidates:
     reworded: [kev_vs_facts/kev_general_para]
     blind: na
     rerecorded: perturbed:kev_perturbed/kev_general
+    test50: test50:test50/kev_general
     passages: "ja (Fenster ~40 Wörter, lang)"
     hardware: "wie Kev v1"
     licence: "Kev Apache-2.0, ASR MIT"
@@ -205,6 +219,7 @@ candidates:
     reworded: [qwen38_q6/q38q6_general_para]
     blind: na
     rerecorded: perturbed:qwen38_q6_perturbed/q38q6_general
+    test50: test50:test50/q38q6_general
     passages: "nein (nur Stichwort-/Muster-Treffer)"
     hardware: "wie Q3.8 6-bit"
     licence: "Qwen3.8: nicht geprüft, ASR MIT"
