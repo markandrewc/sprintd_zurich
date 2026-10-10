@@ -31,7 +31,7 @@ from callguard.policy_versions import FourEyesError, VersionStore
 from callguard.types import CallResult, CheckResult, Decision, Family, FamilyScore, Segment, Transcript
 from callguard.ui import whatif as wi
 
-SHIPPED = ROOT / "config" / "policy_table.yaml"
+SHIPPED = ROOT / "config" / "policy_table_v1.yaml"  # the table the stored runs/recommended results were decided with (v1); active table is v3 since 2026-10-10
 
 
 @pytest.fixture

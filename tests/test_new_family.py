@@ -25,7 +25,7 @@ from callguard.routing import RoutingConfig, route
 from callguard.types import CallResult, Segment, Transcript
 from callguard.ui import whatif as wi
 
-SHIPPED = ROOT / "config" / "policy_table.yaml"
+SHIPPED = ROOT / "config" / "policy_table_v1.yaml"  # the table the stored runs/recommended results were decided with (v1); active table is v3 since 2026-10-10
 
 BRIBERY = {
     "id": "bestechung", "label": "Bestechung",
@@ -54,7 +54,8 @@ BRIBERY = {
 def live_bundle(tmp_path: Path) -> tuple[VersionStore, dict]:
     cfg = tmp_path / "config"
     cfg.mkdir(exist_ok=True)
-    for name in ("policy_table.yaml", "criteria.yaml", "keywords.json", "routing.yaml"):
+    shutil.copy(SHIPPED, cfg / "policy_table.yaml")  # v1: the table the stored fixture results were decided with
+    for name in ("criteria.yaml", "keywords.json", "routing.yaml"):
         shutil.copy(ROOT / "config" / name, cfg / name)
     store = VersionStore(cfg / "policy_table.yaml", audit_dir=tmp_path / "runs",
                          extras={"criteria": cfg / "criteria.yaml", "keywords": cfg / "keywords.json",
@@ -158,8 +159,8 @@ def test_new_family_defined_only_in_config_flows_through_facts_fusion_routing_an
 
     env = write_fixture_env(tmp_path, config="recommended")
     cfg_dir = tmp_path / "config"
-    for name in ("policy_table.yaml", "routing.yaml"):
-        shutil.copy(ROOT / "config" / name, cfg_dir / name)
+    shutil.copy(SHIPPED, cfg_dir / "policy_table.yaml")  # the v1 table the fixture results were decided with
+    shutil.copy(ROOT / "config" / "routing.yaml", cfg_dir / "routing.yaml")
     store = VersionStore(cfg_dir / "policy_table.yaml", audit_dir=env.runs_dir,
                          extras={"criteria": env.criteria, "keywords": env.keywords, "routing": cfg_dir / "routing.yaml"})
     store.ensure_initial()

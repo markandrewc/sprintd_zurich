@@ -13,7 +13,7 @@ base: recommended-test50
 split: external
 compare_to: champion
 variants:
-  - {name: champion, description: "config/recommended.yaml (Qwen2.5-7B facts, table v1 + light kw/pat)"}
+  - {name: champion, set: [checks.facts.policy_table=config/policy_table_v1.yaml], description: "config/recommended.yaml with table v1 (frozen copy; pre-registered) + light kw/pat"}
   - {name: champion_v3, set: [checks.facts.policy_table=config/policy_table_v3.yaml], description: "champion with policy table v3"}
   - {name: facts_only, refuse_from: champion, checks: [facts]}
   - name: qwen_general

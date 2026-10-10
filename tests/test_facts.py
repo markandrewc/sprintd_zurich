@@ -139,7 +139,7 @@ def test_shipped_table_covers_every_alarm_family():
     alarm_fams = {f.id for f in fams if f.can_alarm}
     assert alarm_fams <= set(table.families)
     for fid, ft in table.families.items():
-        assert 3 <= len(ft.facts) <= 5, fid
+        assert 3 <= len(ft.facts) <= 8, fid  # v3 (team decision 2026-10-10) adds open-fact review facts
         assert any(f.role == "act" for f in ft.facts), fid
         assert {r.label for r in ft.rules} >= {"alarm", "no_alert"}, fid
         assert all(f.en and f.de for f in ft.facts), fid
@@ -546,4 +546,4 @@ def test_recommended_facts_cache_key_is_pinned():
     spec = next(c for c in cfg.checks if c["name"] == "facts")
     check = FactSheetCheck(Context(cfg), **{k: v for k, v in spec.items() if k != "type"})
     fams = load_families(ROOT / "config/keywords.json", ROOT / "config/criteria.yaml")
-    assert stable_hash(check.cache_key(fams)) == "8b0a7f5f13bf43d9"
+    assert stable_hash(check.cache_key(fams)) == "1eba33abda0dbf2c"  # re-pinned deliberately: table v3 adopted 2026-10-10 (v1 was 8b0a7f5f13bf43d9)
