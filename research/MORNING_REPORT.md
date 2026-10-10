@@ -40,6 +40,16 @@ _Last update: 04:35. Everything below is reproducible from `experiments/*.yaml` 
      (4-5 vs 8-11 of 48) but scores 0.73-0.81 on dev and is level with the tuned wording on synthetic calls (0.81 vs
      0.80) -> champion kept; expect ~0.75-0.80 AUC on new calls (estimate, not measured; v1: 0.68, with 86% false alarms).
 
+## Candidate B (14B) — tested, not adopted
+- Why tried: on large-v3 transcripts the 14B's facts decisions barely depend on the question wording (dev AUC tuned
+  0.85 / blind 0.85 / paraphrased 0.88) while the 7B drops to 0.72 with paraphrased questions.
+- Dev (`config/recommended-14b.yaml`): AUC 0.82, FAR 18%, miss 23%, 3-class 71%. Holdout (one logged run): FAR 33%,
+  flag recall 33%, alarm F1 0.00, 3-class 33% vs the 7B champion's 0% / 50% / 0.67 / 67%.
+- Decision: keep the 7B champion. Holdout looks in total: 3 (7B champion, v1 reference, 14B), all logged and listed in
+  the journal — the holdout is spent. **Protocol note (research/AGENT.md): more than two looks make the holdout
+  worthless as a final test** — we made two candidate looks + one reference look; treat all holdout numbers as
+  sanity checks (n = 6 dialogues), not as the test-set result. The hidden set on Sunday is the real test.
+
 ## Leaderboard (dev, flag AUC; full table `research/leaderboard.md`)
 | system | ASR | LLM | flag AUC [95% CI] | CV FAR | CV miss | 3-class acc |
 |---|---|---|---|---|---|---|

@@ -141,3 +141,18 @@ items:
      title: "Threshold policy for facts: score is near-discrete (flag decision flat for t in 0.25-0.80), CV max-F1 picks edge 0.20 which turns every facts review into alarm; pin rule labels, t=0.55 band 0.15, choose decide_at (0.5/0.55/0.6) by worst-fold 3-class acc, redo per LLM; no per-family thresholds (0/198 cross-family false flags)"}
   - {id: R8, group: ideas2, priority: 3, status: todo, rq: [RQ5, RQ12], needs: [facts], cost: "0 GPU",
      title: "Product: 'Gegenprobe' minimal fact flips that would change the label (why not an alarm), policy-table editor with instant impact preview from cached fact probs + table hash in result.json, open fact as officer question (fact-level feedback), fact markers on the audio timeline"}
+
+  # ---------------------------------------------------------------- ideas round 3 (research/ideas_round3.md)
+  # Last review before submission. Holdout untouched; every rule change is unvalidated on the holdout -> say so.
+  - {id: S1, group: ideas3, priority: 1, status: todo, rq: [RQ5, RQ9], needs: [facts], cost: "0 GPU (re-decide cached facts), 1-2 h",
+     title: "Wording-shift bench + review hardening: re-decide cached dev champion/para/para2/table_v3 and synthetic facts7b_* results with (a) asymmetric no (no_at 0.8 for context/authorization facts) + v3 open facts, (b) para/para2 disagreement -> review (escalate only); PRE-REGISTER: dev <= +1 harmless dialogue, CV FAR <= 20%, synthetic FAR <= +7 pp, para/para2 miss -10 pp; else keep champion, show as UI strict policy. Never a generic net in access (= table_v2, C01/C02 4242 FAR 36%)"}
+  - {id: S2, group: ideas3, priority: 3, status: todo, rq: [RQ5, RQ10], needs: [facts], cost: "~30-40 GPU-min, 2-3 h",
+     title: "Contrastive twin few-shot in fact probes (dev minimal pair per family as fixed prefix, fold-aware: exemplars only from training folds, never holdout twins C03/C04, C15/C16); primary: champion<->para flip rate 11/48 -> <=5/48; dev AUC >= -0.03, synthetic 7B AUC >= 0.80, FAR <= 20%"}
+  - {id: S3, group: ideas3, priority: 2, status: todo, rq: [RQ5, RQ7, RQ9], needs: [facts], cost: "~3 GPU-min dev, ~2 h",
+     title: "No silent clearance: act=yes (or non-negated keyword hit) but no_alert -> ask for the verbatim exculpating sentence + segment id, fuzzy-verify; unverified -> review, verified -> quoted+playable in 'Warum kein Alarm?'; kill if >=2 harmless dev dialogues lose clearance; synthetic 7B miss -5 pp at FAR <= +7 pp"}
+  - {id: S4, group: ideas3, priority: 4, status: todo, rq: [RQ7], needs: [facts], cost: "~10 GPU-min, config flip + ~1 h",
+     title: "Evaluate the built but never-run facts prefix_max (experiments/facts.yaml) + anchored re-ask of boundary context facts (p in [0.3, 0.7]) on the prefix up to act evidence + 3 turns (exculpatory always whole call); label-free clean/noisy consistency first, kill if any harmless twin flips"}
+  - {id: S5, group: ideas3, priority: 5, status: todo, rq: [RQ8, RQ9], needs: [facts], cost: "~30 GPU-min, 1-2 h",
+     title: "Audio test-time augmentation: facts over 3 decodes (original, speed 0.97/1.03, telephone band-pass + light noise), average fact p, label disagreement -> review; primary dev clean/noisy pair consistency; kill if AUC -0.03 or clean miss rises; new views so cache keys stay stable"}
+  - {id: S6, group: ideas3, priority: 2, status: todo, rq: [RQ12], needs: [facts], cost: "0 GPU, 2-3 h UI",
+     title: "Pitch: fact-level officer feedback - review card asks the open fact (Ja/Nein), instant re-decision from the policy table, fact label + table hash in feedback.jsonl, per-fact overrule rate on Feedback page; demo C17-K3 'gueltig = ja' -> Alarm; test: newcomer resolves 3 cards < 60 s each, re-decision == sim_rules"}

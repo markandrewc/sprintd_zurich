@@ -78,3 +78,5 @@ variants:
   - {name: qwen25_7b__both, refuse_from: qwen25_7b, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
   - {name: qwen25_7b_facts_l3__blind_only, refuse_from: qwen25_7b_facts_l3, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
   - {name: qwen25_7b_facts_l3__both, refuse_from: qwen25_7b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
+  # ---- R3 on 14B: is the wording fragility a 7B problem? (large-v3 transcripts, paraphrased table)
+  - {name: qwen25_14b_para_l3, checks: [facts], set: [checks.facts.weight=1.0, checks.facts.policy_table=config/policy_table_para.yaml, asr.model=models/asr/whisper-large-v3-gsw-ct2, asr.compute_type=float16], description: "14B facts with the paraphrased table on large-v3 ASR"}

@@ -6,7 +6,7 @@ Last update: 2026-10-10 04:35 (GPU-host overnight session). Champion frozen 04:0
 
 ## D0 How we measure (method) — accepted
 - Dev = 24 dialogues (48 calls), 4 folds, Stufe2 twin pairs share a fold; holdout = 6 dialogues, locked, looked at
-  twice (champion + v1 reference), both logged in `runs/holdout_log.jsonl`.
+  three times (7B champion, v1 reference, 14B candidate B), all logged in `runs/holdout_log.jsonl`; now spent.
 - Primary: threshold-free **flag AUC** + the CV operating point at **FAR <= 20%**; flag F1 is misleading here
   (flag-all = 0.70 on dev; on the holdout v1 "flag everything" and the champion both have flag F1 0.67).
 - Paired bootstrap over twin groups (18 units), McNemar, flip tables; independent audit of the code (all metric math
@@ -44,7 +44,9 @@ Last update: 2026-10-10 04:35 (GPU-host overnight session). Champion frozen 04:0
 - **Qwen2.5-7B-Instruct-AWQ** on vLLM (fits next to everything, fast). Evidence (RQ6): Qwen3-8B lower (0.74, CIs overlap),
   Qwen2.5-14B facts 0.87 vs 0.84 (no detectable difference; 14B only fits for facts at 2 parallel requests, OOM for the
   full set); check design >> model size.
-- Event GPUs >= 24 GB: 14B or larger is a safe upgrade (more robust on dialect text: ORACLE 0.90 vs 0.76, CIs overlap).
+- Candidate B (14B, `config/recommended-14b.yaml`): robust to fact wording on dev (0.85-0.88 over three wordings) but
+  dev 0.82 and holdout FAR 33% / alarm F1 0.00 vs 7B 0% / 0.67 -> not adopted.
+- Event GPUs >= 24 GB: 14B or larger remains an option (more robust on dialect text: ORACLE 0.90 vs 0.76, CIs overlap).
 
 ## D4 Fusion and uncertainty — accepted
 - Weighted fusion over facts (+ light keywords/patterns, abstain_on_empty). Uncertainty escalation kept at default

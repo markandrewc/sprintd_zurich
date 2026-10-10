@@ -302,8 +302,9 @@ uv run callguard fusion-cv --kind calibrated -e <exp> --variant <v>   # nested C
 * `--split` defaults to `dev` (the dev dialogues of the locked `config/splits.yaml`) for `eval`,
   `experiment` and `asr-eval`. `holdout` and `all` include the holdout dialogues, and every such run is
   appended to `runs/holdout_log.jsonl`. Under `all` the threshold suggestion and the CV thresholds are still
-  fitted on dev dialogues only. Do not tune on its numbers. Overnight the holdout was looked at twice, both
-  logged: the frozen champion and the v1 baseline as a reference.
+  fitted on dev dialogues only. Do not tune on its numbers. Overnight the holdout was looked at three times, all
+  logged: the frozen 7B champion, the v1 baseline as a reference, and the 14B candidate B (not adopted). The
+  holdout is spent; the protocol (research/AGENT.md) says more than two looks make it worthless as a final test.
 * Primary metric for comparing systems (research/DECISIONS.md D0): threshold-free **flag AUC** plus the
   cross-validated operating point at false-alarm rate <= 20%. Flag F1 is secondary only, because flagging
   every dev call already scores flag F1 0.70.

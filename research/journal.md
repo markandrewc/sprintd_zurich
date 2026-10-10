@@ -443,3 +443,23 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   expected. Chain runs without manual steps per call (case requirement). Log: runs/logs/e2e_new.log.
 - Note: `callguard transcribe` with vLLM down also diarizes and falls back to first-speaker roles (not cached since the
   audit fix) -> roles recomputed in stage 2 with the LLM.
+
+## 2026-10-10T04:55 R3 on 14B: wording fragility is a 7B problem
+- qwen25_14b_para_l3 (paraphrased table, large-v3 ASR, 14B): flag AUC 0.88 [0.76, 0.98], CV FAR 9%, miss 27%, 3-class 77%
+  vs tuned table 0.85 [0.73, 0.96] and blind table 0.85 on the same transcripts. 7B with the paraphrased table: 0.72.
+- => with the 14B the facts decision is robust to the question wording (three independent wordings 0.85-0.88); with the
+  7B it is not (0.72-0.89). For unseen calls this robustness matters more than the 7B's dev score.
+- DECISION: candidate B = config/recommended-14b.yaml (same ASR/checks/table, LLM Qwen2.5-14B-AWQ). Chosen on DEV
+  evidence only (paraphrase robustness), not on holdout results. Run dev (experiments/champion14.yaml), then ONE holdout
+  run (experiments/champion14_holdout.yaml) -> third logged holdout look in total (2nd candidate).
+
+## 2026-10-10T05:05 candidate B (14B) dev + its single HOLDOUT run (3rd logged holdout look; all looks listed)
+- dev (experiments/champion14.yaml): flag AUC 0.82 [0.68, 0.95], CV FAR 18%, miss 23%, 3-class 71% (fixed thr)
+  vs champion (7B) 0.87 / 14% / 15% / 79%.
+- HOLDOUT (12 calls): flag F1 0.40, flag recall 33%, FAR 33%, miss 67%, alarm F1 0.00, 3-class acc 33%
+  (D07 alarm -> review K1 / no_alert K2; C15 harmless -> review both; C16 -> review K3 / no_alert K4; C19 -> no_alert).
+  vs champion (7B) on the same calls: FAR 0%, recall 50%, alarm F1 0.67, 3-class 67%.
+- Holdout looks so far: (1) champion 7B 04:08, (2) v1 reference 04:11, (3) candidate B 05:04. Holdout is now spent;
+  n = 6 dialogues, so the 7B-vs-14B holdout difference is not significant either way.
+- DECISION: submission stays the frozen champion (config/recommended.yaml, 7B). The 14B's wording robustness on dev
+  (paraphrase test) did not show on the holdout. recommended-14b.yaml kept as a documented option for bigger GPUs.

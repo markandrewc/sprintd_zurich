@@ -1,0 +1,15 @@
+# Candidate B (robustness): the recommended profile with Qwen2.5-14B-Instruct-AWQ as the LLM.
+# Why: on large-v3 transcripts the 14B's facts decisions barely depend on the question wording (dev flag AUC: tuned
+# table 0.85, blind table 0.85, paraphrased table 0.88), while the 7B drops from 0.87-0.89 (tuned) to 0.72 (paraphrased).
+# On 12 GB the 14B only fits for the fact probes (no other LLM checks) and alone on the GPU:
+#   scripts/run_staged.sh recommended-14b Qwen/Qwen2.5-14B-Instruct-AWQ   (vLLM: util 0.90, 6k ctx, 2 parallel)
+extends: recommended.yaml
+description: Recommended checks with Qwen2.5-14B-AWQ (robust to fact wording; staged on 12 GB)
+llms:
+  default:
+    timeout: 600
+    max_concurrency: 4
+checks:
+  - {name: keywords, type: keywords, weight: 0.15, fuzzy: 90}
+  - {name: patterns, type: patterns, weight: 0.1}
+  - {name: facts, type: facts, llm: default, parallel: 2, weight: 1.0}

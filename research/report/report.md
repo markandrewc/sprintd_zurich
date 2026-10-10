@@ -1,6 +1,6 @@
 # callguard research report
 
-Generated 2026-10-10 04:36 by `callguard report` from 9 experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev dialogues, differences inside the CIs are noise.
+Generated 2026-10-10 05:02 by `callguard report` from 11 experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev dialogues, differences inside the CIs are noise.
 
 AUC is not decision-consistent: it ranks the fused call score, but review rules (uncertainty escalation, "undetermined" verdicts, review band) flag calls whatever the threshold, so for many variants no threshold reaches FAR <= 20% (see each variant's FAR floor). The top variants are ranked by cap compliance and CV@FAR20 recall, not by AUC.
 
@@ -78,6 +78,49 @@ Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant
 - `ens3_band` vs `champion`: flag AUC -0.13 [-0.29, -0.01] (real); flag F1 -0.14 [-0.34, +0.00] (no detectable difference); FAR -5pp; McNemar p=0.125; 12 calls flip
 - `ens2b` vs `champion`: flag AUC -0.09 [-0.22, +0.00]; flag F1 -0.09 [-0.22, +0.00] (no detectable difference); FAR +5pp; McNemar p=0.125; 5 calls flip
 - `ens_blind` vs `champion`: flag AUC -0.11 [-0.28, +0.00]; flag F1 -0.11 [-0.28, +0.00] (no detectable difference); FAR +5pp; McNemar p=0.0625; 12 calls flip
+- `turbo_clean` vs `champion`: flag AUC -0.02 [-0.05, +0.02]; flag F1 -0.05 [-0.12, +0.00] (no detectable difference); FAR +0pp; McNemar p=0.625; 13 calls flip
+
+## champion14
+
+Recommended profile with Qwen2.5-14B-AWQ (robustness candidate)
+
+RQ: RQ6, RQ5 · split dev · baseline `champion14` · details: `runs/experiments/champion14/summary.md`
+
+Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant score AUC 0.50.
+
+![chart_auc](champion14/auc.png)
+
+![chart_metrics](champion14/metrics.png)
+
+![chart_cost](champion14/cost_vs_f1.png)
+
+![chart_noise](champion14/clean_vs_noisy.png)
+
+![chart_levels](champion14/levels.png)
+
+![chart_thresholds](champion14/thresholds.png)
+
+
+## champion14_holdout
+
+HOLDOUT run of config/recommended-14b.yaml (logged; run once)
+
+RQ: RQ6 · split holdout · baseline `champion14` · details: `runs/experiments/champion14_holdout/summary.md`
+
+Floor on these calls: flag-all flag F1 0.67 (FAR 100%), flag-none 0.00, constant score AUC 0.50.
+
+![chart_auc](champion14_holdout/auc.png)
+
+![chart_metrics](champion14_holdout/metrics.png)
+
+![chart_cost](champion14_holdout/cost_vs_f1.png)
+
+![chart_noise](champion14_holdout/clean_vs_noisy.png)
+
+![chart_levels](champion14_holdout/levels.png)
+
+![chart_thresholds](champion14_holdout/thresholds.png)
+
 
 ## checks_ablation
 
@@ -216,6 +259,7 @@ Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant
 - `qwen25_7b__both` vs `qwen25_7b`: flag AUC +0.14 [+0.04, +0.27] (real); flag F1 +0.13 [-0.02, +0.29] (no detectable difference); FAR -64pp; McNemar p=0.0118; 32 calls flip
 - `qwen25_7b_facts_l3__blind_only` vs `qwen25_7b`: flag AUC +0.11 [-0.03, +0.22]; flag F1 +0.01 [-0.25, +0.26] (no detectable difference); FAR -68pp; McNemar p=0.1686; 33 calls flip
 - `qwen25_7b_facts_l3__both` vs `qwen25_7b`: flag AUC +0.18 [+0.05, +0.30] (real); flag F1 +0.13 [-0.06, +0.33] (no detectable difference); FAR -64pp; McNemar p=0.0118; 35 calls flip
+- `qwen25_14b_para_l3` vs `qwen25_7b`: flag AUC +0.20 [+0.09, +0.29] (real); flag F1 +0.15 [-0.06, +0.36] (no detectable difference); FAR -77pp; McNemar p=0.0066; 32 calls flip
 
 ## smoke
 
