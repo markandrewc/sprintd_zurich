@@ -426,3 +426,59 @@ def write_holdout_log(env: FixtureEnv, f1: float = 0.6) -> Path:
                          "miss_rate": 0.25}}
     p.write_text(json.dumps(entry) + "\n")
     return p
+
+
+# --------------------------------------------------------------------------------------------
+# contribution analysis (callguard.contrib / Entscheidungshilfe page)
+# --------------------------------------------------------------------------------------------
+
+CONTRIB_FAMILIES = ["trade", "access", "disclosure", "documentation", "splitting", "numbers"]
+
+
+def contrib_rows(quality: float, seed: int = 0, n_dialogues: int = 12, prefix: str = "Stufe2_X") -> list[dict]:
+    """Synthetic per-call rows like rows.json: ``n_dialogues`` dialogues x 2 calls (K1/K2), twin groups of two
+    dialogues, labels cycling alarm / no_alert / review / no_alert. Each call is right with prob ``quality``;
+    right flaggable calls score high, harmless ones low (so AUC rises with quality)."""
+    rng = np.random.default_rng(seed)
+    labels = ["alarm", "no_alert", "review", "no_alert"]
+    rows = []
+    for d in range(n_dialogues):
+        did = f"{prefix}{d:02d}"
+        exp = labels[d % len(labels)]
+        fam = CONTRIB_FAMILIES[d % len(CONTRIB_FAMILIES)]
+        for k in (1, 2):
+            right = rng.random() < quality
+            flag = exp != "no_alert"
+            pred = exp if right else ("no_alert" if flag else "alarm")
+            high = flag if right else not flag
+            score = round(float(0.6 + 0.35 * rng.random()) if high else float(0.4 * rng.random()), 4)
+            rows.append({"call_id": f"{did}-K{k}", "dialogue_id": did, "group": f"g{d // 2}", "level": 2,
+                         "noisy": k == 2, "expected": exp, "expected_family": fam, "predicted": pred, "score": score,
+                         "llm_calls": 2, "check_seconds": {"facts": 1.5}})
+    return rows
+
+
+def write_contrib_variant(root: Path, ref: str, rows: list[dict], **meta) -> Path:
+    """``<root>/<experiment>/<variant>/rows.json + meta.json`` as ``callguard experiment`` writes them."""
+    import json
+
+    d = Path(root) / ref
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "rows.json").write_text(json.dumps({"fixed": rows, "cv": rows}))
+    (d / "meta.json").write_text(json.dumps({"variant": ref.split("/")[1], "profile": "recommended",
+                                             "check_weights": {"facts": 1.0}, "git": {"sha": "abc1234"}, **meta}))
+    return d
+
+
+def write_contrib_fixture(env: FixtureEnv) -> Path:
+    """A few of the variants experiments/contrib/contrib.yaml names, with synthetic rows (no Kev runs: those stay pending)."""
+    root = env.runs_dir.parent / "experiments"
+    write_contrib_variant(root, "llm_models/qwen25_7b", contrib_rows(0.45, seed=1), description="v1")
+    write_contrib_variant(root, "llm_models/qwen25_7b__facts_only", contrib_rows(0.9, seed=2))
+    write_contrib_variant(root, "champion/champion", contrib_rows(0.9, seed=2), description="champion")
+    write_contrib_variant(root, "champion/facts_only", contrib_rows(0.9, seed=2))
+    write_contrib_variant(root, "champion/para", contrib_rows(0.7, seed=3))
+    write_contrib_variant(root, "perturbed/perturbed", contrib_rows(0.8, seed=4))
+    write_contrib_variant(root, "checks_ablation/keywords", contrib_rows(0.5, seed=5))
+    write_contrib_variant(root, "synth_stress/facts7b_v1", contrib_rows(0.75, seed=6, prefix="Synth_x_"))
+    return root
