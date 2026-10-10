@@ -118,23 +118,27 @@ def passage_marks(transcript: Transcript, passages: Sequence[Passage], colors: M
 
 
 def start_segment(transcript: Transcript, t: float | None) -> str | None:
-    """Id of the segment playing at ``t`` (the last one starting at or before it); None without ``t``."""
+    """Id of the segment that contains ``t`` (the last one starting at or before it); in a pause between two
+    segments the next one (about to be spoken); None without ``t``. The player's script uses the same rule."""
     if t is None or not transcript.segments:
         return None
-    current = transcript.segments[0].id
-    for s in transcript.segments:
-        if s.start <= t + 1e-6:
-            current = s.id
+    segs = transcript.segments
+    i = 0
+    for k, s in enumerate(segs):
+        if s.start <= t + 1e-3:
+            i = k
         else:
             break
-    return current
+    if t > segs[i].end + 1e-3 and i + 1 < len(segs):
+        i += 1
+    return segs[i].id
 
 
 def player_html(transcript: Transcript, passages: Sequence[Passage], *, audio_src: str | None,
                 colors: Mapping[str, str] | None = None, labels: Mapping[str, str] | None = None,
                 start_at: float | None = None, link_pad: float = 10.0, misheard_below: float | None = None,
                 terms: Mapping[str, list[str]] | None = None, height: int = 660, accent: str = DEFAULT_ACCENT,
-                audio_note: str = "") -> str:
+                audio_note: str = "", autoplay: bool = False, nonce: int = 0) -> str:
     """The whole component document. ``audio_src``: a data URI or URL, None = no recording here
     (``audio_note`` says why). ``start_at``: deep-link time in seconds. ``height``: iframe height in px."""
     colors, labels, terms = colors or {}, labels or {}, terms or {}
@@ -198,7 +202,8 @@ def player_html(transcript: Transcript, passages: Sequence[Passage], *, audio_sr
                   f'{": " + html.escape(audio_note) if audio_note else ""}. Das Transkript bleibt lesbar.</div>')
     hint = (f"Passagen: {len(marks)} · Klick auf einen Abschnitt spielt ihn ab" if marks
             else "Keine verdächtige Passage · Klick auf einen Abschnitt spielt ihn ab")
-    config = json.dumps({"startAt": start_at, "duration": duration, "hasAudio": bool(audio_src)})
+    config = json.dumps({"startAt": start_at, "duration": duration, "hasAudio": bool(audio_src),
+                         "autoplay": bool(autoplay), "nonce": int(nonce)})
     slots = {"HEIGHT": str(int(height)), "ACCENT": accent, "ACCENT_SOFT": _rgba(accent, 0.16), "PLAYER": player,
              "JUMPS": jumps, "STRIP": strip, "HINT": html.escape(hint), "ROWS": "\n".join(rows),
              "CONFIG": html.escape(config, quote=True)}
@@ -286,13 +291,16 @@ __ROWS__
   var track = document.getElementById("cg-track");
   var segs = Array.prototype.slice.call(document.querySelectorAll(".cg-seg"));
   var starts = segs.map(function (s) { return parseFloat(s.getAttribute("data-start")); });
+  var ends = segs.map(function (s) { return parseFloat(s.getAttribute("data-end")); });
   var current = -1, userScrollAt = 0, stopAt = null, ours = false;
   var duration = cfg.duration || 0;
 
   function indexAt(t) {
     var lo = 0, hi = starts.length - 1, best = -1;
     while (lo <= hi) { var mid = (lo + hi) >> 1; if (starts[mid] <= t + 1e-3) { best = mid; lo = mid + 1; } else { hi = mid - 1; } }
-    return best < 0 && starts.length ? 0 : best;
+    if (best < 0) return starts.length ? 0 : -1;
+    if (t > ends[best] + 1e-3 && best + 1 < starts.length) return best + 1;  // pause: the next one is coming
+    return best;
   }
   function inView(el) {
     var top = el.offsetTop - box.scrollTop, h = box.clientHeight;
@@ -360,7 +368,10 @@ __ROWS__
       ours = false;
     });
     if (cfg.startAt !== null && cfg.startAt !== undefined) {
-      var place = function () { ours = true; audio.currentTime = Math.max(0, cfg.startAt); moveHead(cfg.startAt); };
+      var place = function () {
+        ours = true; audio.currentTime = Math.max(0, cfg.startAt); moveHead(cfg.startAt);
+        if (cfg.autoplay) { var pp = audio.play(); if (pp && pp.catch) pp.catch(function () {}); }
+      };
       if (audio.readyState >= 1) { place(); } else { audio.addEventListener("loadedmetadata", place, { once: true }); }
     }
   }
