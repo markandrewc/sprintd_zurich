@@ -1,159 +1,99 @@
 {
-  "_comment": "Konfiguration der Kev-Checks, in zwei Listen: 'gesetzlich' (Gesetz/Verordnung) und 'intern' (Policy der Bank). Jede noul-Frage ist ein Check; ihr p(yes) ist das Risiko. Erreicht das höchste Risiko eines Anrufs die Schwelle, gibt es einen Alert (manuelle Prüfung). Kev liest immer das ganze Transkript. category/basis sind nur Anzeige, Kev ignoriert sie. Änderbar ohne Code.",
+  "_comment": "Konfiguration der Kev-Checks, in zwei Listen: 'gesetzlich' (Gesetz/Verordnung) und 'intern' (Policy der Bank). Jede noul-Frage ist ein Check; ihr p(yes) ist das Risiko. Erreicht das höchste Risiko eines Anrufs die Schwelle, gibt es einen Alert (manuelle Prüfung). Kev liest immer das ganze Transkript. Die Fragen beschreiben die allgemeine Regel, ohne Beispiele und ohne Ausnahmen aus Testdaten. category/basis sind nur Anzeige, Kev ignoriert sie. Änderbar ohne Code.",
   "threshold": 0.7,
   "questions": {
     "gesetzlich": {
-      "insider_own_trade": {
+      "insider_trading": {
         "category": "Insiderhandel",
         "basis": "FinfraG Art. 142 / 154",
         "type": "noul",
-        "instructions": "Does the customer want to buy or sell securities because of information they personally received that is not yet public?",
-        "criteria": {
-          "true": "Own trade wish based on non-public, price-relevant information, such as unpublished figures or an upcoming announcement",
-          "false": "The information is already public, only explained or quoted, or there is no trade wish"
-        }
+        "instructions": "Does someone want to buy or sell financial instruments because of non-public, price-relevant information?"
       },
-      "insider_tip": {
+      "insider_disclosure": {
         "category": "Insiderhandel",
         "basis": "FinfraG Art. 142 / 154",
         "type": "noul",
-        "instructions": "Does the bank advisor pass on non-public, price-relevant information about a company, or recommend a trade based on it?",
-        "criteria": {
-          "true": "The advisor shares inside information or tips the customer",
-          "false": "The advisor only discusses public information"
-        }
+        "instructions": "Does someone pass on non-public, price-relevant information, or recommend a trade based on it?"
       },
       "market_manipulation": {
         "category": "Marktmanipulation",
         "basis": "FinfraG Art. 143 / 155",
         "type": "noul",
-        "instructions": "Does the customer ask for orders that are meant to move or set a market price, for example to push the closing price?",
-        "criteria": {
-          "true": "Orders are requested in order to influence a price",
-          "false": "Normal orders for investment reasons"
-        }
+        "instructions": "Does someone try to influence a market price through orders or information?"
       },
       "aml_source_of_funds": {
         "category": "Geldwäscherei",
         "basis": "StGB Art. 305bis, GwG Art. 6",
         "type": "noul",
-        "instructions": "Is the customer evasive or unwilling to explain where their money comes from?",
-        "criteria": {
-          "true": "The customer avoids or refuses to explain the origin of funds",
-          "false": "The origin of the funds is explained or documented, or it is not discussed"
-        }
+        "instructions": "Does someone conceal or refuse to explain where assets come from?"
       },
       "aml_structuring": {
         "category": "Geldwäscherei",
         "basis": "StGB Art. 305bis, GwG Art. 6 / 9",
         "type": "noul",
-        "instructions": "Does the customer want to split cash deposits or transfers into smaller amounts to stay below a reporting or checking limit?",
-        "criteria": {
-          "true": "Amounts are split to stay below a limit",
-          "false": "Several amounts with genuine separate reasons"
-        }
+        "instructions": "Does someone arrange transactions so that a legal threshold or reporting obligation is avoided?"
       },
       "aml_hidden_beneficiary": {
         "category": "Geldwäscherei",
         "basis": "GwG Art. 4",
         "type": "noul",
-        "instructions": "Does the customer act for another person who is the real owner of the money, while hiding this from the bank?",
-        "criteria": {
-          "true": "The real owner of the money is concealed from the bank",
-          "false": "The customer acts for themselves, or an authorized representative is openly declared"
-        }
+        "instructions": "Does someone conceal who the actual owner or beneficiary of assets is?"
       },
-      "secrecy_disclosure": {
-        "category": "Bankgeheimnis",
-        "basis": "BankG Art. 47, DSG",
+      "confidential_disclosure": {
+        "category": "Vertrauliche Informationen",
+        "basis": "BankG Art. 47, DSG, StGB Art. 162",
         "type": "noul",
-        "instructions": "Does the bank advisor give account or personal information about a customer to a caller whose authorization is missing or not verified?",
-        "criteria": {
-          "true": "Protected information is actually given to an unauthorized or unverified person",
-          "false": "The authorization was checked and confirmed, or the advisor refuses to give information"
-        }
+        "instructions": "Does someone reveal confidential information to a person who is not entitled to receive it?"
       },
-      "secrecy_request": {
-        "category": "Bankgeheimnis",
-        "basis": "BankG Art. 47, DSG",
+      "confidential_request": {
+        "category": "Vertrauliche Informationen",
+        "basis": "BankG Art. 47, DSG, StGB Art. 162",
         "type": "noul",
-        "instructions": "Does a caller ask for account information about another person without a verified power of attorney?",
-        "criteria": {
-          "true": "A third party asks for someone else's account information and the authorization is missing or unclear",
-          "false": "The caller asks about their own account, or their authorization has been verified"
-        }
+        "instructions": "Does someone try to obtain confidential information they are not entitled to?"
       },
-      "doc_false_entry": {
+      "false_records": {
         "category": "Falsche Dokumentation",
         "basis": "StGB Art. 251",
         "type": "noul",
-        "instructions": "Does someone ask the bank to record information that they know is false, for example a wrong purpose, amount or date?",
-        "criteria": {
-          "true": "Knowingly false information is to be recorded",
-          "false": "A mistake is corrected, or an open point is left open"
-        }
+        "instructions": "Does someone want false information to be recorded?"
       },
       "bribery": {
         "category": "Bestechung",
         "basis": "StGB Art. 322octies / 322novies",
         "type": "noul",
-        "instructions": "Does someone offer or ask for a personal advantage, such as money, gifts or favours, in return for the bank advisor doing something?",
-        "criteria": {
-          "true": "A personal advantage is offered or requested in exchange for a service",
-          "false": "No personal advantage is involved"
-        }
+        "instructions": "Does someone offer or request an undue advantage in exchange for an action?"
       }
     },
     "intern": {
-      "doc_concealment": {
+      "withheld_information": {
         "category": "Falsche Dokumentation",
         "basis": "interne Policy",
         "type": "noul",
-        "instructions": "Does someone ask that a relevant fact, for example an existing debt or obligation, be hidden from the bank department that has to assess it?",
-        "criteria": {
-          "true": "A relevant fact is to be kept away from the responsible department",
-          "false": "Only a wrong or irrelevant detail is removed or corrected"
-        }
+        "instructions": "Does someone want relevant information withheld from the people who need it for a decision?"
       },
-      "control_splitting": {
+      "control_circumvention": {
         "category": "Kontrollumgehung",
         "basis": "interne Policy",
         "type": "noul",
-        "instructions": "Does someone ask to split one invoice or payment into parts so that an internal approval or check is avoided?",
-        "criteria": {
-          "true": "One amount is split to avoid an approval or check",
-          "false": "Several genuine, independent invoices are handled separately"
-        }
+        "instructions": "Does someone try to get around an internal approval, limit or control?"
       },
-      "access_secret_disclosed": {
+      "credential_disclosure": {
         "category": "Zugangsdaten",
         "basis": "interne Policy",
         "type": "noul",
-        "instructions": "Does the customer read out a currently valid password, PIN or one-time code during the call?",
-        "criteria": {
-          "true": "A secret that is still valid is actually spoken",
-          "false": "An expired example, a help picture, a refusal, a warning, only the last digits of a card, or a reference number"
-        }
+        "instructions": "Does someone reveal a valid access credential?"
       },
-      "access_secret_requested": {
+      "credential_request": {
         "category": "Zugangsdaten",
         "basis": "interne Policy",
         "type": "noul",
-        "instructions": "Does the bank advisor ask the customer to tell a password, PIN or one-time code?",
-        "criteria": {
-          "true": "The advisor asks for a secret",
-          "false": "The advisor warns not to share it, or does not ask for it"
-        }
+        "instructions": "Does someone ask for another person's access credentials?"
       },
-      "victim_fraud": {
+      "manipulated_customer": {
         "category": "Kunde als Betrugsopfer",
-        "basis": "StGB Art. 146",
+        "basis": "interne Policy, StGB Art. 146",
         "type": "noul",
-        "instructions": "Does the customer seem to act on instructions from a third party who pressures them, for example a fake police officer, a 'safe account' or a too-good investment promise?",
-        "criteria": {
-          "true": "Signs that the customer is being manipulated by a fraudster",
-          "false": "The customer acts on their own, for their own reasons"
-        }
+        "instructions": "Does someone appear to act under pressure or deception from a third party?"
       }
     }
   }
