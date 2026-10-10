@@ -113,7 +113,7 @@ def _ai_phrase(app: Any, names: dict[str, str]) -> None:
     if st.button("Als Ja/Nein-Frage formulieren", icon=":material/auto_awesome:", type="primary", width="stretch",
                  disabled=not str(ss.get("dm_fw_ai_req") or "").strip(), key="dm_fw_ai_go"):
         try:
-            llm = app.ctx.llm("default")
+            llm = app.ctx.llm(str(app.cfg.app.get("assistant_llm", "default")))  # live LLM for the KI-Assistent
             with st.status("Die KI formuliert die Frage …", expanded=True) as status:
                 q = rd.phrase_question(llm, ss["dm_fw_ai_req"], names.get(state.get("family") or "", ""))
                 st.write(f"«{q}»")

@@ -180,7 +180,7 @@ def _ai_panel(app: Any, work: dict[str, Any], names: dict[str, str]) -> None:
     if st.button("Assistent ausfüllen lassen", icon=":material/auto_awesome:", type="primary", width="stretch",
                  disabled=not str(ss.get("dm_rw_ai_req") or "").strip(), key="dm_rw_ai_go"):
         try:
-            llm = app.ctx.llm("default")
+            llm = app.ctx.llm(str(app.cfg.app.get("assistant_llm", "default")))  # live LLM for the KI-Assistent
             with st.spinner("Die KI liest Ihre Beschreibung …"):
                 draft = rd.draft_rule(llm, work, ss["dm_rw_ai_req"], names)
         except rd.NeedsNewFamily:

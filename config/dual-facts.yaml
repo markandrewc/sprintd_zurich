@@ -13,6 +13,17 @@ llms:
     identity: {type: openai_compat, model: Qwen/Qwen2.5-7B-Instruct-AWQ, json_mode: json_schema, seed: null, extra_body: {}}
     note: Qwen fact answers and roles come from the cache (computed with vLLM by `callguard batch -c recommended`)
 
+  assistant:   # the KI-Assistent in Einstellungen (drafts rules / phrases facts): a LIVE Qwen, not the cache stand-in
+    type: openai_compat
+    base_url: ${CALLGUARD_LLM_URL:-http://127.0.0.1:8000/v1}
+    model: callguard-llm
+    timeout: 120
+    json_mode: json_schema
+
+app:
+  base_url: http://localhost:8502
+  assistant_llm: assistant
+
 paths:
   runs_dir: runs/dual-facts
 
