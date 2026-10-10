@@ -356,6 +356,10 @@ def test_ops_pages_and_detail_panels_render(tmp_path, monkeypatch):
     at = run("detail", query={"call": ALARM_ID})
     expanders = " | ".join(e.label for e in at.expander)
     assert "Rückmeldung" in expanders and "Herkunft" in expanders and "Personen" in expanders, expanders
-    btn = next(b for b in at.button if b.label == fb.VERDICT_DE["false_alarm"])
-    btn.click().run()
-    assert [i.verdict for i in fb.load(env.runs_dir)][-1] == "false_alarm"
+    # schema-2 form (callguard.ui.panels.feedback): verdict on the call + first passage, one submit
+    next(x for x in at.radio if x.key == f"cg_fb2_v_{ALARM_ID}").set_value("no_violation")
+    next(x for x in at.radio if x.key == f"cg_fb2_p_{ALARM_ID}_0").set_value("not_applies")
+    next(b for b in at.button if b.label == "Rückmeldung speichern").click().run()
+    assert not at.exception, [e.message for e in at.exception]
+    assert [i.verdict for i in fb.load(env.runs_dir)][-2:] == ["no_violation", "not_applies"]
+    assert fb.labels_from_feedback(fb.load(env.runs_dir))[ALARM_ID] == "no_alert"

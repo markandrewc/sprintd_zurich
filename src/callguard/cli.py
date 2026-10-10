@@ -612,6 +612,10 @@ for _mod in (_asr_eval, _splits, _experiment, _leaderboard, _report, _fit_fusion
              _candidates):
     _mod.register(app)
 
+from callguard.commands import learn as _learn  # noqa: E402  (learning from officer feedback)
+
+_learn.register(app)
+
 
 if __name__ == "__main__":
     app()

@@ -71,7 +71,7 @@ PANELS: list[Panel] = [
           order=40, expanded=True, when=lambda r, s: _has_open_facts(r)),
     Panel("routing", "Weitergeleitet an", "callguard.ui.panels.ops:routed_to", icon=":material/alt_route:", order=50,
           when=lambda r, s: r.decision.label != "no_alert"),
-    Panel("feedback", "Rückmeldung", "callguard.ui.panels.ops:feedback", icon=":material/rate_review:", order=55,
+    Panel("feedback", "Rückmeldung", "callguard.ui.panels.feedback:render", icon=":material/rate_review:", order=55,
           expanded=True),
     Panel("entities", "Personen & Firmen", "callguard.ui.panels.ops:entities", icon=":material/badge:", order=60),
     Panel("provenance", "Herkunft & Audit", "callguard.ui.panels.ops:provenance", icon=":material/fingerprint:",
