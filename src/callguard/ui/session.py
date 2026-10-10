@@ -16,6 +16,7 @@ import streamlit as st
 from callguard.config import AppConfig, load_config
 from callguard.types import CallResult, Family
 from callguard.ui import backend as be
+from callguard.ui import modes as md
 from callguard.ui import sources as srcs
 from callguard.ui.backend import Decided, Engine, Loaded, UIArgs
 from callguard.ui.sources import Source
@@ -31,6 +32,7 @@ class Settings:
     max_uncertainty: float
     weights: dict[str, float] = field(default_factory=dict)
     families_on: list[str] = field(default_factory=list)
+    mode: str | None = None  # Prüfmodus id (config/pruefmodi.yaml); None = feature off
 
     @property
     def review_floor(self) -> float:
@@ -57,6 +59,8 @@ class AppState:
     pages: dict[str, Any] = field(default_factory=dict)
     source: Source | None = None  # where the results come from (profile run or experiment variant)
     sources: list[Source] = field(default_factory=list)
+    modes: md.ModeState | None = None  # Prüfmodus: spec, choice, measured consequences, availability
+    base_engine: Engine | None = None  # the profile's engine; ``engine`` decides under the chosen mode
 
     @property
     def ctx(self):
@@ -120,6 +124,8 @@ class AppState:
         if any(abs(a - b) > 1e-9 for a, b in knobs):
             return True
         if any(abs(s.weights.get(k, v) - v) > 1e-9 for k, v in self.default_weights.items()):
+            return True
+        if self.modes is not None and not self.modes.is_default:
             return True
         return len(self.families) != len(self.all_families)
 
@@ -215,15 +221,96 @@ def _pick_source(sources: list[Source]) -> Source:
     return by_key[ss[SOURCE_KEY]]
 
 
-def _sidebar(cfg: AppConfig, engine: Engine, defaults: dict[str, float], weights: dict[str, float],
-             families: list[Family], n_calls: int, source: Source) -> Settings:
+MODE_KEY = "cg_mode"
+
+
+def _on_mode_change(runs_root: str, pref_key: str, audit_dir: str, spec: md.ModeSpec,
+                    metrics: dict[str, md.ModeMetrics]) -> None:
+    """Persist the officer's mode choice for this profile and audit-log it (who, from, to, measured consequences)."""
+    from callguard import audit
+
     ss = st.session_state
+    new, old = ss.get(MODE_KEY), ss.get("_cg_mode_prev")
+    if new is None or new == old:
+        return
+    md.save_choice(runs_root, pref_key, new)
+    m = spec.get(new)
+    audit.log_event(audit_dir, "mode_change", profile=pref_key, before=old, after=new, label=m.label, rule=m.rule,
+                    consequences=md.consequence(metrics.get(new)), uncertainty=md.uncertainty_note(metrics.get(new)))
+    ss["_cg_mode_prev"] = new
+    st.toast(f"Prüfmodus «{m.label}» gespeichert (gilt für {pref_key}, im Audit-Log vermerkt).", icon=":material/save:")
+
+
+def _mode_picker(state: md.ModeState, source: Source, runs_root: Path, audit_dir: Path) -> str:
+    """Sidebar «Prüfmodus»: the persisted choice of this profile/source, unavailable modes shown disabled with
+    the reason, each option with its measured consequence on the test data."""
+    ss = st.session_state
+    spec, metrics, avail = state.spec, state.metrics, state.avail
+    by = {m.id: m for m in spec.modes}
+    if ss.get("_cg_mode_for") != source.key:  # new session or new source: start from the saved choice
+        saved = md.load_choice(runs_root, source.key)
+        ss[MODE_KEY] = saved if saved in by else spec.default
+        ss["_cg_mode_for"] = source.key
+    ok = [m.id for m in spec.modes if avail.get(m.id, md.Availability(True)).ok]
+    if ss.get(MODE_KEY) not in ok:
+        wanted = by.get(ss.get(MODE_KEY))
+        ss[MODE_KEY] = spec.default
+        if wanted is not None and wanted.id != spec.default:
+            st.caption(f":material/info: Gespeicherter Modus «{wanted.label}» ist hier nicht verfügbar; es gilt "
+                       f"«{spec.default_mode.label}».")
+    ss["_cg_mode_prev"] = ss[MODE_KEY]
+    st.radio("Prüfmodus", ok, key=MODE_KEY, format_func=lambda k: by[k].label,
+             captions=[md.consequence_short(metrics.get(k)) for k in ok],
+             on_change=_on_mode_change, args=(str(runs_root), source.key, str(audit_dir), spec, metrics),
+             help="Wie streng callguard entscheidet. Wirkt sofort auf alle Anrufe (nur Neu-Bewertung der "
+                  "gespeicherten Prüfergebnisse). Die Wahl wird pro Profil gespeichert und im Audit-Log vermerkt.")
+    cur = ss[MODE_KEY]
+    st.caption(by[cur].text + (f" {md.uncertainty_note(metrics[cur])}." if cur in metrics else ""))
+    for m in spec.modes:
+        a = avail.get(m.id)
+        if a is not None and not a.ok:
+            st.caption(f":material/block: **{m.label}**: nicht verfügbar. {a.reason}")
+        elif a is not None and a.reason and m.id == cur:
+            st.caption(f":material/info: {a.reason}")
+    if metrics:
+        with st.expander("Was bedeuten die Modi?", icon=":material/help:"):
+            for m in spec.modes:
+                mm = metrics.get(m.id)
+                wl = md.workload_note(mm)
+                st.markdown(f"**{m.label}**: {m.text}")
+                st.caption(" ".join(x for x in (md.consequence(mm), wl + "." if wl else "",
+                                                md.uncertainty_note(mm) + ".") if x))
+            src = next(iter(metrics.values())).source
+            st.caption(f"Gemessen auf dem Dev-Split (synthetische Fallanrufe), Kreuzvalidierung. Quelle: {src}.")
+    return cur
+
+
+def _sidebar(cfg: AppConfig, engine: Engine, defaults: dict[str, float], weights: dict[str, float],
+             families: list[Family], n_calls: int, source: Source, modes: md.ModeState | None = None,
+             runs_root: Path | None = None) -> Settings:
+    ss = st.session_state
+    weights = {k: max(0.0, w) for k, w in weights.items()}
+    with st.sidebar:
+        st.caption(f"{source.label} · {n_calls} Anruf{'e' if n_calls != 1 else ''}"
+                   + (" · nur lesen" if source.read_only else ""))
+        if engine.error:
+            st.warning(f"Notbetrieb: {engine.error}. Wo nötig werden die gespeicherten Entscheide gezeigt.",
+                       icon=":material/warning:")
+
+        st.markdown("#### Entscheidung")
+        mode = None
+        if modes is not None:
+            audit_dir = source.path if source.kind == "experiment" else engine.ctx.runs_dir
+            mode = _mode_picker(modes, source, runs_root or cfg.paths.resolve("runs_dir"), audit_dir)
+            modes.current = mode
+            defaults = {**defaults, "threshold": md.mode_threshold(modes.mode, modes.metrics.get(mode),
+                                                                   defaults["threshold"])}
     defaults = {**defaults, "threshold": min(1.0, max(0.0, defaults["threshold"])),
                 "max_uncertainty": min(1.0, max(0.0, defaults["max_uncertainty"]))}
-    weights = {k: max(0.0, w) for k, w in weights.items()}
-    if ss.get("_cg_knobs_for") not in (None, source.key):  # new source: start from its own config
+    knobs_for = source.key if mode is None else f"{source.key}|{mode}"
+    if ss.get("_cg_knobs_for") not in (None, knobs_for):  # new source or mode: start from its own defaults
         _reset(defaults, weights, families)
-    ss["_cg_knobs_for"] = source.key
+    ss["_cg_knobs_for"] = knobs_for
     ss.setdefault("cg_threshold", defaults["threshold"])
     ss.setdefault("cg_band", defaults["review_band"])
     ss.setdefault("cg_maxunc", defaults["max_uncertainty"])
@@ -233,13 +320,6 @@ def _sidebar(cfg: AppConfig, engine: Engine, defaults: dict[str, float], weights
         ss.setdefault(_fkey(f.id), True)
 
     with st.sidebar:
-        st.caption(f"{source.label} · {n_calls} Anruf{'e' if n_calls != 1 else ''}"
-                   + (" · nur lesen" if source.read_only else ""))
-        if engine.error:
-            st.warning(f"Notbetrieb: {engine.error}. Wo nötig werden die gespeicherten Entscheide gezeigt.",
-                       icon=":material/warning:")
-
-        st.markdown("#### Entscheidung")
         thr = st.slider("Alarmschwelle", 0.0, 1.0, step=0.01, key="cg_threshold", persist_state="session",
                         help="Ab diesem Score löst ein Anruf Alarm aus. Tiefer = mehr Alarme. Wirkt sofort auf "
                              "alle Anrufe (nur Neu-Bewertung, keine Spracherkennung, kein LLM).")
@@ -250,8 +330,9 @@ def _sidebar(cfg: AppConfig, engine: Engine, defaults: dict[str, float], weights
                             help="Sind sich die Prüfungen uneinig oder unsicher über diesen Wert hinaus, geht der "
                                  "Anruf zur Prüfung statt automatisch entschieden zu werden.")
         floor = max(0.0, thr - band)
-        st.caption(f"Alarm ab **{thr:.2f}** · Prüfen ab **{floor:.2f}** · Standard des Profils "
-                   f"{defaults['threshold']:.2f}")
+        st.caption(f"Alarm ab **{thr:.2f}** · Prüfen ab **{floor:.2f}** · Standard "
+                   + ("des Modus" if modes is not None and not modes.is_default else "des Profils")
+                   + f" {defaults['threshold']:.2f}")
 
         w_out: dict[str, float] = {}
         with st.expander("Gewichte der Prüfungen", icon=":material/balance:"):
@@ -275,12 +356,33 @@ def _sidebar(cfg: AppConfig, engine: Engine, defaults: dict[str, float], weights
             reload_everything()
             st.rerun()
     return Settings(threshold=float(thr), review_band=float(band), max_uncertainty=float(max_unc),
-                    weights=w_out, families_on=on)
+                    weights=w_out, families_on=on, mode=mode)
 
 
 # --------------------------------------------------------------------------------------------
 # Bootstrap
 # --------------------------------------------------------------------------------------------
+
+
+@st.cache_data(show_spinner=False, ttl=600)
+def _mode_metrics(runs_root: str, spec_key: str, _spec: md.ModeSpec) -> dict[str, md.ModeMetrics]:
+    return md.load_metrics(_spec, runs_root)
+
+
+def _mode_state(cfg: AppConfig, engine: Engine, loaded: Loaded, runs_root: Path) -> md.ModeState | None:
+    """Prüfmodi for this source; None (feature off, sidebar as before) when config/pruefmodi.yaml is absent
+    or unreadable."""
+    try:
+        spec = md.load_spec()
+    except FileNotFoundError:
+        return None
+    except Exception as e:
+        st.sidebar.error(f"config/pruefmodi.yaml unlesbar ({type(e).__name__}: {e}); Prüfmodus aus.",
+                         icon=":material/error:")
+        return None
+    avail = md.availability(spec, cfg, loaded.results, can_decide=engine.can_decide)
+    return md.ModeState(spec=spec, current=spec.default, metrics=_mode_metrics(str(runs_root), repr(spec), spec),
+                        avail=avail)
 
 
 def _pages() -> dict[str, Any]:
@@ -314,16 +416,38 @@ def bootstrap() -> AppState:
     defaults = be.fusion_defaults(cfg)
     default_weights = be.check_weights(cfg)
     all_families = engine.families()
-    settings = _sidebar(cfg, engine, defaults, default_weights, all_families, len(loaded.results), source)
+    runs_root = cfg.paths.resolve("runs_dir")
+    modes = _mode_state(cfg, engine, loaded, runs_root)
+    settings = _sidebar(cfg, engine, defaults, default_weights, all_families, len(loaded.results), source,
+                        modes, runs_root)
+    base_engine = engine
+    if modes is not None:
+        try:
+            engine = modes.engine(base_engine, settings.mode)
+        except Exception as e:  # a broken mode must not take the inbox down: decide like the profile
+            st.sidebar.error(f"Prüfmodus konnte nicht geladen werden ({type(e).__name__}: {e}); es gilt das Profil.",
+                             icon=":material/error:")
+            engine = base_engine
+        defaults = {**defaults, "threshold": min(1.0, max(0.0, md.mode_threshold(
+            modes.mode, modes.metrics.get(modes.current), defaults["threshold"])))}
     families = [f for f in all_families if f.id in set(settings.families_on)]
     if not all_families:  # unreadable keyword list/criteria: say so instead of deciding "nothing found"
         st.sidebar.error(f"Stichwortliste oder Kriterien unlesbar ({engine.ctx.path('keywords')}, "
                          f"{engine.ctx.path('criteria')}); es gelten die gespeicherten Entscheide.",
                          icon=":material/error:")
     decided = be.decide_all(engine, loaded, settings.overrides(), families if all_families else None)
-    baseline = be.decide_all(engine, loaded, None, all_families or None)
+    baseline_engine = base_engine  # the deltas compare against the profile: default mode, default knobs
+    if modes is not None and settings.mode != modes.spec.default:
+        try:
+            baseline_engine = modes.engine(base_engine, modes.spec.default)
+        except Exception:
+            baseline_engine = base_engine
+    elif modes is not None:
+        baseline_engine = engine
+    baseline = be.decide_all(baseline_engine, loaded, None, all_families or None)
     app = AppState(args=args, cfg=cfg, engine=engine, defaults=defaults, default_weights=default_weights,
                    settings=settings, all_families=all_families, families=families, loaded=loaded,
-                   decided=decided, baseline=baseline, pages=_pages(), source=source, sources=sources)
+                   decided=decided, baseline=baseline, pages=_pages(), source=source, sources=sources,
+                   modes=modes, base_engine=base_engine)
     st.session_state[APP_KEY] = app
     return app
