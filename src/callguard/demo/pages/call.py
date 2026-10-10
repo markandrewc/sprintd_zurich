@@ -4,6 +4,7 @@ provenance, audit log). Deep link ``?call=<id>&t=<seconds>`` starts the recordin
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 import streamlit as st
@@ -11,12 +12,13 @@ import streamlit as st
 from callguard import misheard
 from callguard.demo import card as cd
 from callguard.demo import common as cm
-from callguard.demo import media
+from callguard.demo import media, original_script
 from callguard.demo import review
 from callguard.demo import state as ds
+from callguard.demo.original_script import OriginalScript
 from callguard.demo.transcript import ROLE_DE, keyword_terms, player_html
 from callguard.fact_policy import combination_label
-from callguard.types import fmt_ts
+from callguard.types import Transcript, fmt_ts
 from callguard.ui import render as ui
 from callguard.ui.backend import LABEL_RANK, parse_seconds, short_label
 from callguard.ui.session import current_app
@@ -31,6 +33,13 @@ s = app.settings
 def _audio(audio_path: str | None, run_dir: str, mtime: float) -> tuple[str | None, str]:
     a = media.player_audio(audio_path, run_dir)
     return a.src, a.note
+
+
+@st.cache_data(show_spinner=False, max_entries=32)
+def _original(call_id: str, audio_path: str | None, data_dir: str, _transcript: Transcript,
+              transcript_key: str) -> OriginalScript | None:
+    """The Swiss German original script of a test call, DISPLAY ONLY (never goes back into the pipeline)."""
+    return original_script.load(call_id, audio_path, _transcript, [data_dir])
 
 
 def _order() -> list[str]:
@@ -156,10 +165,14 @@ with left:
     mtime = Path(ap).stat().st_mtime if ap and Path(ap).is_file() else 0.0
     src, note = _audio(ap, str(run_dir), mtime)
     start_at = seek[0] if seek else t
-    doc = player_html(result.transcript, live.decision.passages, audio_src=src, colors=colors, labels=labels,
+    tr = result.transcript
+    original = _original(call_id, ap, str(app.cfg.paths.resolve("data_dir")), tr,
+                         hashlib.sha1(tr.model_dump_json(include={"segments"}).encode()).hexdigest())
+    doc = player_html(tr, live.decision.passages, audio_src=src, colors=colors, labels=labels,
                       start_at=start_at, link_pad=app.link_pad, misheard_below=app.misheard_below,
                       terms=keyword_terms(result), height=PLAYER_HEIGHT - 8, audio_note=note,
-                      autoplay=bool(seek), nonce=seek[1] if seek else 0)
+                      autoplay=bool(seek), nonce=seek[1] if seek else 0, original=original,
+                      view="ch" if st.query_params.get("ansicht") == "ch" else "de")
     st.iframe(doc, height=PLAYER_HEIGHT)
     if seek:
         st.caption(f":material/play_circle: Aufnahme bei {fmt_ts(seek[0])} (Stelle eines Fakts, 10 s davor).")
