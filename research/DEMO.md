@@ -141,7 +141,7 @@ Cross-validated (journal 04:09): flag AUC 0.87 [0.72, 0.99], alarm F1 0.86, revi
 (free LLM judge) had AUC 0.68, false alarms 86% and 3-class accuracy 38%.
 
 **Holdout:** held back all night, evaluated once on the frozen config. 12 calls / 6 dialogues, logged in
-`runs/holdout_log.jsonl`. The table is shown at the bottom of the Qualität page.
+`runs/holdout_log.jsonl` (3 logged looks in total: champion, v1 reference, 14B candidate -> a sanity check, not a test). The table is shown at the bottom of the Qualität page.
 
 | system | false alarms | alarm F1 | flag recall | 3-class acc |
 |---|---|---|---|---|

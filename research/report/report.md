@@ -1,6 +1,6 @@
 # callguard research report
 
-Generated 2026-10-10 05:02 by `callguard report` from 11 experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev dialogues, differences inside the CIs are noise.
+Generated 2026-10-10 05:55 by `callguard report` from 13 experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev dialogues, differences inside the CIs are noise.
 
 AUC is not decision-consistent: it ranks the fused call score, but review rules (uncertainty escalation, "undetermined" verdicts, review band) flag calls whatever the threshold, so for many variants no threshold reaches FAR <= 20% (see each variant's FAR floor). The top variants are ranked by cap compliance and CV@FAR20 recall, not by AUC.
 
@@ -9,15 +9,15 @@ AUC is not decision-consistent: it ranks the fused call score, but review rules 
 | # | experiment / variant | split | n | CV@FAR20 R / F1 / FAR | cap | FAR floor | cap folds | flag AUC [95% CI] | alarm AUC | CV flag F1 [95% CI] | FAR | miss | bal. acc | review recall | alarm F1 | acc | check s/call | LLM calls/call | commit | tags |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | champion / **table_v3** | dev | 48 | 88% / 0.88 / 14% | ok | 14% | 4/4 | 0.92 [0.80, 1.00] | 0.90 | 0.91 [0.80, 1.00] | 14% | 8% | 0.89 | 100% | 0.86 | 83% | 4.9 | 10.0 | 3757224ef0* |  |
-| 2 | champion / **facts_only** | dev | 48 | 85% / 0.86 / 14% | ok | 14% | 4/4 | 0.89 [0.77, 0.99] | 0.92 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.0 | 1.6 | 795bb55852* | re-fusion of champion |
-| 3 | llm_models / **qwen25_7b_facts_l3** | dev | 48 | 85% / 0.86 / 14% | ok | 14% | 4/4 | 0.89 [0.77, 0.99] | 0.92 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 13.3 | 47.4 | 1fd19e75c0* |  |
-| 4 | champion / **band025** | dev | 48 | 85% / 0.86 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* | re-fusion of champion |
-| 5 | champion / **champion** | dev | 48 | 81% / 0.84 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* |  |
-| 6 | champion / **t045** | dev | 48 | 81% / 0.84 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* | re-fusion of champion |
-| 7 | champion / **t065** | dev | 48 | 81% / 0.84 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* | re-fusion of champion |
-| 8 | champion / **noesc** | dev | 48 | 81% / 0.84 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* | re-fusion of champion |
-| 9 | llm_models / **qwen25_14b_facts_oracle** | dev | 48 | 77% / 0.87 / 0% | ok | 0% | 4/4 | 0.90 [0.79, 1.00] | 0.91 | 0.87 [0.70, 1.00] | 0% | 23% | 0.88 | 67% | 0.89 | 88% | 83.1 | 46.7 | 1fd19e75c0* | ORACLE |
-| 10 | llm_models / **qwen25_14b_facts** | dev | 48 | 77% / 0.82 / 14% | ok | 14% | 4/4 | 0.87 [0.76, 0.96] | 0.91 | 0.82 [0.70, 0.92] | 14% | 23% | 0.82 | 0% | 0.79 | 75% | 79.1 | 46.7 | 5d9264d90c* |  |
+| 2 | champion / **s1_v3_08** | dev | 48 | 88% / 0.87 / 18% | ok | 18% | 2/4 | 0.91 [0.80, 1.00] | 0.88 | 0.87 [0.75, 0.96] | 18% | 12% | 0.85 | 33% | 0.77 | 77% | 2.0 | 2.0 | 2a156c452d* |  |
+| 3 | champion / **facts_only** | dev | 48 | 85% / 0.86 / 14% | ok | 14% | 4/4 | 0.89 [0.77, 0.99] | 0.92 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.0 | 1.6 | 795bb55852* | re-fusion of champion |
+| 4 | llm_models / **qwen25_7b_facts_l3** | dev | 48 | 85% / 0.86 / 14% | ok | 14% | 4/4 | 0.89 [0.77, 0.99] | 0.92 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 13.3 | 47.4 | 1fd19e75c0* |  |
+| 5 | perturbed / **table_v3** | dev | 48 | 85% / 0.86 / 14% | ok | 14% | 4/4 | 0.88 [0.76, 0.98] | 0.88 | 0.86 [0.75, 0.96] | 14% | 15% | 0.85 | 0% | 0.73 | 73% | 6.5 | 9.9 | 60e402c62e* |  |
+| 6 | champion / **band025** | dev | 48 | 85% / 0.86 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* | re-fusion of champion |
+| 7 | champion / **champion** | dev | 48 | 81% / 0.84 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* |  |
+| 8 | champion / **t045** | dev | 48 | 81% / 0.84 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* | re-fusion of champion |
+| 9 | champion / **t065** | dev | 48 | 81% / 0.84 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* | re-fusion of champion |
+| 10 | champion / **noesc** | dev | 48 | 81% / 0.84 / 14% | ok | 14% | 4/4 | 0.87 [0.72, 0.99] | 0.90 | 0.86 [0.73, 0.96] | 14% | 15% | 0.85 | 67% | 0.86 | 79% | 4.1 | 1.6 | 795bb55852* | re-fusion of champion |
 
 `*` = uncommitted changes in the tree when the variant ran.
 
@@ -79,6 +79,15 @@ Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant
 - `ens2b` vs `champion`: flag AUC -0.09 [-0.22, +0.00]; flag F1 -0.09 [-0.22, +0.00] (no detectable difference); FAR +5pp; McNemar p=0.125; 5 calls flip
 - `ens_blind` vs `champion`: flag AUC -0.11 [-0.28, +0.00]; flag F1 -0.11 [-0.28, +0.00] (no detectable difference); FAR +5pp; McNemar p=0.0625; 12 calls flip
 - `turbo_clean` vs `champion`: flag AUC -0.02 [-0.05, +0.02]; flag F1 -0.05 [-0.12, +0.00] (no detectable difference); FAR +0pp; McNemar p=0.625; 13 calls flip
+- `s1_v1_08` vs `champion`: flag AUC -0.01 [-0.03, +0.00]; flag F1 -0.04 [-0.10, +0.00] (no detectable difference); FAR +5pp; McNemar p=0.5; 10 calls flip
+- `s1_v3_08` vs `champion`: flag AUC +0.05 [-0.02, +0.17]; flag F1 +0.01 [-0.08, +0.12] (no detectable difference); FAR +5pp; McNemar p=1.0; 12 calls flip
+- `s1_para_08` vs `champion`: flag AUC -0.13 [-0.26, -0.02] (real); flag F1 -0.14 [-0.28, -0.04] (**real difference**); FAR +5pp; McNemar p=0.0312; 16 calls flip
+- `fs_tuned` vs `champion`: flag AUC -0.07 [-0.20, +0.01]; flag F1 -0.07 [-0.20, +0.00] (no detectable difference); FAR +0pp; McNemar p=0.25; 8 calls flip
+- `fs_para` vs `champion`: flag AUC -0.17 [-0.33, -0.03] (real); flag F1 -0.20 [-0.40, -0.05] (**real difference**); FAR +5pp; McNemar p=0.0078; 16 calls flip
+- `qlang_de` vs `champion`: flag AUC -0.13 [-0.29, -0.01] (real); flag F1 -0.18 [-0.40, -0.04] (**real difference**); FAR +0pp; McNemar p=0.0156; 13 calls flip
+- `noroles` vs `champion`: flag AUC -0.06 [-0.15, +0.00]; flag F1 -0.09 [-0.18, +0.00] (no detectable difference); FAR +5pp; McNemar p=0.125; 10 calls flip
+- `prefixmax` vs `champion`: flag AUC +0.00 [+0.00, +0.00]; flag F1 -0.02 [-0.06, +0.00] (no detectable difference); FAR +5pp; McNemar p=1.0; 1 calls flip
+- `perturbed` vs `champion`: flag AUC +0.00 [+0.00, +0.00]; flag F1 +0.00 [+0.00, +0.00] (no detectable difference); FAR +0pp; McNemar p=1.0; 0 calls flip
 
 ## champion14
 
@@ -261,6 +270,52 @@ Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant
 - `qwen25_7b_facts_l3__both` vs `qwen25_7b`: flag AUC +0.18 [+0.05, +0.30] (real); flag F1 +0.13 [-0.06, +0.33] (no detectable difference); FAR -64pp; McNemar p=0.0118; 35 calls flip
 - `qwen25_14b_para_l3` vs `qwen25_7b`: flag AUC +0.20 [+0.09, +0.29] (real); flag F1 +0.15 [-0.06, +0.36] (no detectable difference); FAR -77pp; McNemar p=0.0066; 32 calls flip
 
+## new_checks
+
+keyword_context (window / anchored full), semantic_windows, quote_judge vs the v1 champion set
+
+RQ: RQ7, RQ4 · split dev · baseline `base` · details: `runs/experiments/new_checks/summary.md`
+
+Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant score AUC 0.50.
+
+![chart_auc](new_checks/auc.png)
+
+![chart_metrics](new_checks/metrics.png)
+
+![chart_cost](new_checks/cost_vs_f1.png)
+
+![chart_noise](new_checks/clean_vs_noisy.png)
+
+![chart_levels](new_checks/levels.png)
+
+![chart_thresholds](new_checks/thresholds.png)
+
+- `kwctx_window` vs `base`: flag AUC -0.01 [-0.06, +0.04]; flag F1 +0.00 [+0.00, +0.00] (no detectable difference); FAR +0pp; McNemar p=1.0; 3 calls flip
+- `kwctx_full` vs `base`: flag AUC +0.01 [-0.01, +0.05]; flag F1 +0.00 [+0.00, +0.00] (no detectable difference); FAR +0pp; McNemar p=1.0; 3 calls flip
+- `quote_judge` vs `base`: flag AUC +0.01 [-0.10, +0.10]; flag F1 +0.05 [-0.09, +0.18] (no detectable difference); FAR +9pp; McNemar p=1.0; 15 calls flip
+
+## perturbed
+
+champion on re-recorded dev audio (speed 0.96, -3 dB)
+
+RQ: RQ8 · split dev · baseline `perturbed` · details: `runs/experiments/perturbed/summary.md`
+
+Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant score AUC 0.50.
+
+![chart_auc](perturbed/auc.png)
+
+![chart_metrics](perturbed/metrics.png)
+
+![chart_cost](perturbed/cost_vs_f1.png)
+
+![chart_noise](perturbed/clean_vs_noisy.png)
+
+![chart_levels](perturbed/levels.png)
+
+![chart_thresholds](perturbed/thresholds.png)
+
+- `table_v3` vs `perturbed`: flag AUC +0.05 [+0.00, +0.18]; flag F1 +0.05 [+0.00, +0.16] (no detectable difference); FAR +0pp; McNemar p=0.5; 2 calls flip
+
 ## smoke
 
 Plumbing check on demo-offline (reference scripts + fake LLM); numbers are meaningless.
@@ -315,6 +370,8 @@ Floor on these calls: flag-all flag F1 0.77 (FAR 100%), flag-none 0.00, constant
 - `facts7b_para` vs `v1`: flag AUC -0.14 [-0.27, +0.01]; flag F1 -0.25 [-0.39, -0.11] (**real difference**); FAR -39pp; McNemar p=0.0807; 50 calls flip
 - `facts7b_para2` vs `v1`: flag AUC +0.01 [-0.11, +0.13]; flag F1 -0.10 [-0.22, +0.02] (no detectable difference); FAR -50pp; McNemar p=0.8601; 43 calls flip
 - `facts7b_ens3_band` vs `v1`: flag AUC -0.05 [-0.19, +0.10]; flag F1 -0.15 [-0.28, -0.02] (**real difference**); FAR -50pp; McNemar p=0.5114; 49 calls flip
+- `facts7b_s1_v1_08` vs `v1`: flag AUC -0.07 [-0.20, +0.06]; flag F1 -0.14 [-0.28, -0.01] (**real difference**); FAR -46pp; McNemar p=0.5114; 47 calls flip
+- `facts7b_s1_v3_08` vs `v1`: flag AUC -0.04 [-0.18, +0.09]; flag F1 -0.09 [-0.23, +0.03] (no detectable difference); FAR -46pp; McNemar p=0.8679; 47 calls flip
 
 ## synth_stress_audited
 

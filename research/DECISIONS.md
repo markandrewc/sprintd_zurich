@@ -2,7 +2,7 @@
 
 One record per decision. Status: proposed | accepted | superseded. Evidence links point to
 `research/findings/`. Keep dissent: if a teammate disagrees, write their argument down.
-Last update: 2026-10-10 04:35 (GPU-host overnight session). Champion frozen 04:09 = `config/recommended.yaml`.
+Last update: 2026-10-10 05:57 (GPU-host overnight session). Champion frozen 04:09 = `config/recommended.yaml`.
 
 ## D0 How we measure (method) — accepted
 - Dev = 24 dialogues (48 calls), 4 folds, Stufe2 twin pairs share a fold; holdout = 6 dialogues, locked, looked at
@@ -37,8 +37,9 @@ Last update: 2026-10-10 04:35 (GPU-host overnight session). Champion frozen 04:0
   - **v3** (+ criteria-derived "decisive fact open" questions): fewer misses with unchanged false alarms in three
     independent dev-side tests — dev miss 15% -> 8% (review recall 67% -> 100%), synthetic review recall 38% -> 48%,
     re-recorded audio miss 23% -> 15% (AUC 0.83 -> 0.88). Designed with knowledge that splitting was missed on the
-    holdout; no holdout validation. **Lean: adopt v3 for Sunday** (one line: `checks.facts.policy_table:
-    config/policy_table_v3.yaml`), unless the team weighs the caveat higher.
+    holdout; no holdout validation; each single difference is within noise (paired CIs include 0). **Lean: adopt v3 for
+    Sunday** (profile `config/recommended-v3.yaml`, i.e. `-c recommended-v3` / `scripts/run_staged.sh recommended-v3`),
+    unless the team weighs the caveat higher.
   - v2 (+ access validity-unknown -> review): miss 15% -> 8% but FAR 14% -> 36%. Not recommended.
   - paraphrase ensemble (R6): halves label flips under rewording but dev AUC 0.73-0.81 vs 0.87, synthetic 0.81 vs 0.80
     -> not adopted (built: facts `paraphrase_tables`, off by default).

@@ -12,6 +12,7 @@ process the hidden set) and `research/ideas_round3.md` (Q&A cheat sheet). Everyt
    - Decision: **`facts`**, which asks atomic yes/no/unknown questions (scored by log-probability) and decides with an
      officer-editable policy table (`config/policy_table.yaml`). Every alarm names the facts and the rule.
    - Keywords + patterns stay visible and editable with a light weight. No keyword hit means "abstain", not "harmless".
+   - Open team decision: policy table v3 (`config/recommended-v3.yaml`); overnight lean = adopt (see "Still open").
    - New calls on one 12 GB GPU: `scripts/run_staged.sh recommended` (ASR first, then the LLM). Verified end to end
      on 3 re-encoded audio files with neutral names (nothing cached): alarm / no alert / review all correct, ~90 s.
    - Single-pass fallback (live demo, UI "Anruf verarbeiten"): `config/recommended-turbo.yaml` (turbo ASR without
@@ -21,7 +22,9 @@ process the hidden set) and `research/ideas_round3.md` (Q&A cheat sheet). Everyt
 2. **Dev (48 calls, cross-validated):**
    - flag AUC **0.87 [0.72, 0.99]**, flag F1 0.86, false-alarm rate **14%**, miss rate 15%
    - alarm F1 0.86, review recall 67%, 3-class accuracy 79%
-   - v1 (turbo ASR + free LLM judge + G-Eval): AUC 0.68, false alarms 86%, 3-class accuracy 38%.
+   - v1 (turbo ASR + free LLM judge + G-Eval): AUC 0.68, false alarms 45-86% (two runs of the same config: its judge
+     samples at T=0.7, so v1 is not reproducible run to run), 3-class accuracy 38-50%. The champion's fact probes are
+     deterministic (log-probabilities at T=0).
    - Threshold-robust: flag decisions are identical anywhere from 0.45 to 0.65; 3-class labels from 0.55 to 0.65
      (at 0.45 the 10 "open fact" calls scored 0.50 turn from review into alarm).
 3. **Holdout (champion run once; 12 calls / 6 dialogues; 3 logged looks in total — see Candidate B):**
@@ -52,7 +55,7 @@ process the hidden set) and `research/ideas_round3.md` (Q&A cheat sheet). Everyt
 ## Candidate B (14B) — tested, not adopted
 - Why tried: on large-v3 transcripts the 14B's facts decisions barely depend on the question wording (dev AUC tuned
   0.85 / blind 0.85 / paraphrased 0.88) while the 7B drops to 0.72 with paraphrased questions.
-- Dev (`config/recommended-14b.yaml`): AUC 0.82, FAR 18%, miss 23%, 3-class 71%. Holdout (one logged run): FAR 33%,
+- Dev (`config/recommended-14b.yaml`): AUC 0.82, FAR 18%, miss 23%, 3-class 65% CV (71% fixed threshold). Holdout (one logged run): FAR 33%,
   flag recall 33%, alarm F1 0.00, 3-class 33% vs the 7B champion's 0% / 50% / 0.67 / 67%.
 - Decision: keep the 7B champion. Holdout looks in total: 3 (7B champion, v1 reference, 14B), all logged and listed in
   the journal — the holdout is spent. **Protocol note (research/AGENT.md): more than two looks make the holdout
@@ -70,6 +73,7 @@ process the hidden set) and `research/ideas_round3.md` (Q&A cheat sheet). Everyt
 | disclosure (third party) | 8 | 6 | 5 | C11 harmless -> review x2, C12-K3 alarm -> review |
 | documentation | 6 | 5 | 3 | C13 alarm -> review x2, C14-K3 harmless -> review |
 | splitting | 4 | 2 | 2 | C20 open case -> no_alert x2 (table v3 fixes this on dev) |
+
 Holdout misses (C16 splitting, C19 documentation review) fall in the same weak families.
 
 ## Leaderboard (dev, flag AUC; full table `research/leaderboard.md`)
@@ -102,8 +106,8 @@ See `research/findings/RQ*.md`. Each has the setup, a CI table, flips, a recomme
 ## Still open (for the team on Saturday)
 - **Team decision: policy table v1 (frozen, holdout-run) or v3 (+ criteria-derived "open fact" review questions)?**
   v3 cuts misses with unchanged false alarms on dev (15% -> 8%), synthetic (review recall 38% -> 48%) and re-recorded
-  audio (23% -> 15%, AUC 0.83 -> 0.88); no holdout validation and its builder knew a holdout failure mode.
-  Our lean: adopt v3 (one line in config/recommended.yaml). See DECISIONS.md D2b.
+  audio (23% -> 15%, AUC 0.83 -> 0.88); each difference alone is within noise, no holdout validation, and its builder
+  knew a holdout failure mode. Our lean: adopt v3 (profile `config/recommended-v3.yaml`). See DECISIONS.md D2b.
 - Ask the organisers how `review` is scored. Flag F1 is meaningless here (flag-all = 0.70); we report AUC + FAR.
 - Event GPUs: with ≥24 GB, Qwen2.5-14B (or larger) + large-v3 run side by side (`config/recommended-14b.yaml`): more
   robust to question wording on dev, but not better on dev or the holdout here (candidate B above).

@@ -602,3 +602,11 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
 - RECOMMENDATION to the team (DECISIONS D2b): adopt v3 for Sunday unless you weigh the caveat higher; the frozen v1
   champion's holdout run remains the documented sanity check. Switch = one line in config/recommended.yaml
   (checks.facts.policy_table: config/policy_table_v3.yaml) or `--set checks.2.policy_table=config/policy_table_v3.yaml`.
+
+## 2026-10-10T06:00 note: v1 is not reproducible run-to-run; final fact-check done
+- The v1 check set (free judge with 3 samples at T=0.7 + G-Eval) scored CV FAR 45% in checks_ablation/all and 86% in
+  llm_models/qwen25_7b (same checks, same transcripts, re-sampled because the LLM entry name differs) — flag AUC 0.68 both.
+  The champion's facts probes are deterministic (next-token logprobs at T=0): re-running gives identical labels
+  (champion re-run 04:09 vs llm_models qwen25_7b_facts_l3: same numbers).
+- Final independent fact-check of all post-05:00 content: runbook timing, D2b switch instruction, candidate-B 3-class
+  (65% CV / 71% fixed), DEMO holdout-look count fixed.

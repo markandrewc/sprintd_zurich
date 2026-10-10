@@ -17,7 +17,8 @@ scripts/run_staged.sh recommended Qwen/Qwen2.5-7B-Instruct-AWQ /path/to/hidden/A
 ```
 - **Stage 1:** stops vLLM and transcribes every `.wav` with Whisper large-v3 (MIT, ~2.4 GPU-s per audio minute).
 - **Stage 2:** restarts the 7B and runs diarization roles, facts, keywords, patterns, fusion and snippets.
-- **Speed:** about 30 s per call for small batches (3 calls took 44 s, restarts included). ~18 calls ≈ 6-10 min.
+- **Speed:** about 30 s per call for small batches (3 new, uncached calls took ~90 s: ASR 45 s incl. model load,
+  vLLM restart 28 s, checks 20 s; a re-run with cached transcripts took 44 s). ~18 calls ≈ 6-10 min.
 - **Results:** `runs/recommended/<file-stem>/result.json` plus `snippets/*.wav`.
 - **File names:** they are only call ids; nothing in the checks reads them (case rule).
 - **Don't use `callguard batch` for this:** it only picks up case-style names (`Stufe1_D02-K1.wav`) and silently
@@ -59,8 +60,10 @@ Back up `config/keywords.json` before the keyword click: `cp config/keywords.jso
 - **Holdout (12 calls):** 0 false alarms and alarm F1 0.67, but 3 logged looks in total, so it is a sanity check.
 - **Expected on new calls:** ~0.75-0.80 AUC, because the fact wording was tuned on dev; paraphrased questions drop
   to 0.72.
-- **Weak spots:** open review cases and the splitting family. Table v3 (`config/policy_table_v3.yaml`) is the optional
-  "strict review" policy.
+- **Weak spots:** open review cases and the splitting family. Table v3 (`config/policy_table_v3.yaml`, profile
+  `recommended-v3`) adds review rules for them; overnight lean: adopt it (team decision, DECISIONS.md D2b). If adopted,
+  use `recommended-v3` instead of `recommended` in section 1 (results: `runs/recommended-v3/`) and say "no holdout
+  validation".
 
 ## 5. Stop / clean up
 - **Stop vLLM:** `kill $(cat runs/logs/vllm.pid)`. Never use `pkill -f` (it matches its own shell).
