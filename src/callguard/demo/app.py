@@ -3,9 +3,9 @@
     uv run callguard demo -c recommended            # http://localhost:8502
 
 Pages: Fälle (worklist + Alarmschwelle + Prüfmodus), Anruf prüfen (audio and transcript in sync, decision
-card, review -> training data point), Einstellungen (keyword list with live effect, Prüfarten), Regelwerk
-(the officer UI's page, mounted as is), Qualität (false alarms / misses, dev and external test set
-separately), Anruf verarbeiten (upload -> decision; needs the GPU host). The internal officer UI
+card, review -> training data point), Regeln & Einstellungen (how strict, what is looked for: Prüfarten,
+questions -> rules, keywords; preview + four-eyes approval from the officer UI's Regelwerk page, mounted in
+its embedded layout), Qualität (false alarms / misses, dev and external test set separately), Anruf verarbeiten (upload -> decision; needs the GPU host). The internal officer UI
 (``callguard ui``, port 8501) is unchanged; both read the same results and stores.
 
 Deep links (Outcept trigger backlinks): ``/?call=<id>&t=<seconds>`` open «Anruf prüfen» at that moment.
@@ -22,7 +22,6 @@ from callguard.demo import state as dstate
 
 HERE = Path(__file__).resolve().parent
 PAGES = HERE / "pages"
-RULES = HERE.parent / "ui" / "views" / "rules.py"
 ACCENT = "#2a78d6"
 
 st.set_page_config(layout="wide", page_title="callguard · Anrufprüfung", page_icon=":material/verified_user:",
@@ -31,9 +30,8 @@ st.set_page_config(layout="wide", page_title="callguard · Anrufprüfung", page_
 pages = {
     "cases": st.Page(PAGES / "cases.py", title="Fälle", icon=":material/inbox:", url_path="faelle", default=True),
     "detail": st.Page(PAGES / "call.py", title="Anruf prüfen", icon=":material/graphic_eq:", url_path="anruf"),
-    "settings": st.Page(PAGES / "settings.py", title="Einstellungen", icon=":material/tune:",
-                        url_path="einstellungen"),
-    "rules": st.Page(RULES, title="Regelwerk", icon=":material/rule:", url_path="regelwerk"),
+    "settings": st.Page(PAGES / "rules.py", title="Regeln & Einstellungen", icon=":material/tune:",
+                        url_path="regeln"),
     "quality": st.Page(PAGES / "quality.py", title="Qualität", icon=":material/insights:", url_path="qualitaet"),
     "process": st.Page(PAGES / "process.py", title="Anruf verarbeiten", icon=":material/upload_file:",
                        url_path="verarbeiten"),

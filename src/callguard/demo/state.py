@@ -1,6 +1,6 @@
 """Shared state of the demo app: the same :class:`callguard.ui.session.AppState` the officer UI builds (so its
 pages, panels and backend work unchanged), but without the officer UI's sidebar. The knobs live on the
-pages: Alarmschwelle + Prüfmodus on «Fälle», the Prüfarten on «Einstellungen»; their values persist for
+pages: Alarmschwelle + Prüfmodus on «Fälle» and «Regeln & Einstellungen»; their values persist for
 the session (``persist_state="session"``) and are read here before any page draws.
 
 Mode changes are saved per profile and audit-logged exactly like in the officer UI (``ui_prefs.json``,

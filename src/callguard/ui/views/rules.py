@@ -74,9 +74,16 @@ store = VersionStore(table_path, audit_dir=app.runs_dir, extras=_extra_paths())
 families_by_id = {f.id: f for f in app.all_families}
 CHECK_KIND = {str(c.get("name") or c.get("type")): rb.CHECK_KIND_DE.get(str(c.get("type")), str(c.get("type")))
               for c in app.cfg.checks}
+# "officer" (this page, `callguard ui`) draws everything in the order below. "embedded" (the demo app's page
+# «Regeln & Einstellungen», ``runpy.run_path(..., init_globals={"RW_LAYOUT": "embedded"})``) draws nothing at
+# import and calls the section functions (status_row, family_switches, family_questions_rules, ai_tab,
+# family_wizard, preview_tab, versions_tab) in its own order. Same state, same governance.
+LAYOUT = globals().get("RW_LAYOUT", "officer")
+KNOBS = "der Seitenleiste" if LAYOUT == "officer" else "unter «Wie streng?»"  # where the decision knobs live
 
-st.title("Regelwerk")
-st.caption("Was als Alarm, Prüffall oder unbedenklich gilt: pro **Prüfart** (Art von Fehlverhalten) beantwortet das "
+if LAYOUT == "officer":
+    st.title("Regelwerk")
+    st.caption("Was als Alarm, Prüffall oder unbedenklich gilt: pro **Prüfart** (Art von Fehlverhalten) beantwortet das "
            "Sprachmodell einfache Ja/Nein-Fragen (**Fakten**) zum Gespräch, die **Regeln** machen daraus den "
            "Entscheid; die erste zutreffende Regel entscheidet. Neue Prüfarten, Regeln und Schalter entstehen in einer "
            "Arbeitskopie, werden in der Vorschau an den verarbeiteten Anrufen geprüft, als Entwurf gespeichert und "
@@ -165,25 +172,34 @@ fam_names = {**{f.id: be.short_label(f.label) for f in work_families},
              **{f.id: be.short_label(f.label) for f in app.all_families}}
 new_family_ids = {f.id for f in work_families} - {f.id for f in _family_list(active_bundle, enabled_only=False)}
 changes = rb.diff_bundle(active_bundle, bundle(), fam_names, profile, CHECK_KIND)
-c1, c2, c3 = st.columns([3, 2, 1.3])
-with c1:
-    act = store.active()
-    who = (f"freigegeben von **{act.meta.get('approver')}**, verfasst von **{act.author}**" if act.meta.get("approver")
-           else f"**{act.meta.get('comment') or act.author}**")
-    st.markdown(f":material/verified: Aktiv: **Version {act.n}** · {who} · {str(act.meta.get('approved_at', ''))[:16]}")
+
+
+def status_row() -> None:
+    """Active version, pending working-copy changes / drafts, the officer's name, «verwerfen»."""
+    c1, c2, c3 = st.columns([3, 2, 1.3])
+    with c1:
+        act = store.active()
+        who = (f"freigegeben von **{act.meta.get('approver')}**, verfasst von **{act.author}**"
+               if act.meta.get("approver") else f"**{act.meta.get('comment') or act.author}**")
+        st.markdown(f":material/verified: Aktiv: **Version {act.n}** · {who} · "
+                    f"{str(act.meta.get('approved_at', ''))[:16]}")
+        if changes:
+            st.markdown(f":material/edit_note: Arbeitskopie: **{len(changes)} Änderung"
+                        f"{'en' if len(changes) != 1 else ''}**, noch nicht gespeichert → **Vorschau & Speichern**")
+        drafts = store.drafts()
+        if drafts:
+            st.markdown(f":material/pending_actions: {len(drafts)} Entwurf/Entwürfe warten auf Freigabe → "
+                        "**Versionen & Freigabe**")
+    c2.text_input("Ihr Name", key="rw_user", help="Wird als Autor oder Freigeber protokolliert (Audit-Log).")
     if changes:
-        st.markdown(f":material/edit_note: Arbeitskopie: **{len(changes)} Änderung{'en' if len(changes) != 1 else ''}**, "
-                    "noch nicht gespeichert → **Vorschau & Speichern**")
-    drafts = store.drafts()
-    if drafts:
-        st.markdown(f":material/pending_actions: {len(drafts)} Entwurf/Entwürfe warten auf Freigabe → "
-                    "**Versionen & Freigabe**")
-c2.text_input("Ihr Name", key="rw_user", help="Wird als Autor oder Freigeber protokolliert (Audit-Log).")
-if changes:
-    c3.button("Änderungen verwerfen", icon=":material/undo:", on_click=_discard, width="stretch")
-if app.read_only:
-    st.info("Angezeigt wird eine Experiment-Variante (nur lesen): die Vorschau rechnet mit diesen Ergebnissen, "
-            "Speichern und Freigeben ist nur mit einem Profil-Lauf als Quelle möglich.", icon=":material/lock:")
+        c3.button("Änderungen verwerfen", icon=":material/undo:", on_click=_discard, width="stretch")
+    if app.read_only:
+        st.info("Angezeigt wird eine Experiment-Variante (nur lesen): die Vorschau rechnet mit diesen Ergebnissen, "
+                "Speichern und Freigeben ist nur mit einem Profil-Lauf als Quelle möglich.", icon=":material/lock:")
+
+
+if LAYOUT == "officer":
+    status_row()
 
 # --------------------------------------------------------------------------------------------
 # preview of the working copy (shared by the cards' statistics and the preview tab)
@@ -481,10 +497,7 @@ def fact_editor(fam: str, fact: dict[str, Any] | None) -> None:
             st.rerun()
 
 
-def family_tab(fam: str) -> None:
-    fdoc = pe.family_doc(doc(), fam)
-    labels = pe.fact_labels(doc(), fam)
-    rules = fdoc["rules"]
+def _basis_row(fam: str, fdoc: dict[str, Any]) -> None:
     bkey = f"rw_basis_{fam}"
     c1, c2 = st.columns([4, 1], vertical_alignment="bottom")
     basis = c1.text_input("Rechtsgrundlage dieser Art (Vorschlag, bitte durch Compliance bestätigen)",
@@ -497,10 +510,8 @@ def family_tab(fam: str) -> None:
         _set_doc(cand, "Rechtsgrundlage geändert (Arbeitskopie).")
         st.rerun()
 
-    st.markdown("##### Regeln (von oben nach unten geprüft, die erste zutreffende entscheidet)")
-    for i, r in enumerate(rules):
-        rule_card(fam, i, r, len(rules), labels)
 
+def _manual_rule(fam: str, labels: dict[str, str]) -> None:
     with st.expander("Regel von Hand hinzufügen", icon=":material/add_circle:"):
         k = f"rw_newrule_{fam}"
         new = rule_form(k, {"id": "", "label": "review", "when": f"{next(iter(labels))} = yes" if labels else "true",
@@ -513,6 +524,18 @@ def family_tab(fam: str) -> None:
                 for key in [x for x in ss if str(x).startswith(k)]:
                     del ss[key]
                 st.rerun()
+
+
+def family_tab(fam: str) -> None:
+    fdoc = pe.family_doc(doc(), fam)
+    labels = pe.fact_labels(doc(), fam)
+    rules = fdoc["rules"]
+    _basis_row(fam, fdoc)
+
+    st.markdown("##### Regeln (von oben nach unten geprüft, die erste zutreffende entscheidet)")
+    for i, r in enumerate(rules):
+        rule_card(fam, i, r, len(rules), labels)
+    _manual_rule(fam, labels)
 
     st.markdown("##### Fakten (Fragen an das Sprachmodell)")
     used = pe.facts_in_use(doc(), fam)
@@ -532,6 +555,54 @@ def family_tab(fam: str) -> None:
                           on_click=lambda t=(fam, fid): ss.update(rw_fact_edit=t))
     with st.expander("Neuen Fakt anlegen", icon=":material/add:"):
         fact_editor(fam, None)
+
+
+def _rule_fact_ids(rule: dict[str, Any]) -> list[str]:
+    from callguard.checks.facts import parse_rule, rule_facts
+
+    try:
+        return rule_facts(parse_rule(str(rule.get("when", "true"))))
+    except PolicyTableError:
+        return []
+
+
+def family_questions_rules(fam: str) -> None:
+    """One Prüfart, questions first: what the AI is asked (short label + full question), each with the rules
+    that use it, then the rules built from those questions, then the legal basis (embedded layout)."""
+    fdoc = pe.family_doc(doc(), fam)
+    labels = pe.fact_labels(doc(), fam)
+    rules = fdoc["rules"]
+    used_in = {str(f["id"]): [i + 1 for i, r in enumerate(rules) if str(f["id"]) in _rule_fact_ids(r)]
+               for f in fdoc["facts"]}
+    st.markdown("##### 1 · Fragen an die KI")
+    st.caption("Die KI beantwortet jede Frage zum ganzen Gespräch mit ja / nein / unklar und sagt, wie sicher sie ist. "
+               "Eine neue oder umformulierte Frage muss die KI für jeden Anruf neu beantworten.")
+    for f in fdoc["facts"]:
+        fid = str(f["id"])
+        with st.container(border=True):
+            if ss.get("rw_fact_edit") == (fam, fid):
+                fact_editor(fam, f)
+                st.button("Abbrechen", key=f"rw_fx_cancel_{fam}_{fid}", on_click=lambda: ss.update(rw_fact_edit=None))
+                continue
+            left, right = st.columns([6, 1], vertical_alignment="top")
+            left.markdown(f"**{ui.esc(str(f.get('label') or fid))}** · "
+                          f":gray-badge[{ui.esc(pe.ROLE_DE.get(str(f.get('role')), str(f.get('role'))))}]  \n"
+                          f"{ui.esc(str(f.get('de') or ''))}")
+            rules_of = used_in.get(fid) or []
+            left.caption((":material/arrow_downward: verwendet in Regel " + ", ".join(map(str, rules_of)))
+                         if rules_of else ":material/info: in keiner Regel verwendet")
+            right.button("Ändern", key=f"rw_fx_btn_{fam}_{fid}", icon=":material/edit:", width="stretch",
+                         on_click=lambda t=(fam, fid): ss.update(rw_fact_edit=t))
+    with st.expander("Neue Frage anlegen", icon=":material/add:"):
+        fact_editor(fam, None)
+
+    st.markdown("##### 2 · Regeln aus diesen Fragen")
+    st.caption("Von oben nach unten geprüft: die erste Regel, deren Bedingungen alle erfüllt sind, entscheidet. "
+               "Regeln ändern kostet keine KI-Zeit: die Vorschau rechnet mit den schon gegebenen Antworten.")
+    for i, r in enumerate(rules):
+        rule_card(fam, i, r, len(rules), labels)
+    _manual_rule(fam, labels)
+    _basis_row(fam, fdoc)
 
 
 # --------------------------------------------------------------------------------------------
@@ -691,7 +762,7 @@ def preview_tab() -> None:
     if changes and pv.n_calls:
         if not changed:
             st.success(f"Diese Änderung ändert **keinen** der {pv.n_calls} verarbeiteten Anrufe (bei den aktuellen "
-                       "Einstellungen der Seitenleiste).", icon=":material/check_circle:")
+                       f"Einstellungen {KNOBS}).", icon=":material/check_circle:")
         else:
             st.markdown(f"#### Diese Änderung ändert {len(changed)} von {pv.n_calls} Anrufen")
             if provisional:
@@ -899,18 +970,28 @@ def _preview_line() -> None:
         return
     n = len(pv.changed)
     st.markdown(f":material/preview: Mit der Arbeitskopie ändern sich **{n} von {pv.n_calls}** verarbeiteten Anrufen "
-                "(bei den Einstellungen der Seitenleiste).")
-    st.button("Zur Vorschau", icon=":material/arrow_forward:", key=f"rw_goto_preview_{section}",
-              on_click=_goto, args=("preview",))
+                f"(bei den Einstellungen {KNOBS}).")
+    if LAYOUT == "officer":
+        st.button("Zur Vorschau", icon=":material/arrow_forward:", key=f"rw_goto_preview_{section}",
+                  on_click=_goto, args=("preview",))
+    else:
+        st.caption("Welche Anrufe genau, und die Freigabe: unten unter «Änderungen prüfen & freigeben».")
 
 
 def switches_tab() -> None:
-    b = bundle()
-    teams = (b.get("routing") or {}).get("teams") or {}
     st.markdown("##### Prüfarten")
     st.caption("Ausgeschaltet = diese Art von Fehlverhalten wird nicht mehr gesucht und zählt in keinem Entscheid "
                "(Kriterien: `enabled: false`). Anders als der Schalter in der Seitenleiste (nur Ihre Ansicht, sofort) "
                "gilt dieser Schalter für alle und erst nach Freigabe.")
+    family_switches()
+    check_switches()
+    _preview_line()
+
+
+def family_switches() -> None:
+    """One row per Prüfart: on/off in the working copy, its rules and reporting line."""
+    b = bundle()
+    teams = (b.get("routing") or {}).get("teams") or {}
     for f in work_families:
         on = rb.family_enabled(b, f.id)
         n_rules = len((((b["policy_table"].get("families") or {}).get(f.id)) or {}).get("rules") or [])
@@ -924,6 +1005,10 @@ def switches_tab() -> None:
             cols[1].toggle("aktiv", value=on, key=key, on_change=_fam_toggle, args=(f.id, key), disabled=app.read_only)
             cols[2].caption(f"`{f.id}` · {len(f.keywords)} Stichwortgruppe(n) · {n_rules} Regel(n) · Meldung an "
                             + (", ".join(str((teams.get(t) or {}).get("name") or t) for t in to) or "Standard-Meldeweg"))
+
+
+def check_switches() -> None:
+    b = bundle()
     st.markdown("##### Prüfungen")
     st.caption(f"Ausgeschaltet = Gewicht 0 im Profil **{profile}** (`tuning.yaml`): die Prüfung zählt in keinem "
                "Entscheid mehr. Wie der Gewichts-Regler in der Seitenleiste, aber dauerhaft und mit Freigabe.")
@@ -937,7 +1022,6 @@ def switches_tab() -> None:
         key = f"rw_chkon_{name}_{on}"
         cols[1].toggle("aktiv", value=on, key=key, on_change=_check_toggle, args=(name, key), disabled=app.read_only)
         cols[2].caption(f"`{name}` ({c.get('type')}) · Gewicht jetzt {weights.get(name, c.get('weight', 1.0)):.2f}")
-    _preview_line()
 
 
 # --------------------------------------------------------------------------------------------
@@ -1101,13 +1185,20 @@ fam_ids = list((doc().get("families") or {}).keys())
 SECTIONS = {"rules": ":material/rule: Regeln", "switches": ":material/toggle_on: Prüfarten & Prüfungen",
             "ai": ":material/auto_awesome: Neue Regel", "family": ":material/category: Neue Prüfart",
             "preview": ":material/preview: Vorschau & Speichern", "versions": ":material/verified: Versionen & Freigabe"}
-if "rw_goto" in ss:  # set by a button after the radio was drawn: applied on the next run
-    ss["rw_section"] = ss.pop("rw_goto")
 n_drafts = len(store.drafts())
-section = st.radio("Bereich", list(SECTIONS), key="rw_section", horizontal=True, label_visibility="collapsed",
-                   format_func=lambda k: SECTIONS[k] + (f" ({len(changes)})" if k == "preview" and changes else "")
-                   + (f" ({n_drafts})" if k == "versions" and n_drafts else ""))
-if section == "rules":
+if LAYOUT != "officer":  # embedded: the host page draws the sections in its own order
+    ss.pop("rw_goto", None)
+    section = "embedded"
+else:
+    if "rw_goto" in ss:  # set by a button after the radio was drawn: applied on the next run
+        ss["rw_section"] = ss.pop("rw_goto")
+    section = st.radio("Bereich", list(SECTIONS), key="rw_section", horizontal=True, label_visibility="collapsed",
+                       format_func=lambda k: SECTIONS[k] + (f" ({len(changes)})" if k == "preview" and changes
+                                                            else "")
+                       + (f" ({n_drafts})" if k == "versions" and n_drafts else ""))
+if section == "embedded":
+    pass
+elif section == "rules":
     for tab, fam in zip(st.tabs([fam_names.get(f, f) + (" (neu)" if f in new_family_ids else "") for f in fam_ids]),
                         fam_ids):
         with tab:

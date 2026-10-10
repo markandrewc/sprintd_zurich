@@ -31,13 +31,41 @@ def badge(label: str, text: str | None = None) -> str:
 
 
 def active_table(app: AppState) -> PolicyTable | None:
-    spec = next((c for c in app.cfg.checks if c.get("type") == "facts"), {})
-    rel = str(spec.get("policy_table") or DEFAULT_TABLE)
-    path = Path(rel) if Path(rel).is_absolute() else ROOT / rel
     try:
-        return load_policy_table(path)
+        return load_policy_table(active_table_path(app))
     except Exception:
         return None
+
+
+def active_table_path(app: AppState) -> Path:
+    spec = next((c for c in app.cfg.checks if c.get("type") == "facts"), {})
+    rel = str(spec.get("policy_table") or DEFAULT_TABLE)
+    return Path(rel) if Path(rel).is_absolute() else ROOT / rel
+
+
+def policy_status(app: AppState) -> dict[str, Any]:
+    """Which Regelwerk the shown decisions come from: the active version number and how many calls were decided
+    with exactly the active table (per-family hash, as the facts check records it) vs an older one."""
+    from callguard.policy_versions import VersionStore
+
+    out: dict[str, Any] = {"version": None, "same": 0, "other": [], "without": 0}
+    path = active_table_path(app)
+    try:
+        table = load_policy_table(path)
+        act = VersionStore(path).active()
+        out["version"] = act.n if act is not None else None
+    except Exception:
+        return out
+    for cid, r in app.loaded.results.items():
+        cr = next((c for c in r.checks.values() if c.type == "facts" and not (c.meta or {}).get("error")), None)
+        stored = ((cr.meta or {}).get("policy_table") or {}).get("hash") if cr is not None else None
+        if not stored:
+            out["without"] += 1
+        elif stored == table.key(list(cr.family_scores)):
+            out["same"] += 1
+        else:
+            out["other"].append(cid)
+    return out
 
 
 def table_for(app: AppState, result: CallResult) -> PolicyTable | None:

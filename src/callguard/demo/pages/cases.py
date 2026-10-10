@@ -7,8 +7,8 @@ import pandas as pd
 import streamlit as st
 
 from callguard.demo import common as cm
+from callguard.demo import controls as ctl
 from callguard.demo import state as ds
-from callguard.ui import modes as md
 from callguard.ui import render as ui
 from callguard.ui.backend import label_counts
 from callguard.ui.session import current_app
@@ -24,38 +24,24 @@ else:
     judged = {i.call_id for i in ds.feedback_items(app)}
     counts, base = label_counts(app.decided), label_counts(app.baseline)
     open_flagged = sum(1 for cid, d in app.decided.items() if d.decision.label != "no_alert" and cid not in judged)
+    ps = cm.policy_status(app)
+    rule_note = ""
+    if ps["version"] is not None and ps["same"]:
+        rule_note = (f" · entschieden mit dem aktiven Regelwerk (Version {ps['version']})" if not ps["other"]
+                     else f" · {ps['same']} mit dem aktiven Regelwerk (Version {ps['version']}) entschieden")
     st.caption(f"{len(app.loaded.results)} Anrufe · {open_flagged} davon brauchen noch einen Menschen "
-               "(Alarm oder Prüfen, noch nicht bearbeitet)")
+               f"(Alarm oder Prüfen, noch nicht bearbeitet){rule_note}")
+    if ps["other"]:
+        st.warning(f"{len(ps['other'])} Anrufe wurden mit einer älteren Regelwerk-Version entschieden; ihre Zahlen "
+                   "können vom aktiven Regelwerk abweichen (Regeln & Einstellungen → «Gespeicherte Anrufe neu "
+                   "entscheiden» nach einer Freigabe).", icon=":material/history:")
 
     with st.container(border=True):
         c1, c2, c3 = st.columns([4, 4, 5], gap="large")
         with c1:
-            st.slider("Alarmschwelle", 0.0, 1.0, step=0.01, key=ds.THRESHOLD_KEY, persist_state="session",
-                      help="Ab diesem Score löst ein Anruf Alarm aus; knapp darunter geht er zur Prüfung an einen "
-                           "Menschen. Wirkt sofort auf alle Anrufe (keine Spracherkennung, kein Sprachmodell).")
-            st.caption(f"Alarm ab **{s.threshold:.2f}** · Prüfen ab **{max(0.0, s.review_floor):.2f}** · "
-                       f"Standard {app.defaults['threshold']:.2f}")
+            ctl.threshold_slider(app)
         with c2:
-            if app.modes is not None:
-                modes = app.modes
-                by = {m.id: m for m in modes.spec.modes}
-                st.segmented_control(
-                    "Prüfmodus", ds.available_modes(modes), key=ds.MODE_KEY, required=True,
-                    format_func=lambda k: by[k].label, persist_state="session",
-                    on_change=ds.on_mode_change,
-                    args=(str(app.runs_root), app.source.key, str(app.runs_dir), ds.profile_threshold(app)),
-                    help="Wie streng callguard entscheidet. Die Wahl gilt für dieses Profil und wird im "
-                         "Audit-Log vermerkt.")
-                cur = by.get(s.mode or modes.spec.default)
-                if cur is not None:
-                    note = md.consequence_short(modes.metrics.get(cur.id))
-                    st.caption(cur.text + (f" Gemessen: {note}." if note else ""))
-                off = [m for m in modes.spec.modes if not modes.avail.get(m.id, md.Availability(True)).ok]
-                if off:
-                    st.caption(":material/block: " + ", ".join(f"«{m.label}»" for m in off) + " brauchen die "
-                               "Zweitmeinung eines zweiten Modells; für diese Anrufe nicht verfügbar.")
-            else:
-                st.caption("Prüfmodi sind in diesem Profil nicht eingerichtet.")
+            ctl.mode_control(app)
         with c3:
             m = st.columns(3)
             for col, lbl in zip(m, ("alarm", "review", "no_alert")):
