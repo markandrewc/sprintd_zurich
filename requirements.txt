@@ -2,9 +2,14 @@ transformers>=4.56
 accelerate
 # torch mit CUDA separat installieren:
 #   pip install torch --index-url https://download.pytorch.org/whl/cu128
-# Kev (kev_app.py / kev_pipeline.py)
+# Kev (fraud_analysis/)
 peft>=0.21
 pydantic>=2.9
+# Dienste und Oberflächen (APIs, dashboard/, analysis_ui/)
+fastapi
+uvicorn
+python-multipart
+httpx
 gradio>=6
 # SwissDial-TTS (SwissDial/) – letzte espnet-Version für Python 3.11; torchaudio passend zu torch:
 #   pip install "torchaudio==2.11.*" --index-url https://download.pytorch.org/whl/cu128

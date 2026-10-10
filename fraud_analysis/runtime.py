@@ -1,4 +1,4 @@
-"""Kev lokal laden und abfragen (geteilt von kev_app.py und kev_pipeline.py).
+"""Kev laden und abfragen (genutzt von fraud_analysis.api).
 
 Lädt jaredpalmer/kev-4b über kev.checkpoint, wie der HF-Space und kev.serve: LoRA in den Qwen3.5-4B-Base gemerged,
 Pointer-Head obendrauf. Unterschied zum Space: bf16 statt fp32. In fp32 braucht Kev-4B ~16 GB und passt nicht auf eine
@@ -10,16 +10,13 @@ Umgebungsvariablen:
   KEV_DTYPE   bf16 | fp32 (Default bf16)
 """
 import os
+import time
 
-os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+import torch
 
-import time  # noqa: E402
-
-import torch  # noqa: E402
-
-from kev.api import SystemOneRequest, output_tokens, to_answers, to_record  # noqa: E402
-from kev.checkpoint import Checkpoint, LoadOptions  # noqa: E402
-from kev.model import admit  # noqa: E402
+from .kev.api import SystemOneRequest, output_tokens, to_answers, to_record
+from .kev.checkpoint import Checkpoint, LoadOptions
+from .kev.model import admit
 
 MODEL_REPO = os.environ.get("KEV_MODEL", "jaredpalmer/kev-4b")
 DEVICE = os.environ.get("KEV_DEVICE") or ("cuda" if torch.cuda.is_available() else "cpu")
