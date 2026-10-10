@@ -7,6 +7,9 @@ allenfalls das Transkriptionsmodell) werden.
 
 - `export_labels.py` exportiert alle beurteilten Anrufe nach `outputs/finetuning/labels.jsonl`, mit Ja/Nein-Label pro
   Check (Details im Kopf der Datei).
+- `synthetic_data_instructions.md` ist die Anweisung für ein LLM, das synthetische Bankgespräche (Schweizer Hochdeutsch)
+  mit Labels für die 9 Prüfpunkte erzeugt. Ausgabe: JSON Lines, ein Gespräch pro Zeile, abgelegt als
+  `data/synthetic/batch_<NNN>.jsonl` (im Git). Die spätere Vertonung gehört nach `outputs/synthetic_audio/` (nicht im Git).
 
 ## Offen
 

@@ -6,20 +6,14 @@
     "overlap_words": 20,
     "passage_words": 25
   },
-  "version": 1,
+  "version": 2,
   "questions": {
     "gesetzlich": {
       "insider_trading": {
         "category": "Insiderhandel",
         "basis": "FinfraG Art. 142 / 154",
         "type": "noul",
-        "instructions": "Does someone want to buy or sell financial instruments because of non-public, price-relevant information?"
-      },
-      "insider_disclosure": {
-        "category": "Insiderhandel",
-        "basis": "FinfraG Art. 142 / 154",
-        "type": "noul",
-        "instructions": "Does someone pass on non-public, price-relevant information, or recommend a trade based on it?"
+        "instructions": "Does someone want to trade because of non-public, price-relevant information, or pass such information on?"
       },
       "market_manipulation": {
         "category": "Marktmanipulation",
@@ -27,41 +21,23 @@
         "type": "noul",
         "instructions": "Does someone try to influence a market price through orders or information?"
       },
-      "aml_source_of_funds": {
+      "money_laundering": {
         "category": "Geldwäscherei",
-        "basis": "StGB Art. 305bis, GwG Art. 6",
+        "basis": "StGB Art. 305bis, GwG Art. 4 / 6 / 9",
         "type": "noul",
-        "instructions": "Does someone conceal or refuse to explain where assets come from?"
+        "instructions": "Does someone hide where money comes from or who it belongs to, or try to avoid a legal reporting obligation?"
       },
-      "aml_structuring": {
-        "category": "Geldwäscherei",
-        "basis": "StGB Art. 305bis, GwG Art. 6 / 9",
-        "type": "noul",
-        "instructions": "Does someone arrange transactions so that a legal threshold or reporting obligation is avoided?"
-      },
-      "aml_hidden_beneficiary": {
-        "category": "Geldwäscherei",
-        "basis": "GwG Art. 4",
-        "type": "noul",
-        "instructions": "Does someone conceal who the actual owner or beneficiary of assets is?"
-      },
-      "confidential_disclosure": {
+      "confidential_information": {
         "category": "Vertrauliche Informationen",
         "basis": "BankG Art. 47, DSG, StGB Art. 162",
         "type": "noul",
-        "instructions": "Does someone reveal confidential information to a person who is not entitled to receive it?"
-      },
-      "confidential_request": {
-        "category": "Vertrauliche Informationen",
-        "basis": "BankG Art. 47, DSG, StGB Art. 162",
-        "type": "noul",
-        "instructions": "Does someone try to obtain confidential information they are not entitled to?"
+        "instructions": "Does someone reveal confidential information to a person who is not entitled to it, or try to obtain such information without being entitled to it?"
       },
       "false_records": {
         "category": "Falsche Dokumentation",
-        "basis": "StGB Art. 251",
+        "basis": "StGB Art. 251, interne Policy",
         "type": "noul",
-        "instructions": "Does someone want false information to be recorded?"
+        "instructions": "Does someone want false information recorded, or relevant information withheld from the people who need it for a decision?"
       },
       "bribery": {
         "category": "Bestechung",
@@ -71,29 +47,17 @@
       }
     },
     "intern": {
-      "withheld_information": {
-        "category": "Falsche Dokumentation",
-        "basis": "interne Policy",
-        "type": "noul",
-        "instructions": "Does someone want relevant information withheld from the people who need it for a decision?"
-      },
       "control_circumvention": {
         "category": "Kontrollumgehung",
         "basis": "interne Policy",
         "type": "noul",
         "instructions": "Does someone try to get around an internal approval, limit or control?"
       },
-      "credential_disclosure": {
+      "access_credentials": {
         "category": "Zugangsdaten",
         "basis": "interne Policy",
         "type": "noul",
-        "instructions": "Does someone reveal a valid access credential?"
-      },
-      "credential_request": {
-        "category": "Zugangsdaten",
-        "basis": "interne Policy",
-        "type": "noul",
-        "instructions": "Does someone ask for another person's access credentials?"
+        "instructions": "Is a valid access credential revealed, or does someone ask for another person's access credentials?"
       },
       "manipulated_customer": {
         "category": "Kunde als Betrugsopfer",
