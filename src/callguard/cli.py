@@ -616,6 +616,10 @@ from callguard.commands import learn as _learn  # noqa: E402  (learning from off
 
 _learn.register(app)
 
+from callguard.commands import demo as _demo  # noqa: E402  (the showcase app, `callguard demo`)
+
+_demo.register(app)
+
 
 if __name__ == "__main__":
     app()

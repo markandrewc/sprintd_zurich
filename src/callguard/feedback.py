@@ -73,6 +73,47 @@ DEMO_NOTE = "Demo-Feedback (simuliert aus Sollbewertung)"
 FLAG = ("alarm", "review")
 Target = Literal["call", "passage", "fact", "family"]
 
+# Why the officer judged as they did (demo review form, ``items_from_review``): structured reason codes. Some of
+# them are labels in their own right and also become fact / passage / missed-category items (see
+# ``items_from_review``); all of them stay on the call item as ``reasons`` so "why was the system wrong" can
+# be counted per code, rule and fact.
+REASON_DE = {
+    "fact_wrong": "Fakt falsch erkannt",
+    "passage_applies": "Passage trifft zu",
+    "passage_not_applies": "Passage trifft nicht zu",
+    "context_harmless": "Kontext macht es harmlos",
+    "transcript_error": "Transkript / Verhörer",
+    "rule_too_strict": "Regel zu streng",
+    "rule_too_lax": "Regel zu locker",
+    "other_family": "Andere Kategorie",
+    "missing_info": "Fehlende Information im Gespräch",
+}
+REASON_CODES: tuple[str, ...] = tuple(REASON_DE)
+
+
+class Reason(BaseModel):
+    """One ticked reason of a review. ``code`` in :data:`REASON_CODES`; the other fields say what it is about."""
+
+    code: str
+    family: str | None = None  # fact_wrong / other_family / passage_*: the family concerned
+    fact: str | None = None  # fact_wrong: fact id of the policy table
+    passage_index: int | None = None  # passage_*: index into the decision's passages
+    before: str | None = None  # fact_wrong: the model's value (yes / no / unclear)
+    after: str | None = None  # fact_wrong: the value the officer says is right
+    rule: str | None = None  # rule_too_*: id of the rule that fired
+    text: str = ""  # optional free text (e.g. which other category)
+
+    def describe(self) -> str:
+        """German one-liner, e.g. «Fakt falsch erkannt: wish (ja → nein)»."""
+        out = REASON_DE.get(self.code, self.code)
+        what = self.fact or self.family or (f"Passage {self.passage_index + 1}" if self.passage_index is not None
+                                            else None) or self.rule
+        if what:
+            out += f": {what}"
+        if self.before or self.after:
+            out += f" ({_VALUE_DE.get(self.before or '', self.before or '?')} → {_VALUE_DE.get(self.after or '', self.after or '?')})"
+        return out + (f" – {self.text}" if self.text else "")
+
 
 class FeedbackItem(BaseModel):
     call_id: str
@@ -92,10 +133,13 @@ class FeedbackItem(BaseModel):
     question: str | None = None  # the fact question as the model was asked (snapshot)
     answer: Literal["yes", "no", "unclear"] | None = None  # the officer's value of the fact
     model_value: str | None = None  # the model's value when the officer judged it
-    agrees: bool | None = None  # stimmt (True) / stimmt nicht (False)
+    # fact items: stimmt (True) / stimmt nicht (False); call items (review form): the officer agrees (True) or
+    # disagrees (False) with the label the system showed
+    agrees: bool | None = None
     passage: dict[str, Any] | None = None  # snapshot of the judged passage: family, start, end, text
     provenance: dict[str, Any] = Field(default_factory=dict)
     source: Literal["officer", "demo"] = "officer"
+    reasons: list[Reason] = Field(default_factory=list)  # why (review form); older lines have none
 
     @property
     def target(self) -> Target:
@@ -121,7 +165,8 @@ def add(runs_dir: str | Path, item: FeedbackItem, *, store: str = "real") -> Fee
                         family=item.family, passage_index=item.passage_index, label_seen=item.label_seen,
                         fact=item.fact, answer=item.answer, batch=item.batch, comment=item.comment[:200],
                         config_hash=item.provenance.get("config_hash"),
-                        policy_table_hash=(item.provenance.get("policy_table") or {}).get("hash"))
+                        policy_table_hash=(item.provenance.get("policy_table") or {}).get("hash"),
+                        **({"agrees": item.agrees, "reasons": [r.code for r in item.reasons]} if item.reasons else {}))
     return item
 
 
@@ -190,11 +235,14 @@ def items_from_form(result: CallResult, *, user: str, verdict: str | None = None
                     passages: Mapping[int, str] | None = None,
                     facts: Mapping[tuple[str, str, str], str] | None = None,
                     missed: Sequence[str] = (), comment: str = "", threshold: float | None = None,
-                    source: str = "officer") -> list[FeedbackItem]:
+                    source: str = "officer", reasons: Sequence[Reason] = (),
+                    agrees: bool | None = None) -> list[FeedbackItem]:
     """One officer submission (call detail panel) -> schema-2 items sharing a batch id and provenance.
     ``result`` carries the decision the officer saw; ``passages``: index -> applies / not_applies;
     ``facts``: (check, family, fact) -> yes / no / unclear (the model value and question are read from
-    the stored facts check). Empty parts are skipped; the comment goes on every item."""
+    the stored facts check). Empty parts are skipped; the comment goes on every item. ``reasons`` /
+    ``agrees`` (review form: why, and whether the officer agrees with the shown label) go on the call item,
+    or on the first item when there is no call verdict."""
     if verdict is not None and verdict not in CALL_VERDICTS:
         raise ValueError(f"call verdict must be one of {CALL_VERDICTS}, got {verdict!r}")
     d = result.decision
@@ -225,7 +273,56 @@ def items_from_form(result: CallResult, *, user: str, verdict: str | None = None
         out.append(FeedbackItem(verdict="missed_family", family=fam, **common))
     if not out:  # a comment alone is not a label
         raise ValueError("Bitte mindestens ein Urteil wählen (Anruf, Passage, Fakt oder übersehene Kategorie).")
+    if reasons or agrees is not None:
+        head = next((i for i in out if i.target == "call"), out[0])
+        head.reasons = [Reason.model_validate(r) for r in reasons]
+        if head.target == "call":
+            head.agrees = agrees
     return out
+
+
+def items_from_review(result: CallResult, *, user: str, verdict: str | None, agrees: bool | None = None,
+                      reasons: Sequence[Reason | Mapping[str, Any]] = (), comment: str = "",
+                      threshold: float | None = None) -> list[FeedbackItem]:
+    """The demo review form: a call verdict, agree / disagree with the system, and WHY as reason codes.
+
+    Reason codes that are labels in their own right also become items of their own (one batch, same
+    provenance), so the learning export sees them without knowing about reason codes:
+
+    * ``fact_wrong`` (family, fact, after) -> a fact item with the officer's value (a trainable fact label);
+    * ``passage_applies`` / ``passage_not_applies`` (passage_index) -> a passage item;
+    * ``other_family`` (family) with a "Verstoss" verdict -> a missed-category item.
+
+    Unknown codes are refused (``ValueError``) so a typo never becomes a silent label."""
+    parsed = [Reason.model_validate(r) for r in reasons]
+    bad = [r.code for r in parsed if r.code not in REASON_CODES]
+    if bad:
+        raise ValueError(f"unknown reason code(s) {bad}; known: {', '.join(REASON_CODES)}")
+    from callguard.learning.records import facts_check_of
+
+    check = facts_check_of(result)
+    facts: dict[tuple[str, str, str], str] = {}
+    passages: dict[int, str] = {}
+    missed: list[str] = []
+    for r in parsed:
+        if r.code == "fact_wrong" and check and r.family and r.fact and r.after in FACT_ANSWERS:
+            facts[(check, r.family, r.fact)] = r.after
+        elif r.code in ("passage_applies", "passage_not_applies") and r.passage_index is not None:
+            passages[r.passage_index] = "applies" if r.code == "passage_applies" else "not_applies"
+        elif r.code == "other_family" and r.family and verdict == "violation" and r.family not in missed:
+            missed.append(r.family)
+    return items_from_form(result, user=user, verdict=verdict, passages=passages, facts=facts, missed=missed,
+                           comment=comment, threshold=threshold, reasons=parsed, agrees=agrees)
+
+
+def batch_count(items: Sequence[FeedbackItem]) -> int:
+    """Number of stored judgements ("Datenpunkte"): one per form submission (batch), legacy lines one each."""
+    return len({i.batch or f"{i.call_id}|{i.ts}|{i.verdict}|{i.passage_index}" for i in items})
+
+
+def judged_calls(items: Sequence[FeedbackItem]) -> set[str]:
+    """Calls an officer has judged at least once (the case status «bearbeitet»)."""
+    return {i.call_id for i in items}
 
 
 def derive_label(item: FeedbackItem, stored_label: str | None = None) -> str | None:
