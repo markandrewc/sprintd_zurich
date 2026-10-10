@@ -10,6 +10,7 @@ The reports cite `runs/experiments/<name>/summary.md`, `runs/asr_eval/<tag>/summ
 | `runs/view_eval/<tag>/summary.md` | `view_eval_<tag>.md` |
 | `runs/holdout_log.jsonl` (3 logged holdout looks) | `holdout_log.jsonl` |
 | `runs/logs/e2e_new.log` (end-to-end test on new audio) | `e2e_new_audio.log` |
+| `runs/evidence_eval/evidence.md` (`callguard evidence-eval`, 2026-10-10 12:14) | `evidence_eval.md` |
 
 Note: the champion's holdout run wrote into the dev experiment folder; its holdout rows live in
 `runs/experiments/champion_holdout/` on the GPU host and the metrics are in `holdout_log.jsonl`.
