@@ -28,7 +28,7 @@ modes:
     text: Wenige Prüfungen. Nur das zweite Modell (Kev) liest die Fakten; es meldet kaum grundlos, übersieht aber mehr.
     rule: b
     needs_second: true
-    metrics: kev
+    metrics: kev_v3
     threshold: suggested
 
   - id: ausgewogen
@@ -36,7 +36,7 @@ modes:
     text: Standard. Das Hauptmodell (Qwen) liest die Fakten, das Regelwerk entscheidet; Unklares geht zur Prüfung.
     rule: a
     needs_second: false
-    metrics: champion
+    metrics: qwen_v3
     threshold: profile
 
   - id: vorsichtig
@@ -44,5 +44,5 @@ modes:
     text: Zwei Modelle lesen unabhängig. Sind sie einig, gilt ihr Entscheid; sind sie uneinig, prüft ein Mensch.
     rule: labels
     needs_second: true
-    metrics: r1
+    metrics: r1_v3
     threshold: profile

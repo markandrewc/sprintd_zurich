@@ -17,7 +17,9 @@ split: dev
 compare_to: champion
 variants:
   # ---- tuned table (the candidate) ---------------------------------------------------------------------------
-  - {name: tuned_src, description: "JOINED: kev_vs_facts/champion (A) + kev_vs_facts/kev_facts (B); callguard agreement merge"}
+  - name: tuned_src
+    set: [checks.facts.policy_table=config/policy_table_v1.yaml, checks.facts_kev.policy_table=config/policy_table_v1.yaml]
+    description: "JOINED: kev_vs_facts/champion (A) + kev_vs_facts/kev_facts (B); callguard agreement merge (table v1, frozen copy)"
   - {name: champion, refuse_from: tuned_src, set: [fusion.rule=a], description: "reader A alone (= kev_vs_facts/champion)"}
   - {name: kev, refuse_from: tuned_src, set: [fusion.rule=b], description: "reader B alone (= kev_vs_facts/kev_facts)"}
   - {name: r1, refuse_from: tuned_src, set: [fusion.rule=labels], description: "R1 label agreement, tuned table"}
@@ -44,3 +46,11 @@ variants:
   - {name: kev_blind, refuse_from: blind_src, set: [fusion.rule=b]}
   - {name: r1_blind, refuse_from: blind_src, set: [fusion.rule=labels]}
   - {name: r2_blind, refuse_from: blind_src, set: [fusion.rule=facts]}
+  # ---- table v3 (adopted 2026-10-10; not pre-registered: describes the live table for the Prüfmodus page) ------
+  - name: v3_src
+    set: [checks.facts.policy_table=config/policy_table_v3.yaml, checks.facts_kev.policy_table=config/policy_table_v3.yaml]
+    description: "JOINED: champion/table_v3 (A) + kev_vs_facts/kev_facts_v3 (B)"
+  - {name: qwen_v3, refuse_from: v3_src, set: [fusion.rule=a]}
+  - {name: kev_v3, refuse_from: v3_src, set: [fusion.rule=b]}
+  - {name: r1_v3, refuse_from: v3_src, set: [fusion.rule=labels]}
+  - {name: r2_v3, refuse_from: v3_src, set: [fusion.rule=facts]}
