@@ -160,3 +160,55 @@ pushing stages as they land (see docs/STATUS.md). First CPU-only numbers in READ
 - R4 blind policy table written (config/policy_table_blind.yaml; agent saw criteria.yaml + README + facts.py code only;
   it glimpsed one docstring example rule that restates the access criteria). Added as `facts_blind` (weight 0) to the
   llm-sweep profile so the 14B/Qwen3 passes compute it.
+
+## 2026-10-10T02:30 A3 complete: ASR model table (dev split, 48 calls, keyword-spot recall + CER vs dialect script)
+| model (settings) | licence | kw recall | clean | noisy | CER | GPU s / audio min |
+|---|---|---|---|---|---|---|
+| gcoli large-v3 gsw (prompt, cond) | MIT | **83.7%** | 87.0% | 80.4% | 25.8% | 2.4 |
+| gcoli large-v3 gsw (no prompt, no cond) | MIT | 80.4% | 82.6% | 78.3% | 23.4% | 2.4 |
+| Flix large-v3 (no prompt, no cond) | Apache-2.0 | 76.1% | 78.3% | 73.9% | 23.3% | 2.4 |
+| vanilla turbo | MIT | ~76% (60-call run) | | | 23.4% | 0.8 |
+| gcoli turbo gsw MIT | MIT | 75.0% | 80.4% | 69.6% | 24.7% | 1.4 |
+| nebi turbo int8 (no prompt, no cond) | CC BY-NC origin | 75.0% | 78.3% | 71.7% | 25.0% | 0.9 |
+| OST turbo gsw | ? | 73.9% | 73.9% | 73.9% | 28.5% | 2.5 |
+| nebi turbo int8 default (prompt, cond) | CC BY-NC origin | 70.7% | | | 27.6% | 0.9 |
+- DECISION: gcoli large-v3 MIT = ASR candidate (best keyword recall, licence-clean). CIs overlap with most others
+  (10 level-1 dialogues carry all keyword spots) -> argue it on licence + consistent lead, not significance.
+- Skipped (GPU time to the LLM sweep): vanilla large-v3 clean, turbo beam 5 (stopped at 30/60, partial cache kept).
+
+## 2026-10-10T02:29 A7/RQ8 denoise front end (DPDFNet2 via sherpa-onnx, CPU 4.5 s per audio min) before turbo int8 (no cond)
+- dev kw-spot recall 76.1% vs 75.0% without; noisy 76.1% vs 71.7%, clean 76.1% vs 78.3%; CER 25.5% vs 25.4%.
+- No detectable effect (CIs ~[63, 90]); small noisy gain offset by a small clean loss. DECISION: denoise stays an
+  option (plugin kept, off by default); no detection run spent on it. The clean/noisy gap is closed more by decoding
+  settings (no prompt, no conditioning) and by the large-v3 model than by denoising.
+- 02:29 Qwen2.5-14B-AWQ starting (GPU exclusive, fp8 KV, 12k ctx).
+
+## 2026-10-10T02:35 V4/A4 LLM transcript correction view `de_fused` (fuses turbo + large-v3 + vanilla turbo hypotheses)
+- 4 noisy level-1 calls (D02/D04/D05/D09-K2), corrector Qwen3-8B: kw spots de 9/19, de_large 14/19, de_vanilla 13/19,
+  **de_fused 15/19**; repaired the D02-K2 prompt loop (insider passage restored). +1 spot over large-v3 alone ->
+  most of the gain is the large-v3 model. DECISION: not worth 3 ASR passes + an LLM pass per call for Sunday; use
+  large-v3 directly. Keep de_fused as an option/creativity story (multi-hypothesis repair) — not on the critical path.
+
+## 2026-10-10T02:44 L1 Qwen3-8B-AWQ (thinking off, fp8 KV) — 13 min for all checks on 48 dev calls
+- Verified rows[].models = Qwen/Qwen3-8B-AWQ only (audit F3). 1 call DEGRADED (llm_judge truncated JSON once).
+- flag AUC: v1 set 0.64 (7B: 0.68); facts_only 0.74 (7B: 0.84); judge+facts 0.76; hybrid 0.76; blind table 0.67.
+- Qwen3-8B is not better than Qwen2.5-7B here. Caveat: the tuned fact wording was developed against 7B answers.
+- Qwen2.5-14B-AWQ failed to start at 0.90 util / 12k ctx / fp8 KV (root cause lost: log overwritten -> per-model
+  logs now). Qwen3-14B starting; 14B retry with smaller context afterwards.
+- Re-fusion-only runs abort while vLLM is swapping (F3 identity check); run them when a model is up or only refuse variants.
+
+## 2026-10-10T02:50 L1 14B on 12 GB + product variant facts_kwlight
+- Qwen2.5-14B-AWQ: full check set OOMs at runtime (11.2/11.7 GB in use after load; 0.95 util, 8k ctx, 4 seqs).
+  Qwen3-14B OOMs at startup. Running a facts-only pass at util 0.90 / 6k ctx / 2 seqs (fact probes are single-token,
+  prefix-cached) to answer "does a bigger model improve the check we ship?".
+- facts_kwlight (facts w1 + keywords w0.15 + patterns w0.1, abstain_on_empty): same CV operating point as facts only
+  (FAR 18%, miss 27%, cap reachable 4/4 folds, FAR floor 14%), AUC 0.80 vs 0.84. Keeps the officer's keyword list
+  live in the decision (jury: "adjust keyword list without code ... visible effect") at a small, not significant cost.
+
+## 2026-10-10T03:10 L1 Qwen2.5-14B-AWQ facts-only pass (util 0.90, 6k ctx, 2 seqs; 20 min / 48 calls = 25 s per call)
+- facts (tuned table): flag AUC 0.87 [0.76, 0.96] vs 7B 0.84 [0.70, 0.95], Qwen3-8B 0.74; CV FAR 14%, miss 23%, 3-class acc 75%.
+- R4 BLIND table: 14B 0.77 [0.62, 0.91], Qwen3-8B 0.67 vs tuned 0.87 / 0.74 -> ~0.07-0.10 AUC of the tuned table's
+  advantage may be dev-fitted wording; the blind table still beats the free 7B judge (0.68). Honest range for an
+  unseen-call facts system: AUC ~0.77-0.87.
+- 14B vs 7B on facts: +0.03 AUC, CIs overlap heavily -> no detectable difference at n=24 dialogues; 3x cost.
+- Queued with the 14B up: facts on large-v3 ASR transcripts, facts on ORACLE dialect scripts.

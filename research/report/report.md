@@ -1,6 +1,6 @@
 # callguard research report
 
-Generated 2026-10-10 02:14 by `callguard report` from 5 experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev dialogues, differences inside the CIs are noise.
+Generated 2026-10-10 03:10 by `callguard report` from 5 experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev dialogues, differences inside the CIs are noise.
 
 AUC is not decision-consistent: it ranks the fused call score, but review rules (uncertainty escalation, "undetermined" verdicts, review band) flag calls whatever the threshold, so for many variants no threshold reaches FAR <= 20% (see each variant's FAR floor). The top variants are ranked by cap compliance and CV@FAR20 recall, not by AUC.
 
@@ -8,16 +8,16 @@ AUC is not decision-consistent: it ranks the fused call score, but review rules 
 
 | # | experiment / variant | split | n | CV@FAR20 R / F1 / FAR | cap | FAR floor | cap folds | flag AUC [95% CI] | alarm AUC | CV flag F1 [95% CI] | FAR | miss | bal. acc | review recall | alarm F1 | acc | check s/call | LLM calls/call | commit | tags |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | llm_models / **qwen25_7b__facts_only** | dev | 48 | 73% / 0.78 / 18% | ok | - | - | 0.84 [0.70, 0.95] | 0.89 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 33% | 0.75 | 73% | 12.2 | 11.8 | f012763172* | re-fusion of qwen25_7b |
-| 2 | llm_models / **qwen25_7b__kwpat_facts** | dev | 48 | 73% / 0.78 / 18% | ok | - | - | 0.79 [0.63, 0.92] | 0.87 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 50% | 0.52 | 58% | 12.2 | 11.8 | f012763172* | re-fusion of qwen25_7b |
-| 3 | checks_ablation / **all_minus_keywords** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.69 [0.55, 0.84] | 0.78 | 0.69 [0.54, 0.81] | 73% (!) | 15% | 0.56 | 33% | 0.64 | 46% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of all |
-| 4 | fusion / **llmunc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.68 [0.54, 0.83] | 0.77 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
-| 5 | fusion / **unc045** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.68 [0.54, 0.83] | 0.77 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
-| 6 | fusion / **noesc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.68 [0.54, 0.83] | 0.77 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | a72e6a6f84* | re-fusion of base |
-| 7 | checks_ablation / **llm_only** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.66 [0.51, 0.82] | 0.75 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.70 | 50% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of all |
-| 8 | fusion / **abstain** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.65 [0.48, 0.82] | 0.73 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 48% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
-| 9 | fusion / **abstain_llmunc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.65 [0.48, 0.82] | 0.73 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 48% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
-| 10 | fusion / **abstain_noesc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.65 [0.48, 0.82] | 0.73 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 48% | 31.8 | 10.0 | a72e6a6f84* | re-fusion of base |
+| 1 | llm_models / **qwen25_14b_facts** | dev | 48 | 77% / 0.82 / 14% | ok | 14% | 4/4 | 0.87 [0.76, 0.96] | 0.91 | 0.82 [0.70, 0.92] | 14% | 23% | 0.82 | 0% | 0.79 | 75% | 79.1 | 46.7 | 5d9264d90c* |  |
+| 2 | llm_models / **qwen25_7b__facts_only** | dev | 48 | 73% / 0.78 / 18% | ok | 14% | 4/4 | 0.84 [0.70, 0.95] | 0.89 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 33% | 0.75 | 73% | 12.2 | 11.8 | f012763172* | re-fusion of qwen25_7b |
+| 3 | llm_models / **qwen25_7b__facts_noesc** | dev | 48 | 73% / 0.78 / 18% | ok | 14% | 4/4 | 0.84 [0.70, 0.95] | 0.89 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 33% | 0.75 | 73% | 12.2 | 11.8 | 5d9264d90c* | re-fusion of qwen25_7b |
+| 4 | llm_models / **qwen25_7b__facts_kwlight** | dev | 48 | 73% / 0.78 / 18% | ok | 14% | 4/4 | 0.80 [0.65, 0.94] | 0.87 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 33% | 0.72 | 71% | 12.2 | 11.8 | 5d9264d90c* | re-fusion of qwen25_7b |
+| 5 | llm_models / **qwen25_7b__facts_kwlight_noesc** | dev | 48 | 73% / 0.78 / 18% | ok | 14% | 4/4 | 0.80 [0.65, 0.94] | 0.87 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 33% | 0.75 | 73% | 12.2 | 11.8 | 5d9264d90c* | re-fusion of qwen25_7b |
+| 6 | llm_models / **qwen25_7b__kwpat_facts** | dev | 48 | 73% / 0.78 / 18% | ok | 18% | 2/4 | 0.79 [0.63, 0.92] | 0.87 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 50% | 0.52 | 58% | 12.2 | 11.8 | f012763172* | re-fusion of qwen25_7b |
+| 7 | llm_models / **qwen3_8b__facts_only** | dev | 48 | 50% / 0.63 / 9% | ok | 9% | 4/4 | 0.74 [0.59, 0.88] | 0.83 | 0.63 [0.37, 0.83] | 9% | 50% | 0.70 | 0% | 0.74 | 69% | 13.3 | 21.0 | 5d9264d90c* | re-fusion of qwen3_8b |
+| 8 | llm_models / **qwen3_8b__kwpat_facts** | dev | 48 | 50% / 0.63 / 9% | ok | 9% | 4/4 | 0.66 [0.48, 0.85] | 0.79 | 0.63 [0.37, 0.83] | 9% | 50% | 0.70 | 0% | 0.46 | 54% | 13.3 | 21.0 | 5d9264d90c* | re-fusion of qwen3_8b |
+| 9 | checks_ablation / **all_minus_keywords** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.69 [0.55, 0.84] | 0.78 | 0.69 [0.54, 0.81] | 73% (!) | 15% | 0.56 | 33% | 0.64 | 46% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of all |
+| 10 | fusion / **llmunc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.68 [0.54, 0.83] | 0.77 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
 
 `*` = uncommitted changes in the tree when the variant ran.
 
@@ -124,13 +124,27 @@ Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant
 
 ![chart_thresholds](llm_models/thresholds.png)
 
+- `qwen3_8b` vs `qwen25_7b`: flag AUC -0.04 [-0.14, +0.05]; flag F1 +0.05 [-0.01, +0.12] (no detectable difference); FAR +14pp; McNemar p=1.0; 22 calls flip
 - `qwen25_7b__kwpat_facts` vs `qwen25_7b`: flag AUC +0.11 [-0.01, +0.24]; flag F1 +0.12 [-0.04, +0.30] (no detectable difference); FAR -68pp; McNemar p=0.0169; 29 calls flip
 - `qwen25_7b__facts_only` vs `qwen25_7b`: flag AUC +0.16 [+0.05, +0.28] (real); flag F1 +0.12 [-0.04, +0.30] (no detectable difference); FAR -68pp; McNemar p=0.0169; 29 calls flip
 - `qwen25_7b__judge_facts` vs `qwen25_7b`: flag AUC +0.08 [+0.01, +0.17] (real); flag F1 +0.10 [-0.02, +0.24] (no detectable difference); FAR -41pp; McNemar p=0.0225; 25 calls flip
 - `qwen25_7b__gcot` vs `qwen25_7b`: flag AUC -0.03 [-0.15, +0.07]; flag F1 +0.06 [-0.02, +0.17] (no detectable difference); FAR -18pp; McNemar p=0.2266; 25 calls flip
 - `qwen25_7b__all_plus` vs `qwen25_7b`: flag AUC +0.07 [-0.04, +0.17]; flag F1 +0.02 [-0.07, +0.12] (no detectable difference); FAR -9pp; McNemar p=0.7539; 28 calls flip
+- `qwen3_8b__kwpat_facts` vs `qwen25_7b`: flag AUC -0.01 [-0.17, +0.10]; flag F1 -0.02 [-0.29, +0.22] (no detectable difference); FAR -77pp; McNemar p=0.1849; 33 calls flip
+- `qwen3_8b__facts_only` vs `qwen25_7b`: flag AUC +0.06 [-0.04, +0.15]; flag F1 -0.02 [-0.29, +0.22] (no detectable difference); FAR -77pp; McNemar p=0.1849; 33 calls flip
+- `qwen3_8b__judge_facts` vs `qwen25_7b`: flag AUC +0.08 [-0.03, +0.17]; flag F1 +0.08 [+0.00, +0.19] (no detectable difference); FAR -9pp; McNemar p=0.0625; 21 calls flip
+- `qwen3_8b__gcot` vs `qwen25_7b`: flag AUC -0.00 [-0.14, +0.10]; flag F1 +0.09 [+0.03, +0.18] (**real difference**); FAR -5pp; McNemar p=0.1797; 23 calls flip
+- `qwen3_8b__all_plus` vs `qwen25_7b`: flag AUC +0.05 [-0.05, +0.13]; flag F1 +0.06 [+0.01, +0.13] (**real difference**); FAR +0pp; McNemar p=0.4531; 23 calls flip
 - `qwen25_7b__hybrid` vs `qwen25_7b`: flag AUC +0.14 [+0.04, +0.26] (real); flag F1 +0.09 [-0.06, +0.24] (no detectable difference); FAR -59pp; McNemar p=0.0414; 28 calls flip
 - `qwen25_7b__hybrid_kw` vs `qwen25_7b`: flag AUC +0.09 [-0.03, +0.21]; flag F1 +0.07 [-0.07, +0.22] (no detectable difference); FAR -55pp; McNemar p=0.0636; 31 calls flip
+- `qwen3_8b__hybrid` vs `qwen25_7b`: flag AUC +0.08 [-0.06, +0.23]; flag F1 +0.05 [-0.10, +0.19] (no detectable difference); FAR -55pp; McNemar p=0.1516; 30 calls flip
+- `qwen3_8b__hybrid_kw` vs `qwen25_7b`: flag AUC +0.03 [-0.15, +0.22]; flag F1 +0.07 [-0.07, +0.21] (no detectable difference); FAR -55pp; McNemar p=0.0931; 31 calls flip
+- `qwen3_8b__facts_blind_only` vs `qwen25_7b`: flag AUC -0.01 [-0.13, +0.11]; flag F1 -0.03 [-0.29, +0.20] (no detectable difference); FAR -64pp; McNemar p=0.3269; 31 calls flip
+- `qwen25_14b_facts` vs `qwen25_7b`: flag AUC +0.19 [+0.07, +0.31] (real); flag F1 +0.16 [+0.01, +0.33] (**real difference**); FAR -73pp; McNemar p=0.0043; 32 calls flip
+- `qwen25_14b_facts__blind_only` vs `qwen25_7b`: flag AUC +0.10 [-0.04, +0.22]; flag F1 +0.08 [-0.07, +0.26] (no detectable difference); FAR -50pp; McNemar p=0.049; 37 calls flip
+- `qwen25_7b__facts_kwlight` vs `qwen25_7b`: flag AUC +0.13 [-0.00, +0.27]; flag F1 +0.12 [-0.04, +0.30] (no detectable difference); FAR -68pp; McNemar p=0.0169; 28 calls flip
+- `qwen25_7b__facts_kwlight_noesc` vs `qwen25_7b`: flag AUC +0.13 [-0.00, +0.27]; flag F1 +0.12 [-0.04, +0.30] (no detectable difference); FAR -68pp; McNemar p=0.0169; 29 calls flip
+- `qwen25_7b__facts_noesc` vs `qwen25_7b`: flag AUC +0.16 [+0.05, +0.28] (real); flag F1 +0.12 [-0.04, +0.30] (no detectable difference); FAR -68pp; McNemar p=0.0169; 29 calls flip
 
 ## smoke
 

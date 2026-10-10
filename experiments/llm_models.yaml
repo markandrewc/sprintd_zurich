@@ -54,3 +54,16 @@ variants:
   - {name: qwen3_8b__facts_blind_only, refuse_from: qwen3_8b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
   - {name: qwen25_14b__facts_blind_only, refuse_from: qwen25_14b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
   - {name: qwen3_14b__facts_blind_only, refuse_from: qwen3_14b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  # ---- 14B on 12 GB: full check set OOMs at runtime; facts-only pass (single-token answers, prefix cached) at
+  #      low concurrency (util 0.90, 6k ctx, max-num-seqs 2). Compare with <model>__facts_only / __facts_blind_only.
+  - {name: qwen25_14b_facts, checks: [facts, facts_blind], set: [checks.facts.weight=1.0], description: "Qwen2.5-14B-AWQ, facts + facts_blind only"}
+  - {name: qwen25_14b_facts__blind_only, refuse_from: qwen25_14b_facts, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  # ---- product variants: facts decides, keywords/patterns stay visible + editable with a light weight (abstain when empty)
+  - {name: qwen25_7b__facts_kwlight, refuse_from: qwen25_7b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0, checks.keywords.weight=0.15, checks.patterns.weight=0.1, fusion.abstain_on_empty=true]}
+  - {name: qwen25_7b__facts_kwlight_noesc, refuse_from: qwen25_7b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0, checks.keywords.weight=0.15, checks.patterns.weight=0.1, fusion.abstain_on_empty=true, fusion.max_uncertainty=1.0]}
+  - {name: qwen25_7b__facts_noesc, refuse_from: qwen25_7b, checks: [facts], set: [checks.facts.weight=1.0, fusion.max_uncertainty=1.0]}
+  # ---- with the facts check: ASR model and ORACLE ceiling (run while the matching model is served)
+  - {name: qwen25_14b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, asr.model=models/asr/whisper-large-v3-gsw-ct2, asr.compute_type=float16], description: "14B facts on gcoli large-v3 ASR"}
+  - {name: qwen25_14b_facts_oracle, profile: llm-sweep-oracle, oracle: true, checks: [facts, facts_blind], set: [checks.facts.weight=1.0], description: "ORACLE: 14B facts on the dialect reference scripts"}
+  - {name: qwen25_7b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, asr.model=models/asr/whisper-large-v3-gsw-ct2, asr.compute_type=float16], description: "7B facts on gcoli large-v3 ASR"}
+  - {name: qwen25_7b_facts_oracle, profile: llm-sweep-oracle, oracle: true, checks: [facts, facts_blind], set: [checks.facts.weight=1.0], description: "ORACLE: 7B facts on the dialect reference scripts"}

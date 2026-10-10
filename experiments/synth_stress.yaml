@@ -3,7 +3,8 @@
 # fresh from config/synth_scenarios.yaml (twins per scenario: alarm / harmless / review, other companies,
 # relatives, amounts, advisor-side misconduct, training quotes) by `callguard synth scripts`.
 # ORACLE text (reference scripts, no ASR): measures the checks' reasoning, not transcription.
-# Same served LLM for every variant: `v1` computes all checks once (facts at weight 0 = not fused),
+# Same served LLM for every variant: `v1` computes all checks of config/synth-oracle.yaml once (facts and
+# facts_blind at weight 0 = not fused; facts_blind = R4 blind table written without transcripts),
 # the others re-fuse those stored results (exactly paired, no new LLM calls).
 # Split `external`: only dialogues that are in no fold of config/splits.yaml (synthetic): no holdout look.
 # Resampling / CV unit = scenario (twin group, header line "Gruppe:").
@@ -18,11 +19,8 @@ compare_to: v1
 variants:
   - name: v1
     description: keywords + patterns + llm_judge + geval (gpu-12gb v1); facts computed, weight 0
-    add_checks:
-      - {name: facts, type: facts, llm: default, parallel: 5, weight: 0.0}
-      # R4 blind table (written from criteria.yaml + README, no transcripts): the dev-tuned wording should
-      # lose its edge over it out of sample if the dev numbers were overfit
-      - {name: facts_blind, type: facts, llm: default, policy_table: config/policy_table_blind.yaml, parallel: 5, weight: 0.0}
+    # Qwen3 thinking off (as llm_models.yaml); other chat templates ignore the kwarg
+    set: ["llms.default.extra_body={chat_template_kwargs: {enable_thinking: false}}"]
   - name: facts_only
     description: facts alone (policy table decides), re-fusion of v1
     refuse_from: v1
