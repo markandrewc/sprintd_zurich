@@ -60,6 +60,7 @@ PAGES: list[PageSpec] = [
     # other teams: add your PageSpec lines below (order 70+), e.g. routing / feedback / patterns / audit
     PageSpec("notifications", "Meldungen", ":material/notifications:", _V + "notifications", order=70),
     PageSpec("feedback", "Feedback & Tuning", ":material/rate_review:", _V + "feedback", order=72),
+    PageSpec("learning", "Lernen", ":material/school:", _V + "learning", order=73),
     PageSpec("patterns", "Muster", ":material/hub:", _V + "patterns", order=74),
     PageSpec("audit", "Audit-Log", ":material/history:", _V + "audit", order=76),
 ]
