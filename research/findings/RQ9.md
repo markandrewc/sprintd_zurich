@@ -27,7 +27,7 @@ review recall by 33 pp.)
 On v1 the escalation did the detection work. Switch it off and the cap becomes reachable, but two thirds of the
 flaggable calls are then missed. Escalation on top of a weak signal amounts to flagging everything.
 On the champion the escalation does nothing: `noesc` and `band025` give the same CV labels (FAR floor 14% in both),
-because facts scores are nearly discrete (labels identical for thresholds 0.45-0.65).
+because facts scores are nearly discrete (flag decisions identical for thresholds 0.45-0.65, 3-class labels for 0.55-0.65).
 
 ## Result 2: operating points at the FAR cap (CV@FAR20)
 | system | flag F1 [95% CI] | FAR [CI] | miss [CI] | review recall | FAR floor | cap met |
@@ -85,5 +85,5 @@ judge + facts reaches 71% (see RQ10). In compliance a miss costs more than an ex
 strict mode, and its FAR of ~36% is still far below v1's 55-86%.
 
 ## What would change our mind
-The organisers scoring *review* as heavily as *alarm*. The holdout review case (C19) being missed. Or a conformal /
+The organisers scoring *review* as heavily as *alarm*. The holdout review case (C19) being missed (it was: no_alert on both versions). Or a conformal /
 calibrated abstention that keeps FAR <= 20% with higher review recall on dev CV.

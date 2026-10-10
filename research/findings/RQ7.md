@@ -70,5 +70,5 @@ misses more alarms. keyword_context alone (keywords + local LLM context) was nev
 for D03-type calls.
 
 ## What would change our mind
-New harmless keyword-heavy calls (holdout C03/C04, C15/C16 or the hidden set) that facts flags. Or a standalone
+New harmless keyword-heavy calls (the hidden set; on the holdout the harmless C03, C04 and C15 were all cleared) that facts flags. Or a standalone
 keyword_context run that matches facts on these calls at lower cost.

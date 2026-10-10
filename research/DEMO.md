@@ -155,8 +155,8 @@ Cross-validated (journal 04:09): flag AUC 0.87 [0.72, 0.99], alarm F1 0.86, revi
 
 Q&A caveat, if asked about overfitting: the fact wording was written against dev transcripts.
 - Paraphrasing the questions drops dev AUC 0.87 → 0.72.
-- A table written blind from the criteria scores 0.77–0.85.
-- A realistic unseen-call AUC is about 0.72–0.85. See research/MORNING_REPORT.md.
+- A table written blind from the criteria scores 0.73–0.85.
+- A realistic unseen-call AUC is about 0.75–0.80 (estimate, not measured). See research/MORNING_REPORT.md.
 
 ## Fallback plan
 

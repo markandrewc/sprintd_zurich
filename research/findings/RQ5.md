@@ -19,19 +19,19 @@ better than the free LLM judge: flag AUC 0.84 vs 0.68 (diff +0.16 [+0.05, +0.28]
 | kw + pat + judge + geval (v1) | 0.68 [0.53, 0.84] | 0.79 | 0.66 | 86% | 15% | 83% | 38% |
 | **facts only** | **0.84 [0.70, 0.95]** | 0.89 | 0.78 | **18%** | 27% | 33% | **73%** |
 | kw + pat + facts | 0.79 [0.63, 0.92] | 0.87 | 0.78 | 18% | 27% | 50% | 58% |
-| kw + pat + judge + facts | 0.76 [0.62, 0.90] | 0.84 | 0.74 | 45% | 19% | 67% | 33% |
-| kw + pat + judge + geval_cot | 0.65 [0.46, 0.84] | 0.76 | 0.66 | 68% | 23% | 67% | 23% |
-| everything (+facts, anchored, geval_cot) | 0.75 [0.58, 0.92] | 0.85 | 0.67 | 64% | 23% | 67% | 40% |
+| kw + pat + judge + facts | 0.76 [0.62, 0.90] | 0.84 | 0.76 | 45% | 15% | 67% | 60% |
+| kw + pat + judge + geval_cot | 0.65 [0.46, 0.84] | 0.76 | 0.72 | 68% | 12% | 67% | 35% |
+| everything (+facts, anchored, geval_cot) | 0.75 [0.58, 0.92] | 0.85 | 0.68 | 77% | 15% | 67% | 42% |
 (CV = threshold chosen on the other dev folds.) Adding anything to `facts` makes it worse at this LLM size: the
 other LLM checks mostly add false alarms.
 
-## Calls that flip (facts only vs v1), 29 calls: 21 fixed, 6 broken
+## Calls that flip (facts only vs v1), 29 calls: 21 fixed, 4 broken (3-class; flag decision: 17 fixed, 5 broken)
 - fixed: all the `documentation` false alarms of the free judge (D01-K2, D06, D08, C02-K4, C05, C08), the harmless
   card-number calls C01/C02 ("4242..." test numbers), D03 (harmless keyword twin), and D02-K2/D04-K2/D05-K1/C07-K4/C13
   alarms that the v1 fusion left at review/no_alert.
 - broken: D05-K2 (TAN read out on noisy audio: ASR garbled "Bestätigungscode" -> fact "code read out" = no),
   C06-K4 (trade alarm, noisy ASR), C18 and C20 (Stufe3 open cases -> facts says no_alert instead of review),
-  C14 (harmless correction of an old address -> documentation alarm).
+  C14 (harmless correction of an old address: review -> documentation alarm, wrong before and after).
 
 ## Examples
 - D06-K2 (harmless: expired sample code on a help document). v1 judge: "Der Kunde möchte, dass eine relevante
@@ -50,4 +50,4 @@ final config is the honest test. Also: the hidden test set may contain misconduc
 does not ask about (the free judge is more open-ended). Mitigation: keep the judge as a review-only signal.
 
 ## What would change our mind
-A holdout result where facts loses its FAR advantage, or a bigger LLM where the free judge catches up (LLM sweep running).
+A holdout result where facts loses its FAR advantage, or a bigger LLM where the free judge catches up (not seen in the LLM sweep: Qwen3-8B v1 0.64; the 14B full set does not fit).

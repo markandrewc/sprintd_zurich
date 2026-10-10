@@ -46,7 +46,7 @@ dialect text:
 
 **14B:** 13 calls change label. For the flag decision 6 get better and 2 get worse. The 14B reads the same D05 passage
 correctly ("Der Kunde liest den Bestätigungscode 'sibe, drü, eins, nüün, vier, zwei' aus", rule access.alarm_1) and
-fixes the C11/C14 harmless-twin reviews. It loses C13 (alarm -> no_alert) on both versions.
+fixes the C11/C14 harmless-twin reviews. It loses C13 (expected alarm; review -> no_alert) on both versions.
 
 ## Recommendation
 Keep Standard German output from the Swiss German Whisper model (large-v3 MIT). It is available off the shelf, the

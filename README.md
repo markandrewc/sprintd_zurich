@@ -345,12 +345,12 @@ differences are noise.
 | **champion = facts + light kw/patterns (`recommended`)** | **large-v3** | **7B** | **0.87 [0.72, 0.99]** | **14%** | **15%** | **79%** |
 | facts ORACLE (dialect reference scripts) | none | 14B | 0.90 [0.79, 1.00] | 0% | 23% | 88% |
 
-The champion also has flag F1 0.86, alarm F1 0.86 and review recall 67%. Its labels are identical anywhere
-from threshold 0.45 to 0.65.
+The champion also has flag F1 0.86, alarm F1 0.86 and review recall 67%. Its flag decisions are identical anywhere
+from threshold 0.45 to 0.65 (3-class labels from 0.55 to 0.65; at 0.45 the "open fact" reviews become alarms).
 
 **Holdout** (run once on the frozen config, 12 calls / 6 dialogues, logged in `runs/holdout_log.jsonl`):
 
-- Champion: **0 false alarms** (6/6 harmless correct), both disclosure alarms caught, alarm F1 0.67, 3-class
+- Champion: **0 false alarms** (6/6 harmless correct), the disclosure alarm D07 caught (both versions), alarm F1 0.67, 3-class
   accuracy 67%. It missed the splitting alarm C16 (one version only went to review) and the open
   documentation case C19.
 - v1 on the same 12 calls sends *everything* to review: 100% false alarms, 3-class accuracy 17%.
@@ -360,20 +360,20 @@ from threshold 0.45 to 0.65.
 
 - Check design matters far more than model size. Facts beat the free judge by +0.16 AUC (real). Qwen2.5-7B,
   Qwen3-8B and Qwen2.5-14B are within ±0.1 of each other, which is not detectable.
-- Better ASR helps once the checks are good: 7B facts went from 0.84 to 0.89 with large-v3. Perfect transcripts
+- Better ASR helps once the checks are good: 7B facts went from 0.84 to 0.89 with large-v3 (CIs overlap). Perfect transcripts
   (ORACLE) add only ~0.03.
 - ASR keyword-spot recall: large-v3 MIT 84%, Flix 76%, vanilla turbo ~76%, default turbo 71%.
-- The 7B reads Standard German ASR output better than perfect dialect text (0.89 vs 0.76).
+- The 7B reads Standard German ASR output at least as well as perfect dialect text (0.89 vs 0.76, CIs overlap).
 - No gain from an English view, denoising or 3-way LLM transcript repair. Hybrid check sets add false alarms.
 
 **Caveats:**
 
 - The fact wording was written while reading dev transcripts.
-- A table written blind from the criteria only scores 0.77-0.85.
+- A table written blind from the criteria only scores 0.73-0.85.
 - **Paraphrase test (R3):** rewording the fact questions (same meaning) drops dev AUC from 0.87 to 0.72. The
-  drop is real (-0.15 [-0.31, -0.03]) and flips 11/48 labels. The tuned wording is fragile. A realistic
-  unseen-call AUC is ~0.72-0.79. A paraphrase ensemble (each fact averaged over several wordings) is being
-  tested as the fix.
+  drop is real (-0.15 [-0.31, -0.03]) and flips 11/48 labels. The tuned wording is fragile. A paraphrase
+  ensemble (each fact averaged over several wordings, R6) halves label flips but scores 0.73-0.81 on dev and
+  0.81 vs 0.80 on synthetic calls, so it was not adopted. Expect ~0.75-0.80 AUC on new calls (estimate).
 - Synthetic out-of-sample test (74 fresh twin scripts, mostly written by the judging 14B itself, so there is a
   circularity risk): facts keeps its large false-alarm advantage (14% vs 61%) but misses more (33%), mostly in
   access.

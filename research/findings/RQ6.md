@@ -16,11 +16,11 @@ the free judge to fact questions + policy table moves flag AUC by +0.16 (real), 
 |---|---|---|---|
 | v1: keywords + patterns + free judge + G-Eval | 0.68 [0.53, 0.84] | 0.64 [0.44, 0.82] | does not fit |
 | facts (tuned table) | **0.84** [0.70, 0.95] | 0.74 [0.59, 0.88] | **0.87** [0.76, 0.96] |
-| facts (blind table, R4) | (pending) | 0.67 [0.53, 0.82] | 0.77 [0.62, 0.91] |
+| facts (blind table, R4) | 0.73 [0.57, 0.88] | 0.67 [0.53, 0.82] | 0.77 [0.62, 0.91] |
 | judge + facts | 0.76 | 0.76 | - |
 | G-Eval with analysis first (geval_cot) | 0.65 | 0.67 | - |
 
-Cost: 7B all checks 10 min / 48 calls (8 parallel); Qwen3-8B 13 min; 14B facts only 20 min (2 parallel) = 25 s/call.
+Cost: 7B all checks 10 min / 48 calls (6 parallel calls, journal 01:43); Qwen3-8B 13 min; 14B facts only 20 min (2 parallel) = 25 s/call.
 
 ## Recommendation
 Run the check design that wins (facts) on the model the hardware serves comfortably: Qwen2.5-7B-AWQ on the 12 GB card
