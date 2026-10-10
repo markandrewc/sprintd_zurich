@@ -233,7 +233,7 @@ def strip_chart(answers: list[fpol.FactAnswer], policy: fpol.FactPolicy, family:
             tooltip=[alt.Tooltip("Leser:N"), alt.Tooltip("x:Q", title="ja ab p(ja) / nein ab p(nein)", format=".2f")]))
     if not df.empty:
         layers.append(alt.Chart(df).mark_circle(size=64, opacity=0.9, stroke="#fcfcfb", strokeWidth=1).encode(
-            x=alt.X("p:Q", scale=xs, title="p(ja)",
+            x=alt.X("p:Q", scale=xs, title="p(ja) je Anruf · grau: Band «unklar» · gestrichelt: Grenze bei drei Antworten",
                     axis=alt.Axis(values=[0, 0.25, 0.5, 0.75, 1], format=".2f", grid=False, labelColor=INK_MUTED,
                                   titleColor=INK_MUTED, tickColor=BAND_FILL, domainColor=BAND_FILL)),
             y=alt.Y("row:Q", scale=ys, axis=y_axis),
@@ -241,7 +241,7 @@ def strip_chart(answers: list[fpol.FactAnswer], policy: fpol.FactPolicy, family:
                             legend=None),
             tooltip=[alt.Tooltip("Anruf:N"), alt.Tooltip("Leser:N"), alt.Tooltip("p:Q", title="p(ja)", format=".2f"),
                      alt.Tooltip("Wert:N", title="Wert dieses Lesers"), alt.Tooltip("Ergebnis:N", title="zusammen")]))
-    return alt.layer(*layers).properties(height=110).configure_view(stroke=None)
+    return alt.layer(*layers).properties(height=150).configure_view(stroke=None)
 
 
 # --------------------------------------------------------------------------------------------
