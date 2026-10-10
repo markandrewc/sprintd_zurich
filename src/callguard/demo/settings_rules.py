@@ -18,7 +18,7 @@ import streamlit as st
 from callguard import fact_policy as fpol
 from callguard import policy_edit as pe
 from callguard import rule_drafter as rd
-from callguard.checks.facts import PolicyTableError, eval_hard, parse_rule
+from callguard.checks.facts import CROSS_FAMILY, PolicyTableError, eval_hard, parse_rule
 from callguard.demo import facts_ui as fu
 from callguard.policy_versions import FourEyesError
 from callguard.ui import render as ui
@@ -52,27 +52,50 @@ def rule_title(rule: dict[str, Any]) -> str:
 
 def new_state() -> dict[str, Any]:
     return {"step": 1, "facts": [], "conds": {}, "join": "and", "label": "review", "title": "", "text": "",
-            "nonce": 0, "ai_note": None, "ai_missing": [], "ai_family": None}
+            "nonce": 0, "ai_note": None, "ai_missing": [], "ai_family": None, "report_as": None}
 
 
 def state_family(state: dict[str, Any]) -> str | None:
+    """The Prüfart of the chosen facts; :data:`CROSS_FAMILY` when they span several (a cross rule); None: none."""
     fams = {f.split(".", 1)[0] for f in state["facts"]}
-    return next(iter(fams)) if len(fams) == 1 else None
+    if not fams:
+        return None
+    return next(iter(fams)) if len(fams) == 1 else CROSS_FAMILY
 
 
 def state_rule(state: dict[str, Any], doc: dict[str, Any]) -> tuple[str, dict[str, Any]] | None:
-    """(family, rule) the wizard describes, or None while it cannot be a rule yet (no fact / several Prüfarten)."""
+    """(family, rule) the wizard describes (family :data:`CROSS_FAMILY`: a cross rule over qualified facts), or
+    None while no fact is chosen."""
     fam = state_family(state)
     if fam is None:
         return None
+    cross = fam == CROSS_FAMILY
     conds = []
     for key in state["facts"]:
         c = state["conds"].get(key) or {}
-        conds.append((key.split(".", 1)[1], str(c.get("value") or "yes"), bool(c.get("neg"))))
+        conds.append((key if cross else key.split(".", 1)[1], str(c.get("value") or "yes"), bool(c.get("neg"))))
     label = state["label"] if state["label"] in OUTCOMES else "review"
-    rule = {"id": pe.new_rule_id(doc, fam, label), "label": label, "when": fu.build_when(conds, state["join"]),
-            "text": state["text"].strip(), "title": state["title"].strip()}
+    rid = pe.new_cross_rule_id(doc, label) if cross else pe.new_rule_id(doc, fam, label)
+    rule = {"id": rid, "label": label, "when": fu.build_when(conds, state["join"]), "text": state["text"].strip(),
+            "title": state["title"].strip()}
+    if cross and state.get("report_as"):
+        rule["report_as"] = state["report_as"]
     return fam, rule
+
+
+def doc_with(doc: dict[str, Any], fam: str, rule: dict[str, Any]) -> dict[str, Any]:
+    """The table with the wizard's rule added (into its Prüfart, or into ``cross_rules``)."""
+    if fam == CROSS_FAMILY:
+        cand = copy.deepcopy(doc)
+        pe.add_cross_rule(cand, rule)
+        return cand
+    return fu.with_rule(doc, fam, rule)[0]
+
+
+def fact_label(doc: dict[str, Any], key: str, names: dict[str, str], cross: bool) -> str:
+    fam, fid = key.split(".", 1)
+    lab = pe.fact_labels(doc, fam).get(fid, fid)
+    return f"{names.get(fam, fam)}: {lab}" if cross else lab
 
 
 def state_from_draft(draft: rd.Draft, doc: dict[str, Any]) -> dict[str, Any]:
@@ -112,11 +135,11 @@ def _hits_line(app: Any, pol: fpol.FactPolicy, work: dict[str, Any], state: dict
                base: dict[str, fpol.CallOutcome]) -> tuple[dict[str, Any] | None, str]:
     built = state_rule(state, work)
     if built is None:
-        st.caption(":material/bolt: Diese Regel greift bei … — zuerst Fakten einer Prüfart wählen.")
+        st.caption(":material/bolt: Diese Regel greift bei … — zuerst Fakten wählen.")
         return None, ""
     fam, rule = built
     try:
-        cand, _ = fu.with_rule(work, fam, rule)
+        cand = doc_with(work, fam, rule)
         outs = fu.outcomes(app, pol, pe.validate(cand))
     except PolicyTableError as e:
         st.error(str(e))
@@ -172,6 +195,9 @@ def _band_text(pol: fpol.FactPolicy, fam: str, fid: str) -> str:
 def _ai_panel(app: Any, work: dict[str, Any], names: dict[str, str]) -> None:
     ss = st.session_state
     state = _state()
+    if not fu.assistant_enabled(app):  # no LLM is constructed or called
+        st.caption(f":material/smart_toy: {fu.ASSISTANT_OFF}")
+        return
     st.markdown("##### :material/smart_toy: KI-Assistent")
     st.caption("Beschreiben Sie die Regel in eigenen Worten. Die KI wählt die Fakten und füllt den Assistenten aus; "
                "Sie prüfen jeden Schritt und speichern selbst.")
@@ -267,10 +293,13 @@ def rule_wizard(app: Any) -> None:
                                for i, t in ((1, "Fakten wählen"), (2, "Bedingungen"), (3, "Ergebnis"))))
         fams = list((work.get("families") or {}).keys())
         sel_fam = state_family(state)
-        sel_labels = pe.fact_labels(work, sel_fam) if sel_fam else {}
+        is_cross = sel_fam == CROSS_FAMILY
+        sel_labels = (pe.cross_labels(work, names) if is_cross
+                      else pe.fact_labels(work, sel_fam) if sel_fam else {})
         if state["facts"]:
             st.markdown("Gewählt: " + " ".join(
-                f":blue-badge[{ui.esc(sel_labels.get(k.split('.', 1)[1], k.split('.', 1)[1]))}]" for k in state["facts"]))
+                f":blue-badge[{ui.esc(fact_label(work, k, names, is_cross))}]" for k in state["facts"])
+                + (" · :violet-badge[übergreifend]" if is_cross else ""))
         # live effect + navigation on top, so they stay in view while the list below is long
         cand, fam = _hits_line(app, pol, work, state, base)
         b1, _, b3 = st.columns(3)
@@ -299,34 +328,32 @@ def rule_wizard(app: Any) -> None:
         if state["step"] == 1:
             q = st.text_input("Suchen", key="dm_rw_q", placeholder="Fakten suchen, z.B. Code, Handelswunsch, Vollmacht …",
                               label_visibility="collapsed")
-            if len({k.split('.', 1)[0] for k in state["facts"]}) > 1:
-                st.warning("Eine Regel gehört zu genau einer Prüfart: bitte Fakten nur einer Prüfart wählen.")
+            st.caption("Fakten aus mehreren Prüfarten lassen sich frei kombinieren (eigene, übergreifende Regel).")
             for fam_id in fams:
                 facts = [f for f in pe.family_doc(work, fam_id)["facts"]
                          if not q or q.lower() in f"{f.get('label')} {f.get('de')}".lower()]
                 if not facts:
                     continue
-                st.markdown(f"**{ui.esc(names.get(fam_id, fam_id))}**")
+                st.markdown(f":gray-badge[{ui.esc(names.get(fam_id, fam_id))}]")
                 cols = st.columns(2)
                 for i, f in enumerate(facts):
                     key = f"{fam_id}.{f['id']}"
                     cols[i % 2].checkbox(str(f.get("label") or f["id"]), value=key in state["facts"],
                                          key=f"dm_rw_f_{key}_{n}", on_change=_toggle_fact,
-                                         args=(key, f"dm_rw_f_{key}_{n}"), help=str(f.get("de") or ""),
-                                         disabled=sel_fam is not None and fam_id != sel_fam and key not in state["facts"])
+                                         args=(key, f"dm_rw_f_{key}_{n}"), help=str(f.get("de") or ""))
         elif state["step"] == 2:
             for key in state["facts"]:
-                fid = key.split(".", 1)[1]
+                kfam, fid = key.split(".", 1)
                 c = state["conds"].setdefault(key, {"value": "yes", "neg": False})
                 with st.container(border=True):
                     a, b, d = st.columns([3, 3, 1], vertical_alignment="center")
-                    a.markdown(f"«{ui.esc(sel_labels.get(fid, fid))}»")
+                    a.markdown(f"«{ui.esc(fact_label(work, key, names, is_cross))}»")
                     b.segmented_control("Wert", list(VALUE_OPTS), default=c["value"], key=f"dm_rw_v_{key}_{n}",
                                         format_func=fpol.VALUE_DE.get, label_visibility="collapsed", required=True,
                                         on_change=_set_cond, args=(key, "value", f"dm_rw_v_{key}_{n}"))
                     d.checkbox("nicht", value=c["neg"], key=f"dm_rw_n_{key}_{n}", on_change=_set_cond,
                                args=(key, "neg", f"dm_rw_n_{key}_{n}"))
-                    st.caption(_band_text(pol, sel_fam, fid))
+                    st.caption(_band_text(pol, kfam, fid))
             st.toggle("ODER statt UND (eine der Bedingungen genügt)", value=state["join"] == "or",
                       key=f"dm_rw_join_{n}", on_change=_set, args=("join", f"dm_rw_join_{n}"))
         else:
@@ -337,6 +364,16 @@ def rule_wizard(app: Any) -> None:
                           args=("title", f"dm_rw_title_{n}"), placeholder="z.B. Code vorgelesen, Gültigkeit offen")
             st.text_area("Beschreibung (sieht die Fallbearbeitung als Begründung)", value=state["text"],
                          key=f"dm_rw_text_{n}", on_change=_set, args=("text", f"dm_rw_text_{n}"), height=90)
+            if is_cross:
+                st.info("Diese Fakten stammen aus mehreren Prüfarten: **wird als übergreifende Regel gespeichert** "
+                        "(«Eigene Regeln»). Sie entscheidet, nachdem jede Prüfart ihre Fakten bestimmt hat.",
+                        icon=":material/hub:")
+                fams_used = list(dict.fromkeys(k.split(".", 1)[0] for k in state["facts"]))
+                st.selectbox("Melden als (optional, für Anzeige und Meldeweg)", [None, *fams_used],
+                             index=([None, *fams_used].index(state.get("report_as"))
+                                    if state.get("report_as") in fams_used else 0),
+                             format_func=lambda f: "Eigene Regeln" if f is None else names.get(f, f),
+                             key=f"dm_rw_rep_{n}", on_change=_set, args=("report_as", f"dm_rw_rep_{n}"))
             built = state_rule(state, work)
             if built:
                 st.markdown(f"**{ui.esc(pe.render_rule(built[1], sel_labels))}**")
@@ -372,6 +409,56 @@ def _delete_rule(app: Any, fam: str, rid: str) -> None:
     doc = fu.live_doc(app)
     pe.delete_rule(doc, fam, rid)
     _apply(app, doc, f"Regel {rid} gelöscht")
+
+
+def _toggle_cross(app: Any, rid: str, key: str) -> None:
+    doc = fu.live_doc(app)
+    on = bool(st.session_state.get(key))
+    pe.set_cross_enabled(doc, rid, on)
+    _apply(app, doc, f"Übergreifende Regel {rid} {'eingeschaltet' if on else 'ausgeschaltet'}")
+
+
+def _delete_cross(app: Any, rid: str) -> None:
+    doc = fu.live_doc(app)
+    pe.delete_cross_rule(doc, rid)
+    _apply(app, doc, f"Übergreifende Regel {rid} gelöscht")
+
+
+def cross_section(app: Any, doc: dict[str, Any], outs: dict[str, fpol.CallOutcome], names: dict[str, str]) -> None:
+    """«Eigene Regeln (übergreifend)»: rules over facts of several Prüfarten (section ``cross_rules``)."""
+    ss = st.session_state
+    st.markdown(f"#### {pe.CROSS_NAME}")
+    rules = list(doc.get("cross_rules") or [])
+    if not rules:
+        st.caption("Noch keine. «Neue Regel» und Fakten aus mehreren Prüfarten wählen: Ihre eigene Regelidee, "
+                   "die nach allen Prüfarten entscheidet.")
+        return
+    labels = pe.cross_labels(doc, names)
+    for r in rules:
+        rid = str(r["id"])
+        on = pe.is_enabled(r)
+        lab = str(r.get("label"))
+        if on:
+            calls = [cid for cid, o in sorted(outs.items())
+                     if (v := o.families.get(CROSS_FAMILY)) is not None and v.rule == rid]
+            hit_txt = f"greift bei {len(calls)} Anruf{'en' if len(calls) != 1 else ''}"
+        else:
+            node = parse_rule(str(r.get("when")))
+            calls = [cid for cid, o in sorted(outs.items()) if eval_hard(node, {
+                f"{fam}.{fid}": x.value for fam, v in o.families.items() for fid, x in v.facts.items()})]
+            hit_txt = f"aus · wäre erfüllt bei {len(calls)}"
+        with st.container(border=True):
+            a, b, c, d = st.columns([7, 1.6, 0.8, 0.6], vertical_alignment="center")
+            rep_as = f" · gemeldet als {names.get(r['report_as'], r['report_as'])}" if r.get("report_as") else ""
+            a.markdown(f":{LABEL_COLOR.get(lab, 'gray')}-badge[{LABEL_DE.get(lab, lab)}] :violet-badge[übergreifend] "
+                       f"**{ui.esc(rule_title(r))}**{ui.esc(rep_as)}  \n:small[{ui.esc(pe.render_rule(r, labels))}]")
+            with b.popover(hit_txt, width="stretch"):
+                st.markdown(" · ".join(f"{fu.call_link(x)} ({LABEL_DE[outs[x].label]})" for x in calls) or "keine Anrufe")
+            key = f"dm_rg_xon_{rid}"
+            ss[key] = on
+            c.toggle("an", key=key, on_change=_toggle_cross, args=(app, rid, key), label_visibility="collapsed")
+            d.button("", icon=":material/delete:", key=f"dm_rg_xdel_{rid}", on_click=_delete_cross, args=(app, rid),
+                     help="Regel löschen (sofort, rückgängig machbar)")
 
 
 def _undo(app: Any) -> None:
@@ -442,6 +529,7 @@ def render(app: Any) -> None:
                 c.toggle("an", key=key, on_change=_toggle_rule, args=(app, fam, rid, key), label_visibility="collapsed")
                 d.button("", icon=":material/delete:", key=f"dm_rg_del_{fam}_{rid}", on_click=_delete_rule,
                          args=(app, fam, rid), help="Regel löschen (sofort, rückgängig machbar)")
+    cross_section(app, doc, outs, names)
     with st.expander("Verlauf der Regeländerungen", icon=":material/history:"):
         for v in list(reversed(vs.versions()))[:10]:
             kind = "sofort" if v.meta.get("instant") else ("Freigabe " + str(v.meta.get("approver") or "–"))

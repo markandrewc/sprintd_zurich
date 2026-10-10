@@ -26,8 +26,8 @@ from typing import TYPE_CHECKING, Any
 from callguard import agreement as ag
 from callguard import fact_policy as fpol
 from callguard.cache import stable_hash
-from callguard.checks.facts import DEFAULT_TABLE, FamilyTable, load_policy_table
-from callguard.fusion.weighted import WeightedFusion
+from callguard.checks.facts import DEFAULT_TABLE, FamilyTable, PolicyTable, load_policy_table
+from callguard.fusion.weighted import WeightedFusion, short_label
 from callguard.types import CheckResult, Decision, Family, Transcript
 
 if TYPE_CHECKING:
@@ -106,17 +106,31 @@ class TwoReadersFusion(WeightedFusion):
     def decide_checks(self, transcript: Transcript, checks: dict[str, CheckResult], families: list[Family],
                       overrides: dict[str, Any] | None = None,
                       views: dict[str, Transcript] | None = None) -> Decision:
-        """The weighted fusion on already combined checks (the what-if of the demo's «Fakten» / «Regeln»)."""
+        """The weighted fusion on already combined checks (the what-if of the demo's «Fakten» / «Regeln»); the
+        cross rules' virtual family joins the families when a combined result carries it."""
+        families = fpol.with_cross_family(families, checks, self._names(families))
         return super().decide(transcript, checks, families, overrides, views)
+
+    @staticmethod
+    def _names(families: list[Family]) -> dict[str, str]:
+        return {f.id: short_label(f.label) for f in families}
+
+    def table(self) -> PolicyTable:
+        """The live policy table, cross rules included."""
+        return load_policy_table(self.policy_table)
 
     def decide_policy(self, transcript: Transcript, results: dict[str, CheckResult], families: list[Family],
                       overrides: dict[str, Any] | None = None, views: dict[str, Transcript] | None = None, *,
                       policy: "fpol.FactPolicy | None" = None,
-                      tables: dict[str, FamilyTable] | None = None) -> Decision:
+                      tables: "PolicyTable | dict[str, FamilyTable] | None" = None) -> Decision:
         """Rule ``policy``: both readers -> one combined facts result (bands + combination per fact, then the
-        rules) -> the weighted fusion. ``policy`` / ``tables``: a draft instead of the live files."""
+        rules of every family, then the cross rules over all resolved facts) -> the weighted fusion. ``policy`` /
+        ``tables``: a draft instead of the live files (a PolicyTable also brings its cross rules)."""
         pol = policy or self._policy_override(overrides) or self.fact_policy()
-        checks = fpol.combined_checks(results, tables or self.tables(), pol, **self.scoring)
+        names = self._names(families)
+        checks = fpol.combined_checks(results, tables if tables is not None else self.table(), pol,
+                                      family_names=names, **self.scoring)
+        families = fpol.with_cross_family(families, checks, names)
         d = super().decide(transcript, checks, families, overrides, views)
         comb = checks.get(pol.a.check)
         split = (comb.meta.get("fact_policy") or {}).get("disagree") if comb is not None else None

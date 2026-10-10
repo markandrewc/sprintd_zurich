@@ -92,7 +92,8 @@ def with_fact_policy(app: AppState, result: CallResult) -> CallResult:
         pol = fu.session_policy(app)
         if not has_both(result, pol):
             return result
-        return result.model_copy(update={"checks": combined_checks(result, fus.tables(), pol, **fus.scoring)})
+        checks = combined_checks(result, fus.table(), pol, family_names=fus._names(app.all_families), **fus.scoring)
+        return result.model_copy(update={"checks": checks})
     except Exception as e:  # the card falls back to the stored first reader
         log.warning("card: fact policy view of %s failed: %s", result.call_id, e)
         return result

@@ -33,7 +33,17 @@ from typing import Any
 import yaml
 
 from callguard.cache import stable_hash
-from callguard.checks.facts import FamilyTable, PolicyTableError, average_probs, decide_family, discretize
+from callguard.checks.facts import (
+    CROSS_FAMILY,
+    CROSS_LABEL,
+    FamilyTable,
+    PolicyTable,
+    PolicyTableError,
+    average_probs,
+    decide_family,
+    discretize,
+    rule_facts,
+)
 from callguard.config import ROOT
 from callguard.types import CallResult, CheckResult, FamilyScore
 
@@ -492,10 +502,74 @@ def combine_family(ft: FamilyTable, fs_a: FamilyScore | None, fs_b: FamilyScore 
                        segment_ids=list(fs_a.segment_ids) if fs_a is not None else [], detail=detail)
 
 
-def combined_result(tables: Mapping[str, FamilyTable], a: CheckResult | None, b: CheckResult | None,
-                    policy: FactPolicy, *, name: str = "facts", **scoring: float) -> CheckResult:
-    """One call's combined facts result: every family either reader scored (and the table has). Findings
-    (audio evidence) are reader A's; reader B runs without evidence."""
+def split_tables(tables: Any) -> tuple[Mapping[str, FamilyTable], FamilyTable | None]:
+    """(families, cross rules) of a PolicyTable, or (the mapping, None) for a plain ``families`` mapping."""
+    if isinstance(tables, PolicyTable):
+        return tables.families, tables.cross
+    return tables, None
+
+
+def cross_family(cross: FamilyTable | None, fam_scores: Mapping[str, FamilyScore], findings: list[Any],
+                 family_names: Mapping[str, str] | None = None, **scoring: float
+                 ) -> tuple[FamilyScore, list[Any]] | None:
+    """The cross rules (section ``cross_rules``) over the union of every family's RESOLVED facts: the first
+    matching rule decides the virtual family :data:`CROSS_FAMILY`. None when no cross rule matches (the call
+    is then decided exactly as without cross rules). Pure: the same function serves the live fusion and the
+    instant re-decision. Returns the FamilyScore and the evidence findings of the decisive facts."""
+    if cross is None or not cross.rules:
+        return None
+    names = family_names or {}
+    values: dict[str, str] = {}
+    probs: dict[str, dict[str, float]] = {}
+    facts: dict[str, dict[str, Any]] = {}
+    for f in cross.facts:
+        fam, fid = f.id.split(".", 1)
+        fs = fam_scores.get(fam)
+        e = ((fs.detail or {}).get("facts") or {}).get(fid) if fs is not None else None
+        label = f"{names.get(fam, fam)}: {f.label}"
+        if e:
+            values[f.id], probs[f.id] = str(e.get("value") or "unclear"), dict(e.get("p") or {"unclear": 1.0})
+            facts[f.id] = {**e, "label": label, "family": fam}
+        else:
+            values[f.id], probs[f.id] = "unclear", {"unclear": 1.0}
+            facts[f.id] = {"label": label, "family": fam, "role": f.role, "value": "unclear", "p": {"unclear": 1.0}}
+    rule = cross.decide(values)
+    if rule is None:
+        return None
+    ft = FamilyTable(family=CROSS_FAMILY, facts=[f.__class__(**{**f.__dict__, "label": facts[f.id]["label"]})
+                                                 for f in cross.facts], rules=cross.rules)
+    fd = decide_family(ft, values, probs, **scoring)
+    decisive = rule_facts(rule.node)
+    segs: list[str] = []
+    for q in decisive:
+        segs += [s for s in facts[q].get("evidence") or [] if s not in segs]
+    keep = {(q.split(".", 1)[0], q.split(".", 1)[1]) for q in decisive}
+    ev = [f.model_copy(update={"family": CROSS_FAMILY}) for f in findings
+          if (f.family, str((f.detail or {}).get("fact") or "")) in keep]
+    title = rule.title or rule.text or rule.id
+    detail: dict[str, Any] = {
+        "decision": fd.label, "facts": {q: facts[q] for q in [*decisive, *[x for x in facts if x not in decisive]]},
+        "summary": fd.summary, "cross": True, "report_as": rule.report_as,
+        "rule": {"id": rule.id, "label": rule.label, "when": rule.when, "text": rule.text, "title": rule.title,
+                 "report_as": rule.report_as},
+        "rule_probs": fd.soft, "p_alarm": round(fd.p_alarm, 4), "p_review": round(fd.p_review, 4)}
+    reason = f"{title.rstrip('.')}. Regel: {rule.id} (übergreifend)."
+    return FamilyScore(score=round(min(1.0, max(0.0, fd.score)), 4), confidence=round(min(1.0, fd.confidence), 4),
+                       verdict=fd.verdict, reason=reason, segment_ids=segs, detail=detail), ev  # type: ignore[arg-type]
+
+
+def cross_family_label(detail: Mapping[str, Any], family_names: Mapping[str, str] | None = None) -> str:
+    rep_ = str(detail.get("report_as") or "")
+    return f"{CROSS_LABEL} · {(family_names or {}).get(rep_, rep_)}" if rep_ else CROSS_LABEL
+
+
+def combined_result(tables: Any, a: CheckResult | None, b: CheckResult | None,
+                    policy: FactPolicy, *, name: str = "facts", family_names: Mapping[str, str] | None = None,
+                    **scoring: float) -> CheckResult:
+    """One call's combined facts result: every family either reader scored (and the table has), plus the virtual
+    family of the cross rules when one matches (``tables`` a PolicyTable with a ``cross_rules`` section).
+    Findings (audio evidence) are reader A's; reader B runs without evidence."""
+    tables, cross = split_tables(tables)
     a, b = usable(a), usable(b)
     fams = [f for f in tables if (a and f in a.family_scores) or (b and f in b.family_scores)]
     out = {f: combine_family(tables[f], a.family_scores.get(f) if a else None, b.family_scores.get(f) if b else None,
@@ -510,12 +584,18 @@ def combined_result(tables: Mapping[str, FamilyTable], a: CheckResult | None, b:
     src = a or b
     fam_ok = set(fams)
     findings = [f for f in (a.findings if a else []) if f.family in fam_ok]
+    xr = cross_family(cross, out, findings, family_names, **scoring)
+    if xr is not None:
+        out[CROSS_FAMILY], ev = xr
+        findings = [*findings, *ev]
+        meta["cross_rule"] = xr[0].detail["rule"]["id"]
     return CheckResult(check=name, type="facts", family_scores=out, findings=findings, meta=meta,
                        view=src.view if src else None)
 
 
-def combined_checks(result: CallResult | Mapping[str, CheckResult], tables: Mapping[str, FamilyTable],
-                    policy: FactPolicy, **scoring: float) -> dict[str, CheckResult]:
+def combined_checks(result: CallResult | Mapping[str, CheckResult], tables: Any,
+                    policy: FactPolicy, *, family_names: Mapping[str, str] | None = None,
+                    **scoring: float) -> dict[str, CheckResult]:
     """The call's checks as the fusion sees them under ``policy``: both readers replaced by one combined
     facts result under reader A's name (so A's weight applies); every other check unchanged."""
     checks = result.checks if isinstance(result, CallResult) else result
@@ -523,7 +603,8 @@ def combined_checks(result: CallResult | Mapping[str, CheckResult], tables: Mapp
     rest = {k: v for k, v in checks.items() if k not in (a, b)}
     if checks.get(a) is None and checks.get(b) is None:
         return rest
-    return {**rest, a: combined_result(tables, checks.get(a), checks.get(b), policy, name=a, **scoring)}
+    return {**rest, a: combined_result(tables, checks.get(a), checks.get(b), policy, name=a,
+                                       family_names=family_names, **scoring)}
 
 
 # --------------------------------------------------------------------------------------------
@@ -569,20 +650,35 @@ def family_verdicts(combined: CheckResult, policy: FactPolicy) -> dict[str, Fami
 Decide = Callable[[CallResult, dict[str, CheckResult]], Any]  # (call, checks) -> Decision
 
 
-def redecide_one(result: CallResult, tables: Mapping[str, FamilyTable], policy: FactPolicy, decide: Decide,
-                 **scoring: float) -> CallOutcome:
-    checks = combined_checks(result, tables, policy, **scoring)
+def redecide_one(result: CallResult, tables: Any, policy: FactPolicy, decide: Decide,
+                 family_names: Mapping[str, str] | None = None, **scoring: float) -> CallOutcome:
+    checks = combined_checks(result, tables, policy, family_names=family_names, **scoring)
     d = decide(result, checks)
     comb = checks.get(policy.a.check)
     fams = family_verdicts(comb, policy) if comb is not None and comb.meta.get("fact_policy") else {}
     return CallOutcome(result.call_id, d.label, float(d.score), fams, list(d.reasons))
 
 
-def redecide(results: Mapping[str, CallResult], tables: Mapping[str, FamilyTable], policy: FactPolicy,
-             decide: Decide, **scoring: float) -> dict[str, CallOutcome]:
-    """Every stored call re-decided under ``policy`` + ``tables`` (no LLM). ``decide(call, checks)`` is the
-    fusion (e.g. ``lambda r, c: fusion.decide(r.transcript, c, families, overrides)``)."""
-    return {cid: redecide_one(r, tables, policy, decide, **scoring) for cid, r in results.items()}
+def redecide(results: Mapping[str, CallResult], tables: Any, policy: FactPolicy,
+             decide: Decide, family_names: Mapping[str, str] | None = None, **scoring: float) -> dict[str, CallOutcome]:
+    """Every stored call re-decided under ``policy`` + ``tables`` (no LLM; a PolicyTable also applies its cross
+    rules). ``decide(call, checks)`` is the fusion; the fusion's ``decide_checks`` adds the cross rules' virtual
+    family (:func:`with_cross_family`)."""
+    return {cid: redecide_one(r, tables, policy, decide, family_names, **scoring) for cid, r in results.items()}
+
+
+def with_cross_family(families: list[Any], checks: Mapping[str, CheckResult],
+                      family_names: Mapping[str, str] | None = None) -> list[Any]:
+    """``families`` plus the virtual family of the cross rules when a combined facts result carries it (the
+    fusion only scores families it is given)."""
+    from callguard.types import Family
+
+    for cr in checks.values():
+        fs = cr.family_scores.get(CROSS_FAMILY)
+        if fs is not None and not any(f.id == CROSS_FAMILY for f in families):
+            return [*families, Family(id=CROSS_FAMILY, label=cross_family_label(fs.detail or {}, family_names),
+                                      can_alarm=True)]
+    return families
 
 
 def effect(before: Mapping[str, CallOutcome | str], after: Mapping[str, CallOutcome | str]) -> dict[str, Any]:
@@ -676,26 +772,39 @@ def facts_part(doc: Mapping[str, Any]) -> dict[str, Any]:
     return {fid: copy.deepcopy((fam or {}).get("facts") or []) for fid, fam in ((doc or {}).get("families") or {}).items()}
 
 
+CROSS_KEY = "__cross__"  # rules_part: the section ``cross_rules`` (rules over several Prüfarten)
+
+
 def rules_part(doc: Mapping[str, Any]) -> dict[str, Any]:
-    return {fid: copy.deepcopy((fam or {}).get("rules") or []) for fid, fam in ((doc or {}).get("families") or {}).items()}
+    """Per family its rules, plus :data:`CROSS_KEY` -> the cross rules (both are RULES: instant, with undo)."""
+    out = {fid: copy.deepcopy((fam or {}).get("rules") or []) for fid, fam in ((doc or {}).get("families") or {}).items()}
+    out[CROSS_KEY] = copy.deepcopy(list((doc or {}).get("cross_rules") or []))
+    return out
 
 
 def with_rules(doc: Mapping[str, Any], rules: Mapping[str, list[dict[str, Any]]]) -> dict[str, Any]:
-    """``doc`` with the rules of ``rules`` (per family present in both); facts and everything else kept."""
+    """``doc`` with the rules of ``rules`` (per family present in both, and the cross rules); facts kept."""
     out = copy.deepcopy(dict(doc))
     for fid, fam in (out.get("families") or {}).items():
         if fid in rules:
             fam["rules"] = copy.deepcopy(list(rules[fid]))
+    if CROSS_KEY in rules:
+        if rules[CROSS_KEY]:
+            out["cross_rules"] = copy.deepcopy(list(rules[CROSS_KEY]))
+        else:
+            out.pop("cross_rules", None)
     return out
 
 
 def only_rules_changed(old: Mapping[str, Any], new: Mapping[str, Any]) -> bool:
-    """True if ``new`` differs from ``old`` in rules only (facts, families and the family keys equal)."""
+    """True if ``new`` differs from ``old`` in rules only (family rules and cross rules; facts, families and every
+    other key equal)."""
     if facts_part(old) != facts_part(new):
         return False
     strip = lambda d: {fid: {k: v for k, v in (fam or {}).items() if k != "rules"}  # noqa: E731
                        for fid, fam in ((d or {}).get("families") or {}).items()}
-    return strip(old) == strip(new)
+    top = lambda d: {k: v for k, v in (d or {}).items() if k not in ("families", "cross_rules")}  # noqa: E731
+    return strip(old) == strip(new) and top(old) == top(new)
 
 
 def validate_policy_dict(raw: Any) -> FactPolicy:

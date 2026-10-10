@@ -108,6 +108,15 @@ def extra_paths(app: AppState) -> dict[str, Path]:
     return out
 
 
+def assistant_enabled(app: AppState) -> bool:
+    """``app.assistant_enabled`` (profile): the KI-Assistent of the wizards and «Qwen jetzt fragen». False = the
+    demo makes no LLM call at all (manual wizards only)."""
+    return bool((getattr(app.cfg, "app", None) or {}).get("assistant_enabled", True))
+
+
+ASSISTANT_OFF = "KI-Assistent ist in diesem Profil ausgeschaltet (keine KI-Aufrufe); der Assistent links funktioniert von Hand."
+
+
 def store(app: AppState) -> VersionStore:
     """Same files as the Regelwerk page's store (ui/views/rules.py), so versions stay one history."""
     return VersionStore(table_path(app), audit_dir=app.runs_dir, extras=extra_paths(app))
@@ -132,14 +141,16 @@ def outcomes(app: AppState, policy: fpol.FactPolicy, doc: dict[str, Any] | Polic
     overrides = app.settings.overrides()
     fams = app.families if app.all_families else None
     key = stable_hash({"p": policy.key(), "t": {k: v.raw for k, v in table.families.items()},
+                       "x": table.cross.raw if table.cross is not None else None,
                        "sig": app.loaded.signature, "o": overrides, "f": [x.id for x in fams or []]})
     hit = _MEMO.get(key)
     if hit is not None:
         _MEMO.move_to_end(key)
         return hit
     families = fams or app.engine.families()
-    out = fpol.redecide(app.loaded.results, table.families, policy,
-                        lambda r, c: f.decide_checks(r.transcript, c, families, overrides), **f.scoring)
+    out = fpol.redecide(app.loaded.results, table, policy,
+                        lambda r, c: f.decide_checks(r.transcript, c, families, overrides),
+                        f._names(app.all_families or families), **f.scoring)
     _MEMO[key] = out
     while len(_MEMO) > 48:
         _MEMO.popitem(last=False)

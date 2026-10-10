@@ -264,7 +264,7 @@ def _decide_draft(r):
         pol = fpol.parse_fact_policy(fp_doc) if fp_doc else POLICY_FUSION.fact_policy()
         fams = _draft_families() or app.all_families
         return POLICY_FUSION.decide_policy(r.transcript, r.checks, fams, _draft_overrides(), policy=pol,
-                                           tables=work_table.families)
+                                           tables=work_table)
     return app.engine.decide(r, _draft_overrides(), _draft_families())
 
 
