@@ -3,7 +3,7 @@
 _Last update: 05:55 (final). Read with `research/DEMO.md` (5-minute demo script), `docs/SUNDAY_RUNBOOK.md` (how to
 process the hidden set) and `research/ideas_round3.md` (Q&A cheat sheet). Everything below is reproducible from
 `experiments/*.yaml` + caches; numbers come from `runs/experiments/*/summary.md` and `research/journal.md`
-(timestamped log of every run and decision)._
+(timestamped log of every run and decision). On GitHub the `runs/` summaries are in `research/evidence/`._
 
 ## TL;DR
 1. **Recommended config for Sunday: `config/recommended.yaml`** (frozen 04:09)
