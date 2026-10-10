@@ -610,3 +610,48 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   (champion re-run 04:09 vs llm_models qwen25_7b_facts_l3: same numbers).
 - Final independent fact-check of all post-05:00 content: runbook timing, D2b switch instruction, candidate-B 3-class
   (65% CV / 71% fixed), DEMO holdout-look count fixed.
+
+## 2026-10-10T05:58 S3 pre-registration ("no silent clearance", pure re-fusion; ideas_round3 S3, simplified)
+- Simplified S3 (no quote request, no LLM calls): new opt-in fusion plugin `no_silent` (fusion/no_silent.py, subclass of
+  weighted, defaults of every existing config unchanged). If the fused call label is no_alert and, for an enabled family
+  that may alarm, (a) the facts check's act fact has p(yes) >= 0.3 OR the keywords check has a non-negated, non-harmless
+  hit of that family, AND (b) no exculpatory fact of that family is "yes", the call goes to review with the reason
+  "Handlung möglich, aber nicht entkräftet – bitte prüfen" (score raised to threshold - review_band/2, as hybrid).
+- Runs (refuse_from, cached results only): champion.yaml `s3` <- champion; perturbed.yaml `s3` <- perturbed;
+  synth_stress.yaml `facts7b_s3` <- facts7b_v1 (facts only there, so only the act-fact path can fire).
+- PASS (all must hold, fixed before any result):
+  (1) dev CV: FAR <= 20% AND miss down by >= 5 pp vs champion (14% / 15%);
+  (2) re-recorded audio: miss down vs perturbed (23%) with CV FAR <= 20%;
+  (3) synthetic 7B: CV FAR up by <= 7 pp vs facts7b_v1 (7%).
+  Otherwise FAIL -> champion stays. Holdout is spent and not touched.
+
+## 2026-10-10T06:10 S3 result: "no silent clearance" re-fusion (fusion no_silent) — FAIL, not adopted
+- Built: src/callguard/fusion/no_silent.py (`fusion.type: no_silent`, subclass of weighted; params act_min 0.3,
+  use_keywords; registered in registry.py). Opt-in, no LLM calls, existing configs/cache keys unchanged; 706 offline
+  tests pass. Variants: champion.yaml `s3`, perturbed.yaml `s3` (outputs copied runs/perturbed/experiments/perturbed ->
+  runs/experiments/perturbed/), synth_stress.yaml `facts7b_s3`. Logs runs/logs/s3_{dev,perturbed,synth}.log.
+- RESULTS (flag AUC [CI] | CV FAR / miss | CV review recall | CV 3-class):
+  | dev champion        | 0.87 [0.72, 0.99] | 14% / 15% | 67% | 79% |
+  | dev s3              | 0.89 [0.74, 0.99] | 50% /  8% | 67% | 62% |
+  | perturbed           | 0.83 [0.67, 0.96] | 14% / 23% |  0% | 73% |
+  | perturbed s3        | 0.84 [0.67, 0.97] | 50% / 12% |  0% | 48% |
+  | synth facts7b_v1    | 0.80 [0.71, 0.89] |  7% / 43% |  5% | 57% |
+  | synth facts7b_s3    | 0.82 [0.72, 0.91] | 25% / 22% | 29% | 57% |
+  CV@FAR20 not reachable for any s3 variant (FAR floor 50% / 50% / 25%: escalated calls sit at score t - band/2 for
+  every threshold). 3-class McNemar dev: only-champion 8 vs only-s3 0, p=0.008 (real loss).
+- Why: dev escalated 10 calls, only 2 correct (C09-K3/K4 alarm, previously no_alert). The other 8 are harmless twins
+  C01, C02, C10 (K3/K4; act p(yes) >= 0.3, cleared by a CONTEXT fact = no, no exculpatory fact = yes) and D08 (keyword
+  hit). I.e. the policy table clears most real harmless twins through context facts, not exculpatory facts, so "no
+  exculpatory yes" is not a sign of drift. Perturbed: same pattern (+D01, C07-K3). Synthetic: 17 escalations, FAR +18 pp.
+- PRE-REGISTERED RULES: (1) dev FAR 50% > 20% -> FAIL (miss -8 pp would pass); (2) perturbed miss 23% -> 12% but FAR
+  50% -> FAIL; (3) synthetic FAR +18 pp > 7 pp -> FAIL. => S3 (simplified) FAILS. Champion stays. Holdout untouched.
+- Not tested: the original S3 design (ask for a verbatim exculpation quote and fuzzy-verify it) — it would have to
+  accept context-fact clearances with a quote, which is an LLM step, not a re-fusion. The plugin stays as an opt-in
+  "strenge Prüfung" mode at most (it lifts synthetic review recall 5% -> 29% at a 3.6x false-alarm cost).
+
+## 2026-10-10T06:10 session wrap-up (GPU-host overnight agent)
+- Final state: champion = config/recommended.yaml (frozen 04:09); team lean: switch to policy table v3
+  (config/recommended-v3.yaml). Fallback single-pass: config/recommended-turbo.yaml. Runbook: docs/SUNDAY_RUNBOOK.md.
+- Services left running: vLLM Qwen2.5-7B-AWQ on :8000 (stop: kill $(cat runs/logs/vllm.pid)). No UI/ASR server running.
+- Holdout: spent (3 logged looks). All research artifacts pushed to `overnight`; code to `main` (tests green, 706 passed).
+- Post-freeze ideas tried and rejected with pre-registered rules: S1, S2, S3; R6 paraphrase ensemble; candidate B (14B).

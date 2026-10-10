@@ -81,3 +81,9 @@ variants:
     description: facts7b_v3 with decide_at 0.8 (S1)
     checks: [facts]
     set: [checks.facts.weight=1.0, checks.facts.policy_table=config/policy_table_v3.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2]
+  # S3 (ideas_round3, simplified): "no silent clearance" re-fusion of facts7b_v1 (facts only: act-fact path only)
+  - name: facts7b_s3
+    description: facts7b_v1 re-fused with fusion no_silent (act p(yes) >= 0.3 and no exculpatory yes -> review)
+    refuse_from: facts7b_v1
+    checks: [facts]
+    set: [checks.facts.weight=1.0, fusion.type=no_silent]

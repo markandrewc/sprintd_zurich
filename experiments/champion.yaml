@@ -43,3 +43,5 @@ variants:
   - {name: qlang_de, set: [checks.facts.question_lang=de], description: "fact questions sent in German instead of English"}
   - {name: noroles, set: [checks.facts.roles=false], description: "advisor/customer labels hidden from the fact probes"}
   - {name: prefixmax, set: [checks.facts.prefix_max=true], description: "act facts also on growing prefixes (max)"}
+  # ---- S3 (ideas_round3, simplified): "no silent clearance" re-fusion (fusion/no_silent.py), no LLM calls
+  - {name: s3, refuse_from: champion, set: [fusion.type=no_silent], description: "S3: no_alert with act p(yes) >= 0.3 or a non-negated keyword hit and no exculpatory yes -> review"}
