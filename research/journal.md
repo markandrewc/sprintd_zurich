@@ -585,3 +585,11 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   skip others -> if the hidden set uses other names nothing would be processed. run_staged.sh now runs `transcribe`
   (stage 1, vLLM stopped) + `run` (stage 2) per file for any folder: `scripts/run_staged.sh recommended <llm> <folder>`.
   Tested on /tmp/e2e_new/Audio (call_a/b/c): 44 s total, labels alarm / no alert / review as expected.
+
+## 2026-10-10T05:50 robustness proxy: champion on RE-RECORDED dev audio (sox speed 0.96 = slower + lower pitch, -3 dB)
+- New ASR outputs for all 48 dev calls (data_perturbed/v1; staged: large-v3 with vLLM stopped, then 7B), same labels.
+- flag AUC 0.83 [0.67, 0.96] vs 0.87; CV FAR 14% = 14%; miss 23% vs 15%; 3-class 71-73% vs 79%. 4/48 labels change:
+  D05-K1 alarm->review, C12-K4 alarm->review (still flagged), C07-K3 alarm->no_alert, C18-K3 review->no_alert. No harmless
+  call flips. => false alarms are stable under a recording change; the cost shows up as a few more misses.
+- Pitfall found: `callguard experiment` loads calls from the BASE profile's data_dir — a per-variant paths.data_dir is
+  silently ignored (first attempt reused the original audio; discarded). Dedicated profile config/recommended-perturbed.yaml.

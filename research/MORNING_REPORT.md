@@ -40,6 +40,8 @@ _ Everything below is reproducible from `experiments/*.yaml` + caches; numbers c
    - Synthetic out-of-sample test (74 fresh twin scripts, mostly written by the judging 14B itself = circularity risk): facts keeps its large false-alarm advantage (14% vs 61%),
      but misses more (33%), mostly in access.
    - Open review cases (Stufe3) are the weakest spot everywhere.
+   - Re-recorded audio (same dev calls, speed 0.96 + -3 dB -> different ASR output): AUC 0.83 vs 0.87, false alarms
+     unchanged (14%), misses 15% -> 23% (4/48 labels change, no harmless call flips).
    - **Paraphrase test (R3): rewording the fact questions (same meaning) drops dev AUC 0.87 -> 0.72 (real, -0.15
      [-0.31, -0.03]) and flips 11/48 labels.** The tuned wording is fragile.
      A second independent paraphrase set repeats it (0.74). A paraphrase ensemble halves label flips under rewording
