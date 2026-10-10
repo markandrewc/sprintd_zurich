@@ -427,3 +427,19 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   sample (0.81 vs 0.80). ens3 is the documented robustness option (`paraphrase_tables`) — it halves wording
   sensitivity at ~3x the fact probes; worth switching to only with a new, non-dev-tuned table where no single
   wording is privileged.
+
+## 2026-10-10T04:45 single-pass fallback: champion checks on turbo int8 ASR (no prompt, no conditioning)
+- experiments/champion.yaml variant turbo_clean (dev): flag AUC 0.85 [0.70, 0.98] vs champion 0.87; CV FAR 14% both;
+  miss 23% vs 15%; review recall 0% vs 67% (CV) ; 3-class 73% vs 79%. Fits next to vLLM on 12 GB (no staging).
+- DECISION: config/recommended-turbo.yaml = fallback for live processing (UI "Anruf verarbeiten", `callguard run`);
+  the staged large-v3 champion stays the scoring config.
+
+## 2026-10-10T04:50 E2E on NEW audio files (the Sunday procedure, no cache): staged recommended profile
+- 3 dev calls re-encoded (sox speed 1.04, gain -2 dB -> new audio hashes, nothing cached) with neutral names
+  call_a/b/c (no hints). Stage 1 `callguard transcribe -c recommended` (vLLM stopped): 45 s for 3 calls (~13 min audio,
+  incl. model load); vLLM 7B restart 28 s; stage 2 `callguard run -c recommended`: 20 s for 3 calls.
+- Results: call_a (= D02-K1 insider trade) ALARM 0.99 "Regel trade.alarm_1, Fakt Insider-Information = ja";
+  call_b (= D03-K2 harmless keyword call) KEIN ALARM 0.05; call_c (= C17-K3 open access case) PRÜFEN 0.50 — all as
+  expected. Chain runs without manual steps per call (case requirement). Log: runs/logs/e2e_new.log.
+- Note: `callguard transcribe` with vLLM down also diarizes and falls back to first-speaker roles (not cached since the
+  audit fix) -> roles recomputed in stage 2 with the LLM.

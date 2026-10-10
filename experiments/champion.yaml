@@ -27,3 +27,5 @@ variants:
   - {name: ens3_band, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", "checks.facts.unclear_band=[0.2, 0.6]", checks.facts.parallel=1], description: "R6: ens3, fact value from averaged p(yes) alone: yes >= 0.6, no < 0.2, else unclear"}
   - {name: ens2b, set: ["checks.facts.paraphrase_tables=[config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: tuned + para2 (ens2 with the other paraphrase set: ensemble sensitivity to swapping one wording)"}
   - {name: ens_blind, set: [checks.facts.policy_table=config/policy_table_para.yaml, "checks.facts.paraphrase_tables=[config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: para + para2 averaged, no tuned wording (ensemble of untuned wordings)"}
+  # ---- single-pass option (no staging): turbo int8 ASR (no prompt, no conditioning) fits next to vLLM on 12 GB
+  - {name: turbo_clean, set: [asr.model=models/asr/whisper-turbo-gsw-ct2-int8, asr.compute_type=int8_float16, asr.condition_on_previous_text=false, asr.initial_prompt=null], description: "champion checks on the fast turbo ASR (single pass on 12 GB)"}

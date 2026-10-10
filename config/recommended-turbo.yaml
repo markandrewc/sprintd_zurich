@@ -1,0 +1,13 @@
+# Single-pass fallback of the recommended profile: the fast Swiss German turbo ASR (no keyword prompt, no
+# conditioning on previous text: avoids prompt-leak loops) fits on the 12 GB GPU next to vLLM, so new calls run in one
+# pass (live demo, `callguard run`, UI "Anruf verarbeiten"). Dev (experiments/champion.yaml variant turbo_clean):
+# flag AUC 0.85 vs 0.87 for the staged large-v3 champion, FAR 14% both, miss 23% vs 15%.
+# Licence note: these turbo weights derive from a CC BY-NC fine-tune (hackathon OK; bank: use the MIT large-v3).
+extends: recommended.yaml
+description: Recommended checks on the fast turbo ASR (single pass on one 12 GB GPU)
+asr:
+  model: models/asr/whisper-turbo-gsw-ct2-int8
+  compute_type: int8_float16
+  condition_on_previous_text: false
+  initial_prompt: null
+  model_tag: whisper-turbo-gsw-int8-clean-cuda
