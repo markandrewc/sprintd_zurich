@@ -412,6 +412,53 @@ def load_policy_table(path: str | Path) -> PolicyTable:
     return table
 
 
+@dataclass
+class FamilyDecision:
+    """The policy table applied to one family's fact values (and probabilities)."""
+
+    rule: Rule | None
+    label: Label
+    soft: dict[str, float]  # P(rule holds) per rule id
+    p_alarm: float
+    p_review: float
+    score: float
+    confidence: float
+    verdict: str
+    summary: str
+
+
+def decide_family(ft: FamilyTable, values: dict[str, str], probs: dict[str, dict[str, float]], *,
+                  alarm_base: float = 0.6, review_score: float = 0.5, review_confidence: float = 0.3,
+                  no_alert_scale: float = 0.4) -> FamilyDecision:
+    """First matching rule on the discrete values + the soft score for the fusion (see module doc).
+    Pure: the check uses it, and so does the UI when an officer answers an open fact (no LLM)."""
+    rule = ft.decide(values)
+    label: Label = rule.label if rule else "no_alert"
+    soft = {r.id: round(eval_soft(r.node, probs), 4) for r in ft.rules}
+    p_alarm = max((soft[r.id] for r in ft.rules if r.label == "alarm"), default=0.0)
+    p_review = max((soft[r.id] for r in ft.rules if r.label == "review"), default=0.0)
+
+    if label == "alarm":
+        p_rule = soft[rule.id] if rule else 1.0
+        score = alarm_base + (1.0 - alarm_base) * p_rule
+        confidence, verdict = max(0.05, p_rule), "present"
+    elif label == "review":
+        score, confidence, verdict = review_score, review_confidence, "undetermined"
+    else:
+        score = no_alert_scale * p_alarm
+        confidence, verdict = 1.0 - max(p_alarm, p_review), "absent"
+
+    shown = rule_facts(rule.node) if rule and rule.node != ("true",) else \
+        [f.id for f in ft.facts if f.role != "exculpatory" or values.get(f.id) == "yes"]
+    fact_txt = "; ".join(_fmt_fact(ft.fact(fid).label, values.get(fid, "unclear"), probs.get(fid) or {"unclear": 1.0})
+                         for fid in shown)
+    rule_id = rule.id if rule else "(keine Regel)"
+    rule_txt = (rule.text if rule and rule.text else _LABEL_DE[label]).rstrip(".")
+    return FamilyDecision(rule=rule, label=label, soft=soft, p_alarm=p_alarm, p_review=p_review, score=score,
+                          confidence=confidence, verdict=verdict,
+                          summary=f"{rule_txt}. Regel: {rule_id}. Fakten: {fact_txt}")
+
+
 # --------------------------------------------------------------------------------------------
 # The check
 # --------------------------------------------------------------------------------------------
@@ -693,28 +740,11 @@ class FactSheetCheck(LLMCheck):
         values = {fid: self._decide(p) for fid, p in probs.items()}
         for fid, v in values.items():
             facts[fid]["value"] = v
-        rule = ft.decide(values)
-        label: Label = rule.label if rule else "no_alert"
-        soft = {r.id: round(eval_soft(r.node, probs), 4) for r in ft.rules}
-        p_alarm = max((soft[r.id] for r in ft.rules if r.label == "alarm"), default=0.0)
-        p_review = max((soft[r.id] for r in ft.rules if r.label == "review"), default=0.0)
-
-        if label == "alarm":
-            p_rule = soft[rule.id] if rule else 1.0
-            score = self.alarm_base + (1.0 - self.alarm_base) * p_rule
-            confidence, verdict = max(0.05, p_rule), "present"
-        elif label == "review":
-            score, confidence, verdict = self.review_score, self.review_confidence, "undetermined"
-        else:
-            score = self.no_alert_scale * p_alarm
-            confidence, verdict = 1.0 - max(p_alarm, p_review), "absent"
-
-        shown = rule_facts(rule.node) if rule and rule.node != ("true",) else \
-            [f.id for f in ft.facts if f.role != "exculpatory" or values[f.id] == "yes"]
-        fact_txt = "; ".join(_fmt_fact(ft.fact(fid).label, values[fid], probs[fid]) for fid in shown)
+        fd = decide_family(ft, values, probs, alarm_base=self.alarm_base, review_score=self.review_score,
+                           review_confidence=self.review_confidence, no_alert_scale=self.no_alert_scale)
+        rule, label, soft, score, confidence, verdict = fd.rule, fd.label, fd.soft, fd.score, fd.confidence, fd.verdict
+        p_alarm, p_review, summary = fd.p_alarm, fd.p_review, fd.summary
         rule_id = rule.id if rule else "(keine Regel)"
-        rule_txt = (rule.text if rule and rule.text else _LABEL_DE[label]).rstrip(".")
-        summary = f"{rule_txt}. Regel: {rule_id}. Fakten: {fact_txt}"
         detail: dict[str, Any] = {
             "decision": label, "facts": facts, "summary": summary,
             "rule": ({"id": rule.id, "label": rule.label, "when": rule.when, "text": rule.text} if rule

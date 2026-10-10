@@ -56,10 +56,19 @@ class Panel:
             return False
 
 
+def _has_open_facts(result: Any) -> bool:
+    """Only calls whose facts check left a fact open that matters (S6); imported lazily."""
+    from callguard.ui.fact_answers import open_families
+
+    return bool(open_families(result))
+
+
 PANELS: list[Panel] = [
     # built-in sections of the detail page are drawn by views/detail.py itself.
     # other teams: add your Panel lines below, e.g.
     # Panel("routing", "Weiterleitung", "callguard.ops.ui_routing:render", icon=":material/alt_route:", order=50),
+    Panel("open_facts", "Offene Fakten", "callguard.ui.panels.facts:render", icon=":material/live_help:",
+          order=40, expanded=True, when=lambda r, s: _has_open_facts(r)),
     Panel("routing", "Weitergeleitet an", "callguard.ui.panels.ops:routed_to", icon=":material/alt_route:", order=50,
           when=lambda r, s: r.decision.label != "no_alert"),
     Panel("feedback", "Rückmeldung", "callguard.ui.panels.ops:feedback", icon=":material/rate_review:", order=55,

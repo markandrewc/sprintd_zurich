@@ -72,3 +72,12 @@ variants:
     description: ens3 with the p(yes) band [0.2, 0.6] for yes/unclear/no (R6), Qwen2.5-7B
     checks: [facts]
     set: [checks.facts.weight=1.0, checks.facts.parallel=1, "checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", "checks.facts.unclear_band=[0.2, 0.6]"]
+  # S1 (ideas_round3): review hardening, decide_at 0.8 (symmetric: yes and no need p >= 0.8), 7B, cached probes
+  - name: facts7b_s1_v1_08
+    description: facts7b_v1 with decide_at 0.8 (S1)
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.decide_at=0.8, checks.facts.parallel=2]
+  - name: facts7b_s1_v3_08
+    description: facts7b_v3 with decide_at 0.8 (S1)
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.policy_table=config/policy_table_v3.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2]

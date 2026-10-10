@@ -153,5 +153,5 @@ def provenance(result: CallResult, session: Any) -> None:
     if events:
         st.markdown("**Audit-Spur dieses Anrufs**")
         st.dataframe([{"Zeit": e.get("ts"), "Art": e.get("kind"), "Wer": e.get("user"),
-                       "Detail": ", ".join(f"{k}={e[k]}" for k in ("label", "verdict", "to") if k in e)}
+                       "Detail": ", ".join(f"{k}={e[k]}" for k in ("fact", "answer", "label", "verdict", "to") if k in e)}
                       for e in reversed(events)], hide_index=True)

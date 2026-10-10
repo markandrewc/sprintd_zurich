@@ -174,3 +174,24 @@ Q&A caveat, if asked about overfitting: the fact wording was written against dev
 4. **Last resort:** `uv run callguard ui -c demo-offline`. Say it is the offline demo profile: reference scripts and a fake LLM, not
    the real system.
 5. After any rehearsal with recipe B, restore the keywords and runs from the backups listed above.
+
+## Extra step (20 s): the officer answers the open fact on Stufe3_C17-K3 (S6, "Offene Fakten")
+
+Use it right after the review banner of C17-K3. No GPU, no LLM: only the policy table is re-read.
+
+1. Open the call page for **Stufe3_C17-K3** (`/call?call=Stufe3_C17-K3`). It shows **Prüfen**, rule `access.review_1`.
+2. Scroll to the open panel **Offene Fakten**. It shows: *"Offen: Wert gehört zum laufenden, gültigen Vorgang"*, the
+   question, and "Modell: unklar (ja 0.00 · nein 0.00 · unklar 1.00)".
+3. Click **Ja (gültig)**. Red box: **Alarm**, rule `access.alarm_1` ("Ein gültiger Zugangswert wurde am Telefon
+   ausgesprochen"). Below it: **Anruf gesamt: Alarm**, score 0.97 at threshold 0.55 (before: Prüfen, 0.50).
+4. Click **Nein (abgelaufen / ungültig)**. Green box: **Kein Alarm**, rule `access.no_alert`, call score 0.00.
+   (`config/open_facts.yaml`: once the officer has answered whether the value is valid, "im Gespräch offen, ob gültig"
+   no longer counts as open.) **Weiss nicht** keeps it at Prüfen.
+5. Click **Zurücksetzen**. The model's values come back.
+
+Say: "The system does not dump the review on you. It asks the one question it could not answer. Your answer is applied
+to the same rule table, and the call is decided in a second. Every answer goes into the audit log with the fact, the
+answer and the table hash."
+- Proof: the **Herkunft & Audit** panel lists `fact_answer` entries (user `officer`, `fact=current, answer=yes, label=alarm`).
+- The answer changes only the view in memory. The stored `result.json` is not changed.
+- Writes: each click appends one line to `runs/recommended/audit.jsonl` (kinds `fact_answer` / `fact_answer_reset`).

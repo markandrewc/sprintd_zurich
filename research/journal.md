@@ -463,3 +463,58 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   n = 6 dialogues, so the 7B-vs-14B holdout difference is not significant either way.
 - DECISION: submission stays the frozen champion (config/recommended.yaml, 7B). The 14B's wording robustness on dev
   (paraphrase test) did not show on the holdout. recommended-14b.yaml kept as a documented option for bigger GPUs.
+
+## 2026-10-10T05:03 S1 pre-registration (review hardening: shaky "no" -> unclear; ideas_round3 S1)
+- Knob: existing `checks.facts.decide_at` (no src edit). NOTE: in facts.py `discretize` it is SYMMETRIC
+  (yes if p(yes) >= d, no if p(no) >= d, else unclear), so decide_at=0.8 also raises the "yes" bar to 0.8 (the S1
+  design wants yes at 0.5, only no at 0.8). The asymmetric version is simulated offline on the cached fact
+  probabilities (same rules, yes >= 0.5, no >= 0.8) as a secondary, clearly labelled analysis.
+- Variants: experiments/champion.yaml `s1_v1_08` (table v1, decide_at 0.8), `s1_v3_08` (table v3), `s1_para_08`
+  (table para); experiments/synth_stress.yaml `facts7b_s1_v1_08`, `facts7b_s1_v3_08` (7B, facts only).
+- PASS rules (all must hold, fixed before seeing any result):
+  (a) dev vs champion: at most +1 harmless dialogue flagged (fixed threshold) and CV FAR <= 20%;
+  (b) synthetic 7B vs facts7b_v1 / facts7b_v3 (same table): FAR up by at most 7 pp;
+  (c) paraphrased-table runs (`para` style, dev): miss down by >= 10 pp vs `para` (s1_para_08 vs para).
+- If any rule fails: keep the frozen champion; the hardened setting is at most the UI's "strengere Prüfung" option.
+  Holdout is spent and is not touched.
+
+## 2026-10-10T05:09 S1 result: decide_at 0.8 (review hardening) — FAIL, not adopted
+- Runs: experiments/champion.yaml `s1_v1_08`, `s1_v3_08`, `s1_para_08`; experiments/synth_stress.yaml
+  `facts7b_s1_v1_08`, `facts7b_s1_v3_08` (all fact probes cached; 0 new probes; ~2.3 + 1.2 min). decide_at is
+  symmetric (yes AND no need p >= 0.8). Logs runs/logs/s1_dev.log, runs/logs/s1_synth.log.
+- DEV (48 calls; flag AUC [CI] | CV FAR / miss | CV review recall | CV 3-class | fixed-thr harmless dialogues flagged):
+  | champion   | 0.87 [0.72, 0.99] | 14% / 15% | 67% | 79% | 2 (C11, C14) |
+  | s1_v1_08   | 0.86 [0.72, 0.98] | 18% / 19% | 33% | 77% | 3 (+D08)     |
+  | table_v3   | 0.92 [0.80, 1.00] | 14% /  8% | 100% | 83% | 2           |
+  | s1_v3_08   | 0.91 [0.80, 1.00] | 18% / 12% | 33% | 77% | 3 (+D08)     |
+  | para       | 0.72 [0.52, 0.88] | 23% / 38% |  0% | 67% | 3 (D01, C11, C14) |
+  | s1_para_08 | 0.74 [0.57, 0.89] | 18% / 35% |  0% | 65% | 2           |
+  Fixed-threshold flips vs champion (s1_v1_08): D08-K2 no_alert->review (worse), C07-K4 alarm->no_alert (worse; the
+  higher yes-bar removes an act "yes"). s1_v3_08 = those two + C20-K3/K4 review (the v3 gain, already in table_v3).
+  s1_para_08 vs para: fixed miss 38% -> 38% (10/26 both); flips D01-K1 review->no_alert and C18-K3 ->review (better),
+  D09-K2 alarm->review, C07-K3 alarm->no_alert (worse).
+- SYNTHETIC (7B, ORACLE, 74 calls; flag AUC | CV FAR / miss | fixed review recall | fixed 3-class):
+  facts7b_v1 0.80 [0.71, 0.89] | 7% / 43% | 38% | 58%  vs  facts7b_s1_v1_08 0.76 [0.65, 0.86] | 14% / 43% | 43% | 53%;
+  facts7b_v3 0.83 [0.74, 0.91] | 7% / 37% | 48% | 61%  vs  facts7b_s1_v3_08 0.79 [0.69, 0.88] | 14% / 37% | 52% | 55%.
+  FAR 2/28 -> 4/28 (+7.1 pp; new harmless flags disclosure_004, splitting_002) in both tables.
+- PRE-REGISTERED RULES: (a) dev: +1 harmless dialogue (D08), CV FAR 18% <= 20% -> PASS (at the limit);
+  (b) synthetic FAR +7.1 pp > 7 pp -> FAIL (by 0.1 pp = 2 extra harmless calls of 28; read it as "at the limit");
+  (c) para miss 38% -> 35% CV / 38% fixed, -3 pp / 0 pp (needed -10 pp) -> FAIL. => S1 (decide_at 0.8) FAILS.
+- SECONDARY (offline, pre-announced): asymmetric yes >= 0.5 / no >= 0.8 re-decided on the cached fact probabilities
+  (facts-only labels; the script reproduces champion and s1_v1_08 fixed labels exactly at 0.5/0.5 and 0.8/0.8):
+  dev v1 and v3: IDENTICAL to champion / table_v3 (no call changes); wording-shift miss: dev para 10/26 -> 9/26,
+  dev para2 8 -> 7, synthetic para 25/46 -> 21/46, para2 18 -> 18 (mean about -4 pp, needed -10 pp); synthetic FAR
+  v1 2/28 -> 3/28 (+3.6 pp), dev para FAR 5/22 -> 6/22. => the asymmetric knob is harmless on the tuned tables but does
+  not fix the wording fragility either (rule (c) fails). The paraphrase misses are mostly lost act "yes" answers /
+  alarm->review drops, not shaky "no" in context facts, so moving no->unclear cannot recover them.
+- DECISION: keep the frozen champion (table v1, decide_at 0.5). Do not offer decide_at 0.8 (costs FAR on synthetic,
+  lowers review recall on dev, no robustness gain). The table v3 option (D2b) stays as it was. Wording robustness needs
+  a different lever (S2 contrastive exemplars or 14B), not a threshold.
+
+## 2026-10-10T05:20 S6 officer answers an open fact (UI panel "Offene Fakten") + S1 result
+- New detail panel: open facts with Ja / Nein / Weiss nicht; re-evaluates the policy table in memory (facts.py
+  decide_family, no LLM), shows new label + rule + re-fused call label; audit events fact_answer / fact_answer_reset.
+  C17-K3: Ja (gültig) -> Alarm via access.alarm_1 (score 0.97); Nein -> Kein Alarm; Weiss nicht -> Prüfen.
+  UI-only coupling file config/open_facts.yaml (button texts; which facts an answer settles) — pipeline never reads it.
+  Panel appears on 24/62 recommended calls (also alarms with an open exculpatory fact) — team may restrict to review.
+- S1 (confident clearance, decide_at 0.8): FAILED 2 of 3 pre-registered rules -> not adopted (journal 05:09).

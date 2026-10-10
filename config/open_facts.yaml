@@ -1,0 +1,23 @@
+# Officer answers in the "Offene Fakten" panel of the call detail page (research/ideas_round3.md S6).
+# Read only by the UI (src/callguard/ui/fact_answers.py), never by the pipeline: no cache key depends on it.
+#
+# The panel lists the facts of config/policy_table.yaml that are still open for a call (value "unclear" and
+# answering them changes the family's label, or the facts of a review rule that fired). The officer answers
+# Ja / Nein / Weiss nicht; the answer replaces the model's value and the policy table rules are re-read.
+#
+# Per family and fact id, per answer (yes / no / unclear), all optional:
+#   label  button text (default: Ja / Nein / Weiss nicht)
+#   also   other facts this answer settles too. Example: once the officer says whether the value read out
+#          is valid, "im Gespräch offen, ob der Wert gültig ist" is no longer open.
+families:
+  access:
+    current:
+      "yes": {label: "Ja (gültig)", also: {validity_open: "no"}}
+      "no": {label: "Nein (abgelaufen / ungültig)", also: {validity_open: "no"}}
+  disclosure:
+    authorized:
+      "yes": {label: "Ja (Vollmacht deckt es)", also: {not_authorized: "no"}}
+      "no": {label: "Nein (keine Vollmacht)", also: {not_authorized: "yes"}}
+    not_authorized:
+      "yes": {label: "Ja (keine Berechtigung)", also: {authorized: "no"}}
+      "no": {label: "Nein (berechtigt)", also: {authorized: "yes"}}

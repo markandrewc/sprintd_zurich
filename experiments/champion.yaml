@@ -29,3 +29,8 @@ variants:
   - {name: ens_blind, set: [checks.facts.policy_table=config/policy_table_para.yaml, "checks.facts.paraphrase_tables=[config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: para + para2 averaged, no tuned wording (ensemble of untuned wordings)"}
   # ---- single-pass option (no staging): turbo int8 ASR (no prompt, no conditioning) fits next to vLLM on 12 GB
   - {name: turbo_clean, set: [asr.model=models/asr/whisper-turbo-gsw-ct2-int8, asr.compute_type=int8_float16, asr.condition_on_previous_text=false, asr.initial_prompt=null], description: "champion checks on the fast turbo ASR (single pass on 12 GB)"}
+  # ---- S1 (ideas_round3): review hardening, shaky "no" -> unclear. decide_at is SYMMETRIC in facts.py (yes also
+  # needs p >= 0.8); fact probes are cached, only the discretisation + rules change.
+  - {name: s1_v1_08, set: [checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: table v1, yes/no need p >= 0.8 (else unclear)"}
+  - {name: s1_v3_08, set: [checks.facts.policy_table=config/policy_table_v3.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: table v3, yes/no need p >= 0.8"}
+  - {name: s1_para_08, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: paraphrased table (wording-shift bench), yes/no need p >= 0.8"}
