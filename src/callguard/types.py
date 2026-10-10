@@ -204,6 +204,10 @@ class Passage(BaseModel):
     text: str = ""
     texts: dict[str, str] = Field(default_factory=dict)  # view -> what that view says in [start, end]
     snippet_path: str | None = None
+    # lowest ASR confidence of the passage's segments (None: the ASR reports none) and whether it is below
+    # ``snippets.misheard_below``: "möglicherweise verhört — bitte anhören" (callguard.misheard)
+    asr_confidence: float | None = None
+    misheard: bool = False
 
 
 class Decision(BaseModel):

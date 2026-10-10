@@ -18,6 +18,7 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
+from callguard import misheard as mh
 from callguard.types import CallResult, Decision, Family, Passage, Transcript, fmt_ts
 from callguard.ui import explain as ex
 from callguard.ui.backend import LABEL_TEXT, passage_clip, short_label
@@ -273,9 +274,13 @@ def _split_reason(reason: str, checks: Iterable[str]) -> tuple[str, str]:
 
 def passage_card(index: int, p: Passage, result: CallResult, result_dir: Path, pad: float, *,
                  linked: bool = False, family: Family | None = None, color: str | None = None,
-                 view_titles: Mapping[str, str] | None = None) -> None:
+                 view_titles: Mapping[str, str] | None = None, misheard_below: float | None = None) -> None:
     """One suspicious passage: family + matched criterion, which checks support it with which score, the
-    reasons, what each transcript view says, and the audio snippet."""
+    reasons, what each transcript view says, and the audio snippet. A passage whose lowest ASR segment
+    confidence is under ``misheard_below`` gets «möglicherweise verhört — bitte anhören»: its text (and the
+    reasons quoting it) may be wrong, the recording decides."""
+    conf, low_seg = mh.passage_confidence(result.transcript, p)
+    misheard = mh.is_misheard(conf, misheard_below)
     with st.container(border=True):
         left, right = st.columns([3, 2], gap="medium")
         with left:
@@ -288,7 +293,13 @@ def passage_card(index: int, p: Passage, result: CallResult, result_dir: Path, p
                 tags.append(f":blue-badge[{esc(c)} {num(s)}{esc(verdict)}]")
             if linked:
                 tags.insert(0, ":violet-badge[:material/link: aus dem Alarm-Link]")
+            if misheard:
+                tags.append(":gray-badge[:material/hearing: möglicherweise verhört]")
             st.markdown(" ".join(tags))
+            if misheard:
+                st.markdown(f":material/hearing: **Möglicherweise verhört — bitte anhören.** Die Spracherkennung war "
+                            f"bei `{low_seg}` unsicher (Sicherheit {conf:.2f}, unter {misheard_below:.2f}); "
+                            "der Text unten und die Begründung können falsch sein, die Aufnahme entscheidet.")
             crit = ex.passage_criterion(p, family, result)
             if crit is not None:
                 hint = "" if crit.kind in ("rule", "policy") else " (beste Übereinstimmung)"

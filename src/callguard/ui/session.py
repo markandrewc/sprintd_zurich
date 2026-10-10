@@ -98,6 +98,13 @@ class AppState:
             return 2.0
 
     @property
+    def misheard_below(self) -> float | None:
+        """ASR confidence under which a passage is shown as «möglicherweise verhört» (None = off)."""
+        from callguard.misheard import threshold_of
+
+        return threshold_of(self.cfg.snippets)
+
+    @property
     def link_pad(self) -> float:
         try:
             return float(self.cfg.snippets.get("link_pad", 10.0))

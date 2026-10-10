@@ -246,7 +246,7 @@ if not d.passages:
     st.success("Keine Passage erreicht mit den aktuellen Einstellungen den Prüfbereich.", icon=":material/check:")
 for i, p in enumerate(d.passages):
     ui.passage_card(i + 1, p, result, result_dir, app.snippet_pad, linked=(i == link_i), family=app.family(p.family),
-                    color=colors.get(p.family), view_titles=view_titles)
+                    color=colors.get(p.family), view_titles=view_titles, misheard_below=app.misheard_below)
 
 # -- per family / per check ---------------------------------------------------------------------
 

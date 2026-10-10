@@ -19,7 +19,7 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
-from callguard import audio, preprocess, registry
+from callguard import audio, misheard, preprocess, registry
 from callguard.cache import file_hash, stable_hash
 from callguard.config import ROOT, AppConfig
 from callguard.context import Context
@@ -418,6 +418,7 @@ class Pipeline:
                             views=views if self.multi_view else {}, checks=results, decision=decision,
                             config_name=self.cfg.name, timings={k: round(v, 2) for k, v in (timings or {}).items()},
                             meta=meta)
+        misheard.annotate(result, misheard.threshold_of(self.cfg.snippets))
         if snippets:
             stage("snippets")
             self.make_snippets(result)

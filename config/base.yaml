@@ -71,6 +71,9 @@ fusion:
 snippets:
   pad: 2.0               # seconds of context cut around each passage
   link_pad: 10.0         # seconds before/after in deep links (Outcept trigger)
+  # misheard_below: 0.60 # passage with an ASR segment below this confidence is shown as «möglicherweise
+  #                        verhört — bitte anhören» (default in callguard/misheard.py: dev p10 of
+  #                        whisper-large-v3-gsw; 0 = off). Commented so config hashes stay stable.
 
 sinks:
   - type: json_dir
