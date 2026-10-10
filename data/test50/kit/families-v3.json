@@ -1,0 +1,116 @@
+{
+  "version": "v3-draft, 10 Oct 2026",
+  "idea": "The LLM readers (QWEN, optionally KEV) only fill facts per family, each with a quote and turn ID. This rule table turns facts into the verdict. Compliance edits the table and the questions in «Regeln», without code.",
+  "values": ["ja", "nein", "unklar"],
+  "reader_instructions": [
+    "Lies das ganze Gespräch. Finde zuerst die Handlung (oft spät im Gespräch), dann den früheren Kontext, der sie bestimmt.",
+    "Spätere Warnungen, Ablehnungen oder Abbrüche machen eine erfolgte Handlung nicht rückgängig. Eine Ausführung ist nicht nötig.",
+    "Nichts unterstellen: Ist eine nötige Tatsache im Gespräch nicht geklärt, antworte «unklar».",
+    "Zu jedem «ja» und «nein» gehört ein wörtliches Zitat mit Turn-ID. Ein Zitat, das nicht im Transkript steht, macht die Antwort ungültig.",
+    "Wer spricht, zählt: Beratung oder Kundin."
+  ],
+  "verdict_rule": [
+    "classify_only → no_alert (Information für die Anzeige)",
+    "gate = nein → no_alert",
+    "ein Slot aus review_if_unklar = unklar → review",
+    "alle Slots aus alarm_if = ja → alarm",
+    "ein Slot aus alarm_if = nein → no_alert",
+    "sonst → review",
+    "Gesamturteil eines Calls = schwerstes Urteil über alle Familien (alarm > review > no_alert)"
+  ],
+  "families": {
+    "trade": {
+      "label": "Information und Kaufwunsch",
+      "gate": "kaufwunsch",
+      "alarm_if": ["kaufwunsch", "info_nicht_oeffentlich", "wegen_info"],
+      "review_if_unklar": [],
+      "slots": {
+        "kaufwunsch": "Äussert die Kundin irgendwann einen eigenen Kauf- oder Verkaufswunsch für ein Wertpapier? Eine spätere Ablehnung oder fehlende Ausführung ändert nichts.",
+        "info_nicht_oeffentlich": "Stützt sich die Kundin auf Information, die noch nicht öffentlich ist (persönlich gezeigt, intern, vor der Meldung)? Bereits veröffentlichte Berichte = nein.",
+        "wegen_info": "Begründet die Kundin den Wunsch ausdrücklich mit genau dieser Information?"
+      }
+    },
+    "access": {
+      "label": "Zugangsinformation",
+      "gate": "wert_vorgelesen",
+      "alarm_if": ["wert_vorgelesen", "wert_aktiv"],
+      "review_if_unklar": [],
+      "slots": {
+        "wert_vorgelesen": "Liest die Kundin einen Zugangswert (Code, TAN, PIN, Passwort, Bestätigungscode) tatsächlich vor? Nur erwähnen oder verweigern = nein.",
+        "wert_aktiv": "Ist dieser Wert beim Vorlesen ein gültiges Geheimnis eines laufenden eigenen Vorgangs? Abgelaufen oder Muster aus einer Anleitung = nein; Herkunft oder Gültigkeit nicht geklärt = unklar."
+      }
+    },
+    "disclosure": {
+      "label": "Auskunft an Dritte",
+      "gate": "drittinfo_erfragt",
+      "alarm_if": ["drittinfo_genannt", "berechtigung_fehlt"],
+      "review_if_unklar": ["berechtigung_fehlt"],
+      "slots": {
+        "drittinfo_erfragt": "Geht es um geschützte Konto- oder Personendaten einer Drittperson?",
+        "berechtigung_fehlt": "Hat die Bank festgestellt, dass für genau diese Auskunft keine Berechtigung besteht? Berechtigung bestätigt = nein; Prüfung offen = unklar.",
+        "drittinfo_genannt": "Nennt die Beratung tatsächlich ein geschütztes Detail der Drittperson (z. B. Kontostand, Darlehen, Zinstermin)?"
+      }
+    },
+    "documentation": {
+      "label": "Relevante Angabe auslassen",
+      "gate": "weglass_wunsch",
+      "alarm_if": ["weglass_wunsch", "angabe_relevant"],
+      "review_if_unklar": [],
+      "slots": {
+        "weglass_wunsch": "Bittet die Kundin, eine Angabe absichtlich aus der Dokumentation für eine interne Stelle (z. B. Kredit- oder Finanzierungsstelle) wegzulassen oder zu verbergen? Eine reine Korrektur = nein.",
+        "angabe_relevant": "Ist die betroffene Angabe eine richtige, für den Entscheid relevante Tatsache (z. B. bestehende Rückzahlungsverpflichtung)? Falsch oder sachfremd = nein; Bezug offen = unklar."
+      }
+    },
+    "splitting": {
+      "label": "Zuständigkeit verhindern",
+      "gate": "teilung_angefragt",
+      "alarm_if": ["teilung_angefragt", "ein_vorgang", "motiv_umgehung"],
+      "review_if_unklar": [],
+      "slots": {
+        "teilung_angefragt": "Bittet die Kundin, eine Zahlung oder Erfassung in Teilbeträge aufzuteilen?",
+        "ein_vorgang": "Gehören die Teilbeträge zu einer einzigen Rechnung oder Lieferung? Unabhängige echte Rechnungen = nein; nicht bekannt = unklar.",
+        "motiv_umgehung": "Ist der Zweck ausdrücklich, eine interne Freigabe oder Kontrolle zu verhindern? Nicht bekannt = unklar."
+      }
+    },
+    "numbers": {
+      "label": "Zahlenobjekte",
+      "classify_only": true,
+      "slots": {
+        "zahlenobjekt": "Was ist die vorgelesene Zahl laut früherem Feldbezug? Antwort: zahlungsmittel_voll | zahlungsmittel_endstellen | rechnungsreferenz | reservierungsreferenz | betrag_oder_datum | anderes | unklar"
+      }
+    }
+  },
+  "gold": {
+    "_note": "Facts of the target family per script, derived from the expected assessment (Begründung, Offen, Belege). belege = [context turn(s) …, act turn].",
+    "D01": {"family": "numbers", "facts": {"zahlenobjekt": "zahlungsmittel_endstellen"}, "expected": "no_alert", "belege": ["T008"]},
+    "D02": {"family": "trade", "facts": {"kaufwunsch": "ja", "info_nicht_oeffentlich": "ja", "wegen_info": "ja"}, "expected": "alarm", "belege": ["T004", "T008"]},
+    "D03": {"family": "trade", "facts": {"kaufwunsch": "nein", "info_nicht_oeffentlich": "nein", "wegen_info": "nein"}, "expected": "no_alert", "belege": ["T008", "T006", "T020"]},
+    "D04": {"family": "trade", "facts": {"kaufwunsch": "ja", "info_nicht_oeffentlich": "ja", "wegen_info": "ja"}, "expected": "alarm", "belege": ["T008", "T012"]},
+    "D05": {"family": "access", "facts": {"wert_vorgelesen": "ja", "wert_aktiv": "ja"}, "expected": "alarm", "belege": ["T006", "T008"]},
+    "D06": {"family": "access", "facts": {"wert_vorgelesen": "ja", "wert_aktiv": "nein"}, "expected": "no_alert", "belege": ["T015", "T017"]},
+    "D07": {"family": "disclosure", "facts": {"drittinfo_erfragt": "ja", "berechtigung_fehlt": "ja", "drittinfo_genannt": "ja"}, "expected": "alarm", "belege": ["T008", "T025"]},
+    "D08": {"family": "disclosure", "facts": {"drittinfo_erfragt": "ja", "berechtigung_fehlt": "nein", "drittinfo_genannt": "ja"}, "expected": "no_alert", "belege": ["T005", "T013"]},
+    "D09": {"family": "documentation", "facts": {"weglass_wunsch": "ja", "angabe_relevant": "ja"}, "expected": "alarm", "belege": ["T004", "T012"]},
+    "D10": {"family": "splitting", "facts": {"teilung_angefragt": "ja", "ein_vorgang": "ja", "motiv_umgehung": "ja"}, "expected": "alarm", "belege": ["T003", "T009"]},
+    "C01": {"family": "numbers", "facts": {"zahlenobjekt": "zahlungsmittel_voll"}, "expected": "no_alert", "belege": ["T004", "T011"]},
+    "C02": {"family": "numbers", "facts": {"zahlenobjekt": "rechnungsreferenz"}, "expected": "no_alert", "belege": ["T004", "T011"]},
+    "C03": {"family": "numbers", "facts": {"zahlenobjekt": "zahlungsmittel_endstellen"}, "expected": "no_alert", "belege": ["T004", "T019"]},
+    "C04": {"family": "numbers", "facts": {"zahlenobjekt": "reservierungsreferenz"}, "expected": "no_alert", "belege": ["T004", "T019"]},
+    "C05": {"family": "trade", "facts": {"kaufwunsch": "ja", "info_nicht_oeffentlich": "nein", "wegen_info": "ja"}, "expected": "no_alert", "belege": ["T006", "T032"]},
+    "C06": {"family": "trade", "facts": {"kaufwunsch": "ja", "info_nicht_oeffentlich": "ja", "wegen_info": "ja"}, "expected": "alarm", "belege": ["T006", "T032"]},
+    "C07": {"family": "trade", "facts": {"kaufwunsch": "ja", "info_nicht_oeffentlich": "ja", "wegen_info": "ja"}, "expected": "alarm", "belege": ["T004", "T018"]},
+    "C08": {"family": "trade", "facts": {"kaufwunsch": "ja", "info_nicht_oeffentlich": "nein", "wegen_info": "ja"}, "expected": "no_alert", "belege": ["T004", "T018"]},
+    "C09": {"family": "access", "facts": {"wert_vorgelesen": "ja", "wert_aktiv": "ja"}, "expected": "alarm", "belege": ["T004", "T010"]},
+    "C10": {"family": "access", "facts": {"wert_vorgelesen": "ja", "wert_aktiv": "nein"}, "expected": "no_alert", "belege": ["T004", "T010"]},
+    "C11": {"family": "disclosure", "facts": {"drittinfo_erfragt": "ja", "berechtigung_fehlt": "nein", "drittinfo_genannt": "ja"}, "expected": "no_alert", "belege": ["T005", "T017"]},
+    "C12": {"family": "disclosure", "facts": {"drittinfo_erfragt": "ja", "berechtigung_fehlt": "ja", "drittinfo_genannt": "ja"}, "expected": "alarm", "belege": ["T005", "T017"]},
+    "C13": {"family": "documentation", "facts": {"weglass_wunsch": "ja", "angabe_relevant": "ja"}, "expected": "alarm", "belege": ["T006", "T032"]},
+    "C14": {"family": "documentation", "facts": {"weglass_wunsch": "ja", "angabe_relevant": "nein"}, "expected": "no_alert", "belege": ["T006", "T032"]},
+    "C15": {"family": "splitting", "facts": {"teilung_angefragt": "ja", "ein_vorgang": "nein", "motiv_umgehung": "nein"}, "expected": "no_alert", "belege": ["T004", "T010"]},
+    "C16": {"family": "splitting", "facts": {"teilung_angefragt": "ja", "ein_vorgang": "ja", "motiv_umgehung": "ja"}, "expected": "alarm", "belege": ["T004", "T010"]},
+    "C17": {"family": "access", "facts": {"wert_vorgelesen": "ja", "wert_aktiv": "unklar"}, "expected": "review", "belege": ["T004", "T010"]},
+    "C18": {"family": "disclosure", "facts": {"drittinfo_erfragt": "ja", "berechtigung_fehlt": "unklar", "drittinfo_genannt": "nein"}, "expected": "review", "belege": ["T004", "T016", "T017"]},
+    "C19": {"family": "documentation", "facts": {"weglass_wunsch": "ja", "angabe_relevant": "unklar"}, "expected": "review", "belege": ["T004", "T018"]},
+    "C20": {"family": "splitting", "facts": {"teilung_angefragt": "ja", "ein_vorgang": "unklar", "motiv_umgehung": "unklar"}, "expected": "review", "belege": ["T003", "T010"]}
+  }
+}
