@@ -1,6 +1,6 @@
 """Analyse-Oberfläche für Entwickler: einzelne Transkripte prüfen und gegen die Inventx-Sollbewertung auswerten.
 
-  python -m analysis_ui.app      # -> http://<diese-IP>:7861 (lauscht auf 0.0.0.0)
+  python -m misc.analysis_ui.app      # -> http://<diese-IP>:7861 (lauscht auf 0.0.0.0)
 
 Nutzt den Fraud-Analyse-Dienst (muss laufen: python -m fraud_analysis.api) und lädt selbst kein Modell.
 Tab "Analyse": ein Skript/Transkript laden, mit den Fragen aus dem Editor prüfen, daneben die Sollbewertung.
@@ -118,7 +118,7 @@ def load_transcript(choice):
 
 
 # ------------------------------------------------------------------ Auswertung (Tab)
-# Gleiche Analyse und Ablage wie analysis_ui.evaluate (outputs/kev/scripts | asr): was das Skript gerechnet hat, lädt der
+# Gleiche Analyse und Ablage wie misc.analysis_ui.evaluate (outputs/kev/scripts | asr): was das Skript gerechnet hat, lädt der
 # Tab, und umgekehrt. Die Ergebnisse werden einmal gerechnet; die Schwelle entscheidet danach neu, ohne Dienst.
 
 EVAL_SOURCES = {"Skripte (30 Dialoge)": "scripts", "ASR (Whisper-Transkripte)": "asr"}

@@ -15,7 +15,7 @@ function Start-Part($title, $module) {
 Start-Part "Transkription (8001)" "transcription.api"
 Start-Part "Fraud-Analyse (8002)" "fraud_analysis.api"
 Start-Part "Dashboard (7860)" "dashboard.app"
-if ($Analyse) { Start-Part "Analyse-UI (7861)" "analysis_ui.app" }
+if ($Analyse) { Start-Part "Analyse-UI (7861)" "misc.analysis_ui.app" }
 
 Write-Host "Gestartet. Dashboard: http://localhost:7860  (die Modelle brauchen beim ersten Start etwa eine Minute)"
 if ($Analyse) { Write-Host "Analyse-UI: http://localhost:7861" }

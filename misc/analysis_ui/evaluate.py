@@ -1,10 +1,10 @@
 """
 Auswertung gegen die Inventx-Sollbewertung, über den Fraud-Analyse-Dienst (muss laufen: python -m fraud_analysis.api).
 
-  python -m analysis_ui.evaluate                            # die 30 Skripte in inventx-case-study/data/Transkript
-  python -m analysis_ui.evaluate --asr                      # stattdessen die Transkripte in outputs/transcriptions
-  python -m analysis_ui.evaluate a.txt b.txt                # bestimmte Transkripte
-  python -m analysis_ui.evaluate --rescore --threshold 0.6  # nur neu entscheiden, ohne Dienst (gespeicherte Ergebnisse)
+  python -m misc.analysis_ui.evaluate                            # die 30 Skripte in inventx-case-study/data/Transkript
+  python -m misc.analysis_ui.evaluate --asr                      # stattdessen die Transkripte in outputs/transcriptions
+  python -m misc.analysis_ui.evaluate a.txt b.txt                # bestimmte Transkripte
+  python -m misc.analysis_ui.evaluate --rescore --threshold 0.6  # nur neu entscheiden, ohne Dienst (gespeicherte Ergebnisse)
 
 Schreibt pro Transkript die Antwort von POST /analyze nach outputs/kev/<quelle>/<name>.json und eine Übersicht
 summary.csv. Die Sollbewertung wird erst NACH der Analyse gelesen, nie als Eingabe.
@@ -19,7 +19,7 @@ from pathlib import Path
 
 from fraud_analysis import client as fraud
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]   # misc/analysis_ui/ -> Projektordner
 SCRIPT_DIR = ROOT / "inventx-case-study" / "data" / "Transkript"
 ASR_DIR = ROOT / "outputs" / "transcriptions"
 OUT_ROOT = ROOT / "outputs" / "kev"

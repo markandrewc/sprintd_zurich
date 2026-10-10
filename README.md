@@ -14,7 +14,7 @@ flowchart LR
     D["<b>Dashboard</b> :7860<br/>dashboard/<br/>―――<br/>Anrufe ansehen<br/>Fundstelle anhören<br/>Befunde beurteilen<br/>Einstellungen"]
     F["<b>Fraud-Analyse-API</b> :8002<br/>fraud_analysis/<br/>―――<br/>1. Kev-4B, ganzes Transkript:<br/>Entscheid + Kategorie<br/>2. Kev im gleitenden Fenster:<br/>Fundstelle<br/>Checks: questions.json"]
     FT["<b>Finetuning</b><br/>finetuning/"]
-    DEV["<b>Analyse-UI</b> :7861<br/>analysis_ui/<br/>Auswertung gegen Inventx"]
+    DEV["<b>Analyse-UI</b> :7861<br/>misc/analysis_ui/<br/>Auswertung gegen Inventx"]
 
     rec -->|".wav"| D
     D -->|".wav"| T
@@ -36,7 +36,7 @@ Gestrichelt: geplant. Die beiden APIs laden ihre Modelle erst bei Bedarf und geb
 | `fraud_analysis/` | Kev-4B (jaredpalmer/kev-4b): Entscheid über das ganze Transkript, gleitender Kev sucht für jeden Befund die Fundstelle. Checks in `questions.json`. Dienst `api.py` |
 | `dashboard/` | Gradio-App für Endnutzer. Daten (SQLite, Audio) in `dashboard/data/` |
 | `finetuning/` | Export der Beurteilungen als Trainingsdaten |
-| `analysis_ui/` | Entwickler-Oberfläche und Auswertung gegen die Inventx-Sollbewertung |
+| `misc/analysis_ui/` | Entwickler-Oberfläche und Auswertung gegen die Inventx-Sollbewertung (nicht Teil der App) |
 | `misc/SwissDial/` | TTS für Schweizer Dialekte: Ausweichlösung, um synthetische Testaufnahmen zu erzeugen (nicht Teil der App) |
 
 ## Starten
@@ -46,7 +46,7 @@ Gestrichelt: geplant. Die beiden APIs laden ihre Modelle erst bei Bedarf und geb
 .\start.ps1 -Analyse    # zusätzlich die Entwickler-Oberfläche -> http://localhost:7861
 ```
 
-Einzeln: `.venv\Scripts\python.exe -m transcription.api` (bzw. `fraud_analysis.api`, `dashboard.app`, `analysis_ui.app`).
+Einzeln: `.venv\Scripts\python.exe -m transcription.api` (bzw. `fraud_analysis.api`, `dashboard.app`, `misc.analysis_ui.app`).
 API-Doku der Dienste: http://127.0.0.1:8001/docs und http://127.0.0.1:8002/docs.
 
 ## Konfiguration
