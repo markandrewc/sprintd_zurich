@@ -20,6 +20,7 @@ import streamlit as st
 
 from callguard import audit
 from callguard import policy_edit as pe
+from callguard import rulebook as rb
 from callguard import rule_drafter as rd
 from callguard.cache import stable_hash
 from callguard.checks.facts import DEFAULT_TABLE, FACT_ROLES, RULE_LABELS, PolicyTableError, discretize
@@ -52,31 +53,52 @@ table_path = Path(table_rel) if Path(table_rel).is_absolute() else ROOT / table_
 lang = str(getattr(check, "question_lang", None) or spec.get("question_lang") or "en")
 decide_fact = getattr(check, "_decide", None) or discretize
 params = fa.check_params(app.engine, getattr(check, "name", "facts"))
-store = VersionStore(table_path, audit_dir=app.runs_dir)
-fam_names = {f.id: be.short_label(f.label) for f in app.all_families}
+profile = app.cfg.name
+
+
+def _extra_paths() -> dict[str, Path]:
+    """The other files of the rulebook bundle, as this profile reads them."""
+    from callguard.routing import DEFAULT_ROUTING
+
+    notify = next((s for s in app.cfg.sinks if s.get("type") == "notify"), {})
+    routing = Path(str(notify.get("routing") or DEFAULT_ROUTING))
+    out = {"criteria": app.ctx.path("criteria"), "keywords": app.ctx.path("keywords"),
+           "routing": routing if routing.is_absolute() else ROOT / routing}
+    tuning = app.cfg.paths.tuning
+    if tuning:
+        out["tuning"] = Path(tuning) if Path(tuning).is_absolute() else ROOT / tuning
+    return out
+
+
+store = VersionStore(table_path, audit_dir=app.runs_dir, extras=_extra_paths())
 families_by_id = {f.id: f for f in app.all_families}
+CHECK_KIND = {str(c.get("name") or c.get("type")): rb.CHECK_KIND_DE.get(str(c.get("type")), str(c.get("type")))
+              for c in app.cfg.checks}
 
 st.title("Regelwerk")
-st.caption("Was als Alarm, Prüffall oder unbedenklich gilt: pro Art von Fehlverhalten beantwortet das Sprachmodell "
-           "einfache Ja/Nein-Fragen (**Fakten**) zum Gespräch, die **Regeln** machen daraus den Entscheid; die "
-           "erste zutreffende Regel entscheidet. Änderungen entstehen in einer Arbeitskopie, werden in der "
-           "Vorschau an den verarbeiteten Anrufen geprüft, als Entwurf gespeichert und gelten erst nach Freigabe "
-           f"durch eine zweite Person. Datei: `{table_rel}`, Versionen: `{store.dir.name}/`.")
+st.caption("Was als Alarm, Prüffall oder unbedenklich gilt: pro **Prüfart** (Art von Fehlverhalten) beantwortet das "
+           "Sprachmodell einfache Ja/Nein-Fragen (**Fakten**) zum Gespräch, die **Regeln** machen daraus den "
+           "Entscheid; die erste zutreffende Regel entscheidet. Neue Prüfarten, Regeln und Schalter entstehen in einer "
+           "Arbeitskopie, werden in der Vorschau an den verarbeiteten Anrufen geprüft, als Entwurf gespeichert und "
+           f"gelten erst nach Freigabe durch eine zweite Person. Regeltabelle: `{table_rel}`, Versionen: "
+           f"`{store.dir.name}/` (zusammen mit Kriterien, Stichwortliste, Meldewegen und Prüfungs-Schaltern).")
 
 try:
     active_v = store.ensure_initial()
 except Exception as e:
-    st.error(f"Die aktive Regeltabelle ist unlesbar: {type(e).__name__}: {e}")
+    st.error(f"Das aktive Regelwerk ist unlesbar: {type(e).__name__}: {e}")
     st.stop()
 active_doc = active_v.doc()
 active_table = pe.validate(active_doc)
+active_bundle = store.live_bundle()
 
 # --------------------------------------------------------------------------------------------
 # working copy (session) + the officer's name
 # --------------------------------------------------------------------------------------------
 
 if ss.get("rw_for") != str(table_path) or "rw_doc" not in ss:
-    ss.update(rw_for=str(table_path), rw_doc=copy.deepcopy(active_doc), rw_base=active_v.n, rw_probes={})
+    ss.update(rw_for=str(table_path), rw_doc=copy.deepcopy(active_doc), rw_base=active_v.n, rw_probes={},
+              rw_extra={k: v for k, v in copy.deepcopy(active_bundle).items() if k != "policy_table"})
 ss.setdefault("rw_user", audit.current_user())
 ss.setdefault("rw_rid", 0)
 
@@ -88,6 +110,10 @@ def _rid() -> str:
 
 def doc() -> dict[str, Any]:
     return ss["rw_doc"]
+
+
+def bundle() -> dict[str, dict[str, Any]]:
+    return {"policy_table": ss["rw_doc"], **ss["rw_extra"]}
 
 
 def _flash(msg: str, icon: str = ":material/check_circle:") -> None:
@@ -110,12 +136,35 @@ def _set_doc(new: dict[str, Any], msg: str | None = None) -> bool:
     return True
 
 
+def _set_bundle(new: dict[str, dict[str, Any]], msg: str | None = None) -> bool:
+    if not _set_doc(new["policy_table"]):
+        return False
+    ss["rw_extra"] = {k: v for k, v in new.items() if k != "policy_table"}
+    if msg:
+        _flash(msg)
+    return True
+
+
 def _discard() -> None:
-    ss.update(rw_doc=copy.deepcopy(store.active().doc()), rw_base=store.active().n, rw_probes={}, rw_edit=None)
+    live = store.live_bundle()
+    ss.update(rw_doc=live["policy_table"], rw_base=store.active().n, rw_probes={}, rw_edit=None,
+              rw_extra={k: v for k, v in live.items() if k != "policy_table"})
     _flash("Arbeitskopie verworfen.")
 
 
-changes = pe.diff_docs(active_doc, doc(), fam_names)
+def _family_list(b: dict[str, dict[str, Any]], enabled_only: bool = True) -> list[Any]:
+    from callguard.families import families_from_raw
+
+    fams = families_from_raw(b.get("keywords") or {}, (b.get("criteria") or {}).get("families") or {},
+                             only=app.cfg.families)
+    return [f for f in fams if f.enabled or not enabled_only]
+
+
+work_families = _family_list(bundle(), enabled_only=False)
+fam_names = {**{f.id: be.short_label(f.label) for f in work_families},
+             **{f.id: be.short_label(f.label) for f in app.all_families}}
+new_family_ids = {f.id for f in work_families} - {f.id for f in _family_list(active_bundle, enabled_only=False)}
+changes = rb.diff_bundle(active_bundle, bundle(), fam_names, profile, CHECK_KIND)
 c1, c2, c3 = st.columns([3, 2, 1.3])
 with c1:
     act = store.active()
@@ -155,17 +204,52 @@ def _decide_call(r):
     return app.engine.decide(r, app.settings.overrides(), app.families if app.all_families else None)
 
 
+@st.cache_data(show_spinner=False)
+def _untuned_weights(config: str, sets: tuple[str, ...]) -> dict[str, float]:
+    """Check weights of the profile without the tuning overlay (what "wieder einschalten" restores)."""
+    from callguard.config import load_config
+
+    try:
+        return be.check_weights(load_config(config, [*sets, "paths.tuning="]))
+    except Exception:
+        return {}
+
+
+def _draft_overrides() -> dict[str, Any]:
+    """The sidebar knobs with the working copy's check switches applied."""
+    o = app.settings.overrides()
+    weights = dict(o.get("weights") or {})
+    off_now, off_draft = rb.checks_off(active_bundle, profile), rb.checks_off(bundle(), profile)
+    base = _untuned_weights(app.args.config, tuple(app.args.sets))
+    for name in off_draft:
+        weights[name] = 0.0
+    for name in off_now - off_draft:
+        weights[name] = base.get(name, 1.0)
+    return {**o, "weights": weights}
+
+
+def _draft_families() -> list[Any] | None:
+    if not app.all_families:
+        return None
+    on = set(app.settings.families_on)
+    return [f for f in _family_list(bundle()) if f.id in on or f.id not in families_by_id]
+
+
+def _decide_draft(r):
+    return app.engine.decide(r, _draft_overrides(), _draft_families())
+
+
 try:
     work_table = pe.validate(doc())
     work_error = None
 except PolicyTableError as e:  # cannot happen through the editor; a hand-loaded draft might
     work_table, work_error = active_table, str(e)
 probes = _valid_probes(work_table)
-memo_key = stable_hash({"doc": doc(), "sig": app.loaded.signature, "knobs": app.settings.overrides(),
+memo_key = stable_hash({"doc": bundle(), "sig": app.loaded.signature, "knobs": app.settings.overrides(),
                         "fams": app.settings.families_on, "probes": sorted(map(str, probes)), "lang": lang})
 if ss.get("rw_preview_key") != memo_key:
     ss["rw_preview"] = wi.preview(app.loaded.results, active_table, work_table, _decide_call, params, probes, lang,
-                                  decide_fact) if app.engine.can_decide else None
+                                  decide_fact, decide_after=_decide_draft) if app.engine.can_decide else None
     ss["rw_preview_key"] = memo_key
 pv: wi.Preview | None = ss["rw_preview"]
 if work_error:
@@ -463,6 +547,8 @@ def _make_draft() -> None:
         ss["rw_ai_error"] = None
         for k in [k for k in ss if str(k).startswith("rw_aid_")]:
             del ss[k]
+    except rd.NeedsNewFamily as e:
+        ss["rw_ai"], ss["rw_ai_error"], ss["rw_ai_newfam"] = None, None, e.request
     except rd.DraftError as e:
         ss["rw_ai"], ss["rw_ai_error"] = None, str(e)
     except Exception as e:
@@ -480,6 +566,11 @@ def ai_tab() -> None:
               disabled=not str(ss.get("rw_ai_request") or "").strip())
     if ss.get("rw_ai_error"):
         st.error(ss["rw_ai_error"], icon=":material/error:")
+    if ss.get("rw_ai_newfam"):
+        st.info("Diese Regel passt laut Sprachmodell zu **keiner bestehenden Prüfart**. Legen Sie dafür eine neue "
+                "Prüfart an; Ihre Beschreibung wird übernommen.", icon=":material/add_circle:")
+        st.button("Als neue Prüfart anlegen", icon=":material/category:", key="rw_ai_to_family",
+                  on_click=lambda: ss.update(rw_section="family", rw_fam_request=ss.pop("rw_ai_newfam", "")))
     draft: rd.Draft | None = ss.get("rw_ai")
     if draft is None:
         return
@@ -543,7 +634,8 @@ def _run_probes(tasks: list[wi.Key]) -> None:
         bar.progress(i / n, text=f"{i} von {n} Antworten")
 
     try:
-        out, errors = wi.run_probes(check, app.loaded.results, work_table, tasks, families_by_id,
+        out, errors = wi.run_probes(check, app.loaded.results, work_table, tasks,
+                                    {**{f.id: f for f in work_families}, **families_by_id},
                                     lambda r: be.check_view_transcript(app.engine.pipeline, check, r), progress)
     except wi.ProbeUnavailable as e:
         bar.empty()
@@ -570,7 +662,12 @@ def preview_tab() -> None:
     if not pv.n_calls:
         st.info("Keine verarbeiteten Anrufe mit Fakten-Ergebnissen in dieser Quelle: nichts zum Vergleichen.")
 
-    tasks = [t for t in wi.probe_tasks(app.loaded.results, work_table, lang) if t not in probes]
+    tasks = [t for t in wi.probe_tasks(app.loaded.results, work_table, lang, new_family_ids) if t not in probes]
+    if new_family_ids:
+        st.info("Neue Prüfart in der Arbeitskopie: für die schon verarbeiteten Anrufe gibt es noch keine Antworten auf "
+                "ihre Fragen. Erst nach «Neue Fragen jetzt abfragen» zeigt die Vorschau, welche Anrufe sie markiert; "
+                "Stichwort-Treffer der neuen Prüfart kommen mit dem nächsten Lauf (oder «Günstige Prüfungen neu "
+                "ausführen» auf der Stichwort-Seite nach der Freigabe).", icon=":material/category:")
     if tasks:
         n_facts = len({(f, x) for _, f, x in tasks})
         sec = wi.seconds_per_probe(app.loaded.results)
@@ -624,7 +721,8 @@ def preview_tab() -> None:
     if st.button(f"Als Entwurf speichern (Version {store.next_n()})", type="primary", icon=":material/save:",
                  disabled=not changes or app.read_only or bool(work_error)):
         try:
-            v = store.save_draft(doc(), ss["rw_user"], comment, family_names=fam_names)
+            v = store.save_draft(bundle(), ss["rw_user"], comment, family_names=fam_names, profile=profile,
+                                 check_kinds=CHECK_KIND)
         except (FourEyesError, PolicyTableError) as e:
             st.error(str(e))
         else:
@@ -664,14 +762,18 @@ def _effect(changed: list[wi.CallPreview]) -> None:
 def _redecide_stored(v_n: int) -> None:
     """Write the stored results re-decided with the active table (rules only, cached fact answers)."""
     table = pe.validate(store.active().doc())
+    known = _valid_probes(table)  # answers asked in this session's preview (new questions / Prüfarten)
+    parent = store.get(v_n).meta.get("parent")
+    before = set((store.get(parent).doc().get("families") or {}) if parent else table.families)
+    added = set(table.families) - before  # Prüfarten new in this version: every call needs their answers
     n = skipped = 0
     for cid, r in app.loaded.results.items():
         if wi.facts_check_name(r) is None:
             continue
-        if wi.probe_tasks({cid: r}, table, lang):
+        if [t for t in wi.probe_tasks({cid: r}, table, lang, added) if t not in known]:
             skipped += 1
             continue
-        new, _ = wi.redecide_result(r, table, params, None, lang, decide_fact)
+        new, _ = wi.redecide_result(r, table, params, known, lang, decide_fact)
         name = wi.facts_check_name(new)
         meta = dict(new.checks[name].meta or {})
         meta["policy_table"] = {**(meta.get("policy_table") or {}), "hash": table.key(list(new.checks[name].family_scores)),
@@ -706,7 +808,8 @@ def versions_tab() -> None:
                         f"{str(v.meta.get('created', ''))[:16]}"
                         + (f"  \n:material/chat: {ui.esc(str(v.meta['comment']))}" if v.meta.get("comment") else ""))
             base = store.active()
-            diff = pe.diff_docs(base.doc(), v.doc(), fam_names) if base else []
+            live = store.live_bundle()
+            diff = rb.diff_bundle(live, {**live, **v.bundle()}, fam_names, profile, CHECK_KIND) if base else []
             st.markdown("\n".join(f"- {ui.esc(c)}" for c in diff) or "_keine Änderung gegenüber der aktiven Version_")
             c1, c2, c3, c4 = st.columns([2, 1.2, 1, 1.2], vertical_alignment="bottom")
             approver = c1.text_input("Freigabe durch (Name)", key=f"rw_appr_{v.n}",
@@ -718,7 +821,9 @@ def versions_tab() -> None:
                 except FourEyesError as e:
                     st.error(str(e), icon=":material/group:")
                 else:
-                    ss.update(rw_doc=copy.deepcopy(store.active().doc()), rw_base=v.n, rw_just_approved=v.n)
+                    live = store.live_bundle()
+                    ss.update(rw_doc=live["policy_table"], rw_base=v.n, rw_just_approved=v.n,
+                              rw_extra={k: x for k, x in live.items() if k != "policy_table"})
                     reload_everything()
                     _flash(f"Version {v.n} freigegeben und aktiv.")
                     st.rerun()
@@ -726,7 +831,9 @@ def versions_tab() -> None:
                 store.reject(v.n, ss["rw_user"])
                 st.rerun()
             if c4.button("In Arbeitskopie laden", key=f"rw_load_{v.n}"):
-                ss.update(rw_doc=v.doc(), rw_base=v.n, rw_edit=None)
+                loaded = {**store.live_bundle(), **v.bundle()}
+                ss.update(rw_doc=loaded["policy_table"], rw_base=v.n, rw_edit=None,
+                          rw_extra={k: x for k, x in loaded.items() if k != "policy_table"})
                 _flash(f"Version {v.n} in die Arbeitskopie geladen.")
                 st.rerun()
 
@@ -744,7 +851,7 @@ def versions_tab() -> None:
         n = c1.selectbox("Frühere freigegebene Version", [v.n for v in others], format_func=lambda n: f"Version {n}")
         if c2.button(f"Zurücksetzen auf Version {n} (als Entwurf)", icon=":material/history:", disabled=app.read_only):
             try:
-                v = store.rollback(n, ss["rw_user"], fam_names)
+                v = store.rollback(n, ss["rw_user"], fam_names, profile)
             except (FourEyesError, PolicyTableError) as e:
                 st.error(str(e))
             else:
@@ -755,7 +862,7 @@ def versions_tab() -> None:
                 prev = next((p for p in store.versions() if p.n == (v.meta.get("parent") or 0)), None)
                 if prev is None:
                     continue
-                d = pe.diff_docs(prev.doc(), v.doc(), fam_names)
+                d = rb.diff_bundle(prev.bundle(), {**prev.bundle(), **v.bundle()}, fam_names, profile, CHECK_KIND)
                 st.markdown(f"**Version {v.n}** (gegenüber {prev.n}, {STATUS_DE.get(v.status, v.status)})")
                 st.markdown("\n".join(f"- {ui.esc(c)}" for c in d) or "_keine Änderung_")
 
@@ -767,22 +874,250 @@ def pe_same(a: str, b: str) -> bool:
 
 
 # --------------------------------------------------------------------------------------------
+# section: Prüfarten & Prüfungen on/off
+# --------------------------------------------------------------------------------------------
+
+
+def _fam_toggle(fid: str, key: str) -> None:
+    b = copy.deepcopy(bundle())
+    rb.set_family_enabled(b, fid, bool(ss[key]))
+    ss["rw_extra"] = {k: v for k, v in b.items() if k != "policy_table"}
+
+
+def _check_toggle(name: str, key: str) -> None:
+    b = copy.deepcopy(bundle())
+    rb.set_check_enabled(b, profile, name, bool(ss[key]))
+    ss["rw_extra"] = {k: v for k, v in b.items() if k != "policy_table"}
+
+
+def _goto(section: str) -> None:
+    ss["rw_section"] = section
+
+
+def _preview_line() -> None:
+    if pv is None or not changes:
+        return
+    n = len(pv.changed)
+    st.markdown(f":material/preview: Mit der Arbeitskopie ändern sich **{n} von {pv.n_calls}** verarbeiteten Anrufen "
+                "(bei den Einstellungen der Seitenleiste).")
+    st.button("Zur Vorschau", icon=":material/arrow_forward:", key=f"rw_goto_preview_{section}",
+              on_click=_goto, args=("preview",))
+
+
+def switches_tab() -> None:
+    b = bundle()
+    teams = (b.get("routing") or {}).get("teams") or {}
+    st.markdown("##### Prüfarten")
+    st.caption("Ausgeschaltet = diese Art von Fehlverhalten wird nicht mehr gesucht und zählt in keinem Entscheid "
+               "(Kriterien: `enabled: false`). Anders als der Schalter in der Seitenleiste (nur Ihre Ansicht, sofort) "
+               "gilt dieser Schalter für alle und erst nach Freigabe.")
+    for f in work_families:
+        on = rb.family_enabled(b, f.id)
+        n_rules = len((((b["policy_table"].get("families") or {}).get(f.id)) or {}).get("rules") or [])
+        to = rb.family_team(b, f.id)
+        with st.container(border=True):
+            cols = st.columns([4, 1.3, 4], vertical_alignment="center")
+            cols[0].markdown(f"**{ui.esc(be.short_label(f.label))}**"
+                             + (" :blue-badge[neu]" if f.id in new_family_ids else "")
+                             + ("" if f.can_alarm else " :gray-badge[nur Hinweis]"))
+            key = f"rw_famon_{f.id}_{on}"
+            cols[1].toggle("aktiv", value=on, key=key, on_change=_fam_toggle, args=(f.id, key), disabled=app.read_only)
+            cols[2].caption(f"`{f.id}` · {len(f.keywords)} Stichwortgruppe(n) · {n_rules} Regel(n) · Meldung an "
+                            + (", ".join(str((teams.get(t) or {}).get("name") or t) for t in to) or "Standard-Meldeweg"))
+    st.markdown("##### Prüfungen")
+    st.caption(f"Ausgeschaltet = Gewicht 0 im Profil **{profile}** (`tuning.yaml`): die Prüfung zählt in keinem "
+               "Entscheid mehr. Wie der Gewichts-Regler in der Seitenleiste, aber dauerhaft und mit Freigabe.")
+    off = rb.checks_off(b, profile)
+    weights = app.default_weights
+    for c in app.cfg.checks:
+        name = str(c.get("name") or c.get("type"))
+        on = name not in off
+        cols = st.columns([4, 1.3, 4], vertical_alignment="center")
+        cols[0].markdown(f"**{ui.esc(CHECK_KIND.get(name, name))}**")
+        key = f"rw_chkon_{name}_{on}"
+        cols[1].toggle("aktiv", value=on, key=key, on_change=_check_toggle, args=(name, key), disabled=app.read_only)
+        cols[2].caption(f"`{name}` ({c.get('type')}) · Gewicht jetzt {weights.get(name, c.get('weight', 1.0)):.2f}")
+    _preview_line()
+
+
+# --------------------------------------------------------------------------------------------
+# section: new Prüfart (wizard)
+# --------------------------------------------------------------------------------------------
+
+
+def _teams() -> dict[str, str]:
+    return {str(k): str((v or {}).get("name") or k) for k, v in ((bundle().get("routing") or {}).get("teams") or {}).items()}
+
+
+def _clear_fd() -> None:
+    for k in [k for k in ss if str(k).startswith("rw_fd_")]:
+        del ss[k]
+
+
+def _make_family_draft() -> None:
+    try:
+        llm = app.ctx.llm(getattr(check, "llm_name", "default"))
+        ss["rw_fam_draft"] = rd.draft_family(llm, bundle(), ss.get("rw_fam_request", ""), fam_names, _teams(),
+                                             ss.get("rw_fam_name", ""))
+        ss["rw_fam_ai"], ss["rw_fam_error"] = True, None
+        _clear_fd()
+    except rd.DraftError as e:
+        ss["rw_fam_draft"], ss["rw_fam_error"] = None, str(e)
+    except Exception as e:
+        ss["rw_fam_draft"], ss["rw_fam_error"] = None, (
+            f"Sprachmodell nicht erreichbar ({type(e).__name__}: {str(e)[:160]}). Entwürfe brauchen das konfigurierte "
+            "LLM (GPU-Rechner); «Ohne KI beginnen» geht immer.")
+
+
+def _blank_family() -> None:
+    ss["rw_fam_draft"] = rd.blank_family(bundle(), ss.get("rw_fam_name", "") or "Neue Prüfart",
+                                         ss.get("rw_fam_request", ""))
+    ss["rw_fam_ai"], ss["rw_fam_error"] = False, None
+    _clear_fd()
+
+
+def _fd_add(kind: str) -> None:
+    fd: rd.FamilyDraft = ss["rw_fam_draft"]
+    spec = fd.spec
+    if kind == "fact":
+        n = len(spec["facts"]) + 1
+        while any(f["id"] == f"fakt_{n}" for f in spec["facts"]):
+            n += 1
+        spec["facts"].append({"id": f"fakt_{n}", "label": f"Fakt {n}", "role": "context", "de": "", "en": ""})
+    else:
+        first = spec["facts"][0]["id"] if spec["facts"] else "act"
+        spec["rules"].append({"id": f"{spec['id']}.review_{len(spec['rules']) + 1}", "label": "review",
+                              "when": f"{first} = yes", "text": ""})
+
+
+def _lines(text: str) -> list[str]:
+    return [" ".join(x.split()) for x in str(text or "").splitlines() if x.strip()]
+
+
+def family_wizard() -> None:
+    st.markdown("Eine neue Prüfart ist reine Konfiguration: Name und Beschreibung (Kriterien), Stichwörter, "
+                "Ja/Nein-Fragen und Regeln, Rechtsgrundlage und Meldeweg. Beschreiben Sie, was gesucht werden soll; "
+                "das Sprachmodell schlägt alles vor, Sie prüfen und ändern. **Aktiv wird nichts vor der Vorschau und "
+                "der Freigabe durch eine zweite Person.**")
+    c1, c2 = st.columns([1, 2])
+    c1.text_input("Name der Prüfart", key="rw_fam_name", placeholder="z.B. Bestechung")
+    c2.text_area("Beschreibung in eigenen Worten", key="rw_fam_request", height=90,
+                 placeholder="Alarm, wenn jemand dem Berater einen persönlichen Vorteil anbietet, damit er eine Zahlung "
+                             "ohne Prüfung freigibt. Harmlos: der Berater lehnt ab und meldet es.")
+    b1, b2, _ = st.columns([1.2, 1, 2])
+    b1.button("Entwurf mit KI erstellen", type="primary", icon=":material/auto_awesome:", key="rw_fam_ai_btn",
+              on_click=_make_family_draft, disabled=not str(ss.get("rw_fam_request") or "").strip())
+    b2.button("Ohne KI beginnen", icon=":material/edit_note:", key="rw_fam_blank_btn", on_click=_blank_family)
+    if ss.get("rw_fam_error"):
+        st.error(ss["rw_fam_error"], icon=":material/error:")
+    fd: rd.FamilyDraft | None = ss.get("rw_fam_draft")
+    if fd is None:
+        return
+    spec = fd.spec
+    teams = _teams()
+    with st.container(border=True):
+        st.markdown((":orange-badge[:material/smart_toy: von KI vorgeschlagen — bitte prüfen]" if ss.get("rw_fam_ai")
+                     else ":gray-badge[Vorlage ohne KI]") + f"  Neue Prüfart **{ui.esc(spec['label'])}**")
+        if fd.note:
+            st.caption(f"Hinweis: {ui.esc(fd.note)}")
+        for w in fd.warnings:
+            st.warning(w, icon=":material/warning:")
+        c1, c2 = st.columns([2, 1])
+        label = c1.text_input("Name", value=spec["label"], key="rw_fd_label")
+        fid = c2.text_input("Kennung (intern)", value=spec["id"], key="rw_fd_id",
+                            help="Kleinbuchstaben, Ziffern, _ ; erscheint in Regeln, Meldungen und im Audit-Log.")
+        policy = st.text_area("Beschreibung (Kriterien, lesen die KI-Prüfungen)", value=spec["policy"], key="rw_fd_policy",
+                              height=90)
+        c1, c2, c3 = st.columns(3)
+        alarm_when = c1.text_area("Alarm, wenn … (eine Zeile pro Fall)", value="\n".join(spec["alarm_when"]),
+                                  key="rw_fd_alarm", height=110)
+        not_alarm = c2.text_area("Harmlos, wenn …", value="\n".join(spec["not_alarm_when"]), key="rw_fd_notalarm",
+                                 height=110)
+        review = c3.text_area("Prüfen, wenn …", value="\n".join(spec["review_when"]), key="rw_fd_review", height=110)
+        c1, c2 = st.columns(2)
+        keywords = c1.text_area("Stichwörter Hochdeutsch (durch Komma getrennt)", value=", ".join(spec["keywords"]),
+                                key="rw_fd_kw", height=68)
+        keywords_gsw = c2.text_area("Stichwörter Schweizerdeutsch (optional)", value=", ".join(spec["keywords_gsw"]),
+                                    key="rw_fd_kwgsw", height=68)
+        c1, c2 = st.columns([2, 1])
+        basis = c1.text_input("Rechtsgrundlage (Vorschlag, durch Compliance zu bestätigen)", value=spec["basis"],
+                              key="rw_fd_basis")
+        team_opts = ["", *teams]
+        team = c2.selectbox("Meldung an", team_opts, index=team_opts.index(spec["team"]) if spec["team"] in team_opts
+                            else 0, format_func=lambda t: teams.get(t, "Standard-Meldeweg"), key="rw_fd_team")
+
+        st.markdown("**Fakten (Ja/Nein-Fragen an das Sprachmodell)**")
+        facts = []
+        for i, f in enumerate(spec["facts"]):
+            k = f"rw_fd_f_{f['id']}"
+            cols = st.columns([0.6, 2.4, 2], vertical_alignment="bottom")
+            use = cols[0].checkbox("nutzen", value=True, key=f"{k}_use")
+            flabel = cols[1].text_input(f"Fakt `{f['id']}`", value=f["label"], key=f"{k}_label")
+            role = cols[2].selectbox("Rolle", list(FACT_ROLES), index=list(FACT_ROLES).index(f["role"]),
+                                     format_func=pe.ROLE_DE.get, key=f"{k}_role")
+            de = st.text_input("Frage (Deutsch)", value=f["de"], key=f"{k}_de")
+            en = st.text_input("Frage (Englisch, liest das Modell)" if lang == "en" else "Frage (Englisch)",
+                               value=f.get("en", ""), key=f"{k}_en")
+            if use:
+                facts.append({"id": f["id"], "label": flabel, "role": role, "de": de, "en": en})
+        st.button("Fakt hinzufügen", icon=":material/add:", key="rw_fd_addfact", on_click=_fd_add, args=("fact",))
+        labels = {f["id"]: f["label"] for f in facts}
+        st.markdown("**Regeln** (von oben nach unten; am Ende gilt automatisch «sonst kein Alarm»)")
+        rules = []
+        for i, r in enumerate(spec["rules"]):
+            with st.container(border=True):
+                rules.append(rule_form(f"rw_fd_r{i}", r, labels) if labels else r)
+        st.button("Regel hinzufügen", icon=":material/add:", key="rw_fd_addrule", on_click=_fd_add, args=("rule",))
+
+        c1, c2 = st.columns(2)
+        if c1.button("In Arbeitskopie übernehmen", type="primary", icon=":material/playlist_add:", key="rw_fd_apply"):
+            new_spec = {"id": fid.strip(), "label": label, "policy": policy, "alarm_when": _lines(alarm_when),
+                        "not_alarm_when": _lines(not_alarm), "review_when": _lines(review), "keywords": keywords,
+                        "keywords_gsw": keywords_gsw, "basis": basis, "team": team, "facts": facts,
+                        "rules": [{**r, "id": f"{fid.strip()}.{r['label']}_{i + 1}"} for i, r in enumerate(rules)]}
+            try:
+                cand = rb.add_family(bundle(), new_spec)
+            except (PolicyTableError, KeyError) as e:
+                st.error(f"Nicht übernommen: {e}")
+            else:
+                if _set_bundle(cand, f"Prüfart «{label}» in der Arbeitskopie (nicht aktiv). Weiter: Vorschau."):
+                    audit.log_event(app.runs_dir, "policy_family_draft", user=ss["rw_user"], family=fid.strip(),
+                                    label=label, ai=bool(ss.get("rw_fam_ai")), request=fd.request, raw=fd.raw)
+                    ss["rw_fam_draft"] = None
+                    _clear_fd()
+                    ss["rw_goto"] = "preview"
+                    st.rerun()
+        if c2.button("Verwerfen", icon=":material/delete:", key="rw_fd_discard"):
+            ss["rw_fam_draft"] = None
+            _clear_fd()
+            st.rerun()
+
+
+# --------------------------------------------------------------------------------------------
 # layout
 # --------------------------------------------------------------------------------------------
 
 fam_ids = list((doc().get("families") or {}).keys())
-SECTIONS = {"rules": ":material/rule: Regeln", "ai": ":material/auto_awesome: Neue Regel in eigenen Worten",
+SECTIONS = {"rules": ":material/rule: Regeln", "switches": ":material/toggle_on: Prüfarten & Prüfungen",
+            "ai": ":material/auto_awesome: Neue Regel", "family": ":material/category: Neue Prüfart",
             "preview": ":material/preview: Vorschau & Speichern", "versions": ":material/verified: Versionen & Freigabe"}
+if "rw_goto" in ss:  # set by a button after the radio was drawn: applied on the next run
+    ss["rw_section"] = ss.pop("rw_goto")
 n_drafts = len(store.drafts())
 section = st.radio("Bereich", list(SECTIONS), key="rw_section", horizontal=True, label_visibility="collapsed",
                    format_func=lambda k: SECTIONS[k] + (f" ({len(changes)})" if k == "preview" and changes else "")
                    + (f" ({n_drafts})" if k == "versions" and n_drafts else ""))
 if section == "rules":
-    for tab, fam in zip(st.tabs([fam_names.get(f, f) for f in fam_ids]), fam_ids):
+    for tab, fam in zip(st.tabs([fam_names.get(f, f) + (" (neu)" if f in new_family_ids else "") for f in fam_ids]),
+                        fam_ids):
         with tab:
             family_tab(fam)
+elif section == "switches":
+    switches_tab()
 elif section == "ai":
     ai_tab()
+elif section == "family":
+    family_wizard()
 elif section == "preview":
     preview_tab()
 else:

@@ -232,10 +232,10 @@ def good_draft(**over) -> dict:
 def test_drafter_valid_draft_is_validated_and_applied(doc):
     llm = Canned(json.dumps(good_draft()))
     draft = rd.draft_rule(llm, doc, REQUEST, {"splitting": "Kontrolle umgehen"})
-    assert llm.calls[0]["json_schema"]["properties"]["family"]["enum"] == list(doc["families"])
+    assert llm.calls[0]["json_schema"]["properties"]["family"]["enum"] == [*doc["families"], rd.NEW_FAMILY]
     assert REQUEST in llm.calls[0]["messages"][-1]["content"] and "split_request" in llm.calls[0]["messages"][-1]["content"]
     assert draft.family == "splitting" and [f["id"] for f in draft.facts] == ["below_threshold", "avoid_report"]
-    assert draft.rule["id"] == "splitting.alarm_2" and draft.rule["basis"] == "GwG Art. 6"
+    assert draft.rule["id"] == "splitting.alarm_2" and draft.rule["basis"] == "GwG Art. 6 (Vorschlag)"
     assert not draft.warnings
     new = rd.apply_draft(doc, draft)
     t = pe.validate(new)
@@ -245,19 +245,35 @@ def test_drafter_valid_draft_is_validated_and_applied(doc):
     assert doc["families"]["splitting"]["rules"][0]["id"] == "splitting.alarm_1"  # input not mutated
 
 
-def test_drafter_renames_colliding_ids_and_drops_unused_facts(doc):
+def test_drafter_reuses_restated_existing_facts_and_drops_unused(doc):
+    """Seen live (Qwen2.5-7B): the model restates an existing fact under its id; the existing one is reused."""
     obj = good_draft()
-    obj["facts"][0]["id"] = "split_request"  # collides with an existing fact
-    obj["rule"]["when"] = "split_request = yes"
-    draft = rd.validate_draft(obj, doc)  # a NEW fact named like an existing one: renamed, also in the condition
-    assert [f["id"] for f in draft.facts] == ["split_request_2"] and draft.rule["when"] == "split_request_2 = yes"
-    assert any("gibt es schon" in w for w in draft.warnings)
-    assert any("Nicht verwendete Fakten verworfen: avoid_report" in w for w in draft.warnings)
-    obj = good_draft()
-    obj["facts"][0]["id"] = "harmless"
-    obj["rule"]["when"] = "split_request = yes and harmless = yes"  # the model meant ITS new fact
+    obj["facts"][0]["id"] = "split_request"  # restates an existing fact
+    obj["rule"]["when"] = "split_request = yes and avoid_report = yes"
+    obj["facts"].append({"id": "unused_one", "label": "betrag_unter_10k", "role": "context", "de": "Frage?", "en": "Q?"})
     draft = rd.validate_draft(obj, doc)
-    assert draft.facts[0]["id"] == "harmless_2" and draft.rule["when"] == "split_request = yes and harmless_2 = yes"
+    assert [f["id"] for f in draft.facts] == ["avoid_report"]
+    assert draft.rule["when"] == "split_request = yes and avoid_report = yes"
+    assert any("bestehenden Fakt «Aufteilung in Teilbeträge verlangt»" in w for w in draft.warnings)
+    assert any("Nicht verwendete Fakten verworfen: unused_one" in w for w in draft.warnings)
+
+
+def test_drafter_wording_rules():
+    assert rd.german_label("betrag_unter_10k") == "Betrag unter 10k"
+    assert rd.suggested_basis("GwG Art. 6") == "GwG Art. 6 (Vorschlag)"
+    assert rd.suggested_basis("") == "" and rd.suggested_basis("none") == ""
+    long = "Interne Weisung: " + "sehr " * 40 + "lang"
+    assert len(rd.suggested_basis(long)) < 140
+    msgs = rd.draft_messages("x", pe.load_doc(SHIPPED))
+    assert "GERMAN" in msgs[0]["content"] and "StGB Art. 322ter" in msgs[0]["content"]
+    assert "never snake_case" in msgs[0]["content"]
+
+
+def test_drafter_says_when_no_existing_family_fits(doc):
+    obj = good_draft(family=rd.NEW_FAMILY, facts=[], rule={"label": "alarm", "when": "", "text": "", "basis": ""})
+    with pytest.raises(rd.NeedsNewFamily) as e:
+        rd.draft_rule(Canned(json.dumps(obj)), doc, "Alarm bei Bestechung")
+    assert e.value.request == "Alarm bei Bestechung"
 
 
 @pytest.mark.parametrize("bad,match", [

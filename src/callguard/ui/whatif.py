@@ -48,17 +48,23 @@ def stale_facts(ft: FamilyTable, detail: dict[str, Any], lang: str) -> list[str]
     return out
 
 
-def probe_tasks(results: dict[str, CallResult], table: PolicyTable, lang: str) -> list[Key]:
-    """(call, family, fact) for every fact answer the draft needs and the stored results do not have."""
+def probe_tasks(results: dict[str, CallResult], table: PolicyTable, lang: str,
+                new_families: set[str] | None = None) -> list[Key]:
+    """(call, family, fact) for every fact answer the draft needs and the stored results do not have.
+    ``new_families``: Prüfarten of the draft that no stored run knows yet: every fact of theirs is needed."""
     out: list[Key] = []
     for cid, r in results.items():
         check = facts_check_name(r)
         if check is None:
             continue
-        for fam, fs in r.checks[check].family_scores.items():
+        stored = r.checks[check].family_scores
+        for fam, fs in stored.items():
             ft = table.families.get(fam)
             if ft is not None and (fs.detail or {}).get("facts") is not None:
                 out += [(cid, fam, fid) for fid in stale_facts(ft, fs.detail, lang)]
+        for fam in sorted((new_families or set()) - set(stored)):
+            if fam in table.families:
+                out += [(cid, fam, f.id) for f in table.families[fam].facts]
     return out
 
 
@@ -121,7 +127,11 @@ def redecide_result(result: CallResult, table: PolicyTable, params: dict[str, fl
     cr = result.checks[check]
     fss = dict(cr.family_scores)
     outcomes: dict[str, FamilyOutcome] = {}
-    for fam, fs in cr.family_scores.items():
+    probed = {f for (cid, f, _) in (probes or {}) if cid == result.call_id}
+    # a Prüfart the stored run did not know: decided only once some of its facts were asked (else no entry)
+    fresh = {fam: FamilyScore(score=0.0, confidence=0.0, detail={"facts": {}, "new_family": True})
+             for fam in sorted(probed - set(cr.family_scores)) if fam in table.families}
+    for fam, fs in [*cr.family_scores.items(), *fresh.items()]:
         ft = table.families.get(fam)
         if ft is None or (fs.detail or {}).get("facts") is None:
             continue
@@ -173,8 +183,11 @@ class Preview:
 def preview(results: dict[str, CallResult], active: PolicyTable, draft: PolicyTable,
             decide_call: Callable[[CallResult], Any], params: dict[str, float] | None = None,
             probes: dict[Key, dict[str, float]] | None = None, lang: str = "en",
-            decide: Callable[[dict[str, float]], str] = discretize) -> Preview:
-    """Every call decided with the active table and with the draft (same fusion ``decide_call``)."""
+            decide: Callable[[dict[str, float]], str] = discretize,
+            decide_after: Callable[[CallResult], Any] | None = None) -> Preview:
+    """Every call decided with the active table and with the draft. ``decide_call`` is the fusion now;
+    ``decide_after`` the fusion under the draft's switches (Prüfarten / kinds of check on or off), default
+    the same."""
     calls: list[CallPreview] = []
     hits: dict[str, dict[str, int]] = {}
     cond: dict[str, dict[str, int]] = {}
@@ -186,7 +199,7 @@ def preview(results: dict[str, CallResult], active: PolicyTable, draft: PolicyTa
         try:
             rb, ob = redecide_result(r, active, params, None, None, decide)
             ra, oa = redecide_result(r, draft, params, probes, lang, decide)
-            db, da = decide_call(rb), decide_call(ra)
+            db, da = decide_call(rb), (decide_after or decide_call)(ra)
         except Exception as e:  # one broken result must not hide the preview of the others
             errors.append(f"{cid}: {type(e).__name__}: {e}")
             continue
