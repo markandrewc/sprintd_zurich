@@ -266,7 +266,7 @@ def _mode_picker(state: md.ModeState, source: Source, runs_root: Path, audit_dir
     st.radio("Prüfmodus", ok, key=MODE_KEY, format_func=lambda k: by[k].label,
              captions=[md.consequence_short(metrics.get(k)) for k in ok],
              on_change=_on_mode_change, args=(str(runs_root), source.key, str(audit_dir), spec, metrics),
-             help="Wie streng callguard entscheidet. Wirkt sofort auf alle Anrufe (nur Neu-Bewertung der "
+             help="Wie streng Sherlock Phones entscheidet. Wirkt sofort auf alle Anrufe (nur Neu-Bewertung der "
                   "gespeicherten Prüfergebnisse). Die Wahl wird pro Profil gespeichert und im Audit-Log vermerkt.")
     cur = ss[MODE_KEY]
     st.caption(by[cur].text + (f" {md.uncertainty_note(metrics[cur])}." if cur in metrics else ""))
@@ -406,7 +406,7 @@ def bootstrap() -> AppState:
         st.caption("Start mit `uv run callguard ui -c local` (Profile liegen in `config/`).")
         st.stop()
 
-    st.sidebar.markdown("### :material/shield: callguard")
+    st.sidebar.markdown("### :material/shield: Sherlock Phones")
     sources = srcs.list_sources(cfg.paths.resolve("runs_dir"), cfg.name)
     source = _pick_source(sources)
     if source.key != sources[0].key:

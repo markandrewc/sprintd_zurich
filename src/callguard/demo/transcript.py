@@ -185,7 +185,7 @@ def view_switch(script: OriginalScript | None, view: str = "de") -> tuple[str, s
     """(the switch above the transcript, the note under it for the Swiss German view)."""
     ch_on = script is not None and view == "ch"
     de = (f'<button type="button" class="cg-view{"" if ch_on else " is-on"}" data-view="de" '
-          f'aria-pressed="{"false" if ch_on else "true"}" title="Was callguard aus der Aufnahme erkannt hat und '
+          f'aria-pressed="{"false" if ch_on else "true"}" title="Was Sherlock Phones aus der Aufnahme erkannt hat und '
           f'was die KI auswertet">{VIEW_DE}</button>')
     if script is None:
         ch = (f'<button type="button" class="cg-view" data-view="ch" disabled aria-disabled="true" '

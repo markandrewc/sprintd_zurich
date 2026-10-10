@@ -1,6 +1,6 @@
-# callguard: guide for the sprintd_zurich team (and your coding agents)
+# Sherlock Phones (code name `callguard`): guide for the sprintd_zurich team (and your coding agents)
 
-This branch holds **callguard**, the second prototype for the Inventx/Outcept case, next to `main` (Kev pipeline +
+This branch holds **Sherlock Phones** (package and CLI still named `callguard`), the second prototype for the Inventx/Outcept case, next to `main` (Kev pipeline +
 Gradio dashboard). It is meant for comparing the two approaches without rerunning anything: all code, docs,
 research notes and a snapshot of every result we computed are here.
 

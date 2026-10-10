@@ -25,7 +25,7 @@ HERE = Path(__file__).resolve().parent
 PAGES = HERE / "pages"
 ACCENT = "#2a78d6"
 
-st.set_page_config(layout="wide", page_title="callguard · Anrufprüfung", page_icon=":material/verified_user:",
+st.set_page_config(layout="wide", page_title="Sherlock Phones · Anrufprüfung", page_icon=":material/verified_user:",
                    initial_sidebar_state="collapsed")
 
 pages = {

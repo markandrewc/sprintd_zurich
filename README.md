@@ -1,4 +1,6 @@
-# callguard
+# Sherlock Phones
+
+*Every bank call checked, not just samples.* (Internal code name and CLI: `callguard`.)
 
 Checks Swiss German bank phone calls for compliance problems: insider trading, disclosing access codes,
 disclosure to third parties, concealing documentation, and splitting payments to evade controls.
