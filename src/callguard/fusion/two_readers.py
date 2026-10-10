@@ -25,6 +25,7 @@ from typing import TYPE_CHECKING, Any
 
 from callguard import agreement as ag
 from callguard import fact_policy as fpol
+from callguard.cache import stable_hash
 from callguard.checks.facts import DEFAULT_TABLE, FamilyTable, load_policy_table
 from callguard.fusion.weighted import WeightedFusion
 from callguard.types import CheckResult, Decision, Family, Transcript
@@ -46,6 +47,7 @@ class TwoReadersFusion(WeightedFusion):
         if rule not in RULES:
             raise ValueError(f"two_readers: rule must be one of {RULES}, got {rule!r}")
         self.fact_policy_path = str(fact_policy or fpol.DEFAULT_PATH)
+        self._policy_memo: dict[str, fpol.FactPolicy] = {}
         if rule == "policy":  # the readers are the fact policy's (its file names the two checks)
             pol = fpol.load_fact_policy(self.fact_policy_path)
             readers = (pol.a.check, pol.b.check)
@@ -90,6 +92,17 @@ class TwoReadersFusion(WeightedFusion):
         """The live fact policy (re-read when the file changes)."""
         return fpol.load_fact_policy(self.fact_policy_path)
 
+    def _policy_override(self, overrides: dict[str, Any] | None) -> "fpol.FactPolicy | None":
+        """``overrides["fact_policy"]``: a session's fact policy (the demo's «Sicherheit der KI» knob)."""
+        raw = (overrides or {}).get("fact_policy")
+        if not raw:
+            return None
+        key = stable_hash(raw)
+        hit = self._policy_memo.get(key)
+        if hit is None:
+            hit = self._policy_memo[key] = fpol.parse_fact_policy(raw, source="overrides")
+        return hit
+
     def decide_checks(self, transcript: Transcript, checks: dict[str, CheckResult], families: list[Family],
                       overrides: dict[str, Any] | None = None,
                       views: dict[str, Transcript] | None = None) -> Decision:
@@ -102,7 +115,7 @@ class TwoReadersFusion(WeightedFusion):
                       tables: dict[str, FamilyTable] | None = None) -> Decision:
         """Rule ``policy``: both readers -> one combined facts result (bands + combination per fact, then the
         rules) -> the weighted fusion. ``policy`` / ``tables``: a draft instead of the live files."""
-        pol = policy or self.fact_policy()
+        pol = policy or self._policy_override(overrides) or self.fact_policy()
         checks = fpol.combined_checks(results, tables or self.tables(), pol, **self.scoring)
         d = super().decide(transcript, checks, families, overrides, views)
         comb = checks.get(pol.a.check)

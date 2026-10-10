@@ -1,6 +1,6 @@
 """Stichwörter: the case keyword list per Prüfart, edited in a table, with «Treffer vorher → nachher». Saving applies
 at once (backup + audit log) and re-runs the cheap keyword check on every call. Keywords are a light hint; the facts
-and rules decide (tabs «Fakten» and «Regeln»)."""
+and rules decide (Einstellungen › Fakten / Regeln). Tab «Stichwörter» of «Einstellungen»."""
 
 from __future__ import annotations
 
@@ -14,16 +14,12 @@ from callguard.families import load_families
 from callguard.types import LABELS
 from callguard.ui import backend as be
 from callguard.ui.backend import short_label
-from callguard.ui.session import current_app, reload_everything
+from callguard.ui.session import AppState, reload_everything
 
 LABEL_DE = {"alarm": "Alarm", "review": "Prüfen", "no_alert": "Kein Alarm"}
-app = current_app()
-st.title("Stichwörter")
-for msg in st.session_state.pop("dm_set_messages", []):
-    st.toast(msg, icon=":material/check_circle:")
 
 
-def keywords_section() -> None:
+def keywords_section(app: AppState) -> None:
     kw_path, crit_path = app.ctx.path("keywords"), app.ctx.path("criteria")
     try:
         families = sorted(load_families(kw_path, crit_path), key=lambda f: not f.can_alarm)
@@ -108,5 +104,3 @@ def keywords_section() -> None:
         st.session_state["dm_kw_version"] = version + 1
         st.rerun()
 
-
-keywords_section()

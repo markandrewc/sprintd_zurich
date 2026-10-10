@@ -233,7 +233,7 @@ def fmt_ci(m: Mapping[str, Any] | None, pct: bool = True) -> str:
 def fmt_diff(m: Mapping[str, Any] | None, pct: bool = True) -> str:
     if not m or m.get("diff") is None:
         return "–"
-    s = (lambda x: "–" if x is None else (f"{100 * x:+.0f}" if pct else f"{x:+.2f}"))
+    s = (lambda x: "–" if x is None else (f"{100 * x:+.0f}" if pct else f"{x:+.2f}"))  # noqa: E731
     unit = " pp" if pct else ""
     return f"{s(m['diff'])}{unit} [{s(m.get('lo'))}, {s(m.get('hi'))}]" + (" *" if m.get("real") else "")
 

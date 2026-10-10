@@ -89,7 +89,7 @@ def with_fact_policy(app: AppState, result: CallResult) -> CallResult:
     if fus is None:
         return result
     try:
-        pol = fus.fact_policy()
+        pol = fu.session_policy(app)
         if not has_both(result, pol):
             return result
         return result.model_copy(update={"checks": combined_checks(result, fus.tables(), pol, **fus.scoring)})

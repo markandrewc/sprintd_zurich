@@ -33,14 +33,18 @@ class Settings:
     weights: dict[str, float] = field(default_factory=dict)
     families_on: list[str] = field(default_factory=list)
     mode: str | None = None  # Prüfmodus id (config/pruefmodi.yaml); None = feature off
+    fact_policy: dict[str, Any] | None = None  # demo: the session's fact policy («Sicherheit der KI»); None = file
 
     @property
     def review_floor(self) -> float:
         return round(self.threshold - self.review_band, 6)
 
     def overrides(self) -> dict[str, Any]:
-        return {"threshold": self.threshold, "review_band": self.review_band,
-                "max_uncertainty": self.max_uncertainty, "weights": dict(self.weights)}
+        out = {"threshold": self.threshold, "review_band": self.review_band,
+               "max_uncertainty": self.max_uncertainty, "weights": dict(self.weights)}
+        if self.fact_policy:
+            out["fact_policy"] = dict(self.fact_policy)
+        return out
 
 
 @dataclass

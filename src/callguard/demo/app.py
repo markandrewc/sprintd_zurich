@@ -31,12 +31,11 @@ st.set_page_config(layout="wide", page_title="callguard · Anrufprüfung", page_
 pages = {
     "cases": st.Page(PAGES / "cases.py", title="Fälle", icon=":material/inbox:", url_path="faelle", default=True),
     "detail": st.Page(PAGES / "call.py", title="Anruf prüfen", icon=":material/graphic_eq:", url_path="anruf"),
-    "facts": st.Page(PAGES / "facts.py", title="Fakten", icon=":material/fact_check:", url_path="fakten"),
-    "settings": st.Page(PAGES / "rules.py", title="Regeln", icon=":material/rule:", url_path="regeln"),
-    "keywords": st.Page(PAGES / "keywords.py", title="Stichwörter", icon=":material/label:", url_path="stichwoerter"),
+    "settings": st.Page(PAGES / "settings.py", title="Einstellungen", icon=":material/tune:", url_path="einstellungen"),
     "quality": st.Page(PAGES / "quality.py", title="Qualität", icon=":material/insights:", url_path="qualitaet"),
+    # not in the top bar: reached from «Fälle» («Neuen Anruf prüfen»)
     "process": st.Page(PAGES / "process.py", title="Anruf verarbeiten", icon=":material/upload_file:",
-                       url_path="verarbeiten"),
+                       url_path="verarbeiten", visibility="hidden"),
 }
 app = dstate.bootstrap(pages)
 page = st.navigation(list(pages.values()), position="top")

@@ -68,15 +68,21 @@ def live_policy(app: AppState) -> fpol.FactPolicy:
     return f.fact_policy() if f is not None else fpol.default_policy()
 
 
+def session_policy(app: AppState) -> fpol.FactPolicy:
+    """The policy this session decides with: the approved file + the «Sicherheit der KI» knob of «Fälle»."""
+    raw = getattr(app.settings, "fact_policy", None)
+    return fpol.parse_fact_policy(raw, source="session") if raw else live_policy(app)
+
+
 def try_policy(app: AppState) -> fpol.FactPolicy:
-    """The policy the officer is trying out (session), else the live one."""
+    """The policy the officer is trying out in «Erweitert» (session), else the session's one."""
     raw = st.session_state.get(TRY_KEY)
     if raw:
         try:
             return fpol.parse_fact_policy(raw)
         except fpol.FactPolicyError:
             st.session_state.pop(TRY_KEY, None)
-    return live_policy(app)
+    return session_policy(app)
 
 
 def set_try(policy: fpol.FactPolicy | None) -> None:
@@ -242,6 +248,76 @@ def strip_chart(answers: list[fpol.FactAnswer], policy: fpol.FactPolicy, family:
             tooltip=[alt.Tooltip("Anruf:N"), alt.Tooltip("Leser:N"), alt.Tooltip("p:Q", title="p(ja)", format=".2f"),
                      alt.Tooltip("Wert:N", title="Wert dieses Lesers"), alt.Tooltip("Ergebnis:N", title="zusammen")]))
     return alt.layer(*layers).properties(height=150).configure_view(stroke=None)
+
+
+# --------------------------------------------------------------------------------------------
+# «Sicherheit der KI» on Fälle: the spread of all fact answers under the session's policy
+# --------------------------------------------------------------------------------------------
+
+SPREAD_COLORS = {"nein": "#2a78d6", "unklar": "#a9a8a2", "ja": "#eb6834"}  # diverging: two poles + neutral middle
+_SPREAD_MEMO: OrderedDict[str, dict[str, Any]] = OrderedDict()
+
+
+def answer_spread(results: dict[str, Any], policy: fpol.FactPolicy, tables: dict[str, Any], sig: Any = None,
+                  bins: int = 20) -> dict[str, Any]:
+    """Every stored answer of the table's facts (both readers, all facts × calls) binned on p(ja), coloured by that
+    reader's value; plus the combined values per (call, fact) after the combination. Pure; memoised by ``sig``."""
+    key = stable_hash({"p": policy.key(), "sig": sig, "t": sorted((f, x.id) for f, ft in tables.items()
+                                                                   for x in ft.facts), "b": bins}) if sig else None
+    if key and key in _SPREAD_MEMO:
+        return _SPREAD_MEMO[key]
+    known = {(f, x.id) for f, ft in tables.items() for x in ft.facts}
+    hist: dict[tuple[int, str], int] = {}
+    readers = {"yes": 0, "no": 0, "unclear": 0}
+    combined = {"yes": 0, "no": 0, "unclear": 0}
+    for (fam, fid), lst in fpol.fact_answers(results, policy).items():
+        if (fam, fid) not in known:
+            continue
+        for a in lst:
+            rf = fpol.resolve_fact(policy, fam, fid, a.pa, a.pb)
+            combined[rf.value] += 1
+            for p, v in ((a.ya, rf.va), (a.yb, rf.vb)):
+                if p is None:
+                    continue
+                readers[v] += 1
+                b = min(bins - 1, int(p * bins))
+                hist[(b, v)] = hist.get((b, v), 0) + 1
+    rows = [{"von": b / bins, "bis": (b + 1) / bins, "Wert": VALUE_DE[v], "Anzahl": n} for (b, v), n in sorted(hist.items())]
+    out = {"rows": rows, "readers": readers, "combined": combined}
+    if key:
+        _SPREAD_MEMO[key] = out
+        while len(_SPREAD_MEMO) > 24:
+            _SPREAD_MEMO.popitem(last=False)
+    return out
+
+
+def spread_chart(rows: list[dict[str, Any]], lo: float, hi: float) -> Any:
+    """Histogram of p(ja) (sqrt count axis: most answers sit near 0 or 1), nein / unklar / ja, the unklar zone shaded
+    with its two cutoffs (dataviz: one axis, diverging colours with a neutral middle, text in ink, tooltips)."""
+    import altair as alt
+
+    order = ["nein", "unklar", "ja"]
+    df = pd.DataFrame(rows)
+    xs = alt.Scale(domain=[0, 1])
+    zone = alt.Chart(pd.DataFrame([{"lo": lo, "hi": hi}])).mark_rect(color="#ecebe7", opacity=0.8).encode(
+        x=alt.X("lo:Q", scale=xs), x2="hi:Q")
+    cuts = pd.DataFrame([{"x": lo, "t": f"nein bis {lo:.2f}"}, {"x": hi, "t": f"ja ab {hi:.2f}"}])
+    rule = alt.Chart(cuts).mark_rule(color=INK_MUTED, strokeDash=[4, 3], strokeWidth=1.5).encode(x=alt.X("x:Q", scale=xs))
+    text = alt.Chart(cuts).mark_text(align="center", dy=-6, color="#0b0b0b", fontSize=12, fontWeight="bold").encode(
+        x=alt.X("x:Q", scale=xs), y=alt.value(0), text="t:N")
+    bars = alt.Chart(df).mark_bar(cornerRadiusTopLeft=3, cornerRadiusTopRight=3, stroke="#ffffff", strokeWidth=1).encode(
+        x=alt.X("von:Q", scale=xs, title="KI-Sicherheit p(ja) je Antwort (beide Leser, alle Fakten × Anrufe)",
+                axis=alt.Axis(values=[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], format=".1f", grid=False,
+                              labelColor=INK_MUTED, titleColor=INK_MUTED)),
+        x2="bis:Q",
+        y=alt.Y("sum(Anzahl):Q", stack="zero", scale=alt.Scale(type="sqrt"), title="Antworten (Wurzelskala)",
+                axis=alt.Axis(labelColor=INK_MUTED, titleColor=INK_MUTED, gridColor="#efeeea")),
+        color=alt.Color("Wert:N", sort=order, scale=alt.Scale(domain=order, range=[SPREAD_COLORS[v] for v in order]),
+                        legend=alt.Legend(orient="top", title=None, labelColor="#0b0b0b")),
+        order=alt.Order("Wert:N", sort="ascending"),
+        tooltip=[alt.Tooltip("von:Q", title="p(ja) ab", format=".2f"), alt.Tooltip("bis:Q", title="bis", format=".2f"),
+                 alt.Tooltip("Wert:N"), alt.Tooltip("sum(Anzahl):Q", title="Antworten")])
+    return alt.layer(zone, bars, rule, text).properties(height=220).configure_view(stroke=None)
 
 
 # --------------------------------------------------------------------------------------------
