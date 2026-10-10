@@ -1,6 +1,11 @@
 {
-  "_comment": "Konfiguration der Kev-Checks, in zwei Listen: 'gesetzlich' (Gesetz/Verordnung) und 'intern' (Policy der Bank). Jede noul-Frage ist ein Check; ihr p(yes) ist das Risiko. Erreicht das höchste Risiko eines Anrufs die Schwelle, gibt es einen Alert (manuelle Prüfung). Kev liest immer das ganze Transkript. Die Fragen beschreiben die allgemeine Regel, ohne Beispiele und ohne Ausnahmen aus Testdaten. category/basis sind nur Anzeige, Kev ignoriert sie. Änderbar ohne Code.",
+  "_comment": "Konfiguration der Kev-Checks, in zwei Listen: 'gesetzlich' (Gesetz/Verordnung) und 'intern' (Policy der Bank). Jede noul-Frage ist ein Check; ihr p(yes) ist das Risiko. Erreicht das höchste Risiko eines Anrufs die Schwelle, gibt es einen Alert (manuelle Prüfung). Kev liest immer das ganze Transkript. Die Fragen beschreiben die allgemeine Regel, ohne Beispiele und ohne Ausnahmen aus Testdaten. category/basis sind nur Anzeige, Kev ignoriert sie. Änderbar ohne Code. localization: der gleitende Kev sucht für Checks ab der Schwelle die Fundstelle; window_words/overlap_words = Kontextfenster, passage_words = Länge der ausgegebenen Fundstelle (Standard 25 Wörter = 10 s x 2.5 Wörter/s; im Dashboard unter Einstellungen änderbar).",
   "threshold": 0.7,
+  "localization": {
+    "window_words": 40,
+    "overlap_words": 20,
+    "passage_words": 25
+  },
   "questions": {
     "gesetzlich": {
       "insider_trading": {

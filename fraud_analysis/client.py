@@ -9,9 +9,11 @@ import httpx
 URL = os.environ.get("FRAUD_URL", "http://127.0.0.1:8002")
 
 
-def analyze(transcript, threshold=None, questions=None, url=URL, timeout=300):
-    """-> Ergebnis von POST /analyze. Wirft RuntimeError mit der Meldung des Dienstes bei einem Fehler."""
-    body = {"transcript": transcript, "threshold": threshold, "questions": questions}
+def analyze(transcript=None, segments=None, threshold=None, questions=None, passage_words=None, url=URL, timeout=300):
+    """-> Ergebnis von POST /analyze. segments: [{start, end, text, speaker?}] aus der Transkription.
+    Wirft RuntimeError mit der Meldung des Dienstes bei einem Fehler."""
+    body = {"transcript": transcript, "segments": segments, "threshold": threshold, "questions": questions,
+            "passage_words": passage_words}
     try:
         r = httpx.post(f"{url}/analyze", json=body, timeout=timeout)
     except httpx.HTTPError as e:
@@ -30,3 +32,11 @@ def health(url=URL, timeout=3):
         return httpx.get(f"{url}/health", timeout=timeout).json()
     except httpx.HTTPError:
         return {"status": "offline"}
+
+
+def unload(url=URL, timeout=30):
+    """Modell des Dienstes sofort von der GPU entladen. -> True, wenn etwas entladen wurde; False auch, wenn offline."""
+    try:
+        return httpx.post(f"{url}/unload", timeout=timeout).json().get("unloaded", False)
+    except httpx.HTTPError:
+        return False

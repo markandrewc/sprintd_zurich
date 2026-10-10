@@ -17,17 +17,17 @@ Das Modell (~370 MB) lädt beim ersten Start automatisch in den HF-Cache.
 ## Nutzung
 
 ```
-python SwissDial/tts.py "Grüezi mitenand, wie gaht's?"            # -> outputs/swissdial/zh_....wav
-python SwissDial/tts.py "Grüessech mitenand" -d be -o bern.wav
-python SwissDial/tts.py -f text.txt -d bs -s 1.1                  # Tempo 1.1
-python SwissDial/tts.py "Hoi zäme" --all                          # alle 8 Dialekte
-python SwissDial/app.py                                           # Web-UI auf http://localhost:7861
+python misc/SwissDial/tts.py "Grüezi mitenand, wie gaht's?"            # -> outputs/swissdial/zh_....wav
+python misc/SwissDial/tts.py "Grüessech mitenand" -d be -o bern.wav
+python misc/SwissDial/tts.py -f text.txt -d bs -s 1.1                  # Tempo 1.1
+python misc/SwissDial/tts.py "Hoi zäme" --all                          # alle 8 Dialekte
+python misc/SwissDial/app.py                                           # Web-UI auf http://localhost:7862
 ```
 
 Im Code:
 
 ```python
-from tts import SwissDialTTS          # aus SwissDial/ heraus
+from tts import SwissDialTTS          # aus misc/SwissDial/ heraus
 tts = SwissDialTTS()
 wav = tts.synthesize("Grüezi mitenand", dialect="zh")   # np.float32, tts.fs Hz
 tts.to_file("Grüezi mitenand", "out.wav", dialect="be")

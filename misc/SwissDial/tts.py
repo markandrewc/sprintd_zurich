@@ -1,10 +1,10 @@
 """
 Schweizerdeutsch Text -> Sprache mit swordi/SwissDial-TTS (ESPnet VITS + x-Vektor, 22.05 kHz).
 
-  python SwissDial/tts.py "Grüezi mitenand, wie gaht's?"              # Zürcher Stimme
-  python SwissDial/tts.py "Grüessech mitenand" --dialect be           # Berner Stimme
-  python SwissDial/tts.py -f text.txt --dialect bs -o basel.wav       # Text aus Datei
-  python SwissDial/tts.py "Hoi zäme" --all                            # eine WAV pro Dialekt
+  python misc/SwissDial/tts.py "Grüezi mitenand, wie gaht's?"              # Zürcher Stimme
+  python misc/SwissDial/tts.py "Grüessech mitenand" --dialect be           # Berner Stimme
+  python misc/SwissDial/tts.py -f text.txt --dialect bs -o basel.wav       # Text aus Datei
+  python misc/SwissDial/tts.py "Hoi zäme" --all                            # eine WAV pro Dialekt
 
 Das Modell ist auf Text in Dialekt-Schreibweise trainiert (SwissDial-Korpus); Hochdeutsch geht,
 klingt aber weniger natürlich. Die Dialekte sind je eine Sprecherin/ein Sprecher, ausgewählt über
@@ -30,7 +30,7 @@ from huggingface_hub import snapshot_download
 
 MODEL_ID = "swordi/SwissDial-TTS"
 DEVICE = os.environ.get("SWISSDIAL_DEVICE") or ("cuda" if torch.cuda.is_available() else "cpu")
-OUT_DIR = Path(__file__).resolve().parent.parent / "outputs" / "swissdial"
+OUT_DIR = Path(__file__).resolve().parents[2] / "outputs" / "swissdial"   # misc/SwissDial/ -> Projektordner
 
 DIALECTS = {
     "ag": "Aargau",

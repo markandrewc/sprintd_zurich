@@ -28,3 +28,11 @@ def health(url=URL, timeout=3):
         return httpx.get(f"{url}/health", timeout=timeout).json()
     except httpx.HTTPError:
         return {"status": "offline"}
+
+
+def unload(url=URL, timeout=30):
+    """Modell des Dienstes sofort von der GPU entladen. -> True, wenn etwas entladen wurde; False auch, wenn offline."""
+    try:
+        return httpx.post(f"{url}/unload", timeout=timeout).json().get("unloaded", False)
+    except httpx.HTTPError:
+        return False

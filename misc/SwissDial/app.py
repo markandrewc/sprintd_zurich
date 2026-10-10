@@ -1,11 +1,11 @@
 """
 Web-UI für SwissDial-TTS: Text eingeben, Dialekt wählen, Audio anhören/herunterladen.
 
-  python SwissDial/app.py     # http://localhost:7861
+  python misc/SwissDial/app.py     # http://localhost:7862
 
 Umgebungsvariablen:
   SWISSDIAL_HOST  Default 0.0.0.0
-  SWISSDIAL_PORT  Default 7861 (7860 belegt kev_app.py)
+  SWISSDIAL_PORT  Default 7862 (7860 Dashboard, 7861 Analyse-UI)
 """
 
 import os
@@ -44,4 +44,4 @@ with gr.Blocks(title="SwissDial TTS") as demo:
 
 if __name__ == "__main__":
     demo.launch(server_name=os.environ.get("SWISSDIAL_HOST", "0.0.0.0"),
-                server_port=int(os.environ.get("SWISSDIAL_PORT", "7861")))
+                server_port=int(os.environ.get("SWISSDIAL_PORT", "7862")))

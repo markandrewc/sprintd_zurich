@@ -1,52 +1,60 @@
-"""Fraud-Analyse-Dienst (FastAPI). Lädt Kev einmal beim Start und hält es auf der GPU.
+"""Fraud-Analyse-Dienst (FastAPI). Lädt Kev bei der ersten Anfrage und entlädt es nach FRAUD_IDLE_SECONDS ohne Anfrage.
 
   python -m fraud_analysis.api          # -> http://127.0.0.1:8002  (Doku: /docs)
 
-  POST /analyze   {"transcript": "...", "threshold": 0.7?, "questions": {...}?}  -> Alarm, Risiko, Wert pro Check
+  POST /analyze   {"transcript": "...", "segments": [...]?, "threshold": 0.7?, "questions": {...}?}
+                  -> Alarm, Risiko, Wert pro Check; für Checks ab der Schwelle die Fundstelle ("passage", siehe analysis.py)
+                  segments: Abschnitte der Transkription mit Zeitstempeln [{"start", "end", "text", "speaker"?}]; fehlt
+                  transcript, wird es aus den segments zusammengesetzt
   GET  /config    aktuelle Fragen und Schwelle aus questions.json
-  GET  /health
+  POST /unload    Kev sofort von der GPU entladen (die nächste Analyse lädt es wieder, ~10 s)
+  GET  /health    Dienst erreichbar; "loaded": ob Kev gerade auf der GPU liegt
 
 questions.json wird bei jedem Aufruf neu gelesen: Änderungen gelten ohne Neustart.
-Umgebungsvariablen: FRAUD_HOST (127.0.0.1), FRAUD_PORT (8002), dazu KEV_* aus runtime.py.
+Umgebungsvariablen: FRAUD_HOST (127.0.0.1), FRAUD_PORT (8002), FRAUD_IDLE_SECONDS (120; 0 = nie entladen),
+dazu KEV_* aus runtime.py.
 """
 import os
-import threading
-from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ValidationError
 
+from shared.model_slot import ModelSlot
+
 from .analysis import analyze, load_config
-from .runtime import Kev
+from .runtime import DEVICE, MODEL_REPO, Kev
 
-STATE = {}
-LOCK = threading.Lock()   # ein Modell auf einer GPU: Anfragen nacheinander
+KEV = ModelSlot("kev", loader=Kev, idle_seconds=float(os.environ.get("FRAUD_IDLE_SECONDS", "120")))
 
-
-@asynccontextmanager
-async def lifespan(app):
-    STATE["kev"] = Kev()
-    yield
-    STATE.clear()
+app = FastAPI(title="Fraud-Analyse", version="1.1")
 
 
-app = FastAPI(title="Fraud-Analyse", version="1.0", lifespan=lifespan)
+class Segment(BaseModel):
+    start: float | None = None          # Sekunden ab Anrufbeginn
+    end: float | None = None
+    text: str
+    speaker: str | None = None          # folgt mit der Sprechererkennung
 
 
 class AnalyzeRequest(BaseModel):
-    transcript: str
+    transcript: str | None = None       # None: aus segments zusammengesetzt
+    segments: list[Segment] | None = None
     threshold: float | None = None      # None: Schwelle aus questions.json
     questions: dict | None = None       # None: Fragen aus questions.json (Listen-Form oder flach)
+    passage_words: int | None = None    # Länge der Fundstelle in Wörtern; None: localization.passage_words aus questions.json
 
 
 @app.post("/analyze")
 def post_analyze(req: AnalyzeRequest):
-    if not req.transcript.strip(): raise HTTPException(422, "transcript ist leer")
+    segments = [s.model_dump() for s in req.segments] if req.segments else None
+    transcript = req.transcript if req.transcript is not None else " ".join(s["text"] for s in segments or [])
+    if not transcript.strip(): raise HTTPException(422, "Weder transcript noch segments enthalten Text")
     cfg = load_config()
     threshold = cfg["threshold"] if req.threshold is None else req.threshold
     try:
-        with LOCK:
-            return analyze(STATE["kev"], req.transcript, req.questions or cfg["questions"], threshold)
+        with KEV.use() as kev:
+            loc = {**cfg.get("localization", {}), **({"passage_words": req.passage_words} if req.passage_words else {})}
+            return analyze(kev, transcript, req.questions or cfg["questions"], threshold, segments=segments, localization=loc)
     except (ValueError, ValidationError) as e:   # z.B. Transkript zu lang, ungültige Frage
         raise HTTPException(422, str(e)) from None
 
@@ -56,10 +64,14 @@ def get_config():
     return load_config()
 
 
+@app.post("/unload")
+def unload():
+    return {"unloaded": KEV.unload()}
+
+
 @app.get("/health")
 def health():
-    kev = STATE.get("kev")
-    return {"status": "ok" if kev else "loading", "model": kev.repo if kev else None, "device": kev.device if kev else None}
+    return {"status": "ok", "model": MODEL_REPO, "device": DEVICE, **KEV.status()}
 
 
 if __name__ == "__main__":

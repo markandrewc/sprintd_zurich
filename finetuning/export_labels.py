@@ -3,11 +3,12 @@ Export der im Dashboard beurteilten Anrufe als Trainingsdaten.
 
   python -m finetuning.export_labels                 # -> outputs/finetuning/labels.jsonl
 
-Eine Zeile pro beurteiltem Anruf: Transkript, Beurteilung, Kategorien, Kevs Scores zum Zeitpunkt der Analyse und
-abgeleitete Ja/Nein-Labels pro Check:
-  - "Verstoss bestätigt": Checks der angekreuzten Kategorien = true, alle anderen = false
-  - "Kein Verstoss":      alle Checks = false
-  - "Unklar":             nicht exportiert (kein verlässliches Label)
+Eine Zeile pro beurteiltem Anruf: Transkript mit Abschnitten, Beurteilung, Kevs Scores zum Zeitpunkt der Analyse und
+abgeleitete Labels:
+  check_labels    Ja/Nein pro Check. Ein Befund, den die Prüferin als korrekt angehakt hat = true, nicht angehakt = false;
+                  Checks einer als übersehen markierten Kategorie = true; alle übrigen = false.
+                  Bei "Kein Verstoss" sind alle Checks false. "Unklar" wird nicht exportiert (kein verlässliches Label).
+  passage_labels  pro Befund die Fundstelle des gleitenden Kev mit korrekt/falsch (Material für die Lokalisierung)
 Die Checks und ihre Kategorien kommen aus fraud_analysis/questions.json.
 """
 import json
@@ -29,12 +30,17 @@ def records():
     checks = check_categories()
     for c in store.list_calls():
         if c["status"] != "fertig" or c["label"] not in ("fraud", "no_fraud"): continue
-        cats = set(c["label_categories"] or []) if c["label"] == "fraud" else set()
+        judged = c["label_checks"] or {}                                   # {check_id: korrekt?} für die Befunde
+        missed = set(c["label_missed"] or []) if c["label"] == "fraud" else set()
+        labels = {qid: (judged.get(qid, False) or cat in missed) if c["label"] == "fraud" else False for qid, cat in checks.items()}
+        analysis = c["analysis"] or {}
         yield {"call_id": c["id"], "filename": c["filename"], "transcript": c["transcript"], "segments": c["segments"],
-               "label": c["label"], "categories": sorted(cats), "comment": c["label_comment"],
-               "labeled_by": c["labeled_by"], "labeled_at": c["labeled_at"],
-               "check_labels": {qid: cat in cats for qid, cat in checks.items()},
-               "model_scores": {x["id"]: x["p"] for x in (c["analysis"] or {}).get("checks", [])}}
+               "label": c["label"], "categories": c["label_categories"] or [], "missed_categories": sorted(missed),
+               "comment": c["label_comment"], "labeled_by": c["labeled_by"], "labeled_at": c["labeled_at"],
+               "check_labels": labels,
+               "passage_labels": [{"check": x["id"], **x["passage"], "correct": judged[x["id"]]}
+                                  for x in analysis.get("checks", []) if x.get("passage") and x["id"] in judged],
+               "model_scores": {x["id"]: x["p"] for x in analysis.get("checks", [])}}
 
 
 def main():

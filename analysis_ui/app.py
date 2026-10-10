@@ -52,6 +52,11 @@ def render_answers(res):
                      f'<span style="{TRACK}"><span style="position:absolute;top:0;bottom:0;left:0;border-radius:999px;'
                      f'background:{"#c62828" if on else "var(--body-text-color-subdued)"};width:{max(0.0, min(1.0, p)) * 100:.1f}%"></span></span>'
                      f'<span style="text-align:right;font-variant-numeric:tabular-nums;font-weight:{600 if on else 400}">{p:.2f}</span></div>')
+        if c.get("passage"):   # Fundstelle des gleitenden Kev (nur für Checks ab der Schwelle)
+            pa = c["passage"]
+            parts.append(f'<details style="margin:0 0 6px 12px"><summary style="cursor:pointer;{MUTED}">Fundstelle (p {pa["p"]:.2f}, '
+                         f'Zeilen {pa["units"][0] + 1}–{pa["units"][1] + 1})</summary><div style="white-space:pre-wrap;font-size:12px">'
+                         f'{html.escape(pa["text"])}</div></details>')
     return "".join(parts) + "</div>"
 
 
