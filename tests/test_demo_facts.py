@@ -124,15 +124,58 @@ def test_rule_wizard_steps_save_and_decide(env: FixtureEnv):
     assert v.meta["instant"] and v.meta["author"] == "Anna"
 
 
-def test_rule_wizard_one_pruefart_only(env: FixtureEnv):
+def test_rule_wizard_state_one_or_several_pruefarten(env: FixtureEnv):
     st_ = sr.new_state()
-    st_["facts"] = ["access.spoken", "trade.wish"]
-    assert sr.state_family(st_) is None and sr.state_rule(st_, table(env)) is None
     st_["facts"] = ["access.spoken", "access.current"]
     st_["conds"] = {"access.current": {"value": "unclear", "neg": False}}
     st_["join"] = "or"
     fam, rule = sr.state_rule(st_, table(env))
     assert fam == "access" and rule["when"] == "spoken = yes or current = unclear"
+    st_["facts"] = ["access.spoken", "trade.wish"]  # several Prüfarten: a cross rule over qualified names
+    st_["conds"] = {"trade.wish": {"value": "no", "neg": False}}
+    st_["join"], st_["report_as"] = "and", "access"
+    fam, rule = sr.state_rule(st_, table(env))
+    assert fam == sr.CROSS_FAMILY and rule["when"] == "access.spoken = yes and trade.wish = no"
+    assert rule["id"].startswith("eigene.") and rule["report_as"] == "access"
+
+
+def test_rule_wizard_saves_a_cross_rule_instantly_with_undo(env: FixtureEnv):
+    from callguard.config import load_config
+
+    at = run("pages/settings.py", user="Anna")
+    at.button(key="dm_rg_new").click().run()
+    at.checkbox(key="dm_rw_f_access.spoken_0").check().run()
+    at.checkbox(key="dm_rw_f_trade.wish_0").check().run()
+    ok(at)
+    assert "übergreifend" in body(at)
+    at.button(key="dm_rw_next").click().run()
+    at.segmented_control(key="dm_rw_v_trade.wish_0").set_value("no").run()
+    at.button(key="dm_rw_next").click().run()
+    ok(at)
+    assert "wird als übergreifende Regel gespeichert" in body(at)
+    at.segmented_control(key="dm_rw_lab_0").set_value("alarm").run()
+    at.selectbox(key="dm_rw_rep_0").set_value("access").run()
+    at.text_input(key="dm_rw_title_0").input("Code ohne Handelsbezug").run()
+    m = re.search(r"Diese Regel greift bei (\d+) von 3 Anrufen", body(at))
+    assert m and int(m.group(1)) >= 1
+    at.button(key="dm_rw_save").click().run()
+    ok(at)
+    cross = table(env)["cross_rules"]
+    assert cross[0]["when"] == "access.spoken = yes and trade.wish = no" and cross[0]["report_as"] == "access"
+    assert "Eigene Regeln (übergreifend)" in body(at) and "Code ohne Handelsbezug" in body(at)
+    eng = be.Engine(load_config(env.config, env.sets))
+    d = be.redecide(eng, be.load_results(env.runs_dir).results[REVIEW_ID], None, eng.families()).decision
+    assert d.label == "alarm" and d.top_family == sr.CROSS_FAMILY
+    v = VersionStore(env.root / "config" / "policy_table.yaml").active()
+    assert v.meta["instant"] and any("übergreifend" in line for line in v.meta["diff"])
+    card = run("pages/call.py", {"call": REVIEW_ID})  # the call card names the cross rule and its qualified facts
+    text = body(card) + "\n".join(e.label for e in card.expander)
+    assert "Code ohne Handelsbezug" in text and "Eigene Regeln" in text
+    assert "Zugangsinformation preisgegeben: Code/Wert am Telefon vorgelesen" in text
+    at.button(key="dm_rg_undo").click().run()
+    ok(at)
+    assert "cross_rules" not in table(env)
+
 
 
 def canned(monkeypatch: pytest.MonkeyPatch, obj: dict) -> None:
