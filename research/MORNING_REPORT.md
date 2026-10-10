@@ -58,6 +58,17 @@ _ Everything below is reproducible from `experiments/*.yaml` + caches; numbers c
 
 ![Headline evidence: flag AUC with 95% CI and false-alarm rate per system (dev)](report/headline.png)
 
+## Where the champion is strong and weak (dev, per expected family, 48 calls)
+| family | calls | flag correct | exact label | errors |
+|---|---|---|---|---|
+| trade (insider) | 14 | 14 | 14 | none |
+| numbers (never alarms) | 6 | 6 | 6 | none |
+| access (codes) | 10 | 8 | 8 | C09 alarm -> no_alert (code read out, validity unknown) x2 |
+| disclosure (third party) | 8 | 6 | 5 | C11 harmless -> review x2, C12-K3 alarm -> review |
+| documentation | 6 | 5 | 3 | C13 alarm -> review x2, C14-K3 harmless -> review |
+| splitting | 4 | 2 | 2 | C20 open case -> no_alert x2 (table v3 fixes this on dev) |
+Holdout misses (C16 splitting, C19 documentation review) fall in the same weak families.
+
 ## Leaderboard (dev, flag AUC; full table `research/leaderboard.md`)
 | system | ASR | LLM | flag AUC [95% CI] | CV FAR | CV miss | 3-class acc |
 |---|---|---|---|---|---|---|
@@ -79,6 +90,7 @@ _ Everything below is reproducible from `experiments/*.yaml` + caches; numbers c
 | views (RQ1/3) | de vs English translation vs dialect ORACLE | no gain from English; 7B not better on dialect text (CIs overlap) | Standard German |
 | uncertainty (RQ9) | escalation, conformal/calibrated fusion (built), review modes | escalation sets a false-alarm floor; strict review mode trades 14% → 36% FAR for 83% review recall | simple fusion, optional strict mode |
 | overfit checks | blind table, synthetic twins, paraphrases + ensemble (R3, R6) | gain partly dev-fitted, clearly not only | documented |
+| design ablations | German vs English fact questions, roles hidden, prefix-max | English questions +0.13 AUC (real); roles help (borderline); prefix-max nothing | keep champion design |
 | method | independent audit of the evidence code | stats correct; fixed ranking/holdout-logging/LLM-identity issues | fixed |
 
 ## Answers per research question
