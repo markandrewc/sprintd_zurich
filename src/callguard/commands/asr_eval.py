@@ -33,10 +33,31 @@ def register(app: typer.Typer) -> None:
                           " if present); used where the transcript has no elapsed_s.")] = None,
                  per_call: Annotated[bool, typer.Option("--per-call/--no-per-call",
                                                         help="Print the per-call table.")] = True,
+                 split: Annotated[str, typer.Option(
+                     "--split", help="dev (default: the dev dialogues of config/splits.yaml), holdout or all; "
+                                     "holdout and all include holdout dialogues and are logged to "
+                                     "runs/holdout_log.jsonl.")] = "dev",
                  no_cache: cli.NoCacheOpt = False, verbose: cli.VerboseOpt = False) -> None:
         """WER/CER vs the reference scripts + keyword-spot recall + ASR speed, per call/level/clean-noisy."""
+        from callguard import splits as sp
+
+        if split not in sp.SPLIT_CHOICES:
+            raise typer.BadParameter(f"expected one of {', '.join(sp.SPLIT_CHOICES)}", param_hint="--split")
         pipe = cli._pipeline(config, set_, no_cache, verbose)
         selected = cli._select_calls(pipe, level, clean_only, limit, calls)
+        try:
+            locked = sp.load_splits(required=split != "all")
+        except sp.SplitsMissing as e:
+            cli.console.print(f"[red]{e}[/red]")
+            raise typer.Exit(2) from e
+        if locked is not None:
+            selected = locked.select(selected, split)
+        if not selected:
+            cli.console.print(f"[red]No calls selected (split {split}).[/red]")
+            raise typer.Exit(1)
+        if split in (sp.HOLDOUT, "all"):
+            cli.console.print(f"[bold yellow]asr-eval on split {split} (includes holdout dialogues): this run is "
+                              f"logged as a holdout look (earlier looks: {sp.holdout_looks(pipe.cfg)}).[/bold yellow]")
         run_tag = tag or ea.default_tag(pipe.cfg.asr)
         out_dir = out or pipe.ctx.path("runs_dir") / "asr_eval" / run_tag
         if sweep_log is None and (cli.ROOT / "runs" / "logs" / f"asr_sweep_{run_tag}.jsonl").exists():
@@ -51,7 +72,14 @@ def register(app: typer.Typer) -> None:
             res = ea.run_asr_eval(pipe, selected, tag=run_tag, cached_only=cached_only, ref_dir=ref_dir,
                                   profile=config, overrides=set_, sweep_log=sweep_log,
                                   on_call=on_call)
+        res.summary["meta"]["split"] = split
         ea.write_outputs(res, out_dir)
+        if split in (sp.HOLDOUT, "all"):
+            g = res.summary["groups"].get("all") or {}
+            lp = sp.log_holdout_run(pipe.cfg, {}, len(res.rows), kind=f"asr-eval {run_tag}", overrides=set_ or [],
+                                    extra={"split": split, "asr": {k: g.get(k) for k in
+                                                                   ("wer", "cer", "kw_recall", "n_calls")}})
+            cli.console.print(f"[dim]Holdout look logged: {cli._rel(lp)}[/dim]")
         render(res, per_call)
         cli.console.print(f"\n[dim]{ea.WER_GSW_LABEL}. Brackets: 95% dialogue bootstrap CI.[/dim]")
         if res.skipped:

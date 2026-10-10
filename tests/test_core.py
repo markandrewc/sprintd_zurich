@@ -18,11 +18,11 @@ from callguard.config import ROOT, AppConfig, Paths, load_config
 from callguard.families import load_families, save_keywords
 from callguard.fusion import top_family
 from callguard.pipeline import Pipeline
-from callguard.plugins import ASRBackend, Check, Diarizer, Fusion, LLM, Sink, Translator
+from callguard.plugins import ASRBackend, Check, Diarizer, Fusion, LLM, Preprocessor, Sink, Translator
 from callguard.types import CheckResult, FamilyScore, Finding, Segment, Transcript
 
 BASES = {"asr": ASRBackend, "diarizer": Diarizer, "check": Check, "fusion": Fusion, "llm": LLM, "sink": Sink,
-         "translator": Translator}
+         "translator": Translator, "preprocess": Preprocessor}
 PROFILES = ["local", "gpu", "oracle", "fast", "demo-offline"]
 DATA = ROOT / "data_upstream/inventx-case-study/data"
 

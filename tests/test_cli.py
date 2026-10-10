@@ -135,12 +135,12 @@ def test_eval_writes_report_and_suggests_threshold(stub, tmp_path):
                                 "--thresholds", "0.3,0.5,0.7", *opts(tmp_path)])
     assert r.exit_code == 0, r.output
     assert stub.instances[-1].processed == ["Stufe1_D02-K1", "Stufe1_D03-K1", "Stufe3_C17-K3"]
-    report = json.loads((tmp_path / "runs/base/eval/report.json").read_text())
+    report = json.loads((tmp_path / "runs/base/eval_dev/report.json").read_text())
     assert report["metrics"]["accuracy"] == 1.0
     assert [s["threshold"] for s in report["sweep"]] == [0.3, 0.5, 0.7]
     assert report["suggestion"]["threshold"] in (0.3, 0.5, 0.7)
     assert "Vorschlag" in r.output and "Fehlalarmquote" in r.output
-    assert (tmp_path / "runs/base/eval/report.md").exists()
+    assert (tmp_path / "runs/base/eval_dev/report.md").exists()
     assert (tmp_path / "runs/base/Stufe3_C17-K3/result.json").exists()  # UI can show eval calls
 
 
@@ -256,7 +256,7 @@ def test_eval_oracle_with_fake_llm(tmp_path, oracle_plugins):
     r = runner.invoke(cli.app, ["eval", "--calls", "Stufe1_D02-K1,Stufe1_D03-K1", "--thresholds", "0.4,0.6",
                                 *opts(tmp_path, "oracle"), "--set", "llms.default.type=fake"])
     assert r.exit_code == 0, r.output
-    report = json.loads((tmp_path / "runs/oracle/eval/report.json").read_text())
+    report = json.loads((tmp_path / "runs/oracle/eval_dev/report.json").read_text())
     assert report["metrics"]["n"] == 2 and report["metrics"]["errors"] == 0
 
 

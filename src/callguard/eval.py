@@ -53,23 +53,52 @@ def _truth_index(truth: Truth) -> dict[str, Call | str]:
 def _base_row(call_id: str, gt: Call | str | None) -> Row:
     if isinstance(gt, Call):
         exp = gt.expected
-        return {"call_id": call_id, "dialogue_id": gt.dialogue_id, "level": gt.level, "noisy": gt.noisy,
-                "expected": exp.label if exp else None, "expected_family": exp.family if exp else None}
+        row = {"call_id": call_id, "dialogue_id": gt.dialogue_id, "level": gt.level, "noisy": gt.noisy,
+               "expected": exp.label if exp else None, "expected_family": exp.family if exp else None}
+        if getattr(gt, "group", ""):  # synthetic twins: one bootstrap unit (stats._dialogue reads it)
+            row["group"] = gt.group
+        return row
     return {"call_id": call_id, "dialogue_id": dialogue_of(call_id), "level": None, "noisy": None,
             "expected": gt, "expected_family": None}
 
 
-def failed_checks(result: CallResult) -> list[str]:
+def failed_checks(result: CallResult, weights: Mapping[str, float] | None = None) -> list[str]:
     """Checks that failed entirely or for some families. The fusion decides without them, so a run with
-    the LLM server down must not read like an LLM measurement."""
-    return sorted(n for n, c in result.checks.items() if c.meta.get("error") or c.meta.get("errors"))
+    the LLM server down must not read like an LLM measurement. With ``weights`` (check name -> fusion
+    weight of the variant) a check whose weight is <= 0 does not count: it never reaches the decision."""
+    def counts(n: str) -> bool:
+        if weights is None or n not in weights:
+            return True
+        try:
+            return float(weights[n]) > 0
+        except (TypeError, ValueError):
+            return True
+
+    return sorted(n for n, c in result.checks.items()
+                  if (c.meta.get("error") or c.meta.get("errors")) and counts(n))
 
 
-def make_row(result: CallResult, gt: Call | str | None, can_alarm: set[str] | None = None) -> Row:
+def check_weights(pipe: Any) -> dict[str, float]:
+    """Effective fusion weight per check of a pipeline: the check's ``weight``, 0 for checks listed in
+    ``fusion.disabled_checks``, and ``fusion.weights`` overrides (as the weighted fusion reads them)."""
+    w = {c.name: float(c.weight) for c in getattr(pipe, "checks", [])}
+    fusion = getattr(getattr(pipe, "cfg", None), "fusion", None) or {}
+    for k, v in (fusion.get("weights") or {}).items():
+        try:
+            w[str(k)] = float(v)
+        except (TypeError, ValueError):
+            pass
+    for k in fusion.get("disabled_checks") or ():
+        w[str(k)] = 0.0
+    return w
+
+
+def make_row(result: CallResult, gt: Call | str | None, can_alarm: set[str] | None = None,
+             weights: Mapping[str, float] | None = None) -> Row:
     d = result.decision
     return {**_base_row(result.call_id, gt), "predicted": d.label, "score": round(d.score, 4),
             "uncertainty": round(d.uncertainty, 4), "top_family": top_family(d, can_alarm), "error": None,
-            "failed_checks": failed_checks(result)}
+            "failed_checks": failed_checks(result, weights)}
 
 
 def error_row(call_id: str, gt: Call | str | None, error: str) -> Row:
@@ -229,19 +258,22 @@ def suggest_threshold(swept: list[dict[str, Any]], max_false_alarm_rate: float |
 def cross_validate(pipeline: "Pipeline", results: Sequence[CallResult], calls: Sequence[Call], n_folds: int = 5,
                    thresholds: Sequence[float] | None = None,
                    overrides: dict[str, Any] | None = None,
-                   fold_of: Mapping[str, int] | None = None) -> dict[str, Any] | None:
+                   fold_of: Mapping[str, int] | None = None,
+                   test_only: Sequence[int] = ()) -> dict[str, Any] | None:
     """Out-of-fold metrics for the threshold suggestion: per dialogue-level fold, ``suggest_threshold`` on
     the other folds, then that threshold on the held-out fold. A suggestion fitted and scored on the same
     30 dialogues is optimistic; this is not. ``None`` when the results cover fewer than two folds.
     ``fold_of`` (dialogue -> fold) overrides the default split, e.g. the dev folds of config/splits.yaml;
-    results of dialogues it does not list are left out."""
+    results of dialogues it does not list are left out. ``test_only`` folds are scored with a threshold
+    chosen on the other folds but never used to choose one (the holdout under ``--split all``)."""
     fold_of = dict(fold_of) if fold_of is not None else split_dialogues(list(calls), n_folds)
+    test_only = set(test_only)
     by_fold: dict[int, list[CallResult]] = {}
     for r in results:
         k = fold_of.get(dialogue_of(r.call_id))
         if k is not None:
             by_fold.setdefault(k, []).append(r)
-    if len(by_fold) < 2:
+    if len([k for k in by_fold if k not in test_only]) < 2:
         return None
     families = pipeline.ctx.families()
     can_alarm = {f.id for f in families if f.can_alarm}
@@ -249,7 +281,7 @@ def cross_validate(pipeline: "Pipeline", results: Sequence[CallResult], calls: S
     default = float(pipeline.cfg.fusion.get("threshold", 0.55))
     folds, oof = [], []
     for k in sorted(by_fold):
-        train = [r for j, rs in by_fold.items() if j != k for r in rs]
+        train = [r for j, rs in by_fold.items() if j != k and j not in test_only for r in rs]
         pick = suggest_threshold(sweep(pipeline, train, calls, thresholds, overrides))
         t = pick["threshold"] if pick else default
         for r in by_fold[k]:

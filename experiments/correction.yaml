@@ -1,0 +1,23 @@
+# RQ1/RQ8 (A4, v2_plan §7): does an LLM that fuses three ASR hypotheses (de + de_large + de_vanilla ->
+# view de_fused, translator llm_correct) detect better than the plain default ASR view de?
+# Same checks + LLM in both variants, only check_view changes. The shadow keyword checks of gpu-views
+# are dropped (they would pull en_from_de / en_speech / de_large in as views), extra_views=[].
+# Prerequisites: de, de_large (whisper-large-v3-gsw fp16) and de_vanilla (vanilla-turbo fp16) transcripts
+# cached (scripts/research/asr_queue*.sh, same keys); diarization of the three views runs on the CPU
+# (roles via the LLM). Cost: ~1 correction pass per call (segments where all three agree are not sent)
+# + all LLM checks on de_fused. Mechanism first: scripts/research/eval_view.py (keyword-spot recall,
+# false hits, CER per view).
+# CAVEAT: the correction LLM is the served `callguard-llm`; a model swap re-corrects (cache key = model id).
+name: correction
+description: Detection on the LLM-fused transcript (de_fused) vs the default ASR view (de)
+rq: [RQ1, RQ8]
+base: gpu-views
+split: dev
+compare_to: de
+variants:
+  - name: de
+    set: ["extra_views=[]"]
+    drop_checks: [keywords_en_from_de, keywords_en_speech, keywords_de_large]
+  - name: de_fused
+    set: ["extra_views=[]", check_view=de_fused]
+    drop_checks: [keywords_en_from_de, keywords_en_speech, keywords_de_large]

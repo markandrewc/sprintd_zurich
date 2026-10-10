@@ -25,7 +25,7 @@ from rich.text import Text
 
 from callguard import registry
 from callguard.config import ROOT, load_config
-from callguard.data import Call, load_calls, split_dialogues
+from callguard.data import Call, dialogue_of, load_calls, split_dialogues
 from callguard.pipeline import Pipeline
 from callguard.types import CallResult, Decision, fmt_ts
 
@@ -180,6 +180,9 @@ def plugins(config: ConfigOpt = "local", set_: SetOpt = None, no_cache: NoCacheO
     try:
         cfg = load_config(config, set_ or [])
         used["asr"].add(cfg.asr.get("type", ""))
+        pre = cfg.asr.get("preprocess")
+        if pre:
+            used["preprocess"].add(pre if isinstance(pre, str) else pre.get("type", ""))
         used["diarizer"].add(cfg.diarizer.get("type", ""))
         used["fusion"].add(cfg.fusion.get("type", ""))
         used["check"] |= {c.get("type", "") for c in cfg.checks if c.get("enabled", True)}
@@ -293,8 +296,9 @@ def eval_cmd(level: LevelOpt = None, clean_only: CleanOpt = False, limit: LimitO
              cv: Annotated[bool, typer.Option(
                  "--cv/--no-cv", help="Cross-validate the suggested threshold over dialogue-level folds.")] = True,
              split: Annotated[str, typer.Option(
-                 "--split", help="dev (tuning: CV over the dev folds of config/splits.yaml), holdout (final "
-                                 "number, logged to runs/holdout_log.jsonl) or all.")] = "all",
+                 "--split", help="dev (default; tuning: CV over the dev folds of config/splits.yaml), holdout "
+                                 "(final number, logged to runs/holdout_log.jsonl) or all (dev + holdout; also "
+                                 "logged as a holdout look; thresholds are still fitted on dev only).")] = "dev",
              config: ConfigOpt = "local", set_: SetOpt = None, no_cache: NoCacheOpt = False,
              verbose: VerboseOpt = False) -> None:
     """Measure false alarms and misses on the case calls, sweep the threshold, write a report."""
@@ -309,12 +313,16 @@ def eval_cmd(level: LevelOpt = None, clean_only: CleanOpt = False, limit: LimitO
     selected = _select_calls(pipe, level, clean_only, limit, calls, folds)
     locked = sp.load_splits(required=split != "all")
     cv_folds = None
+    test_only: set[int] = set()
     if locked is not None:
         selected = locked.select(selected, split)
         cv_folds = locked.dev_fold_of() if split == "dev" else locked.all_fold_of()
-        if split == "all":
-            console.print("[yellow]--split all includes the holdout dialogues: do not tune on these numbers "
-                          "(use --split dev).[/yellow]")
+        if split == "all" and locked.holdout:  # holdout is scored, never fitted on
+            test_only = {max(locked.dev_folds, default=-1) + 1}
+    if split == "all":
+        console.print(f"[bold yellow]--split all includes the holdout dialogues: this run is logged as a "
+                      f"holdout look (earlier looks: {sp.holdout_looks(pipe.cfg)}); thresholds are fitted on "
+                      f"dev only. Do not tune on these numbers (use --split dev).[/bold yellow]")
     if split == sp.HOLDOUT:
         do_sweep = cv = False  # the holdout scores the config as it is; tuning on it would be peeking
         console.print(f"[bold]Holdout run[/bold] ({len(selected)} calls); this look is logged "
@@ -344,15 +352,19 @@ def eval_cmd(level: LevelOpt = None, clean_only: CleanOpt = False, limit: LimitO
         console.print(_groups_table(groups))
 
     swept, suggestion, cvr = None, None, None
-    if do_sweep and results:
-        swept = ev.sweep(pipe, results, selected, ts)
+    fit_results = results
+    if split == "all" and locked is not None:  # the suggestion must not see holdout labels
+        dev = set(locked.dev_dialogues())
+        fit_results = [r for r in results if dialogue_of(r.call_id) in dev]
+    if do_sweep and fit_results:
+        swept = ev.sweep(pipe, fit_results, selected, ts)
         suggestion = ev.suggest_threshold(swept)
         console.print(_sweep_table(swept, suggestion, pipe.cfg.fusion.get("threshold")))
         if suggestion:
             console.print(f"[bold]Vorschlag:[/bold] {suggestion['reason']}  "
                           f"[dim](--set fusion.threshold={suggestion['threshold']:.2f})[/dim]")
         if cv:
-            cvr = ev.cross_validate(pipe, results, selected, thresholds=ts, fold_of=cv_folds)
+            cvr = ev.cross_validate(pipe, results, selected, thresholds=ts, fold_of=cv_folds, test_only=test_only)
             if cvr:
                 console.print(_cv_table(cvr))
 
@@ -360,8 +372,9 @@ def eval_cmd(level: LevelOpt = None, clean_only: CleanOpt = False, limit: LimitO
             "split": split,
             "filters": {"level": level, "clean_only": clean_only, "limit": limit, "calls": calls, "folds": folds},
             "overrides": set_ or [], "created": time.strftime("%Y-%m-%d %H:%M:%S")}
-    if split == sp.HOLDOUT:
-        lp = sp.log_holdout_run(pipe.cfg, m, len(selected), kind="eval", overrides=set_ or [])
+    if split in (sp.HOLDOUT, "all"):
+        lp = sp.log_holdout_run(pipe.cfg, m, len(selected), kind="eval" if split == sp.HOLDOUT else "eval (split all)",
+                                overrides=set_ or [], extra={"split": split})
         console.print(f"[dim]Holdout look logged: {_rel(lp)} (looks so far: {sp.holdout_looks(pipe.cfg)})[/dim]")
     j, md = ev.write_report(pipe.ctx.runs_dir / ("eval" if split == "all" else f"eval_{split}"), m, rows, swept,
                             suggestion, meta, cvr)
@@ -587,9 +600,10 @@ from callguard.commands import patterns as _patterns  # noqa: E402
 from callguard.commands import report as _report  # noqa: E402
 from callguard.commands import route as _route  # noqa: E402
 from callguard.commands import splits as _splits  # noqa: E402
+from callguard.commands import synth as _synth  # noqa: E402
 
 for _mod in (_asr_eval, _splits, _experiment, _leaderboard, _report, _fit_fusion,
-             _route, _feedback, _patterns):
+             _route, _feedback, _patterns, _synth):
     _mod.register(app)
 
 

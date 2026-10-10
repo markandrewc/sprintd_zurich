@@ -6,7 +6,7 @@ Spec (``experiments/<name>.yaml``)::
     description: which checks carry the decision
     rq: [RQ4]
     base: gpu-12gb                       # profile every variant starts from
-    split: dev                           # dev (default) | holdout (logged!) | all
+    split: dev                           # dev (default) | holdout | all: both logged, need --split on the CLI
     compare_to: all                      # baseline variant for the paired comparisons (default: first)
     thresholds: [0.3, 0.4, 0.5]          # optional: sweep / CV grid (default eval.DEFAULT_THRESHOLDS)
     use_tuning: false                    # default: config/tuning.yaml (officer overlay) is NOT applied
@@ -45,7 +45,7 @@ import logging
 import statistics
 import threading
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Collection, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -298,7 +298,9 @@ def is_oracle(v: Variant, cfg: AppConfig) -> bool:
 
 def select_calls(calls: Sequence[Call], split: str, splits: sp.Splits | None, call_ids: Sequence[str] | None = None,
                  level: int | None = None, clean_only: bool = False, limit: int | None = None) -> list[Call]:
-    if split != "all":
+    if split == sp.EXTERNAL and splits is None:
+        calls = list(calls)  # no case split at all: nothing to exclude
+    elif split != "all":
         if splits is None:
             raise sp.SplitsMissing("config/splits.yaml is missing: `callguard splits --make` first")
         calls = splits.select(calls, split)
@@ -315,10 +317,49 @@ def select_calls(calls: Sequence[Call], split: str, splits: sp.Splits | None, ca
 
 
 def cv_fold_map(split: str, splits: sp.Splits | None, calls: Sequence[Call]) -> dict[str, int]:
-    if splits is not None:
+    if splits is not None and split != sp.EXTERNAL:
         return splits.dev_fold_of() if split == "dev" else splits.all_fold_of()
+    # external (synthetic) sets: none of their dialogues is in config/splits.yaml; folds keep twin groups
     from callguard.data import split_dialogues
     return split_dialogues(list(calls))
+
+
+def holdout_test_folds(split: str, splits: sp.Splits | None) -> set[int]:
+    """Folds CV may score but never fit on: the holdout fold under ``--split all`` (``all_fold_of``
+    appends it as the last fold). Thresholds are then chosen on dev labels only."""
+    if split == "all" and splits is not None and splits.holdout:
+        return {max(splits.dev_folds, default=-1) + 1}
+    return set()
+
+
+def is_logged_split(split: str) -> bool:
+    """Splits that include holdout dialogues: every run on them is a logged look (runs/holdout_log.jsonl)."""
+    return split in (sp.HOLDOUT, "all")
+
+
+class LLMIdentityError(RuntimeError):
+    """An LLM of a variant could not be confirmed live at experiment start."""
+
+
+def resolve_llm_identities(ctx: Any) -> dict[str, dict[str, Any]]:
+    """Resolve every configured LLM's served identity with a live request (OpenAI-compatible servers:
+    ``GET /models``, pinned for the rest of the run, no fallback to the identity persisted from an
+    earlier session). In-process / fake backends have no server: their identity is their model id.
+    Raises :class:`LLMIdentityError`, naming the LLM, if any server cannot be confirmed."""
+    out: dict[str, dict[str, Any]] = {}
+    for name, spec in (getattr(getattr(ctx, "cfg", None), "llms", None) or {}).items():
+        try:
+            llm = ctx.llm(name)
+            resolve = getattr(llm, "resolve_served", None)
+            model_id = resolve() if callable(resolve) else llm.model_id
+        except Exception as e:
+            raise LLMIdentityError(
+                f"LLM {name!r} ({spec.get('type')} {spec.get('base_url') or spec.get('model_path') or ''}): "
+                f"{type(e).__name__}: {e}. Experiments need the served model confirmed live (cache keys "
+                f"name it); start the server / wait until it answers GET /models, then rerun.") from e
+        out[name] = {"type": spec.get("type"), "model": spec.get("model"), "model_id": str(model_id),
+                     "base_url": spec.get("base_url"), "cache_tag": spec.get("cache_tag")}
+    return out
 
 
 # --------------------------------------------------------------------------------------------
@@ -365,8 +406,11 @@ def enrich(row: Row, res: CallResult) -> Row:
     return row
 
 
-def result_row(res: CallResult, call: Call | None, can_alarm: set[str]) -> Row:
-    return enrich(ev.make_row(res, call, can_alarm), res)
+def result_row(res: CallResult, call: Call | None, can_alarm: set[str],
+               weights: Mapping[str, float] | None = None) -> Row:
+    """Eval row + flip/cost fields. ``weights`` (check -> fusion weight): failed checks with weight 0
+    are not counted (they never reach the decision, so they cannot degrade it)."""
+    return enrich(ev.make_row(res, call, can_alarm, weights), res)
 
 
 def strip_words(res: CallResult) -> dict[str, Any]:
@@ -385,7 +429,9 @@ FAR_GRID_EXTRA = (0.95, 1.0)
 def pick_recall_at_far(swept: list[dict[str, Any]], cap: float = FAR_CAP) -> dict[str, Any] | None:
     """Operating point "CV@FAR20": the threshold with the highest flag recall whose false-alarm rate on
     the training folds is <= ``cap`` (ties: lower FAR, then higher F1, then the higher threshold). If no
-    threshold meets the cap, the lowest-FAR one (ties: higher recall). Unlike max-F1 it cannot drift to
+    threshold meets the cap, the lowest-FAR one (ties: higher recall) with ``cap_reachable: False``: the
+    review rules (uncertainty escalation, "undetermined" verdicts, the review band) flag calls whatever
+    the threshold, so for some fusions no threshold gets under the cap. Unlike max-F1 it cannot drift to
     "flag everything" when half the calls are positive."""
     scored = [s for s in swept if s["metrics"]["n"]]
     if not scored:
@@ -403,7 +449,26 @@ def pick_recall_at_far(swept: list[dict[str, Any]], cap: float = FAR_CAP) -> dic
         best = max(scored, key=lambda s: (-f(s, "false_alarm_rate", 1.0), f(s, "recall"), s["threshold"]))
         why = "no threshold meets the FAR cap: lowest FAR"
     return {"threshold": best["threshold"], "flag_recall": f(best, "recall"),
-            "false_alarm_rate": best["metrics"]["flag"]["false_alarm_rate"], "reason": why}
+            "false_alarm_rate": best["metrics"]["flag"]["false_alarm_rate"], "reason": why,
+            "cap_reachable": bool(ok)}
+
+
+FLOOR_THRESHOLD = 1.0  # threshold of the "FAR floor": what the review rules flag on their own
+
+
+def far_floor(pipe: Any, results: Sequence[CallResult], calls: Sequence[Call],
+              cap: float = FAR_CAP) -> dict[str, Any] | None:
+    """False-alarm rate at threshold 1.0, i.e. the calls flagged by the review rules alone (uncertainty
+    escalation, "undetermined" verdicts, review band, abstention), independent of any threshold the
+    CV can pick. If it is above the cap, no threshold reaches FAR <= cap on these calls."""
+    if not results:
+        return None
+    m = ev.sweep(pipe, results, calls, [FLOOR_THRESHOLD])[0]["metrics"]
+    f = m["flag"]
+    far = f["false_alarm_rate"]
+    return {"threshold": FLOOR_THRESHOLD, "false_alarm_rate": far, "flag_recall": f["recall"],
+            "fp": f["fp"], "tn": f["tn"], "flagged": f["tp"] + f["fp"], "n": m["n"],
+            "cap_reachable": None if far is None else far <= cap}
 
 
 CV_POLICIES = ("max_f1", "recall_at_far")
@@ -411,12 +476,13 @@ CV_POLICIES = ("max_f1", "recall_at_far")
 
 def cv_predict(pipe: Any, results: Sequence[CallResult], calls: Sequence[Call], fold_of: dict[str, int],
                thresholds: Sequence[float] | None = None, error_rows: Sequence[Row] = (),
-               policy: str = "max_f1") -> tuple[list[Row], list[dict[str, Any]]]:
+               policy: str = "max_f1", test_only: Collection[int] = ()) -> tuple[list[Row], list[dict[str, Any]]]:
     """Out-of-fold predictions (adapted from ``eval.cross_validate``, keeping the decisions for flip
     tables): per dev fold, a threshold chosen on the other folds' results, then that threshold on the
     fold. ``policy``: ``max_f1`` (``eval.suggest_threshold``) or ``recall_at_far`` (:func:`pick_recall_at_far`,
-    on the grid plus 0.95/1.0). Calls whose dialogue has no fold are left out; error rows stay error rows
-    (counted as review)."""
+    on the grid plus 0.95/1.0; each fold records ``cap_reachable`` and ``fallback``). ``test_only``:
+    folds that are scored but never used to choose a threshold (the holdout under ``--split all``).
+    Calls whose dialogue has no fold are left out; error rows stay error rows (counted as review)."""
     if policy not in CV_POLICIES:
         raise ValueError(f"policy must be one of {CV_POLICIES}")
     if policy == "recall_at_far":
@@ -428,24 +494,33 @@ def cv_predict(pipe: Any, results: Sequence[CallResult], calls: Sequence[Call], 
             by_fold.setdefault(k, []).append(r)
     families = pipe.ctx.families()
     can_alarm = {f.id for f in families if f.can_alarm}
+    weights = ev.check_weights(pipe)
     idx = {c.call_id: c for c in calls}
     default = float(pipe.cfg.fusion.get("threshold", 0.55))
     rows: list[Row] = []
     folds: list[dict[str, Any]] = []
-    if len(by_fold) < 2:
+    test_only = set(test_only)
+    if len([k for k in by_fold if k not in test_only]) < 2:
         return [], []
     for k in sorted(by_fold):
-        train = [r for j, rs in by_fold.items() if j != k for r in rs]
+        train = [r for j, rs in by_fold.items() if j != k and j not in test_only for r in rs]
         swept = ev.sweep(pipe, train, calls, thresholds)
         pick = ev.suggest_threshold(swept) if policy == "max_f1" else pick_recall_at_far(swept)
         t = pick["threshold"] if pick else default
         for r in by_fold[k]:
             d = pipe.decide(r.transcript, r.checks, {"threshold": t}, families)
-            row = result_row(r.model_copy(update={"decision": d}), idx.get(r.call_id), can_alarm)
+            row = result_row(r.model_copy(update={"decision": d}), idx.get(r.call_id), can_alarm, weights)
             row.update(cv_fold=k, cv_threshold=t)
             rows.append(row)
-        folds.append({"fold": k, "threshold": t, "n_test": len(by_fold[k]),
-                      "dialogues": sorted({dialogue_of(r.call_id) for r in by_fold[k]})})
+        fold: dict[str, Any] = {"fold": k, "threshold": t, "n_test": len(by_fold[k]),
+                                "dialogues": sorted({dialogue_of(r.call_id) for r in by_fold[k]})}
+        if k in test_only:
+            fold["test_only"] = True
+        if policy == "recall_at_far":
+            reachable = bool(pick and pick.get("cap_reachable"))
+            fold.update(cap_reachable=reachable, fallback=not reachable,
+                        train_far=pick["false_alarm_rate"] if pick else None)
+        folds.append(fold)
     for er in error_rows:
         k = fold_of.get(er.get("dialogue_id") or dialogue_of(er["call_id"]))
         if k is not None:
@@ -509,14 +584,21 @@ def run_variant(spec: Spec, v: Variant, calls: Sequence[Call], out_dir: Path, *,
     vdir = out_dir / v.name
     vdir.mkdir(parents=True, exist_ok=True)
     can_alarm = {f.id for f in pipe.ctx.families() if f.can_alarm}
+    weights = ev.check_weights(pipe)
     t_start = time.time()
+    extra: dict[str, Any] = {"check_weights": weights}
 
     if v.refuse_from:
-        results, rows = _refuse(pipe, cfg, out_dir / v.refuse_from, calls, can_alarm)
+        src_dir = out_dir / v.refuse_from
+        extra["source"] = source_provenance(src_dir)
+        extra["llm_resolved"] = extra["source"].get("llm_resolved")
+        results, rows = _refuse(pipe, cfg, src_dir, calls, can_alarm, weights)
         for i, r in enumerate(rows, 1):
             if progress:
                 progress(v.name, i, len(rows), r["call_id"], r)
     else:
+        # cache keys of LLM checks / roles name the served model: confirm it live, never from memory
+        extra["llm_resolved"] = resolve_llm_identities(pipe.ctx)
         _serialize_stages(pipe)
         n = len(calls)
         done = [0]
@@ -530,7 +612,7 @@ def run_variant(spec: Spec, v: Variant, calls: Sequence[Call], out_dir: Path, *,
                 log.exception("experiment %s/%s: call %s failed", spec.name, v.name, call.call_id)
                 row, res = ev.error_row(call.call_id, call, f"{type(e).__name__}: {e}"), None
             else:
-                row = result_row(res, call, can_alarm)
+                row = result_row(res, call, can_alarm, weights)
             row["seconds"] = round(time.time() - t0, 3)
             with done_lock:
                 done[0] += 1
@@ -546,7 +628,7 @@ def run_variant(spec: Spec, v: Variant, calls: Sequence[Call], out_dir: Path, *,
         rows = [r for r, _ in outs]
         results = [res for _, res in outs if res is not None]
 
-    _write_variant(spec, v, cfg, pipe, calls, rows, results, vdir, wall=time.time() - t_start)
+    _write_variant(spec, v, cfg, pipe, calls, rows, results, vdir, wall=time.time() - t_start, extra_meta=extra)
     return VariantOutput(v.name, rows, results, vdir)
 
 
@@ -557,8 +639,36 @@ def load_results(vdir: Path) -> list[CallResult]:
     return [CallResult.model_validate_json(line) for line in p.read_text().splitlines() if line.strip()]
 
 
-def _refuse(pipe: Any, cfg: AppConfig, src_dir: Path, calls: Sequence[Call], can_alarm: set[str]
-            ) -> tuple[list[CallResult], list[Row]]:
+def results_hash(vdir: Path) -> str | None:
+    """sha256 (16 hex) of a variant's stored results.jsonl: what a re-fusion was computed from."""
+    p = vdir / "results.jsonl"
+    if not p.exists():
+        return None
+    h = hashlib.sha256()
+    with p.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()[:16]
+
+
+def _read_meta(vdir: Path) -> dict[str, Any]:
+    p = vdir / "meta.json"
+    try:
+        return json.loads(p.read_text()) if p.exists() else {}
+    except ValueError:
+        return {}
+
+
+def source_provenance(src_dir: Path) -> dict[str, Any]:
+    """What a re-fusion is tied to: the source's results hash, commit, config hash and run time."""
+    m = _read_meta(src_dir)
+    return {"variant": src_dir.name, "results_hash": results_hash(src_dir), "git": m.get("git"),
+            "config_hash": m.get("config_hash"), "created": m.get("created"),
+            "llm_resolved": m.get("llm_resolved")}
+
+
+def _refuse(pipe: Any, cfg: AppConfig, src_dir: Path, calls: Sequence[Call], can_alarm: set[str],
+            weights: Mapping[str, float] | None = None) -> tuple[list[CallResult], list[Row]]:
     """Re-fusion only: the source variant's stored check results, this variant's fusion/weights/checks."""
     src = {r.call_id: r for r in load_results(src_dir)}
     if not src:
@@ -579,29 +689,42 @@ def _refuse(pipe: Any, cfg: AppConfig, src_dir: Path, calls: Sequence[Call], can
         d = pipe.decide(r.transcript, checks, None, families)
         new = r.model_copy(update={"decision": d, "checks": checks, "config_name": cfg.name})
         results.append(new)
-        row = result_row(new, call, can_alarm)
+        row = result_row(new, call, can_alarm, weights)
         row["seconds"] = round(time.time() - t0, 4)
         rows.append(row)
     return results, rows
 
 
+def _dev_only(results: Sequence[CallResult], split: str, splits: sp.Splits | None) -> list[CallResult]:
+    """Results a threshold may be fitted on: under ``--split all`` the dev dialogues only."""
+    if split != "all" or splits is None:
+        return list(results)
+    dev = set(splits.dev_dialogues())
+    return [r for r in results if dialogue_of(r.call_id) in dev]
+
+
 def _write_variant(spec: Spec, v: Variant, cfg: AppConfig, pipe: Any, calls: Sequence[Call], rows: list[Row],
-                   results: list[CallResult], vdir: Path, wall: float) -> None:
+                   results: list[CallResult], vdir: Path, wall: float,
+                   extra_meta: dict[str, Any] | None = None) -> None:
     splits = sp.load_splits(required=False)
     fold_of = cv_fold_map(spec.split, splits, calls)
+    test_only = holdout_test_folds(spec.split, splits)
     errors = [r for r in rows if r.get("error")]
     cv_rows, cv_folds = ([], []) if spec.split == sp.HOLDOUT else cv_predict(
-        pipe, results, calls, fold_of, spec.thresholds, errors)
+        pipe, results, calls, fold_of, spec.thresholds, errors, test_only=test_only)
     far_rows, far_folds = ([], []) if spec.split == sp.HOLDOUT else cv_predict(
-        pipe, results, calls, fold_of, spec.thresholds, errors, policy="recall_at_far")
-    swept = ev.sweep(pipe, results, calls, spec.thresholds) if results else []
+        pipe, results, calls, fold_of, spec.thresholds, errors, policy="recall_at_far", test_only=test_only)
+    fit_on = _dev_only(results, spec.split, splits)
+    swept = ev.sweep(pipe, fit_on, calls, spec.thresholds) if fit_on else []
     suggestion = ev.suggest_threshold(swept) if swept else None
+    floor = far_floor(pipe, results, calls)
     with (vdir / "results.jsonl").open("w") as f:
         for r in results:
             f.write(json.dumps(strip_words(r), ensure_ascii=False) + "\n")
     (vdir / "rows.json").write_text(json.dumps(
         {"fixed": rows, "cv": cv_rows, "cv_folds": cv_folds, "cv_far": far_rows, "cv_far_folds": far_folds,
-         "sweep": compact_sweep(swept), "suggestion": suggestion}, ensure_ascii=False, indent=1, default=str))
+         "sweep": compact_sweep(swept), "suggestion": suggestion, "far_floor": floor},
+        ensure_ascii=False, indent=1, default=str))
     (vdir / "metrics.json").write_text(json.dumps(
         {"fixed": ev.metrics(rows), "cv": ev.metrics(cv_rows) if cv_rows else None}, ensure_ascii=False,
         indent=1, default=str))
@@ -616,11 +739,30 @@ def _write_variant(spec: Spec, v: Variant, cfg: AppConfig, pipe: Any, calls: Seq
                 for k, s in cfg.llms.items()},
         "git": sp.git_info(), "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "wall_seconds": round(wall, 2),
         "n_calls": len(rows), "calls": [r["call_id"] for r in rows],
+        **(extra_meta or {}),
     }
     (vdir / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1, default=str))
-    if spec.split == sp.HOLDOUT:
-        sp.log_holdout_run(cfg, ev.metrics(rows), len(rows), kind=f"experiment {spec.name}/{v.name}",
-                           overrides=v.set)
+    if is_logged_split(spec.split):
+        sp.log_holdout_run(cfg, ev.metrics(rows), len(rows),
+                           kind=f"experiment {spec.name}/{v.name}" + ("" if spec.split == sp.HOLDOUT else
+                                                                     f" (split {spec.split})"),
+                           overrides=v.set, extra={"split": spec.split})
+
+
+def preflight_llms(spec: Spec, chosen: Sequence[Variant], use_cache: bool = True) -> dict[str, dict[str, Any]]:
+    """Before any variant runs: every LLM of every computing variant answers GET /models (else
+    :class:`LLMIdentityError`), so a sweep never starts a variant while the server is still loading."""
+    from callguard.context import Context
+
+    seen: dict[str, dict[str, Any]] = {}
+    for v in chosen:
+        if v.refuse_from:
+            continue
+        cfg = variant_config(spec, v)
+        sig = json.dumps(cfg.llms, sort_keys=True, default=str)
+        if sig not in seen:
+            seen[sig] = resolve_llm_identities(Context(cfg, use_cache=use_cache))
+    return {k: e for ids in seen.values() for k, e in ids.items()}
 
 
 def run_experiment(spec: Spec, calls: Sequence[Call], *, variants: Sequence[str] | None = None, jobs: int = 6,
@@ -630,12 +772,15 @@ def run_experiment(spec: Spec, calls: Sequence[Call], *, variants: Sequence[str]
     out.mkdir(parents=True, exist_ok=True)
     chosen = [spec.variant(n) for n in variants] if variants else list(spec.variants)
     chosen.sort(key=lambda v: v.refuse_from is not None)  # sources before their re-fusions
-    if spec.path:
-        (out / "spec.yaml").write_text(spec.path.read_text())
     for v in chosen:
         if v.refuse_from and v.refuse_from not in {c.name for c in chosen} \
                 and not (out / v.refuse_from / "results.jsonl").exists():
             raise SpecError(f"{v.name} re-fuses {v.refuse_from}: run that variant first (or include it)")
+    if pipeline_cls is None:  # test stubs bring their own (fake) LLMs
+        preflight_llms(spec, chosen, use_cache)
+    if spec.path:
+        (out / "spec.yaml").write_text(spec.path.read_text())
+    for v in chosen:
         run_variant(spec, v, calls, out, jobs=jobs, use_cache=use_cache, progress=progress,
                     pipeline_cls=pipeline_cls)
     return summarize(spec, out, n_boot=n_boot, seed=seed)
@@ -671,7 +816,7 @@ def dry_run(spec: Spec, calls: Sequence[Call], variants: Sequence[str] | None = 
             fams = pipe.ctx.families()
             asr_hit, check_miss = 0, {c.name: 0 for c in pipe.checks if c.enabled}
             for call in calls:
-                key = {"audio": file_hash(call.audio_path), "asr": pipe.asr.cache_params()}
+                key = pipe.asr_key(call.audio_path)
                 from callguard.types import Transcript
                 t = pipe.ctx.cache.get("asr", key, Transcript)
                 if t is None:
@@ -748,12 +893,80 @@ def _groups(m: dict[str, Any]) -> dict[str, Any]:
     return {"by_level": {f"Stufe{k}": v for k, v in m["by_level"].items()}, "by_noise": m["by_noise"]}
 
 
-def variant_summary(name: str, vdir: Path, n_boot: int, seed: int) -> dict[str, Any] | None:
+def weights_from_config(cfg: AppConfig) -> dict[str, float]:
+    """Effective fusion weight per configured check without building a pipeline (cf. eval.check_weights)."""
+    w: dict[str, float] = {}
+    for c in cfg.checks:
+        try:
+            w[str(c.get("name") or c.get("type"))] = float(c.get("weight", 1.0))
+        except (TypeError, ValueError):
+            w[str(c.get("name") or c.get("type"))] = 1.0
+    for k, x in (cfg.fusion.get("weights") or {}).items():
+        try:
+            w[str(k)] = float(x)
+        except (TypeError, ValueError):
+            pass
+    for k in cfg.fusion.get("disabled_checks") or ():
+        w[str(k)] = 0.0
+    return w
+
+
+def _reweigh(rows: Sequence[Row], weights: Mapping[str, float] | None) -> list[Row]:
+    """Rows with ``failed_checks`` limited to checks that carry weight in the variant (runs stored
+    before eval.failed_checks took the weights also counted weight-0 checks as DEGRADED)."""
+    if not weights:
+        return list(rows)
+    zero = {n for n, w in weights.items() if w is not None and float(w) <= 0}
+    if not zero:
+        return list(rows)
+    return [{**r, "failed_checks": [n for n in r.get("failed_checks") or [] if n not in zero]}
+            if r.get("failed_checks") else r for r in rows]
+
+
+def model_warnings(meta: dict[str, Any], rows: Sequence[Row]) -> list[str]:
+    """Rows whose LLM check results name another model than the variant resolved live at start (e.g. a
+    result cached under a stale identity), or, for runs without a live resolution, rows that mix models."""
+    seen = sorted({m for r in rows for m in r.get("models") or []})
+    resolved = meta.get("llm_resolved")
+    if resolved:
+        expected = {str(e.get("model_id")) for e in resolved.values() if isinstance(e, dict)}
+        extra = [m for m in seen if m not in expected]
+        if extra:
+            return [f"rows name model(s) {extra} that were not resolved live at start ({sorted(expected)}): "
+                    f"some results come from another model's cache entries"]
+        return []
+    if len(seen) > 1:
+        return [f"rows name {len(seen)} different models {seen} and the run has no live-resolved LLM "
+                f"identity (predates it): check that this is intended"]
+    return []
+
+
+def source_warnings(meta: dict[str, Any], src_dir: Path) -> list[str]:
+    """A re-fusion whose source variant was re-run (results changed) after the re-fusion was computed."""
+    if not meta.get("refuse_from"):
+        return []
+    src = meta.get("source") or {}
+    now = results_hash(src_dir)
+    if src.get("results_hash"):
+        if now != src["results_hash"]:
+            return [f"source `{meta['refuse_from']}` changed after this re-fusion (results hash "
+                    f"{src['results_hash']} -> {now}): rerun this variant"]
+        return []
+    src_created = _read_meta(src_dir).get("created")
+    if src_created and meta.get("created") and src_created > meta["created"]:
+        return [f"source `{meta['refuse_from']}` was re-run ({src_created}) after this re-fusion "
+                f"({meta['created']}): rerun this variant"]
+    return []
+
+
+def variant_summary(name: str, vdir: Path, n_boot: int, seed: int,
+                    weights: Mapping[str, float] | None = None) -> dict[str, Any] | None:
     data = _read_rows(vdir)
     if not data:
         return None
-    meta = json.loads((vdir / "meta.json").read_text()) if (vdir / "meta.json").exists() else {}
-    fixed, cv = data.get("fixed") or [], data.get("cv") or []
+    meta = _read_meta(vdir)
+    weights = meta.get("check_weights") or weights
+    fixed, cv = _reweigh(data.get("fixed") or [], weights), _reweigh(data.get("cv") or [], weights)
     mf = ev.metrics(fixed)
     out: dict[str, Any] = {
         "variant": name, "oracle": bool(meta.get("oracle")), "meta": meta,
@@ -770,23 +983,50 @@ def variant_summary(name: str, vdir: Path, n_boot: int, seed: int) -> dict[str, 
     if cv:
         mc = ev.metrics(cv)
         out["cv"] = {**_flat(mc), "ci": stats.bootstrap_ci(cv, n_boot, seed), **_groups(mc)}
-    far = data.get("cv_far") or []
+    far = _reweigh(data.get("cv_far") or [], weights)
     out["cv_far"] = None
-    out["cv_far_folds"] = data.get("cv_far_folds") or []
+    out["cv_far_folds"] = folds = data.get("cv_far_folds") or []
     if far:
         mf2 = ev.metrics(far)
         out["cv_far"] = {**_flat(mf2), "ci": stats.bootstrap_ci(far, n_boot, seed), **_groups(mf2)}
+    known = [f for f in folds if "cap_reachable" in f]
+    out["cap"] = {
+        "far_cap": FAR_CAP,
+        # out-of-fold FAR of the CV@FAR20 policy within the cap: the leaderboard's compliance test
+        "compliant": None if not out["cv_far"] or out["cv_far"]["false_alarm_rate"] is None
+        else out["cv_far"]["false_alarm_rate"] <= FAR_CAP,
+        "floor": data.get("far_floor"),  # FAR at threshold 1.0: review rules only
+        "folds_reachable": sum(1 for f in known if f["cap_reachable"]) if known else None,
+        "folds": len(folds), "fallback_folds": [f["fold"] for f in known if not f["cap_reachable"]],
+    }
+    if data.get("backfill"):
+        out["backfill"] = data["backfill"]
     # threshold-free: the fixed rows carry the fusion's call score (the threshold does not move it)
     out["auc"] = stats.bootstrap_auc(fixed, n_boot, seed)
     out["degraded"] = bool(out["errors"] or out["check_failures"]["calls"])
+    out["warnings"] = [*model_warnings(meta, fixed), *source_warnings(meta, vdir.parent / str(meta.get("refuse_from")))]
+    for w in out["warnings"]:
+        log.warning("%s: %s", name, w)
     return out
 
 
-def backfill_cv_far(spec: Spec, v: Variant, vdir: Path) -> bool:
-    """Add the CV@FAR20 rows to a variant run that predates them: re-fusion of its stored results with
-    the variant's own config (no ASR, no checks). False if not possible (no results, config broken)."""
+def _needs_backfill(data: dict[str, Any]) -> list[str]:
+    need = []
+    if "cv_far" not in data or any("cap_reachable" not in f for f in data.get("cv_far_folds") or []):
+        need.append("cv_far")
+    if "far_floor" not in data:
+        need.append("far_floor")
+    return need
+
+
+def backfill(spec: Spec, v: Variant, vdir: Path) -> bool:
+    """Add what a variant run that predates them lacks - the CV@FAR20 rows with per-fold cap flags and
+    the FAR floor - by re-fusion of its stored results with the variant's *current* config (no ASR, no
+    checks). The rows are stamped (``rows.json`` ``backfill``) with the commit and config hash used, and
+    whether that config hash matches the original run's. False if nothing to do or not possible."""
     data = _read_rows(vdir)
-    if not data or "cv_far" in data or spec.split == sp.HOLDOUT:
+    need = _needs_backfill(data) if data else []
+    if not need or spec.split == sp.HOLDOUT:
         return False
     results = load_results(vdir)
     if not results:
@@ -799,27 +1039,48 @@ def backfill_cv_far(spec: Spec, v: Variant, vdir: Path) -> bool:
         pipe = Pipeline(cfg)
         ids = {r["call_id"] for r in data.get("fixed") or []}
         calls = [c for c in load_calls(cfg.paths.resolve("data_dir")) if c.call_id in ids]
-        fold_of = cv_fold_map(spec.split, sp.load_splits(required=False), calls)
+        splits = sp.load_splits(required=False)
+        fold_of = cv_fold_map(spec.split, splits, calls)
         errors = [r for r in data.get("fixed") or [] if r.get("error")]
-        far_rows, far_folds = cv_predict(pipe, results, calls, fold_of, spec.thresholds, errors,
-                                         policy="recall_at_far")
+        update: dict[str, Any] = {}
+        if "cv_far" in need:
+            far_rows, far_folds = cv_predict(pipe, results, calls, fold_of, spec.thresholds, errors,
+                                             policy="recall_at_far",
+                                             test_only=holdout_test_folds(spec.split, splits))
+            update.update(cv_far=far_rows, cv_far_folds=far_folds)
+        if "far_floor" in need:
+            update["far_floor"] = far_floor(pipe, results, calls)
     except Exception as e:  # an old run whose config no longer builds keeps its other numbers
-        log.warning("CV@FAR20 backfill of %s failed: %s: %s", vdir, type(e).__name__, e)
+        log.warning("backfill (%s) of %s failed: %s: %s", ", ".join(need), vdir, type(e).__name__, e)
         return False
-    data.update(cv_far=far_rows, cv_far_folds=far_folds)
+    run_hash = _read_meta(vdir).get("config_hash")
+    stamp = dict(data.get("backfill") or {})
+    now = sp.config_hash(cfg)
+    for k in need:
+        stamp[k] = {"git": sp.git_info(), "config_hash": now, "run_config_hash": run_hash,
+                    "config_matches_run": None if run_hash is None else run_hash == now,
+                    "created": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+    data.update(update, backfill=stamp)
     (vdir / "rows.json").write_text(json.dumps(data, ensure_ascii=False, indent=1, default=str))
     return True
 
 
+backfill_cv_far = backfill  # old name
+
+
 def summarize(spec: Spec, out_dir: Path, *, n_boot: int = 2000, seed: int = 13) -> dict[str, Any]:
     """Build summary.json + summary.md from every variant of the spec that has results on disk
-    (older runs get their CV@FAR20 rows back-filled by re-fusion first)."""
+    (older runs get their CV@FAR20 rows / FAR floor back-filled by re-fusion first)."""
     variants: dict[str, Any] = {}
     rows: dict[str, dict[str, Any]] = {}
     for v in spec.variants:
-        backfill_cv_far(spec, v, out_dir / v.name)
+        backfill(spec, v, out_dir / v.name)
     for v in spec.variants:
-        s = variant_summary(v.name, out_dir / v.name, n_boot, seed)
+        try:
+            w = weights_from_config(variant_config(spec, v))
+        except Exception:  # spec/config moved on: the stored meta may still carry the weights
+            w = None
+        s = variant_summary(v.name, out_dir / v.name, n_boot, seed, weights=w)
         if s is not None:
             variants[v.name] = s
             rows[v.name] = _read_rows(out_dir / v.name)
@@ -845,6 +1106,7 @@ def summarize(spec: Spec, out_dir: Path, *, n_boot: int = 2000, seed: int = 13) 
             str(spec.path) if spec.path else None),
         "baselines": stats.trivial_baselines(floor_rows), "far_cap": FAR_CAP,
         "variants": variants, "comparisons": comparisons,
+        "warnings": {n: v["warnings"] for n, v in variants.items() if v.get("warnings")},
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1, default=str))
@@ -892,6 +1154,8 @@ def _tags(s: dict[str, Any]) -> str:
         tags.append("**DEGRADED**")
     if (s.get("meta") or {}).get("refuse_from"):
         tags.append(f"re-fusion of {s['meta']['refuse_from']}")
+    if s.get("warnings"):
+        tags.append("**WARN** (see Warnings)")
     return ", ".join(tags)
 
 
@@ -938,9 +1202,13 @@ def render_summary(s: dict[str, Any]) -> str:
             "twins are paired), CIs are wide: a difference counts "
             "only if its CI excludes 0.", ""]
     out += _render_floor(s)
+    warn = s.get("warnings") or {}
+    if warn:
+        out += ["## Warnings", "", *(f"- `{n}`: {w}" for n, ws in warn.items() for w in ws), ""]
     out += ["## Discrimination (threshold-free) - ROC AUC of the call score", "",
             "Does the score rank flaggable calls above harmless ones at all? 0.5 = no better than a coin "
-            "(and than every constant policy). Same scores for every threshold-only variant.", ""]
+            "(and than every constant policy). Same scores for every threshold-only variant.", "",
+            AUC_NOTE, ""]
     out += _table(["variant", "flag AUC [95% CI]", "alarm-vs-rest AUC [95% CI]", "pos/neg (flag)", ""],
                   [[n, _auc_cell(v, "flag"), _auc_cell(v, "alarm"),
                     f"{(v.get('auc') or {}).get('flag', {}).get('n_pos', '-')}/"
@@ -951,14 +1219,22 @@ def render_summary(s: dict[str, Any]) -> str:
         out += ["## Out-of-fold at the FAR cap (CV@FAR20)", "",
                 "Threshold per fold = highest flag recall with FAR <= 20% on the other dev folds (lowest FAR "
                 "if none meets the cap). Unlike max-F1 it cannot drift to flag-everything.", "",
-                *_metric_table(V, "cv_far"), ""]
+                *_metric_table(V, "cv_far"), "",
+                "**Can the cap be met at all?** The review rules (uncertainty escalation, \"undetermined\" "
+                "verdicts, review band, abstention) flag calls whatever the threshold. *FAR floor* = FAR at "
+                "threshold 1.0 on these calls (review rules only); above 20% no threshold reaches the cap. "
+                "*Folds cap reachable* = training folds where some threshold met the cap; the other folds "
+                "fell back to the lowest-FAR threshold (marked `!` in the fold thresholds below). "
+                "*Compliant* = out-of-fold CV@FAR20 FAR <= 20%.", "",
+                *_cap_table(V), ""]
     out += ["## Fixed threshold", "", *_metric_table(V, "fixed"), ""]
     out += ["## Threshold, cost, errors", ""]
     body = []
     for name, v in V.items():
         c, sug = v["cost"], v.get("suggestion") or {}
         cv_t = ", ".join(_f(f["threshold"]) for f in v.get("cv_folds") or []) or "-"
-        far_t = ", ".join(_f(f["threshold"]) for f in v.get("cv_far_folds") or [])
+        far_t = ", ".join(_f(f["threshold"]) + ("!" if f.get("fallback") else "")
+                          for f in v.get("cv_far_folds") or [])
         cv_t += f" (FAR20: {far_t})" if far_t else ""
         stages = ", ".join(f"{k} {_f(x, 1)}" for k, x in (c.get("stage_s_per_call") or {}).items()) or "-"
         fails = ", ".join(f"{k} {n}x" for k, n in (v["check_failures"].get("by_check") or {}).items())
@@ -969,6 +1245,9 @@ def render_summary(s: dict[str, Any]) -> str:
     out += _table(["variant", "threshold", "suggested", "CV fold thresholds", "wall s/call",
                    "stage s/call (this run)", "check compute s/call", "LLM calls/call", "errors",
                    "calls w/ failed checks", "commit"], body) + [""]
+    if any(f.get("fallback") for v in V.values() for f in v.get("cv_far_folds") or []):
+        out += ["`!` after a FAR20 fold threshold: no threshold met the 20% cap on that fold's training "
+                "folds; the lowest-FAR threshold was used (fallback).", ""]
     if any(v["degraded"] for v in V.values()):
         out += ["> **DEGRADED** variants had failed checks or failed calls: their numbers measure the "
                 "remaining checks only (failed calls count as review). Fix and rerun before concluding.", ""]
@@ -987,6 +1266,29 @@ def render_summary(s: dict[str, Any]) -> str:
     for comp in s.get("comparisons") or []:
         out += _render_comparison(comp, V)
     return "\n".join(out) + "\n"
+
+
+AUC_NOTE = ("AUC is not decision-consistent: it ranks the fused call score, but the label also comes from "
+            "review rules that ignore the threshold (uncertainty escalation, \"undetermined\" verdicts, review "
+            "band), so no threshold may realise the trade-offs the ROC curve suggests. Read it as "
+            "discrimination of the score, and judge operating points by CV@FAR20 and the FAR floor.")
+
+
+def _cap_table(V: dict[str, Any]) -> list[str]:
+    body = []
+    for name, v in V.items():
+        c = v.get("cap") or {}
+        fl = c.get("floor") or {}
+        far20 = v.get("cv_far") or {}
+        folds = "-" if c.get("folds_reachable") is None else f"{c['folds_reachable']}/{c.get('folds')}"
+        bf = ", ".join(f"{k} @ {(x.get('git') or {}).get('sha')} cfg {x.get('config_hash')}"
+                       + ("" if x.get("config_matches_run") is not False else " (config changed since run)")
+                       for k, x in (v.get("backfill") or {}).items())
+        body.append([name, _p(fl.get("false_alarm_rate")) + (" (!)" if fl.get("cap_reachable") is False else ""),
+                     folds, _p(far20.get("false_alarm_rate")),
+                     "-" if c.get("compliant") is None else ("yes" if c["compliant"] else "**no**"), bf or "-"])
+    return _table(["variant", "FAR floor (t=1.0)", "folds cap reachable", "CV@FAR20 FAR", "compliant",
+                   "back-filled (commit, config hash)"], body)
 
 
 def _auc_cell(v: dict[str, Any], target: str) -> str:

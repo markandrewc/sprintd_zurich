@@ -26,7 +26,7 @@ uv run callguard plugins            # what is installed and what the profile use
 A=data_upstream/inventx-case-study/data/Audio      # the case data (paths.data_dir)
 uv run callguard run $A/Stufe1_D02-K1.wav          # one call end to end, local profile
 uv run callguard batch --clean-only                # 30 clean case calls -> runs/local/<call>/result.json
-uv run callguard eval -c fast                      # metrics in seconds once transcripts are cached
+uv run callguard eval -c fast --split dev          # metrics in seconds once transcripts are cached (dev dialogues)
 uv run callguard ui                                # compliance-officer UI on http://localhost:8501
 ```
 
@@ -241,11 +241,17 @@ suggests a threshold.
 ## Evaluation
 
 ```bash
-uv run callguard eval -c fast                                     # rule checks on cached ASR transcripts
-uv run callguard eval -c fast --set asr.type=reference --set name=fast-oracle   # same on the scripts
-uv run callguard eval -c oracle --clean-only                       # LLM checks on the scripts (slow on CPU)
-uv run callguard eval -c local --calls Stufe1_D02-K1,Stufe1_D03-K1 # real chain on chosen calls
+uv run callguard eval -c fast --split dev                         # rule checks on cached ASR transcripts
+uv run callguard eval -c fast --split dev --set asr.type=reference --set name=fast-oracle   # same on the scripts
+uv run callguard eval -c oracle --split dev --clean-only           # LLM checks on the scripts (slow on CPU)
+uv run callguard eval -c local --split dev --calls Stufe1_D02-K1,Stufe1_D03-K1 # real chain on chosen calls
+uv run callguard eval -c <final> --split holdout                   # ONCE per final candidate, logged
 ```
+
+* `--split` defaults to `dev` (the dev dialogues of the locked `config/splits.yaml`). `holdout` and `all`
+  include the holdout dialogues: every such run (also `callguard experiment --split ...` and
+  `callguard asr-eval --split ...`) is appended to `runs/holdout_log.jsonl`. Under `all` the threshold
+  suggestion and the CV thresholds are still fitted on dev dialogues only; do not tune on its numbers.
 
 * 60 calls = 30 dialogues x (clean, noisy). `data.split_dialogues` assigns **dialogues** to 5 folds,
   stratified by expected label, so the clean and noisy recording of a dialogue are never split.
@@ -303,8 +309,9 @@ minutes (3.8-5.1x their length). Apart from the ASR outlier, most of that is the
   GPU profile next ([Home GPU over Tailscale](#home-gpu-over-tailscale)).
 
 **Rule checks only (`fast`: keywords + patterns, no LLM)**, all 60 calls on the reference scripts
-(`runs/fast-oracle/eval/report.md`; 5 s and no models with
-`callguard eval -c fast --set asr.type=reference --set name=fast-oracle`):
+(historical numbers from before the holdout lock; today that run needs `--split all` and is logged as a
+holdout look; 5 s and no models with
+`callguard eval -c fast --split dev --set asr.type=reference --set name=fast-oracle` on the dev dialogues):
 
 | | false alarms | misses | flagged P / R / F1 | 3-class accuracy |
 |---|---|---|---|---|
@@ -341,8 +348,8 @@ Tailscale. Setup, serving and run commands: [docs/REMOTE_GPU.md](docs/REMOTE_GPU
   either as `asr: {type: hf_whisper, model: <dir or repo>}` (**untested**, needs
   `uv pip install transformers torch accelerate`) or convert it with `ct2-transformers-converter
   --model <dir> --output_dir models/asr/<name> --quantization int8 --copy_files tokenizer.json
-  preprocessor_config.json` for `faster_whisper`. Compare with `callguard eval` against the `oracle`
-  ceiling.
+  preprocessor_config.json` for `faster_whisper`. Compare with `callguard eval --split dev` against the
+  `oracle` ceiling.
 * **Learned fusion.** Write a `Fusion` plugin (`type: my_module:LearnedFusion`) whose `decide()` maps
   per-check family scores and confidences to a label. Fit it on cached `CheckResult`s
   (`eval.load_results(runs/<profile>)` or `eval.evaluate(...)`) with `data.split_dialogues` folds.

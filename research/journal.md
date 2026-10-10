@@ -144,3 +144,19 @@ pushing stages as they land (see docs/STATUS.md). First CPU-only numbers in READ
   unchanged 33%. The 7B judge's "undetermined" does not coincide with the expected-review calls. REJECTED at 7B
   (re-test on the 14B results: free). Qwen3-8B failed to start (KV cache too small next to an ASR sweep) -> re-planned:
   large-model ASR sweeps now (vLLM down), then Qwen2.5-14B (GPU exclusive), Qwen3-8B (fp8 KV), Qwen3-14B.
+
+## 2026-10-10T02:10 ideas round 2 (independent ideator, research/ideas_round2.md, queue R1-R8)
+- From stored 7B fact probabilities (0 GPU): all 4 facts false alarms = harmless twins C11, C14; C09 alarm missed
+  ("8-3-6-1-7-4" read out, model says no code read); 4 of 7 clean/noisy disagreements have the CLEAN version wrong
+  (answers near p=0.5, not ASR noise); review recall 33% partly a CV artefact (score nearly discrete; CV picked 0.20).
+- Rule fixes simulated (scripts/research/sim_rules.py): misses 7->3/26, FAR unchanged 4/22, review recall 50->67% —
+  but fitted on these errors -> hypothesis only.
+- DECISION: run R4 first = BLIND policy table written by an agent that sees only criteria.yaml + case README (no
+  transcripts, not the tuned table) -> honest estimate of how much of the facts gain is wording overfit.
+
+## 2026-10-10T02:13 A6 on large-v3 gsw (dev split, 48 calls): no prompt + condition_on_previous_text=false
+- kw-spot recall 80.4% vs 83.7% (prompted, conditioned), CER 23.4% vs 25.8%. Within noise; the knobs fix the turbo's
+  hallucination loops but large-v3 has none. DECISION: keep the knobs only for turbo; large-v3 either way.
+- R4 blind policy table written (config/policy_table_blind.yaml; agent saw criteria.yaml + README + facts.py code only;
+  it glimpsed one docstring example rule that restates the access criteria). Added as `facts_blind` (weight 0) to the
+  llm-sweep profile so the 14B/Qwen3 passes compute it.

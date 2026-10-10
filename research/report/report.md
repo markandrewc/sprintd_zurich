@@ -1,21 +1,23 @@
 # callguard research report
 
-Generated 2026-10-10 01:53 by `callguard report` from 4 experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev dialogues, differences inside the CIs are noise.
+Generated 2026-10-10 02:14 by `callguard report` from 5 experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev dialogues, differences inside the CIs are noise.
+
+AUC is not decision-consistent: it ranks the fused call score, but review rules (uncertainty escalation, "undetermined" verdicts, review band) flag calls whatever the threshold, so for many variants no threshold reaches FAR <= 20% (see each variant's FAR floor). The top variants are ranked by cap compliance and CV@FAR20 recall, not by AUC.
 
 ## Top variants
 
-| # | experiment / variant | split | n | flag AUC [95% CI] | alarm AUC | CV@FAR20 F1 / R / FAR | CV flag F1 [95% CI] | FAR | miss | bal. acc | review recall | alarm F1 | acc | check s/call | LLM calls/call | commit | tags |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | checks_ablation / **all_minus_keywords** | dev | 48 | 0.69 [0.55, 0.84] | 0.78 | 0.46 / 35% / 18% | 0.69 [0.54, 0.81] | 73% (!) | 15% | 0.56 | 33% | 0.64 | 46% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of all |
-| 2 | fusion / **unc025** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.69 / 96% / 95% (!) | 0.69 [0.55, 0.82] | 95% (!) | 4% | 0.50 | 100% | 0.33 | 23% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of base |
-| 3 | fusion / **band020** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.69 / 69% / 36% (!) | 0.69 [0.52, 0.82] | 73% (!) | 15% | 0.56 | 67% | 0.65 | 46% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of base |
-| 4 | asr_models / **turbo_gsw_int8** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.67 / 65% / 36% (!) | 0.67 [0.46, 0.83] | 45% (!) | 31% | 0.62 | 67% | 0.55 | 50% | 31.8 | 10.0 | a72e6a6f84* |  |
-| 5 | checks_ablation / **all** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.67 / 65% / 36% (!) | 0.67 [0.46, 0.83] | 45% (!) | 31% | 0.62 | 67% | 0.55 | 50% | 31.8 | 10.0 | e1954e9ab6* |  |
-| 6 | fusion / **base** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.67 / 65% / 36% (!) | 0.67 [0.46, 0.83] | 45% (!) | 31% | 0.62 | 67% | 0.55 | 50% | 31.8 | 10.0 | a72e6a6f84* |  |
-| 7 | fusion / **band010** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.67 / 65% / 36% (!) | 0.67 [0.46, 0.83] | 45% (!) | 31% | 0.62 | 67% | 0.53 | 50% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of base |
-| 8 | fusion / **llmunc** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.46 / 35% / 18% | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of base |
-| 9 | fusion / **unc045** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.46 / 35% / 18% | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of base |
-| 10 | fusion / **noesc** | dev | 48 | 0.68 [0.54, 0.83] | 0.77 | 0.46 / 35% / 18% | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | a72e6a6f84* | re-fusion of base |
+| # | experiment / variant | split | n | CV@FAR20 R / F1 / FAR | cap | FAR floor | cap folds | flag AUC [95% CI] | alarm AUC | CV flag F1 [95% CI] | FAR | miss | bal. acc | review recall | alarm F1 | acc | check s/call | LLM calls/call | commit | tags |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | llm_models / **qwen25_7b__facts_only** | dev | 48 | 73% / 0.78 / 18% | ok | - | - | 0.84 [0.70, 0.95] | 0.89 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 33% | 0.75 | 73% | 12.2 | 11.8 | f012763172* | re-fusion of qwen25_7b |
+| 2 | llm_models / **qwen25_7b__kwpat_facts** | dev | 48 | 73% / 0.78 / 18% | ok | - | - | 0.79 [0.63, 0.92] | 0.87 | 0.78 [0.63, 0.90] | 18% | 27% | 0.77 | 50% | 0.52 | 58% | 12.2 | 11.8 | f012763172* | re-fusion of qwen25_7b |
+| 3 | checks_ablation / **all_minus_keywords** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.69 [0.55, 0.84] | 0.78 | 0.69 [0.54, 0.81] | 73% (!) | 15% | 0.56 | 33% | 0.64 | 46% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of all |
+| 4 | fusion / **llmunc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.68 [0.54, 0.83] | 0.77 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
+| 5 | fusion / **unc045** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.68 [0.54, 0.83] | 0.77 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
+| 6 | fusion / **noesc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.68 [0.54, 0.83] | 0.77 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 50% | 31.8 | 10.0 | a72e6a6f84* | re-fusion of base |
+| 7 | checks_ablation / **llm_only** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.66 [0.51, 0.82] | 0.75 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.70 | 50% | 31.8 | 10.0 | e1954e9ab6* | re-fusion of all |
+| 8 | fusion / **abstain** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.65 [0.48, 0.82] | 0.73 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 48% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
+| 9 | fusion / **abstain_llmunc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.65 [0.48, 0.82] | 0.73 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 48% | 31.8 | 10.0 | 2cc04e7f41* | re-fusion of base |
+| 10 | fusion / **abstain_noesc** | dev | 48 | 35% / 0.46 / 18% | ok | 18% | 3/4 | 0.65 [0.48, 0.82] | 0.73 | 0.70 [0.54, 0.83] | 68% (!) | 15% | 0.58 | 33% | 0.67 | 48% | 31.8 | 10.0 | a72e6a6f84* | re-fusion of base |
 
 `*` = uncommitted changes in the tree when the variant ran.
 
@@ -101,6 +103,34 @@ Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant
 - `noesc` vs `base`: flag AUC +0.00 [+0.00, +0.00]; flag F1 +0.03 [-0.06, +0.14] (no detectable difference); FAR +23pp; McNemar p=1.0; 16 calls flip
 - `noesc_noband` vs `base`: flag AUC +0.00 [+0.00, +0.00]; flag F1 -0.01 [-0.16, +0.13] (no detectable difference); FAR +23pp; McNemar p=0.5488; 25 calls flip
 - `abstain_noesc` vs `base`: flag AUC -0.03 [-0.12, +0.04]; flag F1 +0.03 [-0.06, +0.14] (no detectable difference); FAR +23pp; McNemar p=1.0; 16 calls flip
+
+## llm_models
+
+Check LLM sweep (Qwen2.5-7B-AWQ vs Qwen3-8B-AWQ vs Qwen2.5-14B-AWQ vs Qwen3-14B-AWQ)
+
+RQ: RQ6 · split dev · baseline `qwen25_7b` · details: `runs/experiments/llm_models/summary.md`
+
+Floor on these calls: flag-all flag F1 0.70 (FAR 100%), flag-none 0.00, constant score AUC 0.50.
+
+![chart_auc](llm_models/auc.png)
+
+![chart_metrics](llm_models/metrics.png)
+
+![chart_cost](llm_models/cost_vs_f1.png)
+
+![chart_noise](llm_models/clean_vs_noisy.png)
+
+![chart_levels](llm_models/levels.png)
+
+![chart_thresholds](llm_models/thresholds.png)
+
+- `qwen25_7b__kwpat_facts` vs `qwen25_7b`: flag AUC +0.11 [-0.01, +0.24]; flag F1 +0.12 [-0.04, +0.30] (no detectable difference); FAR -68pp; McNemar p=0.0169; 29 calls flip
+- `qwen25_7b__facts_only` vs `qwen25_7b`: flag AUC +0.16 [+0.05, +0.28] (real); flag F1 +0.12 [-0.04, +0.30] (no detectable difference); FAR -68pp; McNemar p=0.0169; 29 calls flip
+- `qwen25_7b__judge_facts` vs `qwen25_7b`: flag AUC +0.08 [+0.01, +0.17] (real); flag F1 +0.10 [-0.02, +0.24] (no detectable difference); FAR -41pp; McNemar p=0.0225; 25 calls flip
+- `qwen25_7b__gcot` vs `qwen25_7b`: flag AUC -0.03 [-0.15, +0.07]; flag F1 +0.06 [-0.02, +0.17] (no detectable difference); FAR -18pp; McNemar p=0.2266; 25 calls flip
+- `qwen25_7b__all_plus` vs `qwen25_7b`: flag AUC +0.07 [-0.04, +0.17]; flag F1 +0.02 [-0.07, +0.12] (no detectable difference); FAR -9pp; McNemar p=0.7539; 28 calls flip
+- `qwen25_7b__hybrid` vs `qwen25_7b`: flag AUC +0.14 [+0.04, +0.26] (real); flag F1 +0.09 [-0.06, +0.24] (no detectable difference); FAR -59pp; McNemar p=0.0414; 28 calls flip
+- `qwen25_7b__hybrid_kw` vs `qwen25_7b`: flag AUC +0.09 [-0.03, +0.21]; flag F1 +0.07 [-0.07, +0.22] (no detectable difference); FAR -55pp; McNemar p=0.0636; 31 calls flip
 
 ## smoke
 

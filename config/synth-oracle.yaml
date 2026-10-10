@@ -1,0 +1,13 @@
+# Synthetic TEXT scripts (data_synth/v1, written by `callguard synth scripts`) through the ORACLE path:
+# the reference "ASR" reads each script, no audio, no diarizer; checks + LLM as gpu-12gb (via oracle-gpu).
+# Out-of-sample stress test of the checks (RQ5/RQ10). Not the case data, not the submission.
+# Run: callguard experiment experiments/synth_stress.yaml   (split `external`: never a holdout look)
+extends: oracle-gpu.yaml
+description: ORACLE text of synthetic scripts (data_synth/v1) + gpu-12gb checks/LLM
+paths:
+  data_dir: data_synth/v1
+asr:
+  type: reference
+  scale_to_audio: false   # text-only calls: audio_path is the script itself, there is no recording
+diarizer:
+  type: none

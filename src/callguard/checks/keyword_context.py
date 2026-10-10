@@ -148,7 +148,8 @@ class WindowGEvalCheck(GEvalCheck):
                 no_anchor.append(fid)
                 if self.empty == "skip":
                     del result.family_scores[fid]
-        meta["llm_calls"] = calls + len(meta.get("errors") or {})  # a failed family made >= 1 request
+        # a failed family made >= 1 request (``<family>:steps`` = steps fallback, already counted)
+        meta["llm_calls"] = calls + sum(1 for k in meta.get("errors") or {} if not str(k).endswith(":steps"))
         if no_anchor:
             meta["no_anchor_families"] = no_anchor
         if errors:

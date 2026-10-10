@@ -16,8 +16,9 @@ fake``). It is a plumbing double, not a classifier. The rules, so tests can rely
   minimum..maximum (integer scales: 4 / 1 on 1..5); segment-id arrays -> ids of cue lines; strings
   -> a German reason naming the cue; booleans -> cue found, mitigating flags (negated, quoted,
   expired, public...) -> False.
-* Plain text: a digit if the prompt ends asking for a score (``4`` / ``1`` on 1..5), else a short
-  German sentence. ``choice_probs``: 0.7 on that answer, the rest spread evenly.
+* Plain text: a fixed numbered list if the prompt ends asking for numbered steps (G-Eval step
+  generation), a digit if it ends asking for a score (``4`` / ``1`` on 1..5), else a short German
+  sentence. ``choice_probs``: 0.7 on that answer, the rest spread evenly.
 * ``n > 1`` with ``temperature > 0``: sample 0 is canonical, later samples jitter float fields by
   up to 0.05 (seeded), verdicts never change.
 """
@@ -60,6 +61,10 @@ FAMILY_NAMES: dict[str, tuple[str, ...]] = {
 _LINE = re.compile(r"^[ \t]*\[(?P<id>[A-Z]+\d+)(?P<tags>[^\]\n]*)\][ \t]?(?P<text>.*)$", re.M)
 _TIME = re.compile(r"^\d+:\d\d$")
 _RANGE = re.compile(r"(?<!\d)(\d{1,3})\s*(?:-|–|bis|to)\s*(\d{1,3})(?!\d)")
+_STEPS_ASK = re.compile(r"\bnumbered (?:evaluation )?(?:steps|list)\b", re.I)
+FAKE_STEPS = ("1. Read the policy and what makes the misconduct harmless.\n"
+              "2. Find the transcript lines that match the policy.\n"
+              "3. Rate how clearly the misconduct is present.")
 _SCORE_ASK = re.compile(r"\b(score|punktzahl|punkte|bewerte\w*|rating|skala|ziffer|digit|zahl)\b", re.I)
 _POS = {"present", "yes", "ja", "true", "alarm", "suspicious", "verdächtig", "violation", "verstoss", "high", "hoch"}
 _NEG = {"absent", "no", "nein", "false", "no_alert", "none", "harmless", "unbedenklich", "unauffällig", "low",
@@ -115,7 +120,7 @@ class FakeLLM(LLM):
     ``json_mode``...), so ``--set llms.default.type=fake`` works on any profile. They change
     nothing and stay out of ``cache_params``."""
 
-    version = "fake-v2"  # bump when the heuristic changes, so cached check results are recomputed
+    version = "fake-v3"  # v3: answers G-Eval step prompts with a numbered list. Bump when the heuristic changes, so cached check results are recomputed
 
     def __init__(self, ctx: "Context | None" = None, seed: int = 0,
                  cues: dict[str, list[str]] | None = None, **backend_params: Any):
@@ -227,6 +232,8 @@ class FakeLLM(LLM):
 
     def _text(self, scene: _Scene) -> str:
         tail = scene.instructions.rstrip()[-300:]
+        if _STEPS_ASK.search(tail):
+            return FAKE_STEPS
         rng = _RANGE.search(tail)
         if rng or _SCORE_ASK.search(tail):
             lo, hi = (int(rng.group(1)), int(rng.group(2))) if rng else (1, 5)

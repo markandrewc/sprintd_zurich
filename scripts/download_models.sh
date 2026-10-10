@@ -3,7 +3,7 @@
 # "resolve" URLs and the k2-fsa GitHub releases: no huggingface-cli needed. Re-running skips files
 # that are already complete; interrupted downloads resume.
 #
-# Usage: scripts/download_models.sh [local|gpu]      (default: local)
+# Usage: scripts/download_models.sh [local|gpu|denoise]      (default: local)
 #   local  CPU laptop profile (config/local.yaml):
 #            ASR   nebi/whisper-large-v3-turbo-swiss-german-ct2-int8 (CTranslate2 int8, 0.8 GB)
 #                  + tokenizer.json from Flurin17/whisper-large-v3-turbo-swiss-german (the CT2 export
@@ -22,6 +22,8 @@
 #            Flix-AI/flix-swissgerman-full (Apache-2.0, SPC_R; transformers weights only):
 #              asr: {type: hf_whisper, model: Flix-AI/flix-swissgerman-full}  (needs: uv pip install
 #              transformers torch accelerate), or convert with ct2-transformers-converter for faster_whisper.
+#   denoise  speech denoisers for `asr.preprocess: {type: denoise_sherpa}` (sherpa-onnx, CPU, Apache-2.0):
+#            models/denoise/dpdfnet2.onnx (DPDFNet, 10 MB, default) + gtcrn_simple.onnx (GTCRN, 0.5 MB)
 #
 # Env: HF_TOKEN (optional, sent as bearer token), MODELS_DIR (default: <repo>/models),
 #      SKIP_LLM=1 (local: skip the 1.5B GGUF, e.g. on a GPU host that serves its own LLM).
@@ -98,9 +100,16 @@ gpu_models() {
   echo "LLM: served by vLLM, which downloads the model on first start (scripts/serve_vllm.sh)"
 }
 
+denoise_models() {
+  echo "denoise (sherpa-onnx speech enhancement)"
+  fetch "$K2/speech-enhancement-models/dpdfnet2.onnx" "$MODELS/denoise/dpdfnet2.onnx"
+  fetch "$K2/speech-enhancement-models/gtcrn_simple.onnx" "$MODELS/denoise/gtcrn_simple.onnx"
+}
+
 case "$PROFILE" in
   local) local_models ;;
   gpu) gpu_models ;;
-  *) echo "usage: $0 [local|gpu]" >&2; exit 2 ;;
+  denoise) denoise_models ;;
+  *) echo "usage: $0 [local|gpu|denoise]" >&2; exit 2 ;;
 esac
 echo "done: $PROFILE models in $MODELS/"

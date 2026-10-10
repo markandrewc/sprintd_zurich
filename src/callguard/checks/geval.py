@@ -20,7 +20,7 @@ from callguard.checks import prompts
 from callguard.checks.llm_judge import LLMCheck
 from callguard.families import family_policy_view
 from callguard.plugins import LLM
-from callguard.types import Family, FamilyScore, Finding, Transcript
+from callguard.types import CheckResult, Family, FamilyScore, Finding, Transcript
 
 if TYPE_CHECKING:
     from callguard.context import Context
@@ -28,6 +28,10 @@ if TYPE_CHECKING:
 log = logging.getLogger("callguard.checks.geval")
 
 STEPS_NAMESPACE = "geval_steps"
+# The step-generation prompt version the existing G-Eval result caches were built with. The check's
+# cache key names ``prompts.STEPS_PROMPT_VERSION`` only when it differs from this value: every cached
+# result keeps its key today, and bumping the steps prompt still invalidates the scores built on it.
+BASE_STEPS_PROMPT_VERSION = "geval-steps-1"
 
 
 class GEvalSteps(BaseModel):
@@ -68,6 +72,28 @@ class GEvalCheck(LLMCheck):
         self.evidence_min_score = float(evidence_min_score)
         self.max_tokens = int(max_tokens)
         self._steps_memo: dict[str, GEvalSteps] = {}  # survives a disabled disk cache within one run
+
+    def cache_key(self, families: list[Family]) -> dict[str, Any]:
+        """LLMCheck's key, plus the steps prompt version once it moves past ``BASE_STEPS_PROMPT_VERSION``
+        (auto-generated steps feed every score, so a new steps prompt must not reuse old scores)."""
+        key = super().cache_key(families)
+        if prompts.STEPS_PROMPT_VERSION != BASE_STEPS_PROMPT_VERSION:
+            key["steps_prompt_version"] = prompts.STEPS_PROMPT_VERSION
+        return key
+
+    def run(self, transcript: Transcript, families: list[Family]) -> CheckResult:
+        """As LLMCheck.run; a family scored with the generic DEFAULT_STEPS because step generation
+        failed is degraded: listed in ``meta["errors"]`` (``<family>:steps``) and not cached, so the
+        run shows as DEGRADED and the next run retries the steps."""
+        result = super().run(transcript, families)
+        failed = {fid: fs.detail["steps_error"] for fid, fs in result.family_scores.items()
+                  if (fs.detail or {}).get("steps_error")}
+        if failed:
+            errors = dict(result.meta.get("errors") or {})
+            errors.update({f"{fid}:steps": f"steps fell back to DEFAULT_STEPS: {err}" for fid, err in failed.items()})
+            result.meta["errors"] = errors
+            result.meta["cacheable"] = False
+        return result
 
     # -- (a) evaluation steps ---------------------------------------------------------------------
 

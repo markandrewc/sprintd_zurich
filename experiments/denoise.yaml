@@ -1,0 +1,32 @@
+# RQ8 / queue A7 (A10 denoise front end): does denoising the audio before Whisper close the clean/noisy gap?
+# Both variants run on ALL dev calls; the summary's clean/noisy breakdown answers both questions:
+#   noisy column: denoise vs no denoise on the noisy calls (K2/K4)  -> does it help?
+#   clean column: denoise vs no denoise on the clean calls (K1/K3)  -> does it hurt?
+# Denoising every call is also the only honest deployment: which call is noisy comes from the file name
+# (rule 2: no hidden hints), so "denoise only the noisy ones" is not a candidate.
+# Denoiser: sherpa-onnx DPDFNet2 (models/denoise/dpdfnet2.onnx, scripts/download_models.sh denoise), CPU,
+# ~4-5 s per audio minute; denoised audio is cached in .cache/preprocess/ (the noisy calls are already there).
+# Transcripts first (GPU, ASR only, no LLM needed):
+#   uv run python scripts/research/asr_sweep.py -c gpu-12gb --set asr.condition_on_previous_text=false --tag turbo-gsw-int8-nocond
+#   uv run python scripts/research/asr_sweep.py -c gpu-12gb --set asr.condition_on_previous_text=false \
+#       --set asr.preprocess.type=denoise_sherpa --tag turbo-gsw-int8-nocond-denoise
+# Then: uv run callguard experiment experiments/denoise.yaml   (all LLM checks per variant, ~15-30 min each)
+# Mechanism: callguard asr-eval-compare (keyword-spot recall / WER) on the two transcript sets.
+name: denoise
+description: Denoise front end (sherpa-onnx DPDFNet2) before Whisper turbo gsw int8, condition_on_previous_text off
+rq: [RQ8]
+base: gpu-12gb
+split: dev
+compare_to: nocond
+variants:
+  - name: nocond
+    description: "turbo gsw int8, condition_on_previous_text=false, original audio"
+    set: [asr.condition_on_previous_text=false]
+  - name: nocond_denoise
+    description: "same ASR on DPDFNet2-denoised audio (no attenuation limit, mix 1.0); diarization + snippets keep the original audio"
+    set: [asr.condition_on_previous_text=false, asr.preprocess.type=denoise_sherpa]
+  # Milder denoising if the full one hurts the clean calls (heavy denoising often raises Whisper WER).
+  # Needs its own transcripts first (add the same --set to the asr_sweep command, --tag ...-denoise-att12):
+  # - name: nocond_denoise_att12
+  #   set: [asr.condition_on_previous_text=false, asr.preprocess.type=denoise_sherpa,
+  #         asr.preprocess.attenuation_limit_db=12]

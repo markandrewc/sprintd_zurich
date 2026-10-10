@@ -282,6 +282,15 @@ def llm_advisor(llm: "LLM", segments: Sequence[Segment], n_segments: int = 12,
     return advisor, conf, reason
 
 
+def _model_id(client: Any) -> str | None:
+    """The role LLM's model identity (served weights, not the alias) for the diarization meta."""
+    try:
+        mid = client.model_id
+    except Exception:  # identity lookup failed: the meta just lacks it
+        return None
+    return str(mid) if mid is not None else None
+
+
 def assign_roles(segments: Sequence[Segment], method: str, *, llm: Callable[[], "LLM"] | None = None,
                  context_segments: int = 12, swap_check: bool = True) -> dict[str, Any]:
     """Set ``Segment.role`` in place; returns the ``role_*`` fields for ``meta["diarization"]``.
@@ -308,7 +317,9 @@ def assign_roles(segments: Sequence[Segment], method: str, *, llm: Callable[[], 
         try:
             if llm is None:
                 raise ValueError("no LLM given")
-            advisor, conf, reason = llm_advisor(llm(), segments, context_segments, swap_check)
+            client = llm()
+            info["role_llm_model"] = _model_id(client)
+            advisor, conf, reason = llm_advisor(client, segments, context_segments, swap_check)
             if advisor is not None:
                 info.update(role_method="llm", role_confidence=round(conf, 3), role_reason=reason,
                             roles=set_roles(segments, advisor))
@@ -317,6 +328,9 @@ def assign_roles(segments: Sequence[Segment], method: str, *, llm: Callable[[], 
         except Exception as e:
             log.warning("LLM role assignment failed, using first speaker as advisor: %r", e)
             note = f"LLM failed ({e!r}"[:300] + "); "
+            # a fallback caused by an error (server down, broken output) is not the answer of the
+            # configured setup: the pipeline does not cache it, so the next run asks the LLM again
+            info["role_error"] = f"{type(e).__name__}: {e}"[:300]
 
     advisor = first_speaker(segments)
     info.update(role_method="first_speaker_advisor", role_confidence=FIRST_SPEAKER_CONFIDENCE,

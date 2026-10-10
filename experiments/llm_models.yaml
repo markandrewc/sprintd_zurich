@@ -49,3 +49,8 @@ variants:
   - {name: qwen25_14b__hybrid_kw, refuse_from: qwen25_14b, checks: [keywords, patterns, facts, llm_judge], set: [fusion.type=hybrid, "fusion.core=[keywords, patterns, facts]", checks.facts.weight=1.0]}
   - {name: qwen3_14b__hybrid, refuse_from: qwen3_14b, checks: [facts, llm_judge], set: [fusion.type=hybrid, checks.facts.weight=1.0]}
   - {name: qwen3_14b__hybrid_kw, refuse_from: qwen3_14b, checks: [keywords, patterns, facts, llm_judge], set: [fusion.type=hybrid, "fusion.core=[keywords, patterns, facts]", checks.facts.weight=1.0]}
+  # ---- R4 blind policy table
+  - {name: qwen25_7b__facts_blind_only, refuse_from: qwen25_7b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen3_8b__facts_blind_only, refuse_from: qwen3_8b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen25_14b__facts_blind_only, refuse_from: qwen25_14b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen3_14b__facts_blind_only, refuse_from: qwen3_14b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}

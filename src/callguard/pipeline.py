@@ -19,11 +19,11 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
-from callguard import audio, registry
+from callguard import audio, preprocess, registry
 from callguard.cache import file_hash, stable_hash
 from callguard.config import ROOT, AppConfig
 from callguard.context import Context
-from callguard.plugins import ASRBackend, Check, Diarizer, Fusion, Sink, Translator
+from callguard.plugins import ASRBackend, Check, Diarizer, Fusion, Preprocessor, Sink, Translator
 from callguard.types import CallResult, CheckResult, Decision, Family, Transcript
 from callguard.views import ViewConfigError, ViewSpec, build_order, parse_views, primary_of, root_of
 
@@ -45,11 +45,15 @@ class Pipeline:
         self.primary_view = primary_of(cfg, self.view_specs)
         self._view_asrs: dict[str, ASRBackend] = {}
         self._translators: dict[str, Translator] = {}
+        self._preprocessors: dict[str, Preprocessor] = {}
         for c in self.checks:  # fail at start, not after an hour of ASR
             if c.view is not None and c.view not in self.view_specs and not cfg.check_view:
                 raise ViewConfigError(f"check {c.name!r} reads view {c.view!r}, which is not defined "
                                       f"(views: {list(self.view_specs)})")
-        self.needed_views()
+        for name in self.needed_views():  # multi-source views need a translator that takes several
+            if self.view_specs[name].alternatives and not self.translator_for(name).multi_source:
+                raise ViewConfigError(f"view {name!r}: `from` lists several views but translator "
+                                      f"{self.view_specs[name].translator!r} takes one source")
 
     # -- lazily built: loading Whisper is slow and not needed when everything is cached ----------
 
@@ -110,16 +114,26 @@ class Pipeline:
         t.lang = spec.lang if spec is not None and spec.lang is not None else t.lang
         return t
 
-    def translate(self, source: Transcript, view: str) -> Transcript:
-        """Translated view ``view`` of ``source`` (cached on source segments + translator + languages)."""
+    def translate(self, source: Transcript, view: str,
+                  alternatives: list[Transcript] | None = None) -> Transcript:
+        """Translated view ``view`` of ``source`` (cached on source segments + translator + languages).
+
+        Multi-source views (``from: [primary, ...]``) pass the other source transcripts as
+        ``alternatives``; their segments join the key (single-source keys are unchanged)."""
         spec = self.view_specs[view]
         tr = self.translator_for(view)
         target = spec.lang or "en"
-        key = {"source": stable_hash(source.segments), "source_lang": source.lang,
-               "translator": tr.cache_params(), "target": target}
-        t, cached = self.ctx.cache.get_or_compute(
-            "translate", key, Transcript, lambda: tr.translate(source, target),
-            store=lambda t: not t.meta.get("degraded"))
+        key: dict[str, Any] = {"source": stable_hash(source.segments), "source_lang": source.lang,
+                               "translator": tr.cache_params(), "target": target}
+        multi = spec.alternatives or alternatives
+        if multi:
+            alts = list(alternatives or [])
+            key["alternatives"] = [{"segments": stable_hash(a.segments), "lang": a.lang} for a in alts]
+            compute = lambda: tr.translate_multi(source, alts, target)  # noqa: E731
+        else:
+            compute = lambda: tr.translate(source, target)  # noqa: E731
+        t, cached = self.ctx.cache.get_or_compute("translate", key, Transcript, compute,
+                                                  store=lambda t: not t.meta.get("degraded"))
         log.info("translate %s %s -> %s %s", source.call_id, source.view, view, "(cached)" if cached else "")
         t.call_id, t.audio_path = source.call_id, source.audio_path
         return self._as_view(t, view)
@@ -187,9 +201,14 @@ class Pipeline:
                 if src is None:
                     warnings.append(f"view {name}: source view {spec.source} missing, not translated")
                     continue
+                alts = [out[a] for a in spec.alternatives if a in out]
+                missing = [a for a in spec.alternatives if a not in out]
+                if missing:  # correct with what is there; the key names the sources actually used
+                    warnings.append(f"view {name}: source view(s) {', '.join(missing)} missing, "
+                                    f"built from {', '.join([spec.source or '', *(a.view for a in alts)])}")
                 t0 = enter("translate")
                 try:
-                    out[name] = self.translate(src, name)
+                    out[name] = self.translate(src, name, alts) if spec.alternatives else self.translate(src, name)
                 except Exception as e:
                     log.exception("view %s of %s: translation failed", name, call_id)
                     warnings.append(f"view {name}: translation failed: {type(e).__name__}: {e}")
@@ -205,24 +224,55 @@ class Pipeline:
     # out speed-only knobs (threads, concurrency) and add what the YAML does not show (the role LLM's
     # model). Building a plugin is cheap: models load lazily on first use.
 
-    def transcribe(self, audio_path: Path, call_id: str, view: str | None = None) -> Transcript:
-        """ASR of the top-level ``asr`` (``view=None``, v1) or of an ASR view. The key is the v1 key
-        {audio hash, asr.cache_params()}: views with the same ASR share transcripts."""
+    def asr_key(self, audio_path: str | Path, view: str | None = None) -> dict[str, Any]:
+        """The key :meth:`transcribe` caches under: the v1 key {audio hash, asr.cache_params()} (views
+        with the same ASR share transcripts), plus ``preprocess`` only when ``asr.preprocess`` is set."""
         asr = self.asr if view is None else self.asr_for(view)
-        key = {"audio": file_hash(audio_path), "asr": asr.cache_params()}
-        t, cached = self.ctx.cache.get_or_compute(
-            "asr", key, Transcript, lambda: asr.transcribe(Path(audio_path), call_id),
-            store=lambda t: not t.meta.get("degraded"))
+        key: dict[str, Any] = {"audio": file_hash(audio_path), "asr": asr.cache_params()}
+        pre = self.preprocessor_for(asr)
+        if pre is not None:  # the ASR hears processed audio
+            key["preprocess"] = pre.cache_params()
+        return key
+
+    def transcribe(self, audio_path: Path, call_id: str, view: str | None = None) -> Transcript:
+        """ASR of the top-level ``asr`` (``view=None``, v1) or of an ASR view, keyed by :meth:`asr_key`."""
+        asr = self.asr if view is None else self.asr_for(view)
+        key = self.asr_key(audio_path, view)
+        pre = self.preprocessor_for(asr)
+
+        def compute() -> Transcript:
+            if pre is None:
+                return asr.transcribe(Path(audio_path), call_id)
+            with preprocess.prepared(pre, audio_path, self.ctx.cache.root, audio_hash=key["audio"],
+                                     keep=self.ctx.cache.enabled) as (processed, info):
+                t = asr.transcribe(processed, call_id)
+            t.audio_path = str(audio_path)  # timestamps and snippets refer to the original audio
+            t.meta["preprocess"] = info
+            return t
+
+        t, cached = self.ctx.cache.get_or_compute("asr", key, Transcript, compute,
+                                                  store=lambda t: not t.meta.get("degraded"))
         log.info("asr %s %s%s", call_id, f"[{view}] " if view else "", "(cached)" if cached else "")
         t.call_id, t.audio_path = call_id, str(audio_path)
         return self._as_view(t, view) if view is not None else t
+
+    def preprocessor_for(self, asr: ASRBackend) -> Preprocessor | None:
+        """The audio pre-processor of ``asr`` (its config ``preprocess`` block), None if unset or identity."""
+        spec = getattr(asr, "preprocess", None)
+        if not spec:
+            return None
+        k = stable_hash(spec)
+        if k not in self._preprocessors:
+            self._preprocessors[k] = registry.create("preprocess", spec, ctx=self.ctx)
+        pre = self._preprocessors[k]
+        return pre if preprocess.is_active(pre) else None
 
     def diarize(self, audio_path: Path | None, transcript: Transcript) -> Transcript:
         key = {"transcript": stable_hash(transcript.segments), "diarizer": self.diarizer.cache_params(),
                "audio": file_hash(audio_path) if audio_path else None}
         t, cached = self.ctx.cache.get_or_compute(
             "diarize", key, Transcript, lambda: self.diarizer.diarize(audio_path, transcript),
-            store=lambda t: not (t.meta.get("diarization") or {}).get("error"))
+            store=lambda t: not any((t.meta.get("diarization") or {}).get(k) for k in ("error", "role_error")))
         log.info("diarize %s %s", transcript.call_id, "(cached)" if cached else "")
         t.view, t.lang = transcript.view, transcript.lang  # the cached copy may come from another view
         return t
@@ -393,11 +443,14 @@ class Pipeline:
             spec = self.view_specs.get(name)
             info: dict[str, Any] = {"lang": t.lang, "asr_backend": t.asr_backend}
             if spec is not None and spec.kind == "translate":
-                info["params"] = {"from": spec.source,
+                info["params"] = {"from": list(spec.sources) if spec.alternatives else spec.source,
                                   "translator": safe(lambda n=name: self.translator_for(n).cache_params())}
             elif spec is not None:
                 asr = self._built_asr(spec)
                 params: dict[str, Any] = {"asr": safe(asr.cache_params) if asr is not None else None}
+                pre = safe(lambda a=asr: self.preprocessor_for(a)) if asr is not None else None
+                if pre is not None:  # only when set: v1 provenance unchanged
+                    params["preprocess"] = safe(pre.cache_params) if isinstance(pre, Preprocessor) else pre
                 if spec.diarize and self._diarizer is not None:
                     params["diarizer"] = safe(self._diarizer.cache_params)
                 info["params"] = params

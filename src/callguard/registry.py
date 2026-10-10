@@ -8,7 +8,7 @@ Three ways to make a plugin available, in lookup order:
 3. A dotted import path as the type: ``type: "my_team.checks.sentiment:SentimentCheck"``.
    Drop a file anywhere on PYTHONPATH and point the YAML at it - no registry edit needed.
 
-Kinds: asr, diarizer, check, fusion, llm, sink, translator.
+Kinds: asr, diarizer, check, fusion, llm, sink, translator, preprocess.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from __future__ import annotations
 import importlib
 from typing import Any
 
-KINDS = ("asr", "diarizer", "check", "fusion", "llm", "sink", "translator")
+KINDS = ("asr", "diarizer", "check", "fusion", "llm", "sink", "translator", "preprocess")
 
 _REGISTERED: dict[str, dict[str, type]] = {k: {} for k in KINDS}
 
@@ -49,6 +49,7 @@ BUILTINS: dict[str, dict[str, str]] = {
         "weighted": "callguard.fusion.weighted:WeightedFusion",
         "calibrated": "callguard.fusion.calibrated:CalibratedFusion",
         "learned": "callguard.fusion.learned:LearnedFusion",
+        "hybrid": "callguard.fusion.hybrid:HybridFusion",
     },
     "llm": {
         "openai_compat": "callguard.llm.openai_compat:OpenAICompatLLM",
@@ -65,6 +66,11 @@ BUILTINS: dict[str, dict[str, str]] = {
         "llm_translate": "callguard.translate.llm:LLMTranslator",
         "hf_mt": "callguard.translate.hf_mt:HFTranslator",
         "identity": "callguard.translate.identity:IdentityTranslator",
+        "llm_correct": "callguard.translate.correct:LLMCorrector",
+    },
+    "preprocess": {
+        "none": "callguard.preprocess:NoPreprocessor",
+        "denoise_sherpa": "callguard.preprocess.denoise:SherpaDenoiser",
     },
 }
 
@@ -118,12 +124,17 @@ def create(kind: str, spec: dict[str, Any] | str, **deps: Any) -> Any:
     # Every check reads one transcript view (config ``views``). Handled here, not in each check's
     # constructor, so it never enters cache_params(): the view's segments are in the check key anyway.
     view = spec.pop("view", None) if kind == "check" else None
+    # Same for the audio pre-processor of an ASR (``asr.preprocess``): applied by the pipeline, keyed
+    # separately and only when set, so ASR cache keys without it stay the v1 keys.
+    preprocess = spec.pop("preprocess", None) if kind == "asr" else None
     cls = resolve(kind, type_name)
     obj = cls(**deps, **spec)
     obj.plugin_kind = kind
     obj.plugin_type = type_name
     if kind == "check":
         obj.view = view
+    if kind == "asr":
+        obj.preprocess = {"type": preprocess} if isinstance(preprocess, str) else preprocess
     return obj
 
 

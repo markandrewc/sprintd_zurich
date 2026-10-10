@@ -497,7 +497,7 @@ def test_fake_is_deterministic_and_jitters_only_extra_samples() -> None:
     assert all(abs(s["score"] - 0.8) <= 0.05 + 1e-9 for s in samples)
     greedy = a.chat(msgs, json_schema=schema, n=3)
     assert len(set(greedy)) == 1
-    assert a.calls[-1]["n"] == 3 and a.model_id == "fake-v2-s1"
+    assert a.calls[-1]["n"] == 3 and a.model_id == "fake-v3-s1"
 
 
 def test_fake_from_config_ignores_inherited_server_params() -> None:

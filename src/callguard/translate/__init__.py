@@ -1,7 +1,8 @@
 """Translator plugins: one transcript view -> the same call in another language.
 
 Built-ins (``translator`` kind in :mod:`callguard.registry`): ``llm_translate`` (any configured LLM,
-batched JSON), ``hf_mt`` (NLLB via transformers, untested), ``identity`` (tests / offline demo).
+batched JSON), ``hf_mt`` (NLLB via transformers, untested), ``identity`` (tests / offline demo),
+``llm_correct`` (multi-source: fuses several ASR hypotheses of one call into one transcript, A4).
 """
 
 from __future__ import annotations

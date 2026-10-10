@@ -48,6 +48,12 @@ _RETRY_STATUS = {408, 409, 425, 429, 500, 502, 503, 504}
 _FORMAT_WORDS = ("response_format", "json_schema", "schema", "guided", "grammar", "structured output")
 
 
+class LLMIdentityError(RuntimeError):
+    """The served model's identity could not be confirmed with a live ``GET /models`` (server down or
+    still loading, or the configured name is not served). Experiments abort on it: cache keys built
+    from a remembered identity may name the previous model."""
+
+
 class LLMRequestError(RuntimeError):
     """The server answered, but with an error (bad model name, rejected parameter, overload...)."""
 
@@ -134,6 +140,7 @@ class OpenAICompatLLM(LLM):
         self._served: str | None = None  # identity behind `model` per GET /models (None: the name itself)
         self._served_at: float | None = None
         self._served_ok = False  # last lookup reached the server (else: fallback, retried sooner)
+        self._strict_identity = False  # set by resolve_served(): never fall back to the persisted identity
         self._served_lock = threading.Lock()
         self._sem = threading.BoundedSemaphore(self.max_concurrency)
         self._rng = random.Random()
@@ -180,6 +187,10 @@ class OpenAICompatLLM(LLM):
                 listed, ident = served_identity({"data": self.list_models(timeout=5.0)}, self.model)
             except (httpx.HTTPError, ValueError) as e:
                 self._served_ok = False
+                if self._strict_identity:  # keep what the live lookup of this process confirmed
+                    log.warning("%s unreachable for GET /models (%s); keeping the identity confirmed "
+                                "live at start: %s", self.base_url, type(e).__name__, self._served)
+                    return self._served
                 self._served = self._load_served()
                 if self._served:
                     log.warning("%s unreachable for GET /models (%s); cache keys use the last known model "
@@ -192,6 +203,27 @@ class OpenAICompatLLM(LLM):
             if listed:
                 self._store_served(ident)
             return ident
+
+    def resolve_served(self, timeout: float = 10.0) -> str:
+        """Confirm the served model with a live ``GET /models`` now and pin this client to it: no
+        fallback to the identity persisted in ``.cache/llm_served`` (it may name the model served
+        before a swap). Returns :attr:`model_id`. Raises :class:`LLMIdentityError` if the server is
+        unreachable, answers with an error, or does not list the configured ``model``."""
+        with self._served_lock:
+            try:
+                entries = self.list_models(timeout=timeout)
+            except (httpx.HTTPError, ValueError) as e:
+                raise LLMIdentityError(
+                    f"{self.base_url}: GET /models failed ({type(e).__name__}: {e}); the served model "
+                    f"cannot be confirmed (server down or still loading?)") from e
+            listed, ident = served_identity({"data": entries}, self.model)
+            if not listed:
+                names = [str(e.get("id")) for e in entries]
+                raise LLMIdentityError(f"{self.base_url} does not serve {self.model!r} (serves {names})")
+            self._served, self._served_at, self._served_ok = ident, time.monotonic(), True
+            self._strict_identity = True
+            self._store_served(ident)
+        return self.model_id
 
     def _served_file(self) -> Path | None:
         cache = getattr(self.ctx, "cache", None)

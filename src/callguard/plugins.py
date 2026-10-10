@@ -14,6 +14,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import numpy as np
+
 from callguard.types import CallResult, CheckResult, Decision, Family, Transcript
 
 if TYPE_CHECKING:
@@ -45,8 +47,23 @@ class Plugin(ABC):
 class ASRBackend(Plugin):
     """Audio file -> Transcript with segment (ideally word) timestamps."""
 
+    # config ``asr.preprocess`` (a Preprocessor spec or None). Set by registry.create, deliberately not
+    # a constructor param, so it is not in cache_params(): the pipeline adds it to the ASR key itself.
+    preprocess: dict[str, Any] | None = None
+
     @abstractmethod
     def transcribe(self, audio_path: Path, call_id: str) -> Transcript: ...
+
+
+class Preprocessor(Plugin):
+    """Audio -> audio before ASR (denoising, ...). Mono float32 in, mono float32 out at the same ``sr``
+    and (ideally) the same length, so ASR timestamps still point at the original audio. Only the ASR
+    hears the processed audio; diarization and snippets keep the original."""
+
+    identity: bool = False  # True: output == input (the pipeline then skips it and keeps v1 cache keys)
+
+    @abstractmethod
+    def process(self, samples: np.ndarray, sr: int) -> np.ndarray: ...
 
 
 class Diarizer(Plugin):
@@ -112,8 +129,16 @@ class Translator(Plugin):
     Transcript with ``lang = target_lang``. ``cache_params()`` must name the real model (the pipeline
     caches translations on source segments + cache_params + target language)."""
 
+    # True: also accepts multi-source views (`from: [primary, alt, ...]`) via translate_multi()
+    multi_source: bool = False
+
     @abstractmethod
     def translate(self, transcript: Transcript, target_lang: str) -> Transcript: ...
+
+    def translate_multi(self, primary: Transcript, alternatives: list[Transcript], target_lang: str) -> Transcript:
+        """Multi-source view: ``primary`` (segments/timing/speakers kept) + other hypotheses of the same
+        audio. Only for ``multi_source = True`` translators."""
+        raise NotImplementedError(f"translator {self.plugin_type!r} does not take several sources")
 
 
 class LLM(Plugin):

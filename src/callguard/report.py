@@ -1,7 +1,10 @@
 """Research outputs from ``runs/experiments/*/summary.json``: the leaderboard and the chart report.
 
-* :func:`leaderboard` -> ``research/leaderboard.md``: every variant of every experiment, sorted by
-  out-of-fold (CV) flag F1, with its CI, FAR, miss rate, review recall, cost, commit, ORACLE/DEGRADED.
+* :func:`leaderboard` -> ``research/leaderboard.md``: every variant of every experiment. Variants whose
+  CV@FAR20 operating point keeps the out-of-fold FAR within the 20% cap come first (by CV@FAR20 recall,
+  then F1), cap violators after them (by FAR), variants without CV@FAR20 last; AUC is a column, not the
+  sort key (review rules flag calls independent of the threshold, so AUC can rank a variant high that no
+  threshold makes usable). Plus CI, FAR floor, miss rate, review recall, cost, commit, ORACLE/DEGRADED.
 * :func:`build_report` -> ``research/report/report.md`` + PNG charts per experiment: flag F1 / FAR /
   miss with 95% CI error bars, cost vs F1, clean vs noisy, per-level heat map, threshold curves.
 
@@ -83,10 +86,33 @@ def leaderboard_rows(summaries: Sequence[dict[str, Any]]) -> list[dict[str, Any]
                 "commit": v.get("commit"), "dirty": v.get("dirty"), "oracle": v.get("oracle"),
                 "degraded": v.get("degraded"), "refuse_from": (v.get("meta") or {}).get("refuse_from"),
                 "created": (v.get("meta") or {}).get("created"),
+                "compliant": _compliant(v, s.get("far_cap") or FAR_CAP),
+                "far_floor": ((v.get("cap") or {}).get("floor") or {}).get("false_alarm_rate"),
+                "cap_folds": (v.get("cap") or {}).get("folds_reachable"),
+                "n_folds": (v.get("cap") or {}).get("folds"),
+                "warnings": v.get("warnings") or [],
             })
-    # primary: threshold-free AUC (flag F1 with a max-F1 threshold cannot beat flag-all at prevalence ~0.5)
-    rows.sort(key=lambda r: (r["auc"] is None, -(r["auc"] or 0), -(r["far20_f1"] or 0), -(r["flag_f1"] or 0)))
+    rows.sort(key=rank_key)
     return rows
+
+
+FAR_CAP = 0.2
+
+
+def _compliant(v: dict[str, Any], cap: float) -> bool | None:
+    """CV@FAR20 out-of-fold FAR within the cap (None: no CV@FAR20 numbers)."""
+    far = (v.get("cv_far") or {}).get("false_alarm_rate")
+    return None if far is None else far <= cap
+
+
+def rank_key(r: dict[str, Any]) -> tuple[Any, ...]:
+    """Cap-compliant variants first (CV@FAR20 recall, then F1, then AUC), then cap violators (lowest
+    CV@FAR20 FAR first, then recall), then variants without CV@FAR20 (by CV flag F1)."""
+    if r["compliant"] is True:
+        return (0, -(r["far20_recall"] or 0), -(r["far20_f1"] or 0), -(r["auc"] or 0))
+    if r["compliant"] is False:
+        return (1, r["far20_far"], -(r["far20_recall"] or 0), -(r["far20_f1"] or 0))
+    return (2, -(r["flag_f1"] or 0), 0, 0)
 
 
 def _p(x: Any) -> str:
@@ -100,33 +126,44 @@ def _f(x: Any, nd: int = 2) -> str:
 def render_leaderboard(rows: Sequence[dict[str, Any]], far_cap: float = 0.2) -> str:
     out = ["# Leaderboard", "",
            f"Generated {time.strftime('%Y-%m-%d %H:%M')} by `callguard leaderboard` from "
-           "runs/experiments/*/summary.json. Sorted by **flag AUC** (ROC AUC of the call score, expected "
-           "alarm|review vs no_alert; threshold-free, 0.5 = chance), then CV@FAR20 flag F1. Why not flag F1: "
-           "on dev ~54% of calls are flaggable, so flag-everything already reaches flag F1 ~0.70 and a max-F1 "
-           "threshold drifts there. CV@FAR20 = threshold chosen on the other dev folds for max recall with "
-           "FAR <= 20%. CV flag F1 / FAR / miss / bal. acc = max-F1 CV threshold. Brackets: 95% bootstrap CI "
-           "over twin groups/dialogues; overlapping CIs = no detectable difference. FAR above the "
-           f"{far_cap:.0%} cap is marked (!). ORACLE rows read the reference scripts and are never submission "
-           "candidates; DEGRADED rows had failed checks.", ""]
-    head = ["#", "experiment / variant", "split", "n", "flag AUC [95% CI]", "alarm AUC",
-            "CV@FAR20 F1 / R / FAR", "CV flag F1 [95% CI]", "FAR", "miss", "bal. acc", "review recall",
-            "alarm F1", "acc", "check s/call", "LLM calls/call", "commit", "tags"]
+           "runs/experiments/*/summary.json. **Ranking**: variants whose CV@FAR20 operating point stays within "
+           f"the {far_cap:.0%} false-alarm cap out-of-fold come first, by CV@FAR20 flag recall, then F1; then "
+           "the cap violators (lowest FAR first); then variants without CV@FAR20. CV@FAR20 = threshold chosen "
+           "on the other dev folds for max recall with FAR <= 20% (lowest FAR if no threshold meets it). "
+           "*FAR floor* = FAR at threshold 1.0 (calls the review rules flag on their own: uncertainty "
+           "escalation, \"undetermined\" verdicts, review band); above the cap no threshold can meet it. "
+           "*cap folds* = training folds where some threshold met the cap (the rest fell back). flag AUC (ROC "
+           "AUC of the call score, 0.5 = chance) is shown but is not the sort key: it is not "
+           "decision-consistent, the review rules flag calls the score ranks low. Why not flag F1: on dev ~54% "
+           "of calls are flaggable, so flag-everything already reaches flag F1 ~0.70. CV flag F1 / FAR / miss / "
+           "bal. acc = max-F1 CV threshold. Brackets: 95% bootstrap CI over twin groups/dialogues; overlapping "
+           f"CIs = no detectable difference. FAR above the {far_cap:.0%} cap is marked (!). ORACLE rows read "
+           "the reference scripts and are never submission candidates; DEGRADED rows had failed checks; WARN "
+           "rows have provenance warnings (see the experiment's summary.md).", ""]
+    head = ["#", "experiment / variant", "split", "n", "CV@FAR20 R / F1 / FAR", "cap", "FAR floor",
+            "cap folds", "flag AUC [95% CI]", "alarm AUC", "CV flag F1 [95% CI]", "FAR", "miss", "bal. acc",
+            "review recall", "alarm F1", "acc", "check s/call", "LLM calls/call", "commit", "tags"]
     out += ["| " + " | ".join(head) + " |", "|" + "|".join("---" for _ in head) + "|"]
     for i, r in enumerate(rows, 1):
         auc = _f(r["auc"]) + (f" [{_f(r['auc_lo'])}, {_f(r['auc_hi'])}]" if r["auc_lo"] is not None else "")
         far20 = "-" if r["far20_f1"] is None and r["far20_recall"] is None else \
-            f"{_f(r['far20_f1'])} / {_p(r['far20_recall'])} / {_p(r['far20_far'])}" + \
+            f"{_p(r['far20_recall'])} / {_f(r['far20_f1'])} / {_p(r['far20_far'])}" + \
             (" (!)" if r["far20_far"] is not None and r["far20_far"] > far_cap else "")
+        cap = {True: "ok", False: "**over**", None: "-"}[r.get("compliant")]
+        floor = _p(r.get("far_floor")) + (" (!)" if (r.get("far_floor") or 0) > far_cap else "")
+        cap_folds = "-" if r.get("cap_folds") is None else f"{r['cap_folds']}/{r.get('n_folds')}"
         f1 = _f(r["flag_f1"]) + (f" [{_f(r['lo'])}, {_f(r['hi'])}]" if r["lo"] is not None else "")
         if r["basis"] == "fixed":
             f1 += " (fixed)"
         tags = [t for t, on in (("ORACLE", r["oracle"]), ("DEGRADED", r["degraded"])) if on]
         if r["refuse_from"]:
             tags.append(f"re-fusion of {r['refuse_from']}")
+        if r.get("warnings"):
+            tags.append("WARN")
         far = _p(r["far"]) + (" (!)" if r["far"] is not None and r["far"] > far_cap else "")
         out.append("| " + " | ".join(str(c) for c in [
-            i, f"{r['experiment']} / **{r['variant']}**", r["split"], r["n"], auc, _f(r["auc_alarm"]), far20,
-            f1, far, _p(r["miss"]), _f(r["balanced_accuracy"]), _p(r["review_recall"]), _f(r["alarm_f1"]), _p(r["accuracy"]), _f(r["s_per_call"], 1),
+            i, f"{r['experiment']} / **{r['variant']}**", r["split"], r["n"], far20, cap, floor, cap_folds,
+            auc, _f(r["auc_alarm"]), f1, far, _p(r["miss"]), _f(r["balanced_accuracy"]), _p(r["review_recall"]), _f(r["alarm_f1"]), _p(r["accuracy"]), _f(r["s_per_call"], 1),
             _f(r["llm_calls"], 1), (r["commit"] or "-") + ("*" if r["dirty"] else ""), ", ".join(tags)]) + " |")
     if not rows:
         out.append("\nNo experiments yet: `callguard experiment experiments/<name>.yaml`.")
@@ -462,7 +499,11 @@ def build_report(names: Sequence[str] | None = None, out: Path | None = None,
           f"Generated {time.strftime('%Y-%m-%d %H:%M')} by `callguard report` from "
           f"{len(summaries)} experiment(s). Primary numbers are out-of-fold (CV) on the dev split; whiskers "
           "and brackets are 95% bootstrap CIs over dialogues (clean+noisy resampled together). With ~24 dev "
-          "dialogues, differences inside the CIs are noise.", ""]
+          "dialogues, differences inside the CIs are noise.", "",
+          "AUC is not decision-consistent: it ranks the fused call score, but review rules (uncertainty "
+          "escalation, \"undetermined\" verdicts, review band) flag calls whatever the threshold, so for many "
+          "variants no threshold reaches FAR <= 20% (see each variant's FAR floor). The top variants are "
+          "ranked by cap compliance and CV@FAR20 recall, not by AUC.", ""]
     lb_rows = leaderboard_rows(summaries)
     if lb_rows:
         md += ["## Top variants", "", *render_leaderboard(lb_rows[:10]).splitlines()[4:], ""]

@@ -35,3 +35,5 @@ checks:
   # computed for every model (weight 0 = not fused here); combined by re-fusion variants in llm_models.yaml
   - {name: facts, type: facts, llm: judge, parallel: 5, weight: 0.0}
   - {name: anchored, type: keyword_context, llm: judge, window: 1, context: full, parallel: 5, weight: 0.0}
+  # R4: blind policy table (written from criteria.yaml + README only, no transcripts) vs the tuned one
+  - {name: facts_blind, type: facts, llm: judge, policy_table: config/policy_table_blind.yaml, parallel: 5, weight: 0.0}

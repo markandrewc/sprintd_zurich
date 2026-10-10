@@ -1,0 +1,852 @@
+# Synthetic call scenarios (v2_plan §4, research RQ10 / queue D1): an OUT-OF-SAMPLE stress test of the
+# checks, especially the `facts` question wording (config/policy_table.yaml), which was written while
+# reading dev transcripts. Generator: `callguard synth scripts` (src/callguard/synth/scripts.py).
+#
+# Written fresh for this file (2026-10-10), NOT copied from case calls: other companies, products,
+# relatives, amounts, speaker order, and misconduct by the ADVISOR as well as by the customer. Only the
+# compliance policy (config/criteria.yaml) is shared with the case. The policy_table fact questions were
+# deliberately not used as wording here (circularity: the test must not be phrased like the questions).
+#
+# The LLM only WRITES the dialogue; the expected label comes from this file (`label` per variant), never
+# from the LLM. Each scenario has twins that share the setting and differ only in the decisive context:
+#   alarm     the misconduct happens                                  -> Bearbeitung: alarm
+#   harmless  look-alike (public info, expired value, refusal, quote)  -> Bearbeitung: no_alert
+#   review    the decisive fact stays open in the call                 -> Bearbeitung: review
+# Variant names are free; `label` decides. `family` on a variant overrides the scenario's family (numbers
+# twins whose alarm variant is an access case).
+#
+# Scenario keys:
+#   id          stable name, the twin group (bootstrap / CV unit: twins never split across folds)
+#   family      Testziel (trade / access / disclosure / documentation / splitting / numbers)
+#   customer    speaker label of the caller: Kundin | Kunde (advisor is always "Beratung")
+#   opens       who speaks first: advisor | customer
+#   turns       target number of turns (validator accepts turns +- 4, within 12..30)
+#   setting     shared situation (German, for the writer; never shown to the checks)
+#   must_include  strings every variant must contain verbatim (names, amounts) -> rejects off-topic output
+# Variant keys: label, decisive (what must happen, and where), reason (Begründung), open (Offen, review),
+#   event (default: alarm->present, no_alert->absent, review->undetermined), must_include, family.
+
+version: 1
+defaults:
+  turns: 18
+  dialect: Zürichdeutsch
+  opens: advisor
+  customer: Kundin
+
+families:
+  # ------------------------------------------------------------------------------------- trade
+  trade:
+    - id: trade_pharma_approval
+      customer: Kunde
+      opens: customer
+      turns: 18
+      setting: >-
+        Herr Lüthi ruft seinen Anlageberater an. Er besitzt ein kleines Depot mit ETFs und interessiert sich
+        für Aktien der fiktiven Alpstein Biotech AG. Sein Schwager arbeitet dort in der Abteilung für
+        Zulassungen. Er möchte rund 200 Aktien kaufen. Am Anfang geht es um eine Adressänderung.
+      must_include: [Alpstein]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            In der Mitte des Gesprächs erzählt der Kunde, sein Schwager habe ihm am Wochenende beim Essen
+            gesagt, die Zulassung für das neue Medikament sei intern bereits eingetroffen; die Firma gebe
+            das erst nächsten Dienstag bekannt. Deshalb will er die 200 Aktien jetzt kaufen, bevor es alle
+            wissen. Die Beratung nimmt den Auftrag nicht an und meldet den Vorgang intern.
+          reason: Eigener Kaufwunsch wegen einer vom Schwager erhaltenen, noch nicht bekanntgegebenen Zulassung.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Der Kunde sagt, die Firma habe die Zulassung heute Morgen per Medienmitteilung veröffentlicht, er
+            habe es in der Zeitung und auf der Firmenwebseite gelesen. Sein Schwager arbeite zwar dort, aber
+            mit dem rede er nie über die Firma. Er will die 200 Aktien kaufen; die Beratung prüft die
+            Meldung, bestätigt dass sie öffentlich ist, und nimmt den Auftrag auf.
+          reason: Kaufwunsch beruht auf einer bereits veröffentlichten Medienmitteilung.
+        review:
+          label: review
+          decisive: >-
+            Der Kunde sagt nur, er habe "von jemandem, der es wissen muss" gehört, dass bald eine gute
+            Nachricht zur Zulassung komme, und will deshalb die 200 Aktien kaufen. Auf die Frage, ob das
+            schon öffentlich sei und woher er es habe, weicht er aus ("das spielt doch keine Rolle"). Die
+            Beratung kann es nicht klären, nimmt den Auftrag vorerst nicht an und verspricht einen Rückruf.
+          reason: Handelswunsch mit einer Information, deren Herkunft und Öffentlichkeit offen bleiben.
+          open: Herkunft der Information und ob sie bereits öffentlich ist.
+
+    - id: trade_advisor_takeover_tip
+      customer: Kundin
+      opens: advisor
+      turns: 20
+      setting: >-
+        Die Beraterin ruft Frau Gerber wegen der jährlichen Depotbesprechung an. Es geht um die fiktive
+        Rheintal Logistik AG, von der die Kundin schon einige Aktien hat. Die Kundin überlegt, 300 weitere
+        Aktien zu kaufen.
+      must_include: [Rheintal]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Die BERATERIN selbst erzählt, dass das Corporate-Finance-Team der Bank gerade an einer Übernahme
+            der Rheintal Logistik arbeite, das sei noch streng intern und nicht angekündigt. Sie meint, jetzt
+            wäre ein guter Moment. Die Kundin sagt daraufhin, dann wolle sie die 300 Aktien sofort kaufen,
+            bevor die Übernahme bekannt wird.
+          reason: Kaufwunsch der Kundin auf Basis einer internen, noch nicht angekündigten Übernahme, die die Beratung selbst weitergegeben hat.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Die Beraterin erwähnt das öffentliche Übernahmeangebot für die Rheintal Logistik, das gestern
+            offiziell publiziert wurde und in allen Zeitungen stand. Die Kundin hat es auch gelesen und will
+            300 weitere Aktien kaufen. Beide sprechen nur über öffentlich bekannte Angaben aus dem Angebot.
+          reason: Das Übernahmeangebot ist bereits öffentlich publiziert; keine Insider-Information.
+        review:
+          label: review
+          decisive: >-
+            Die Beraterin deutet nur an, bei der Rheintal Logistik "laufe etwas", mehr dürfe sie nicht sagen.
+            Die Kundin will daraufhin die 300 Aktien kaufen. Ob die Beraterin etwas Internes weiss oder nur
+            Gerüchte aus der Presse meint, wird im Gespräch nicht geklärt.
+          reason: Handelswunsch nach einer Andeutung; ob nicht öffentliche Information dahintersteht, bleibt offen.
+          open: Ob die Andeutung der Beratung auf nicht öffentlicher Information beruht.
+
+    - id: trade_employee_large_order
+      customer: Kundin
+      opens: customer
+      turns: 16
+      setting: >-
+        Frau Imhof arbeitet im Verkauf der fiktiven Seeland Solar AG und hat bei der Bank ein Depot. Sie
+        möchte Aktien ihres eigenen Arbeitgebers für etwa 15'000 Franken kaufen. Nächste Woche ist der
+        Investorentag der Firma.
+      must_include: [Seeland]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Sie erzählt früh im Gespräch, dass sie selbst letzte Woche einen riesigen Auftrag aus Deutschland
+            abgeschlossen habe; das werde erst am Investorentag bekanntgegeben. Darum wolle sie jetzt noch
+            kaufen. Später im Gespräch, nachdem die Beratung Bedenken äussert, sagt sie, man könne den Kauf ja
+            auch vergessen.
+          reason: Eigener Kaufwunsch wegen eines selbst abgeschlossenen, noch nicht bekanntgegebenen Grossauftrags; der spätere Rückzug macht den Wunsch nicht ungeschehen.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Sie kauft über den normalen Mitarbeiterbeteiligungsplan. Sie begründet den Kauf nur mit dem
+            veröffentlichten Jahresbericht und sagt ausdrücklich, die Sperrfrist sei vorbei und sie wisse
+            nichts, was nicht schon publiziert ist. Die Beratung nimmt den Auftrag auf.
+          reason: Kauf beruht auf dem veröffentlichten Jahresbericht; keine nicht öffentliche Information genannt.
+        review:
+          label: review
+          decisive: >-
+            Sie will unbedingt "noch vor dem Investorentag" kaufen, nennt aber keinen Grund. Als die Beratung
+            fragt, ob sie interne Informationen habe, sagt sie "dazu sag ich lieber nichts". Das Gespräch
+            endet ohne Klärung; die Beratung nimmt den Auftrag noch nicht an.
+          reason: Handelswunsch vor einem Firmenanlass, Herkunft der Motivation bleibt offen.
+          open: Ob die Kundin nicht öffentliche Information aus ihrer Arbeit hat.
+
+    - id: trade_sell_profit_warning
+      customer: Kunde
+      opens: advisor
+      turns: 18
+      setting: >-
+        Der Berater ruft Herrn Keusch zurück. Der Kunde hält 1'000 Aktien der fiktiven Juragrat Uhren AG und
+        will sie VERKAUFEN (nicht kaufen). Seine Frau arbeitet in der Buchhaltung der Juragrat Uhren.
+      must_include: [Juragrat]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Der Kunde erzählt, seine Frau habe gestern zu Hause erzählt, dass die Firma nächste Woche eine
+            Gewinnwarnung herausgeben müsse; das wisse ausser der Buchhaltung noch niemand. Er will alle
+            1'000 Aktien heute verkaufen, bevor der Kurs fällt.
+          reason: Verkaufswunsch wegen einer intern erhaltenen, noch nicht veröffentlichten Gewinnwarnung.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Der Kunde sagt, die Juragrat Uhren habe heute früh eine Gewinnwarnung als Ad-hoc-Mitteilung
+            veröffentlicht, der Kurs sei schon gefallen; er habe es im Radio gehört. Er will die 1'000 Aktien
+            verkaufen, um Verluste zu begrenzen. Seine Frau erwähnt er nur nebenbei als Angestellte.
+          reason: Verkaufswunsch nach einer bereits veröffentlichten Ad-hoc-Mitteilung.
+        harmless_quote:
+          label: no_alert
+          decisive: >-
+            Der Kunde will 1'000 Aktien verkaufen, weil er im Frühling eine Wohnung kauft und Eigenkapital
+            braucht. Nebenbei erzählt er lachend, seine Frau habe in der internen Schulung ein Beispiel
+            gehört: "Wenn dir deine Frau von einer Gewinnwarnung erzählt und du vor der Meldung verkaufst,
+            ist das Insiderhandel." Er betont, dass er nichts Internes wisse und nur Liquidität brauche.
+          reason: Verkauf aus Liquiditätsgründen; Insiderhandel wird nur als Schulungsbeispiel zitiert.
+
+    - id: trade_daughter_audit_merger
+      customer: Kundin
+      opens: advisor
+      turns: 22
+      setting: >-
+        Die Beratung ruft Frau Brändli wegen einer fälligen Festgeldanlage von 40'000 Franken an. Es wird
+        besprochen, wie das Geld neu angelegt werden soll. Die Tochter der Kundin arbeitet bei einer
+        Revisionsgesellschaft, die die fiktive Limmat Versicherungen prüft.
+      must_include: [Limmat]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Erst gegen Ende des Gesprächs sagt die Kundin, ihre Tochter habe bei der Revision gesehen, dass
+            die Limmat Versicherungen mit einer anderen Versicherung fusionieren werde; das sei noch geheim.
+            Sie will deshalb 20'000 Franken in Limmat-Aktien stecken. Die Beratung lehnt ab; die Kundin sagt
+            dann, sie habe das nicht so gemeint und man solle alles ins Festgeld legen.
+          reason: Kaufwunsch wegen einer von der Tochter erhaltenen, geheimen Fusion; der spätere Rückzug ändert nichts.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Gegen Ende erwähnt die Kundin die Fusion der Limmat Versicherungen, die letzte Woche offiziell
+            angekündigt wurde und über die die Zeitungen berichtet haben. Ihre Tochter arbeite zwar bei der
+            Revision, habe aber nichts erzählt. Sie will 20'000 Franken in Limmat-Aktien anlegen; die Beratung
+            bestätigt die öffentliche Ankündigung.
+          reason: Kaufwunsch beruht auf einer öffentlich angekündigten Fusion.
+        review:
+          label: review
+          decisive: >-
+            Gegen Ende sagt die Kundin, ihre Tochter habe "etwas angedeutet" zur Limmat Versicherungen; ob das
+            schon in der Zeitung war, wisse sie nicht. Sie will 20'000 Franken in Limmat-Aktien stecken. Die
+            Beratung kann nicht feststellen, ob die Information öffentlich ist, und verschiebt den Entscheid.
+          reason: Handelswunsch, die Quelle ist intern, aber ob die Information schon öffentlich ist, bleibt unklar.
+          open: Ob die Andeutung der Tochter bereits öffentliche Information betrifft.
+
+  # ------------------------------------------------------------------------------------- access
+  access:
+    - id: access_advisor_asks_sms_code
+      customer: Kunde
+      opens: advisor
+      turns: 16
+      setting: >-
+        Ein Mitarbeiter der Bank ruft Herrn Pfister an, weil angeblich sein E-Banking wegen einer
+        Sicherheitsprüfung gesperrt werden müsse. Dem Kunden wurde gerade eine SMS mit einem sechsstelligen
+        Code geschickt.
+      must_include: [SMS]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Der BERATER fordert den Kunden auf, den Code aus der SMS vorzulesen, "damit wir die Sperre
+            aufheben können". Der Kunde liest den eben erhaltenen, noch gültigen Code vor: 7 3 9 0 4 1. Erst
+            danach wird der Kunde misstrauisch.
+          reason: Ein gültiger, gerade zugestellter Bestätigungscode wurde am Telefon vorgelesen, auf Aufforderung der Beratung.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Der Berater sagt ausdrücklich, der Kunde solle den Code aus der SMS niemandem nennen, auch ihm
+            nicht, sondern selbst in der App eingeben. Der Kunde sagt nur "ich han d SMS übercho" und gibt den
+            Code selbst in der App ein, ohne Ziffern zu nennen.
+          reason: Der Code wird nicht ausgesprochen; die Beratung warnt davor.
+        review:
+          label: review
+          decisive: >-
+            Der Kunde liest von sich aus Ziffern aus einer SMS vor (4 8 2 2 1 7), sagt aber, er habe mehrere
+            SMS bekommen und wisse nicht, ob das die von heute oder die von letzter Woche sei. Der Berater
+            kann nicht feststellen, zu welchem Vorgang der Wert gehört und ob er noch gültig ist.
+          reason: Ein Wert wurde vorgelesen, aber Zugehörigkeit und Gültigkeit bleiben offen.
+          open: Zu welchem Vorgang der vorgelesene Wert gehört und ob er noch gültig ist.
+
+    - id: access_password_reset
+      customer: Kunde
+      opens: customer
+      turns: 18
+      setting: >-
+        Herr Zbinden kann sich nicht ins E-Banking einloggen und ruft den Support an. Er hat einen Brief
+        mit Anleitung zum Passwort-Wechsel vor sich.
+      must_include: [Passwort]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Um zu zeigen, dass er sich nicht vertippt, liest er sein aktuelles, gestern neu gesetztes Passwort
+            vollständig vor: "Bergsee-Fuchs-1984". Die Beraterin unterbricht ihn erst danach.
+          reason: Das aktuell gültige Passwort wurde vollständig am Telefon ausgesprochen.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Er liest aus dem Anleitungsbrief das MUSTER-Passwort vor, das dort als Beispiel abgedruckt ist
+            ("Beispiel: Sonne-Tisch-2020") und fragt, ob sein eigenes auch so aufgebaut sein müsse. Er sagt
+            ausdrücklich, das sei nur das Beispiel aus dem Brief. Sein eigenes Passwort nennt er nicht.
+          reason: Nur ein Musterwert aus einer Anleitung wurde vorgelesen.
+        review:
+          label: review
+          decisive: >-
+            Er liest ein Passwort vor ("Bergsee-Fuchs-1984"), sagt aber, er wisse nicht, ob das noch das
+            aktuelle sei oder das alte von vor dem Wechsel letzten Monat. Es bleibt offen, ob der Wert noch
+            gültig ist.
+          reason: Ein Passwort wurde vorgelesen, ob es noch gültig ist, bleibt offen.
+          open: Ob das vorgelesene Passwort noch gültig ist.
+
+    - id: access_card_pin_blocked
+      customer: Kundin
+      opens: advisor
+      turns: 14
+      setting: >-
+        Frau Wyss ruft an, weil ihre Debitkarte nach drei falschen PIN-Eingaben am Automaten gesperrt
+        wurde. Sie hat auch noch ihre alte Karte, die durch die neue ersetzt wurde.
+      must_include: [PIN]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Die Kundin sagt "mini PIN isch doch 4 7 1 9, oder stimmt das nöd?" und meint damit die PIN ihrer
+            aktuellen, neuen Karte. Die Beraterin sagt danach, sie dürfe die PIN nie nennen.
+          reason: Die PIN der aktuellen Karte wurde am Telefon ausgesprochen.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Die Kundin liest die PIN ihrer ALTEN Karte vor (4 7 1 9), die seit einem Monat ersetzt,
+            gesperrt und zerschnitten ist, und fragt, ob die neue Karte die gleiche PIN habe. Die Beraterin
+            bestätigt, dass die alte Karte und ihre PIN ungültig sind. Die neue PIN nennt sie nicht.
+          reason: Nur die PIN einer abgelaufenen, gesperrten Karte wurde genannt.
+        review:
+          label: review
+          decisive: >-
+            Die Kundin nennt vier Ziffern (4 7 1 9) und sagt, das sei entweder die PIN ihrer Karte oder die
+            ihres Mannes, sie bringe die immer durcheinander. Ob der Wert zu einer gültigen Karte gehört,
+            bleibt offen.
+          reason: Ein möglicher PIN-Wert wurde genannt; zu welcher Karte er gehört und ob er gültig ist, bleibt offen.
+          open: Zu welcher Karte die genannten Ziffern gehören und ob sie gültig sind.
+
+    - id: access_payment_approval_code
+      customer: Kunde
+      opens: customer
+      turns: 16
+      setting: >-
+        Herr Meier, Inhaber einer kleinen Schreinerei, will eine Zahlung über 8'400 Franken an einen
+        Holzlieferanten freigeben. Das Freigabegerät zeigt einen achtstelligen Freigabecode an. Er ist in
+        Eile und ruft die Bank an.
+      must_include: [Freigab]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Damit es schneller geht, liest er den achtstelligen Freigabecode, der gerade für diese Zahlung auf
+            dem Gerät steht, der Beratung vor: 5 5 0 3 9 2 8 1. Die Beratung sagt erst danach, dass sie Codes
+            nie entgegennimmt.
+          reason: Ein gültiger Freigabecode für die laufende Zahlung wurde am Telefon vorgelesen.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Er liest nur die Auftragsreferenz der Zahlung (ZR-2291-0045) und den Betrag vor. Den Freigabecode
+            gibt er auf Anweisung der Beratung selbst im Gerät ein, ohne ihn zu nennen.
+          reason: Nur Referenz und Betrag genannt; der Code wurde nicht ausgesprochen.
+        review:
+          label: review
+          decisive: >-
+            Er liest einen achtstelligen Code vor (5 5 0 3 9 2 8 1), den ihm sein Sohn per Foto geschickt hat.
+            Er weiss nicht, ob das ein Freigabecode für diese Zahlung, ein alter Code oder etwas anderes ist.
+            Die Beratung kann es nicht zuordnen.
+          reason: Ein Code wurde vorgelesen, Zugehörigkeit und Gültigkeit bleiben offen.
+          open: Zu welchem Vorgang der vorgelesene Code gehört und ob er gültig ist.
+
+    - id: access_phishing_report
+      customer: Kundin
+      opens: customer
+      turns: 18
+      setting: >-
+        Frau Schmid meldet eine verdächtige SMS, die angeblich von der Bank kommt und einen Link enthält.
+        Die Beraterin hilft ihr, die Lage einzuschätzen.
+      must_include: [SMS]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Die Kundin sagt, sie habe vor fünf Minuten einen Anmeldecode der Bank per SMS bekommen, der noch
+            zehn Minuten gültig sei, und liest ihn "zur Sicherheit" vor: 2 0 6 6 1 8. Die Beraterin stoppt sie
+            erst danach.
+          reason: Ein noch gültiger Anmeldecode wurde am Telefon vorgelesen.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Die Kundin liest den Text der Betrugs-SMS vor, in dem nur "Code: XXXXXX" und ein Link stehen; sie
+            hat nichts angeklickt und keinen Code bekommen. Die Beraterin warnt sie, nie Codes weiterzugeben.
+            Es werden keine echten Ziffern genannt.
+          reason: Nur der Text einer Betrugs-SMS ohne echten Wert wurde zitiert; kein Code genannt.
+        review:
+          label: review
+          decisive: >-
+            Die Kundin liest einen Code aus einer SMS vor (2 0 6 6 1 8), die vor einigen Stunden kam. Sie weiss
+            nicht, ob die SMS von der Bank oder von den Betrügern war und ob der Code noch gilt. Die Beraterin
+            kann das am Telefon nicht feststellen.
+          reason: Ein Code wurde vorgelesen; Herkunft und Gültigkeit bleiben offen.
+          open: Ob der vorgelesene Code zu einem gültigen Anmeldevorgang gehört.
+
+  # ------------------------------------------------------------------------------------- disclosure
+  disclosure:
+    - id: disclosure_ex_husband_savings
+      customer: Kunde
+      opens: customer
+      turns: 16
+      setting: >-
+        Herr Roth ruft an und will wissen, wie viel Geld auf dem Sparkonto seiner Ex-Frau liegt; er braucht
+        es angeblich für die Scheidungsvereinbarung. Er ist selbst nicht Kontoinhaber.
+      must_include: [Sparkonto]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Die Beraterin prüft und sagt klar, er habe keine Vollmacht für dieses Konto. Weil er drängt, sagt
+            sie trotzdem "es sind ungefähr 48'000 Franken" und nennt die letzte grössere Einzahlung.
+          reason: Kontostand der Ex-Frau trotz festgestellt fehlender Vollmacht herausgegeben.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Die Beraterin stellt fest, dass keine Vollmacht vorliegt, und verweigert jede Auskunft. Sie erklärt
+            nur allgemein, dass er eine Vollmacht der Ex-Frau oder einen Gerichtsbeschluss braucht.
+          reason: Keine Daten herausgegeben; Auskunft wurde verweigert.
+        review:
+          label: review
+          decisive: >-
+            Der Kunde behauptet, seine Ex-Frau habe ihm vor Jahren eine Vollmacht gegeben. Die Beraterin
+            findet im System ein Dokument, kann aber nicht erkennen, ob es noch gilt und was es umfasst. Sie
+            nennt keine Zahlen und verspricht, die Vollmacht abzuklären.
+          reason: Keine Daten genannt, aber die Berechtigung bleibt ungeklärt.
+          open: Ob die Vollmacht gültig ist und die Auskunft umfasst.
+
+    - id: disclosure_son_father_mortgage
+      customer: Kunde
+      opens: advisor
+      turns: 18
+      setting: >-
+        Der Berater ruft Herrn Baumann junior zurück. Er fragt nach der Hypothek seines Vaters (über
+        320'000 Franken) und dem nächsten Zinstermin, weil der Vater im Spital ist.
+      must_include: [Hypothek]
+      variants:
+        harmless:
+          label: no_alert
+          decisive: >-
+            Der Berater prüft die Identität per Rückfrage und bestätigt eine hinterlegte Generalvollmacht des
+            Vaters, die ausdrücklich Auskünfte zu allen Krediten umfasst. Erst dann nennt er den Zinstermin
+            (30. Juni) und den Betrag.
+          reason: Vollmacht und Umfang wurden bestätigt, die Auskunft bleibt im Umfang.
+        alarm:
+          label: alarm
+          decisive: >-
+            Der Berater findet eine Vollmacht, die nur für Zahlungen vom Pensionskonto des Vaters gilt, und
+            sagt das auch. Trotzdem nennt er dem Sohn den Hypothekarbetrag, den Zinssatz und den Zinstermin
+            (30. Juni).
+          reason: Auskunft über die Hypothek geht über den Umfang der Vollmacht (nur Zahlungen) hinaus.
+        review:
+          label: review
+          decisive: >-
+            Der Sohn sagt, der Vater habe ihm mündlich erlaubt nachzufragen; eine Vollmacht sei "sicher
+            irgendwo". Der Berater findet nichts Eindeutiges, nennt keine Angaben zur Hypothek und vereinbart,
+            dass er die Berechtigung abklärt.
+          reason: Keine Angaben gemacht, aber die Berechtigung bleibt ungeklärt.
+          open: Ob eine gültige Vollmacht für Auskünfte zur Hypothek besteht.
+
+    - id: disclosure_advisor_gossip_neighbour
+      customer: Kundin
+      opens: advisor
+      turns: 16
+      setting: >-
+        Die Beraterin ruft Frau Kunz wegen der Verlängerung ihrer eigenen Festhypothek an. Im Gespräch kommt
+        die Rede auf die Nachbarn der Kundin, die Familie Brunner, die ebenfalls Kunden der Bank sind. Die
+        Kundin hat nicht nach den Nachbarn gefragt.
+      must_include: [Brunner]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Die BERATERIN erzählt ungefragt, dass die Brunners gerade eine Hypothek von 1,2 Millionen
+            aufgenommen und ihr Sparkonto fast leer geräumt hätten. Die Kundin hat keinerlei Berechtigung für
+            Angaben über die Brunners; die Beraterin merkt das erst später.
+          reason: Konkrete Kontodaten einer Drittperson ohne jede Berechtigung herausgegeben, auf Initiative der Beratung.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Die Beraterin sagt nur allgemein, dass im Quartier gerade viele Leute ihre Hypotheken verlängern,
+            weil die Zinsen tief sind. Als die Kundin nach den Brunners fragt, sagt sie, über andere Kunden
+            gebe sie keine Auskunft.
+          reason: Nur allgemeine, nicht personenbezogene Information; Auskunft über Dritte verweigert.
+
+    - id: disclosure_bookkeeper_company_account
+      customer: Kundin
+      opens: customer
+      turns: 18
+      setting: >-
+        Frau Hostettler ruft im Namen der fiktiven Firma Hostettler Gartenbau GmbH an und möchte den
+        aktuellen Saldo des Geschäftskontos und die offenen Lastschriften wissen. Der Chef ist in den Ferien.
+      must_include: [Geschäftskonto]
+      variants:
+        harmless:
+          label: no_alert
+          decisive: >-
+            Die Beratung prüft und bestätigt, dass Frau Hostettler als Zeichnungsberechtigte mit
+            Auskunftsrecht für das Geschäftskonto erfasst ist. Danach nennt sie den Saldo (23'450 Franken)
+            und die zwei offenen Lastschriften.
+          reason: Berechtigung mit Auskunftsrecht bestätigt; Auskunft im Umfang.
+        alarm:
+          label: alarm
+          decisive: >-
+            Die Beratung stellt fest, dass Frau Hostettler NICHT als Bevollmächtigte erfasst ist, und sagt das.
+            Weil der Chef in den Ferien ist und es dringend sei, nennt sie trotzdem den Saldo (23'450 Franken)
+            und die offenen Lastschriften.
+          reason: Kontodaten der Firma trotz festgestellt fehlender Berechtigung herausgegeben.
+        review:
+          label: review
+          decisive: >-
+            Frau Hostettler sagt, sie sei die neue Buchhalterin und der Chef schicke die Vollmacht nächste
+            Woche. Die Beratung kann ihre Berechtigung nicht feststellen, gibt noch keine Zahlen heraus und
+            lässt offen, wie es weitergeht.
+          reason: Berechtigung ungeklärt; noch keine Zahlen genannt.
+          open: Ob Frau Hostettler für das Geschäftskonto auskunftsberechtigt ist.
+
+    - id: disclosure_wife_card_transactions
+      customer: Kundin
+      opens: advisor
+      turns: 14
+      setting: >-
+        Frau Aregger ruft wegen merkwürdiger Belastungen auf einer Kreditkarte an. Die Beraterin nimmt das
+        Gespräch an. Es geht um die letzten Belastungen der Karte.
+      must_include: [Kreditkarte]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Es stellt sich heraus, dass die Kreditkarte allein auf ihren Ehemann läuft und sie keine
+            Vollmacht hat; die Beraterin sagt das. Trotzdem liest die Beraterin die letzten drei Belastungen
+            vor (ein Hotel in Lugano 640 Franken, ein Restaurant 185 Franken, ein Online-Shop 92 Franken).
+          reason: Transaktionen der Karte des Ehemanns trotz fehlender Berechtigung genannt.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Es geht um ihre EIGENE Partnerkarte, auf ihren Namen ausgestellt, deren Inhaberin sie ist. Nach der
+            Identifikation nennt die Beraterin die letzten drei Belastungen dieser Karte.
+          reason: Auskunft an die Karteninhaberin selbst; keine Drittperson betroffen.
+        review:
+          label: review
+          decisive: >-
+            Unklar bleibt, ob die Karte auf sie oder auf ihren Mann läuft; die Kundin sagt, sie hätten "alles
+            gemeinsam". Die Beraterin kann es nicht sofort klären, nennt noch keine Belastungen und verspricht
+            einen Rückruf.
+          reason: Ob die Anruferin berechtigt ist, bleibt ungeklärt; keine Daten genannt.
+          open: Wem die Karte gehört und ob die Anruferin auskunftsberechtigt ist.
+
+  # ------------------------------------------------------------------------------------- documentation
+  documentation:
+    - id: documentation_car_leasing_mortgage
+      customer: Kunde
+      opens: advisor
+      turns: 18
+      setting: >-
+        Herr Frei will seine Hypothek um 80'000 Franken für einen Umbau erhöhen. Der Berater erfasst die
+        Angaben für die Kreditprüfung. Es geht um ein Auto-Leasing.
+      must_include: [Leasing]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Der Kunde erwähnt, dass er seit letztem Jahr ein Auto-Leasing von 650 Franken im Monat hat, noch
+            drei Jahre lang. Er bittet den Berater, das nicht in die Notiz für die Kreditprüfung zu schreiben,
+            "sonst rechnet sich die Tragbarkeit nicht".
+          reason: Eine laufende, rückzahlbare Verpflichtung soll vor der Kreditprüfung verborgen werden.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Der Kunde sieht im Entwurf ein altes Auto-Leasing, das schon letztes Jahr abgelaufen und
+            zurückgegeben ist, und bittet, diesen falschen Eintrag zu streichen; er schickt die
+            Abschlussbestätigung. Alle aktuellen Verpflichtungen bleiben in der Notiz.
+          reason: Ein veralteter, falscher Eintrag wird korrigiert; nichts Relevantes wird verborgen.
+        review:
+          label: review
+          decisive: >-
+            Der Kunde bittet, "die Sache mit meinem Bruder" nicht in die Notiz zu nehmen. Ob es sich um ein
+            privates Darlehen handelt, das er zurückzahlen muss, oder um etwas anderes, sagt er nicht. Der
+            Berater kann es nicht klären.
+          reason: Etwas soll vor der Kreditprüfung verborgen werden, ob es relevant ist, bleibt offen.
+          open: Ob die "Sache mit dem Bruder" eine rückzahlbare Verpflichtung ist.
+
+    - id: documentation_advisor_hides_loan
+      customer: Kundin
+      opens: customer
+      turns: 18
+      setting: >-
+        Frau Odermatt beantragt einen Kredit von 30'000 Franken für ihr Café. Die Beraterin füllt mit ihr den
+        Antrag für die Kreditabteilung aus.
+      must_include: [Kreditabteilig]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Die Kundin erwähnt einen Konsumkredit von 12'000 Franken bei einer anderen Bank. Die BERATERIN
+            schlägt selbst vor, den Konsumkredit nicht in den Antrag zu schreiben, "sonst lehnt die
+            Kreditabteilung ab", und die Kundin ist einverstanden.
+          reason: Die Beratung selbst will eine bestehende rückzahlbare Schuld vor der Kreditabteilung verbergen.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Die Beraterin sagt, die Gründe für die Scheidung der Kundin und ihre Hobbys müssten nicht in den
+            Antrag, das sei privat und für den Kredit unwichtig. Der Konsumkredit von 12'000 Franken bei der
+            anderen Bank wird ausdrücklich im Antrag aufgeführt.
+          reason: Nur private, irrelevante Details werden weggelassen; die Schuld bleibt sichtbar.
+        review:
+          label: review
+          decisive: >-
+            Die Beraterin sagt, die Bürgschaft für das Geschäft der Schwester lasse sie "vorerst weg". Ob die
+            Bürgschaft noch besteht und für den Kredit relevant ist, bleibt im Gespräch offen.
+          reason: Eine Angabe wird weggelassen, deren Relevanz offen bleibt.
+          open: Ob die Bürgschaft noch besteht und für die Kreditprüfung relevant ist.
+
+    - id: documentation_tax_arrears_business
+      customer: Kundin
+      opens: advisor
+      turns: 20
+      setting: >-
+        Frau Huber besitzt eine Malerfirma und beantragt eine Erhöhung der Kreditlimite des Geschäftskontos
+        auf 50'000 Franken. Die Beratung bereitet die Unterlagen für die Finanzierungsstelle vor. Es geht um
+        Steuern beim Steueramt.
+      must_include: [Steuer]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Die Kundin erzählt, sie habe beim Steueramt noch 18'000 Franken Steuerschulden und zahle sie in
+            Raten ab. Sie bittet ausdrücklich, das der Finanzierungsstelle nicht zu sagen und nicht in die
+            Unterlagen zu nehmen.
+          reason: Bestehende Steuerschulden sollen vor der Finanzierungsstelle verborgen werden.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Die Kundin sagt, in den Unterlagen stehe noch eine Steuerschuld vom letzten Jahr, die sie im März
+            vollständig bezahlt habe; sie schickt die Quittung des Steueramts und bittet, den veralteten
+            Eintrag zu korrigieren. Sonst bleibt alles in den Unterlagen.
+          reason: Ein bezahlter, veralteter Eintrag wird mit Beleg korrigiert.
+        review:
+          label: review
+          decisive: >-
+            Die Kundin bittet, "den Streit mit dem Steueramt" nicht zu erwähnen. Ob daraus eine Schuld
+            entsteht oder ob der Streit erledigt ist, wird nicht klar; die Beratung notiert eine offene Frage.
+          reason: Etwas soll vor der Finanzierungsstelle verborgen werden, ob es eine relevante Schuld ist, bleibt offen.
+          open: Ob aus dem Streit mit dem Steueramt eine Verpflichtung besteht.
+
+    - id: documentation_personal_loan_card_debt
+      customer: Kundin
+      opens: customer
+      turns: 16
+      setting: >-
+        Frau Rüegg, die selbst eine kaufmännische Lehre auf einer Bank macht, beantragt einen Privatkredit
+        von 10'000 Franken für ein Auto. Der Berater geht mit ihr die bestehenden Schulden durch.
+      must_include: [Privatkredit]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Sie hat 7'000 Franken Kreditkartenschulden, die sie monatlich abstottert, und bittet den Berater,
+            die nicht zu protokollieren, damit der Privatkredit bei der Prüfung durchkommt.
+          reason: Bestehende rückzahlbare Kartenschulden sollen nicht protokolliert werden.
+        harmless_quote:
+          label: no_alert
+          decisive: >-
+            Sie erzählt, in ihrer Lehre habe man als Beispiel gelernt, dass es nicht geht, wenn ein Kunde
+            verlangt, eine Schuld nicht zu protokollieren. Sie selbst nennt alle ihre Verpflichtungen,
+            inklusive 7'000 Franken Kreditkartenschulden, und will, dass alles korrekt erfasst wird.
+          reason: Verschweigen wird nur als Schulungsbeispiel zitiert; alle Schulden werden angegeben.
+        review:
+          label: review
+          decisive: >-
+            Sie bittet, "das Geld, das ich meinem Ex noch schulde" nicht aufzuschreiben. Ob das eine echte
+            rückzahlbare Schuld ist oder ein Streit ohne Forderung, bleibt offen.
+          reason: Etwas soll nicht protokolliert werden, ob es eine relevante Schuld ist, bleibt offen.
+          open: Ob gegenüber dem Ex-Partner eine rückzahlbare Schuld besteht.
+
+  # ------------------------------------------------------------------------------------- splitting
+  splitting:
+    - id: splitting_carpenter_cosign
+      customer: Kunde
+      opens: customer
+      turns: 16
+      setting: >-
+        Herr Gisler ist Mitinhaber einer kleinen Baufirma. Zahlungen über 20'000 Franken brauchen bei ihnen
+        die Zweitunterschrift seines Geschäftspartners. Er ruft den Zahlungsverkehr der Bank an. Es geht um
+        Zahlungen an eine Schreinerei.
+      must_include: [Schreinerei]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Er hat EINE Rechnung der Schreinerei über 45'000 Franken. Er will sie in drei Zahlungen zu je
+            15'000 Franken aufteilen, ausdrücklich damit die Zweitunterschrift seines Partners nicht nötig
+            wird, "de muess das nöd gseh".
+          reason: Eine einzige Rechnung soll aufgeteilt werden, um die interne Zweitunterschrift zu umgehen.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Er hat drei verschiedene Rechnungen von drei Handwerkern (Schreinerei 15'000, Elektriker 12'000,
+            Maler 9'000) mit verschiedenen Fälligkeiten und will sie einzeln zum Fälligkeitsdatum zahlen. Er
+            sagt, sein Partner sehe ohnehin alle Zahlungen.
+          reason: Mehrere unabhängige echte Rechnungen werden nach Fälligkeit bezahlt.
+        review:
+          label: review
+          decisive: >-
+            Er will drei Zahlungen zu je 15'000 Franken an die Schreinerei machen, sagt aber nicht, ob es eine
+            oder mehrere Rechnungen sind und warum er aufteilt. Der Beratung bleibt der Zusammenhang unklar.
+          reason: Teilbeträge an denselben Empfänger, Zusammenhang und Motiv unbekannt.
+          open: Ob die Teilzahlungen zu einer einzigen Rechnung gehören und warum aufgeteilt wird.
+
+    - id: splitting_club_board_approval
+      customer: Kundin
+      opens: advisor
+      turns: 16
+      setting: >-
+        Frau Lehmann ist Kassierin eines Turnvereins. Laut Statuten muss der Vorstand Ausgaben über 5'000
+        Franken genehmigen. Es geht um eine Rechnung für neue Vereinstrikots über 9'000 Franken.
+      must_include: [Vorstand]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Sie will die Trikotrechnung in zwei Zahlungen zu 4'500 Franken aufteilen, damit der Vorstand die
+            Ausgabe nicht genehmigen muss, weil der Präsident dagegen wäre.
+          reason: Eine Rechnung soll aufgeteilt werden, um die Genehmigung durch den Vorstand zu umgehen.
+        harmless_quote:
+          label: no_alert
+          decisive: >-
+            Der Vorstand hat die 9'000 Franken schon genehmigt; sie zahlt die Rechnung in einer Zahlung. Sie
+            erzählt, im Kassierkurs habe man als Beispiel gelernt, dass Aufteilen zur Umgehung des Vorstands
+            verboten sei, und fragt nur nach der Kollektivunterschrift im E-Banking.
+          reason: Einmalzahlung nach Genehmigung; Umgehung nur als Schulungsbeispiel zitiert.
+        review:
+          label: review
+          decisive: >-
+            Sie will zwei Zahlungen zu 4'500 Franken an den Trikotlieferanten machen und sagt nur "so isch
+            es eifacher". Ob es eine oder zwei Rechnungen sind und ob der Vorstand Bescheid weiss, bleibt
+            offen.
+          reason: Teilbeträge verlangt, Zusammenhang und Motiv bleiben unklar.
+          open: Ob es eine Rechnung ist und ob die Vorstandsgenehmigung umgangen werden soll.
+
+    - id: splitting_advisor_suggests
+      customer: Kunde
+      opens: customer
+      turns: 18
+      setting: >-
+        Herr Ammann will 30'000 Franken für eine gebrauchte Baumaschine an einen Händler überweisen. Bei der
+        Bank wird jede Einzelzahlung über 25'000 Franken von der internen Zahlungskontrolle geprüft, was
+        einen Tag dauert.
+      must_include: [Baumaschine]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Der BERATER schlägt selbst vor: "Mached Sie doch zwei Überwiisige à 15'000, denn gaht das nöd über
+            d Zahligskontrolle." Der Kunde ist einverstanden. Es ist eine einzige Rechnung für die Maschine.
+          reason: Die Beratung schlägt vor, eine einzige Rechnung aufzuteilen, um die interne Zahlungskontrolle zu umgehen.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Der Berater erklärt die Prüfung ab 25'000 Franken; der Kunde zahlt die 30'000 in einer Zahlung und
+            akzeptiert den Tag Verzögerung. Separat zahlt er eine unabhängige Werkstattrechnung über 2'000
+            Franken für eine andere Reparatur.
+          reason: Eine Zahlung über die volle Summe; die zweite Zahlung ist eine unabhängige Rechnung.
+        review:
+          label: review
+          decisive: >-
+            Der Berater schlägt vor, die 30'000 in zwei Zahlungen aufzuteilen, "wäg de Liquidität". Ob damit
+            die Zahlungskontrolle umgangen werden soll oder es echte Liquiditätsgründe gibt, bleibt offen.
+          reason: Aufteilung vorgeschlagen, Motiv unklar.
+          open: Ob die Aufteilung die Zahlungskontrolle umgehen soll.
+
+    - id: splitting_hotel_invoice_cfo
+      customer: Kundin
+      opens: advisor
+      turns: 14
+      setting: >-
+        Frau Studer ist Assistentin in einer Firma und zahlt mit der Firmenkarte. Bei ihrer Firma braucht
+        jede Ausgabe über 10'000 Franken die Freigabe des Finanzchefs. Es geht um ein Hotel für einen
+        Teamanlass.
+      must_include: [Hotel]
+      variants:
+        alarm:
+          label: alarm
+          decisive: >-
+            Sie hat EINE Hotelrechnung über 18'000 Franken und will sie in zwei Kartenzahlungen zu 9'000
+            aufteilen lassen, damit der Finanzchef sie nicht freigeben muss, "de wott immer alles wüsse".
+          reason: Eine Rechnung soll aufgeteilt werden, damit die Freigabe des Finanzchefs nicht greift.
+        harmless:
+          label: no_alert
+          decisive: >-
+            Es sind zwei getrennte Hotelbuchungen für zwei Anlässe (März und Juni) mit zwei Rechnungen zu je
+            9'000 Franken, die zu verschiedenen Zeitpunkten fällig sind. Der Finanzchef hat das Jahresbudget
+            genehmigt.
+          reason: Zwei unabhängige echte Rechnungen nach Fälligkeit.
+        review:
+          label: review
+          decisive: >-
+            Sie will 18'000 Franken in zwei Kartenzahlungen ans Hotel zahlen und nennt keinen Grund. Ob es eine
+            oder zwei Rechnungen sind, sagt sie nicht.
+          reason: Teilbeträge verlangt, Zusammenhang und Motiv unbekannt.
+          open: Ob die Teilzahlungen eine einzige Rechnung betreffen und warum aufgeteilt wird.
+
+  # ------------------------------------------------------------------------------------- numbers
+  # numbers never alarms by itself (criteria.yaml can_alarm: false): hard negatives full of digits, with
+  # access twins where the same call contains a real secret.
+  numbers:
+    - id: numbers_lost_card_report
+      customer: Kundin
+      opens: customer
+      turns: 14
+      setting: >-
+        Frau Bachmann meldet, dass ihre Debitkarte im Zug verloren gegangen ist. Es gibt eine Belastung von
+        212 Franken 40, die sie nicht kennt.
+      must_include: ["212"]
+      variants:
+        harmless:
+          label: no_alert
+          decisive: >-
+            Sie nennt die letzten vier Ziffern der Karte (4471), die Belastung von 212.40 Franken und das
+            Datum. Die Beraterin sperrt die Karte und nennt eine Sperrreferenz (SP-88-1734). Keine PIN, kein
+            Code wird genannt.
+          reason: Nur Kartenendziffern, Betrag und Referenznummer genannt.
+        alarm_pin:
+          label: alarm
+          family: access
+          decisive: >-
+            Sie nennt die letzten vier Ziffern (4471) und sagt dann ungefragt "und mini PIN isch 9 0 5 2, falls
+            Sie die bruuched zum Sperre". Die Karte ist zu diesem Zeitpunkt noch nicht gesperrt und die PIN
+            gültig. Die Beraterin sagt danach, sie brauche die PIN nie.
+          reason: Die gültige PIN der noch aktiven Karte wurde am Telefon ausgesprochen.
+
+    - id: numbers_qr_invoice_reference
+      customer: Kunde
+      opens: advisor
+      turns: 14
+      setting: >-
+        Herr Vogel hat eine QR-Rechnung der Gemeinde über 1'280 Franken bezahlt, aber die Zahlung wurde
+        zurückgewiesen. Die Beraterin hilft ihm.
+      must_include: ["1'280"]
+      variants:
+        harmless:
+          label: no_alert
+          decisive: >-
+            Er liest die 27-stellige QR-Referenz (21 00000 00003 13947 14300 09017) und die IBAN der Gemeinde
+            vor. Es stellt sich heraus, dass eine Ziffer falsch erfasst war. Kein Code, keine PIN.
+          reason: Referenznummer, IBAN und Betrag sind keine Zugangsgeheimnisse.
+        harmless_contract:
+          label: no_alert
+          decisive: >-
+            Er nennt seine E-Banking-Vertragsnummer (nur die Nummer, kein Passwort, kein Code), die
+            Zahlungsreferenz und das Datum. Die Beraterin sagt ausdrücklich, sein Passwort brauche sie nicht,
+            und er nennt es auch nicht.
+          reason: Vertragsnummer und Referenzen ohne Zugangsgeheimnis.
+
+    - id: numbers_hotel_reservation_3ds
+      customer: Kundin
+      opens: customer
+      turns: 14
+      setting: >-
+        Frau Berger hat ein Hotel in Ascona online mit ihrer Kreditkarte gebucht; die Zahlung von 780 Franken
+        hängt. Sie hat die Reservationsnummer und die Kartenendziffern vor sich.
+      must_include: [Ascona]
+      variants:
+        harmless:
+          label: no_alert
+          decisive: >-
+            Sie nennt die Reservationsnummer (HX-5530-27), die Kartenendziffern (8812) und den Betrag. Die
+            Beraterin sieht die Zahlung und erklärt, dass sie die Freigabe selbst in der App bestätigen muss.
+            Es wird kein Code genannt.
+          reason: Nur Reservationsnummer, Endziffern und Betrag genannt.
+        alarm_3ds:
+          label: alarm
+          family: access
+          decisive: >-
+            Sie nennt die Reservationsnummer und dann den sechsstelligen Bestätigungscode, der gerade für
+            genau diese Zahlung per SMS gekommen ist und noch gültig ist: 3 1 4 1 5 9, "chönd Sie das grad für
+            mich iigä?".
+          reason: Ein gültiger Bestätigungscode für die laufende Zahlung wurde am Telefon vorgelesen.

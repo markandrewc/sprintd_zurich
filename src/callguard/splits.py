@@ -32,8 +32,12 @@ from callguard.data import Call, dialogue_of
 
 SPLITS_PATH = ROOT / "config" / "splits.yaml"
 HOLDOUT = "holdout"
-Split = Literal["dev", "holdout", "all"]
-SPLIT_CHOICES = ("dev", "holdout", "all")
+# external: only calls whose dialogue is in NO fold of the case split (synthetic sets, data_synth/). It
+# can never contain a case dialogue, so it is not a holdout look; CV folds come from data.split_dialogues
+# (twin groups together).
+EXTERNAL = "external"
+Split = Literal["dev", "holdout", "all", "external"]
+SPLIT_CHOICES = ("dev", "holdout", "all", "external")
 
 
 class SplitsMissing(FileNotFoundError):
@@ -85,6 +89,9 @@ class Splits:
             raise ValueError(f"split must be one of {SPLIT_CHOICES}, got {split!r}")
         if split == "all":
             return list(calls)
+        if split == EXTERNAL:
+            known = set(self.holdout_dialogues()) | set(self.dev_dialogues())
+            return [c for c in calls if c.dialogue_id not in known]
         wanted = set(self.holdout_dialogues() if split == HOLDOUT else self.dev_dialogues())
         return [c for c in calls if c.dialogue_id in wanted]
 

@@ -5,6 +5,11 @@ File layout (see data/README.md of the case):
   Transkript/Stufe1_D02.txt            script, turn by turn: "T001 · Beratung" then the text
   Skript_mit_Sollbewertung/Stufe1_D02.txt   header with Testziel / Bearbeitung / Belege ... + script
 
+Text-only sets (synthetic scripts, ``data_synth/<set>/``: no ``Audio/``) are loaded from ``Transkript/``:
+one call ``<dialogue>-K1`` per script, ``audio_path`` = the script file (only the ORACLE ``reference`` ASR
+can read such calls; it hashes that path, so an edited script is a new cache key). A ``Gruppe:`` header
+line puts twins into one resampling / CV unit (``Call.group``).
+
 Ground truth is only for evaluation. Never feed file names, scripts or expected labels into the
 audio pipeline (case rule). The ``reference`` ASR backend is an explicit oracle for ceiling studies.
 """
@@ -51,6 +56,8 @@ class Call:
     title: str = ""
     expected: Expected | None = None
     turns: list[Turn] = field(default_factory=list)
+    group: str = ""  # twin group (synthetic sets: scenario id); "" = the dialogue is its own unit
+    text_only: bool = False  # no recording: audio_path is the script (reference ASR only)
 
 
 def speaker_role(speaker: str) -> Role:
@@ -106,8 +113,14 @@ def dialogue_of(call_id: str) -> str:
     return call_id.split("-K")[0]
 
 
-def load_calls(data_dir: str | Path) -> list[Call]:
+def load_calls(data_dir: str | Path, text_only: bool | None = None) -> list[Call]:
+    """Calls of a data dir. ``text_only``: None = auto (a dir with ``Transkript/`` but no ``Audio/`` is a
+    text-only set, e.g. synthetic scripts), True = force it, False = audio only (case behaviour)."""
     data_dir = Path(data_dir)
+    if text_only is None:
+        text_only = not (data_dir / "Audio").is_dir() and (data_dir / "Transkript").is_dir()
+    if text_only:
+        return load_text_calls(data_dir)
     calls: list[Call] = []
     for wav in sorted((data_dir / "Audio").glob("*.wav")):
         m = _CALL_RE.match(wav.stem)
@@ -127,26 +140,60 @@ def load_calls(data_dir: str | Path) -> list[Call]:
     return calls
 
 
+_GROUP_RE = re.compile(r"^Gruppe\s*:\s*(\S+)", re.MULTILINE)
+
+
+def load_text_calls(data_dir: str | Path) -> list[Call]:
+    """One call ``<dialogue>-K1`` per ``Transkript/<dialogue>.txt`` (no audio). Case-style ids keep their
+    level; other ids (``Synth_trade_001``) get level 0."""
+    data_dir = Path(data_dir)
+    calls: list[Call] = []
+    for script in sorted((data_dir / "Transkript").glob("*.txt")):
+        dlg = script.stem
+        call_id = f"{dlg}-K1"
+        m = _CALL_RE.match(call_id)
+        call = Call(call_id=call_id, dialogue_id=dlg, level=int(m.group(2)) if m else 0, variant=1,
+                    noisy=False, audio_path=script, text_only=True)
+        call.turns = parse_turns(script.read_text(encoding="utf-8"))
+        exp_file = data_dir / "Skript_mit_Sollbewertung" / f"{dlg}.txt"
+        if exp_file.exists():
+            text = exp_file.read_text(encoding="utf-8")
+            call.title, call.expected = parse_expected(text)
+            head = text.split("\nT001", 1)[0]
+            g = _GROUP_RE.search(head)
+            call.group = g.group(1) if g else ""
+        calls.append(call)
+    return calls
+
+
 def split_dialogues(calls: list[Call], n_folds: int = 5, seed: int = 13) -> dict[str, int]:
     """Deterministic dialogue -> fold assignment, stratified by expected label.
 
-    Clean and noisy versions of one dialogue always land in the same fold (no leakage).
+    Clean and noisy versions of one dialogue always land in the same fold (no leakage). Calls with a
+    ``group`` (synthetic twins) are assigned per group: all dialogues of a group share a fold (stratified
+    by the group's first label).
     """
     import random
 
     by_label: dict[str, list[str]] = {}
+    members: dict[str, list[str]] = {}
     for c in calls:
+        unit = c.group or c.dialogue_id
+        members.setdefault(unit, [])
+        if c.dialogue_id not in members[unit]:
+            members[unit].append(c.dialogue_id)
+        if any(unit in v for v in by_label.values()):
+            continue
         lbl = c.expected.label if c.expected else "unknown"
-        by_label.setdefault(lbl, [])
-        if c.dialogue_id not in by_label[lbl]:
-            by_label[lbl].append(c.dialogue_id)
+        by_label.setdefault(lbl, []).append(unit)
     rng = random.Random(seed)
     fold_of: dict[str, int] = {}
     i = 0
     for lbl in sorted(by_label):
-        dlgs = sorted(by_label[lbl])
-        rng.shuffle(dlgs)
-        for d in dlgs:
-            fold_of[d] = i % n_folds
+        units = sorted(by_label[lbl])
+        rng.shuffle(units)
+        for u in units:
+            for d in members[u]:
+                fold_of[d] = i % n_folds
             i += 1
     return fold_of

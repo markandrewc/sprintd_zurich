@@ -36,7 +36,6 @@ from typing import Any, Callable, Iterable
 
 import jiwer
 
-from callguard.cache import file_hash
 from callguard.checks.keywords import KeywordCheck
 from callguard.checks.textnorm import fold, segment_tokens
 from callguard.data import Call, Turn, parse_turns
@@ -322,11 +321,15 @@ CI_STATS = ("wer", "cer", "kw_recall", "kw_false_hits_per_call")
 
 def bootstrap_ci(rows: list[dict], stat: Callable[[list[dict]], float | None], n: int = 1000,
                  seed: int = 0, alpha: float = 0.05) -> tuple[float, float] | None:
-    """Percentile CI, resampling whole dialogues (clean + noisy together: they are not independent)."""
-    by_dlg: dict[str, list[dict]] = {}
+    """Percentile CI, resampling whole twin groups (``splits.group_of``: clean + noisy of a dialogue, and
+    the Stufe2 twin dialogues, together: they are not independent; a dialogue without a twin is its own
+    unit)."""
+    from callguard.splits import group_of
+
+    by_unit: dict[str, list[dict]] = {}
     for r in rows:
-        by_dlg.setdefault(r["dialogue_id"], []).append(r)
-    groups = list(by_dlg.values())
+        by_unit.setdefault(group_of(r["dialogue_id"]), []).append(r)
+    groups = list(by_unit.values())
     if len(groups) < 2:
         return None
     rng = random.Random(seed)
@@ -411,7 +414,7 @@ def default_tag(asr_spec: dict[str, Any]) -> str:
 def asr_cache_key(pipe: Any, audio_path: Path) -> dict[str, Any]:
     """The key :meth:`Pipeline.transcribe` stores transcripts under (pinned by a test). Building the ASR
     plugin is cheap: models load on first decode, which never happens here."""
-    return {"audio": file_hash(audio_path), "asr": pipe.asr.cache_params()}
+    return pipe.asr_key(audio_path)
 
 
 def cached_transcript(pipe: Any, call: Call) -> Transcript | None:
@@ -468,7 +471,7 @@ def run_asr_eval(pipe: Any, calls: list[Call], *, tag: str, cached_only: bool = 
         "wer_label": WER_GSW_LABEL, "cer_label": CER_GSW_LABEL,
         "kw_recall_def": "per call and keyword id min(hits in ASR, annotated spots) / annotated spots; "
                          "kw_ref_recall = same matcher on the reference script (ceiling)",
-        "ci": "95% percentile bootstrap over dialogues (1000x)",
+        "ci": "95% percentile bootstrap over twin groups / dialogues (1000x)",
     }
     return AsrEvalResult(tag=tag, rows=rows, summary=summary, skipped=skipped)
 

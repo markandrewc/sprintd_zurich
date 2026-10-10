@@ -5,17 +5,18 @@
 # Views (docs/design/v2_plan.md §1):
 #   de          default ASR of gpu-12gb (whisper-turbo GSW fine-tune, int8_float16) -> Standard German
 #   de_large    whisper-large-v3 GSW fine-tune (MIT), float16
-#   de_vanilla  vanilla whisper-large-v3, float16 (baseline: how much does the fine-tune buy?)
+#   de_vanilla  vanilla whisper-large-v3-TURBO, float16 (baseline: how much does the fine-tune buy?)
+#   de_fused    A4: LLM fuses de + de_large + de_vanilla into one corrected Standard German transcript
 #   en_from_de  de translated to English by the LLM (vLLM `callguard-llm` on :8000)
 #   en_speech   vanilla large-v3 with task=translate: Swiss German speech -> English text directly
-# VRAM (estimates): turbo int8 ~1 GB + large-v3 GSW fp16 ~3.5 GB + vanilla large-v3 fp16 ~3.5 GB (one copy,
-# shared by de_vanilla and en_speech) = ~8 GB of Whisper kept loaded, PLUS vLLM at 0.70 x 12 GB: that does
+# VRAM (estimates): turbo int8 ~1 GB + large-v3 GSW fp16 ~3.5 GB + vanilla turbo fp16 ~2 GB + vanilla large-v3
+# fp16 ~3.5 GB (en_speech) = ~10 GB of Whisper kept loaded, PLUS vLLM at 0.70 x 12 GB: that does
 # not fit at once. Transcripts are cached per view, so fill the cache in passes, e.g. first
 # `--set extra_views=[]` (only de + en_from_de), then the large views with vLLM stopped and
 # `--set check_view=de --set extra_views=[de_large,de_vanilla,en_speech]` plus rule checks only, or lower
 # vLLM's gpu_memory_utilization.
 extends: gpu-12gb.yaml
-description: GPU 12 GB with transcript views (de, de_large, de_vanilla, en_from_de, en_speech)
+description: GPU 12 GB with transcript views (de, de_large, de_vanilla, de_fused, en_from_de, en_speech)
 
 views:
   de:
@@ -30,11 +31,30 @@ views:
     diarize: true
   de_vanilla:
     lang: de
-    asr:
-      model: models/asr/vanilla-large-v3-ct2
-      compute_type: float16
-      model_tag: vanilla-large-v3-fp16-cuda
+    asr:                     # vanilla TURBO (the one transcribed by scripts/research/asr_queue*.sh "vanilla-turbo"):
+      model: models/asr/vanilla-turbo-ct2      # same cache key as asr_sweep.py -c gpu-12gb --set asr.model=<this>
+      compute_type: float16                    # --set asr.compute_type=float16 (model_tag is not in the key)
+      model_tag: vanilla-turbo-fp16-cuda
     diarize: true
+  de_fused:
+    # A4 (v2_plan §7): LLM fusion of three ASR hypotheses into one Standard German transcript. Primary
+    # = first source (de): its segment ids, times, speakers and roles are kept, so findings point at the
+    # same audio. Per primary segment the time-overlapping words of de_large and de_vanilla are attached
+    # (word midpoints); segments where all three agree are not sent. The LLM may only use words some
+    # hypothesis has (support guard: unsupported answers keep the de text), drops recogniser loops (the
+    # initial_prompt loop of Stufe1_D02-K2), keeps names/numbers/codes. No keyword list in the prompt.
+    # Cached on all source segments + params + served model id. Needs vLLM; the three ASR views are
+    # cached by scripts/research/asr_queue*.sh (same keys). Eval: scripts/research/eval_view.py.
+    lang: de
+    from: [de, de_large, de_vanilla]
+    translator:
+      type: llm_correct
+      llm: default
+      batch_size: 8
+      context: 2
+      max_gap: 1.5           # s: a word of an alternative outside every de segment joins the nearest within 1.5 s
+      min_support: 0.6       # share of answer content words found (fuzzy) in some hypothesis, else keep de
+      concurrency: 4         # speed only, not in the cache key
   en_from_de:
     lang: en
     from: de
@@ -53,7 +73,7 @@ views:
       model_tag: vanilla-large-v3-fp16-translate-cuda
     diarize: true
 primary_view: de
-check_view: null             # e.g. --set check_view=en_from_de runs every check on the English view
+check_view: null             # e.g. --set check_view=en_from_de (or de_fused) runs every check on that view
 extra_views: [de_large, de_vanilla, en_speech]   # computed for the UI comparison even without a check
 
 checks:   # gpu-12gb's checks on `de` + shadow keyword checks (weight 0: computed, not fused) per view

@@ -19,7 +19,9 @@ def register(app: typer.Typer) -> None:
             spec: Annotated[Path, typer.Argument(help="Spec file, e.g. experiments/smoke.yaml (or just 'smoke').")],
             dry_run: Annotated[bool, typer.Option("--dry-run", help="Show what would be computed; run nothing.")] = False,
             split: Annotated[Optional[str], typer.Option(
-                "--split", help="dev | holdout (logged) | all; default: the spec's split (dev).")] = None,
+                "--split", help="dev (default) | holdout | all. holdout and all include holdout dialogues: "
+                                "every variant run is logged to runs/holdout_log.jsonl, and they must be "
+                                "given here explicitly even if the spec names them.")] = None,
             variants: Annotated[Optional[str], typer.Option(
                 "--variants", help="Comma-separated variant names (default: all).")] = None,
             jobs: Annotated[int, typer.Option("--jobs", "-j", help="Calls processed in parallel.")] = 6,
@@ -45,6 +47,11 @@ def register(app: typer.Typer) -> None:
             if split not in sp.SPLIT_CHOICES:
                 raise typer.BadParameter(f"expected one of {', '.join(sp.SPLIT_CHOICES)}", param_hint="--split")
             s.split = split
+        elif s.split not in ("dev", sp.EXTERNAL) and not (rescore or dry_run):
+            cli.console.print(f"[red]{s.name}: the spec asks for split {s.split!r}, which includes holdout "
+                              f"dialogues and is logged as a holdout look. Pass --split {s.split} explicitly "
+                              f"(or --split dev).[/red]")
+            raise typer.Exit(2)
         names = [n.strip() for n in variants.split(",") if n.strip()] if variants else None
         try:
             for n in names or []:
@@ -72,9 +79,11 @@ def register(app: typer.Typer) -> None:
         if not selected:
             cli.console.print("[red]No calls selected.[/red]")
             raise typer.Exit(1)
-        if s.split == sp.HOLDOUT:
-            cli.console.print(f"[bold yellow]HOLDOUT experiment: every variant is logged as a look "
-                              f"(earlier looks: {sp.holdout_looks(base_cfg)}).[/bold yellow]")
+        if s.split in (sp.HOLDOUT, "all"):
+            cli.console.print(f"[bold yellow]{s.split.upper()} experiment (includes holdout dialogues): every "
+                              f"variant is logged as a look (earlier looks: {sp.holdout_looks(base_cfg)})"
+                              f"{'; CV fits thresholds on dev folds only' if s.split == 'all' else ''}."
+                              f"[/bold yellow]")
 
         if dry_run:
             plan = ex.dry_run(s, selected, names, runs_dir)
@@ -99,7 +108,7 @@ def register(app: typer.Typer) -> None:
             try:
                 summary = ex.run_experiment(s, selected, variants=names, jobs=jobs, use_cache=not no_cache,
                                             runs_dir=runs_dir, progress=on_call, n_boot=n_boot, seed=seed)
-            except ex.SpecError as e:
+            except (ex.SpecError, ex.LLMIdentityError) as e:
                 cli.console.print(f"[red]{e}[/red]")
                 raise typer.Exit(2) from e
         _print_summary(cli, summary)

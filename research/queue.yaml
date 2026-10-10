@@ -121,3 +121,23 @@ items:
      title: "Hot-window ASR re-decoding: large-v3 beam 5 + 5-best only on +-8 s around anchors/passages (~5% of audio); keyword confidence = share of hypotheses; noisy keyword-spot recall, negation/digit accuracy"}
   - {id: N11, group: ideas, priority: 5, status: todo, rq: [RQ2, RQ8], needs: [A1], cost: "0 GPU",
      title: "Phonetic (Koelner Phonetik) + ASR word-prob weighted keyword matching as keywords subclass; keyword-spot recall/precision on noisy calls; 'moeglicherweise verhoert' flag in UI"}
+
+  # ---------------------------------------------------------------- ideas round 2 (research/ideas_round2.md)
+  # Skeptical review of `facts` (7B, dev). Rule sims run on CACHED fact probabilities (0 GPU, any model's results.jsonl).
+  # Every rule change is in-sample (found on dev errors) until R4/R5 or the holdout confirms it.
+  - {id: R1, group: ideas2, priority: 1, status: todo, rq: [RQ5, RQ9], needs: [facts], cost: "0 GPU (re-decide cached facts)",
+     title: "Criteria-derived policy fixes: disclosure review_when as rule (third_party_request=yes and authorized!=yes -> review; fixes C18-K3), exculpatory conflict p<0.9 -> review (D05-K2), patterns digit run >=0.2 but spoken!=yes -> review/re-ask (C09); sim 7B: miss 7->3/26, FAR 4/22 unchanged, review recall 50->67% (in-sample); re-sim on 14B cache"}
+  - {id: R2, group: ideas2, priority: 1, status: todo, rq: [RQ5, RQ9], needs: [facts], cost: "~2 GPU-min",
+     title: "Explicit '*_open' facts per family copied from criteria review_when (source_open, authorization_open, relevance_open, purpose_open; like access.validity_open, the only family where review works: C17 2/2), gated by act in [yes, unclear]; review recall on 6 dev review calls (C20 0/2 now), kill if >=2 harmless dialogues newly flagged"}
+  - {id: R3, group: ideas2, priority: 2, status: todo, rq: [RQ5], needs: [facts], cost: "~5 GPU-min",
+     title: "Paraphrase robustness: 2 paraphrase sets of all fact questions written blind (from criteria.yaml only), asked on 48 dev calls; per-fact value agreement, mean |dp(yes)|, call-decision flip rate, flag AUC per set; fragile if >15% calls flip or AUC -0.10"}
+  - {id: R4, group: ideas2, priority: 1, status: todo, rq: [RQ5], needs: [facts], cost: "~3 GPU-min",
+     title: "Overfit test: blind policy table (facts + rules written from criteria.yaml + brief by an agent who never saw transcripts) vs tuned table on dev; method carries the gain if blind flag AUC >=0.79 and FAR <=27%; report blind number as hidden-set expectation"}
+  - {id: R5, group: ideas2, priority: 2, status: todo, rq: [RQ5, RQ10], needs: [synth-scripts, facts], cost: "~5 GPU-min",
+     title: "Pre-registered synthetic twins: freeze + journal the policy-table hash BEFORE scoring; facts vs llm_judge pair-AUC (alarm twin > harmless twin) and review recall on synthetic review cases; seeds exclude holdout scenarios (C03/C04, C15/C16, D07, C19); stress test only, never a jury number"}
+  - {id: R6, group: ideas2, priority: 3, status: todo, rq: [RQ8, RQ9], needs: [facts, R3], cost: "~10 GPU-min",
+     title: "Perturbation ensemble for boundary facts: average fact p over wordings (R3) x ASR views (turbo nocond/noprompt + cached large-v3 MIT) + anchored context questions naming the act evidence segments; label-free metric clean/noisy pair consistency (7/24 dialogues inconsistent now, 4 of 7 wrong on CLEAN), noisy miss rate"}
+  - {id: R7, group: ideas2, priority: 1, status: todo, rq: [RQ9], needs: [facts], cost: "0 GPU",
+     title: "Threshold policy for facts: score is near-discrete (flag decision flat for t in 0.25-0.80), CV max-F1 picks edge 0.20 which turns every facts review into alarm; pin rule labels, t=0.55 band 0.15, choose decide_at (0.5/0.55/0.6) by worst-fold 3-class acc, redo per LLM; no per-family thresholds (0/198 cross-family false flags)"}
+  - {id: R8, group: ideas2, priority: 3, status: todo, rq: [RQ5, RQ12], needs: [facts], cost: "0 GPU",
+     title: "Product: 'Gegenprobe' minimal fact flips that would change the label (why not an alarm), policy-table editor with instant impact preview from cached fact probs + table hash in result.json, open fact as officer question (fact-level feedback), fact markers on the audio timeline"}
