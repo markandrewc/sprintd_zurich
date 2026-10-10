@@ -604,9 +604,10 @@ from callguard.commands import report as _report  # noqa: E402
 from callguard.commands import route as _route  # noqa: E402
 from callguard.commands import splits as _splits  # noqa: E402
 from callguard.commands import synth as _synth  # noqa: E402
+from callguard.commands import triggers as _triggers  # noqa: E402
 
 for _mod in (_asr_eval, _splits, _experiment, _leaderboard, _report, _fit_fusion,
-             _route, _feedback, _patterns, _synth, _contrib, _evidence_eval, _agreement):
+             _route, _feedback, _patterns, _synth, _contrib, _evidence_eval, _agreement, _triggers):
     _mod.register(app)
 
 
