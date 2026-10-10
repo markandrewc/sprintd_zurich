@@ -1,0 +1,12 @@
+# RQ1 with the facts check: same as llm-sweep plus an English view translated by the served LLM (`judge`).
+extends: llm-sweep.yaml
+description: llm-sweep + views de / en_from_de (LLM translation) for the view comparison with facts
+views:
+  de: {lang: de, diarize: true}
+  en_from_de:
+    lang: en
+    from: de
+    translator: {type: llm_translate, llm: judge, batch_size: 12, context: 3, concurrency: 6}
+primary_view: de
+check_view: null
+extra_views: []

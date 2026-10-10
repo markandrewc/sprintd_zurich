@@ -11,3 +11,12 @@ asr:
   scale_to_audio: false   # text-only calls: audio_path is the script itself, there is no recording
 diarizer:
   type: none
+# gpu-12gb v1 checks + the policy-table checks computed at weight 0 (not fused): experiments re-fuse them
+# (experiments/synth_stress.yaml sets checks.facts.weight=1.0 etc.), so every variant uses the same LLM answers.
+checks:
+  - {name: keywords, type: keywords, weight: 0.35, fuzzy: 90}
+  - {name: patterns, type: patterns, weight: 0.2}
+  - {name: llm_judge, type: llm_judge, llm: default, samples: 3, temperature: 0.7, parallel: 5, weight: 1.0}
+  - {name: geval, type: geval, llm: default, parallel: 5, weight: 1.0}
+  - {name: facts, type: facts, llm: default, parallel: 5, weight: 0.0}
+  - {name: facts_blind, type: facts, llm: default, policy_table: config/policy_table_blind.yaml, parallel: 5, weight: 0.0}

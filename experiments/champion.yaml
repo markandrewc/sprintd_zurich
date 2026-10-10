@@ -1,0 +1,18 @@
+# The frozen Sunday candidate (config/recommended.yaml) on the dev split + robustness re-fusions around it.
+# RQ: all (final numbers for MORNING_REPORT). ~5-8 min on the 4070 (facts with the 7B; ASR + roles cached).
+# The single holdout run uses exactly the `champion` variant: callguard experiment experiments/champion.yaml
+#   --split holdout --variants champion  (logged to runs/holdout_log.jsonl; run ONCE).
+name: champion
+description: Recommended profile (large-v3 MIT + Qwen2.5-7B facts + light keywords/patterns) and its neighbours
+rq: [RQ2, RQ4, RQ5, RQ9]
+base: recommended
+split: dev
+compare_to: champion
+variants:
+  - {name: champion, description: "config/recommended.yaml as is"}
+  - {name: facts_only, refuse_from: champion, checks: [facts], description: "without keywords/patterns in the score"}
+  - {name: t045, refuse_from: champion, set: [fusion.threshold=0.45]}
+  - {name: t065, refuse_from: champion, set: [fusion.threshold=0.65]}
+  - {name: noesc, refuse_from: champion, set: [fusion.max_uncertainty=1.0]}
+  - {name: band025, refuse_from: champion, set: [fusion.review_band=0.25]}
+  - {name: table_v2, set: [checks.facts.policy_table=config/policy_table_v2.yaml], description: "+ access.review_2 (spoken, validity unknown -> review); fact answers cached, only rules re-evaluated"}

@@ -67,3 +67,14 @@ variants:
   - {name: qwen25_14b_facts_oracle, profile: llm-sweep-oracle, oracle: true, checks: [facts, facts_blind], set: [checks.facts.weight=1.0], description: "ORACLE: 14B facts on the dialect reference scripts"}
   - {name: qwen25_7b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, asr.model=models/asr/whisper-large-v3-gsw-ct2, asr.compute_type=float16], description: "7B facts on gcoli large-v3 ASR"}
   - {name: qwen25_7b_facts_oracle, profile: llm-sweep-oracle, oracle: true, checks: [facts, facts_blind], set: [checks.facts.weight=1.0], description: "ORACLE: 7B facts on the dialect reference scripts"}
+  # ---- review side: tuned facts decide, the blind table (written from review_when etc.) may escalate to review only
+  - {name: qwen25_14b_facts__blind_review, refuse_from: qwen25_14b_facts, checks: [facts, facts_blind], set: [fusion.type=hybrid, "fusion.second_opinion=[facts_blind]", checks.facts.weight=1.0]}
+  # ---- RQ1 view comparison with facts (7B): Standard German ASR view vs its English LLM translation
+  - {name: qwen25_7b_facts_en, profile: llm-sweep-views, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, check_view=en_from_de], description: "7B facts on the English translation of the de view"}
+  - {name: qwen25_14b_facts_l3__blind_only, refuse_from: qwen25_14b_facts_l3, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen25_14b_facts_l3__both, refuse_from: qwen25_14b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
+  - {name: qwen25_14b_facts__both, refuse_from: qwen25_14b_facts, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
+  - {name: qwen25_14b_facts_oracle__blind_only, refuse_from: qwen25_14b_facts_oracle, oracle: true, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen25_7b__both, refuse_from: qwen25_7b, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
+  - {name: qwen25_7b_facts_l3__blind_only, refuse_from: qwen25_7b_facts_l3, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen25_7b_facts_l3__both, refuse_from: qwen25_7b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}

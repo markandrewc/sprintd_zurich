@@ -1,0 +1,17 @@
+{
+ "about": "Label audit of the generated scripts by a different model family (Claude, the agent that wrote the scenarios), done by reading every transcript BEFORE any check result was seen (2026-10-10 ~03:30). invalid = the generated text contradicts the scenario label (generator resolved the open fact or left alarm content in a harmless twin); doubtful = label defensible but weak/mixed signals. Metrics are reported on all 74 and on the 65 'clean' scripts (neither invalid nor doubtful).",
+ "auditor": "claude-opus-5-5 (synthetic-data agent)",
+ "invalid": {
+  "Synth_trade_012": "harmless_quote twin kept 'wife said the firm must issue a profit warning' before he sells -> reads as alarm/review, not harmless",
+  "Synth_documentation_003": "review twin states 'ich muss ihm ... Geld zurückerstatten' (repayable private loan) + asks not to note it -> alarm content",
+  "Synth_documentation_012": "review twin states 'ich schulde meinem Ex noch 5'000 Franken' + request not to record -> alarm content",
+  "Synth_splitting_003": "review twin: single 45k invoice split 3x15k, 'deshalb' right after the co-signature limit -> motive clear, alarm content"
+ },
+ "doubtful": {
+  "Synth_trade_013": "alarm: secret merger told, but her own buy wish is only implied by the advisor's offer, then withdrawn",
+  "Synth_access_006": "review: customer first confirms it is yesterday's new password, later says unsure",
+  "Synth_splitting_002": "harmless: three invoices, but leftover 'Teilzahlungen' and 'Beträge nicht als Teil der Gesamtsumme angezeigt'",
+  "Synth_splitting_006": "review: 'so ist es einfacher', then says the board was informed (harmless-ish)",
+  "Synth_splitting_008": "harmless: advisor suggests splitting under the 25k control; customer declines and pays once"
+ }
+}

@@ -22,7 +22,9 @@ DEFAULT_EVENT = {"alarm": "present", "no_alert": "absent", "review": "undetermin
 CUSTOMERS = ("Kundin", "Kunde")
 OPENERS = ("advisor", "customer")
 MIN_TURNS, MAX_TURNS = 12, 30
-_SCENARIO_KEYS = {"id", "family", "customer", "opens", "turns", "setting", "must_include", "variants", "dialect"}
+_SCENARIO_KEYS = {"id", "family", "customer", "opens", "turns", "setting", "must_include", "variants", "dialect",
+                  "language"}
+LANGUAGES = ("de", "gsw")  # de: Swiss Standard German (what the de ASR view produces); gsw: dialect
 _VARIANT_KEYS = {"label", "decisive", "reason", "open", "event", "family", "must_include"}
 
 
@@ -53,6 +55,7 @@ class Scenario:
     dialect: str
     must_include: list[str]
     variants: list[Variant]
+    language: str = "de"
 
 
 @dataclass
@@ -124,6 +127,9 @@ def parse_scenarios(raw: dict[str, Any]) -> list[Scenario]:
                 raise ScenarioError(f"{sid}: opens must be one of {OPENERS}")
             if not MIN_TURNS <= turns <= MAX_TURNS:
                 raise ScenarioError(f"{sid}: turns must be within {MIN_TURNS}..{MAX_TURNS}")
+            language = str(e.get("language") or d.get("language") or "de")
+            if language not in LANGUAGES:
+                raise ScenarioError(f"{sid}: language must be one of {LANGUAGES}")
             if not str(e.get("setting") or "").strip():
                 raise ScenarioError(f"{sid}: setting is empty")
             variants: list[Variant] = []
@@ -156,7 +162,8 @@ def parse_scenarios(raw: dict[str, Any]) -> list[Scenario]:
             out.append(Scenario(id=sid, family=fam, customer=customer, opens=opens, turns=turns,
                                 setting=" ".join(str(e["setting"]).split()),
                                 dialect=str(e.get("dialect") or d.get("dialect") or "Zürichdeutsch"),
-                                must_include=_str_list(e.get("must_include"), where), variants=variants))
+                                must_include=_str_list(e.get("must_include"), where), variants=variants,
+                                language=language))
     return out
 
 

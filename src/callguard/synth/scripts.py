@@ -42,7 +42,7 @@ log = logging.getLogger("callguard.synth")
 
 ADVISOR = "Beratung"
 META_WORDS = ("Testziel", "Sollbewertung", "Szenario", "Variante", "no_alert", "Compliance-Test", "Regieanweisung")
-MIN_WORDS_PER_TURN = 3
+MIN_WORDS_PER_TURN = 2  # the last two turns (goodbyes) are exempt
 TWIN_KEPT_MIN = 0.3  # a twin keeps at least this share of its base's turns verbatim (minimal pair) ...
 TWIN_IDENTICAL = 0.985  # ... and is not (almost) identical to it (difflib ratio of the whole text)
 GENERATOR_VERSION = "synth-scripts-v1"
@@ -60,8 +60,9 @@ SCHEMA: dict[str, Any] = {
     "required": ["title", "turns", "evidence_turns"],
 }
 
-# A fresh, neutral dialect sample (not from the case data): shows spelling and tone only.
-STYLE_EXAMPLE = """T001 · Beratung
+# Fresh, neutral samples (not from the case data): they show spelling and tone only.
+STYLE_EXAMPLES = {
+    "gsw": """T001 · Beratung
 Grüezi Herr Muster, da isch de Marco Steiner vo de Bank. Sie händ eus wäge Ihrem Dauerauftrag gschribe. Was chan ich für Sie mache?
 
 T002 · Kunde
@@ -71,17 +72,40 @@ T003 · Beratung
 Das chömer grad mache. Isch es immer no s gliiche Konto vom Vermieter, oder hät sich da au öppis gänderet?
 
 T004 · Kunde
-Nei, s Konto bliibt gliich. Nume de Betrag ändert. Und bitte ab em erschte, nöd ab em füfzähte."""
+Nei, s Konto bliibt gliich. Nume de Betrag ändert. Und bitte ab em erschte, nöd ab em füfzähte.""",
+    "de": """T001 · Beratung
+Grüezi Herr Muster, hier ist Marco Steiner von der Bank. Sie haben uns wegen Ihres Dauerauftrags geschrieben. Was kann ich für Sie tun?
 
-SYSTEM = f"""Du schreibst realistische, fiktive Telefongespräche zwischen der Beratung einer Schweizer Bank und
+T002 · Kunde
+Grüezi. Ich möchte den Dauerauftrag für die Miete anpassen, wir zahlen ab nächstem Monat hundertfünfzig Franken mehr.
+
+T003 · Beratung
+Das können wir gleich machen. Ist es immer noch das gleiche Konto vom Vermieter, oder hat sich da auch etwas geändert?
+
+T004 · Kunde
+Nein, das Konto bleibt gleich. Nur der Betrag ändert. Und bitte ab dem Ersten, nicht ab dem Fünfzehnten.""",
+}
+STYLE_EXAMPLE = STYLE_EXAMPLES["gsw"]
+LANGUAGE_RULE = {
+    "gsw": "Alles auf Schweizerdeutsch ({dialect}), so wie man spricht, in einfacher Dialektschreibweise wie im "
+           "Beispiel unten. Keine hochdeutschen Sätze.",
+    "de": "Alles auf Hochdeutsch in Schweizer Schreibweise (ss statt ß, Franken, Grüezi), in einfachen, "
+          "gesprochenen Sätzen, so wie eine Spracherkennung ein Schweizer Telefongespräch auf Hochdeutsch "
+          "transkribiert.",
+}
+
+
+def system_prompt(language: str = "de", dialect: str = "Zürichdeutsch") -> str:
+    rule = LANGUAGE_RULE[language].format(dialect=dialect)
+    return f"""Du schreibst realistische, fiktive Telefongespräche zwischen der Beratung einer Schweizer Bank und
 einer Kundin oder einem Kunden. Die Gespräche dienen als Testmaterial; alle Personen und Firmen sind erfunden.
 
 Regeln:
-- Alles auf Schweizerdeutsch (Zürichdeutsch), so wie man spricht, in einfacher Dialektschreibweise wie im
-  Beispiel unten. Keine hochdeutschen Sätze, keine Regieanweisungen, keine Geräusche, kein Erzähler.
+- {rule} Keine Regieanweisungen, keine Geräusche, kein Erzähler.
 - Genau zwei Sprecher: "{ADVISOR}" (die Bankberatung) und die anrufende bzw. angerufene Kundin / der Kunde.
 - Ein natürlicher Gesprächsverlauf: Begrüssung, Anliegen, Rückfragen, Alltagsdetails, Abschluss. Der
-  entscheidende Inhalt ist eingebettet, nicht das ganze Gespräch.
+  entscheidende Inhalt ist eingebettet, nicht das ganze Gespräch. Jeder Turn bringt etwas Neues; keine
+  Wiederholungen.
 - Halte dich GENAU an den vorgegebenen entscheidenden Inhalt: nicht mehr und nicht weniger. Wenn etwas offen
   bleiben soll, bleibt es bis zum Schluss offen. Wenn etwas öffentlich, abgelaufen oder ein Beispiel ist, sagt
   das jemand im Gespräch ausdrücklich.
@@ -89,11 +113,14 @@ Regeln:
 - Zahlen dürfen als Ziffern oder als Wörter stehen.
 
 Beispiel für Ton und Schreibweise (anderes Thema):
-{STYLE_EXAMPLE}
+{STYLE_EXAMPLES[language]}
 
 Antworte nur mit JSON: {{"title": "<kurzer Titel auf Hochdeutsch, ohne Bewertung>",
 "turns": [{{"speaker": "...", "text": "..."}}, ...],
 "evidence_turns": [<Nummern (1 = erster Turn) der Turns, die den entscheidenden Inhalt tragen>]}}"""
+
+
+SYSTEM = system_prompt("gsw")
 
 
 @dataclass
@@ -135,7 +162,7 @@ def _frame(job: Job) -> str:
     return (f"Sprecher-Bezeichnungen: \"{ADVISOR}\" und \"{s.customer}\". Das Gespräch beginnt mit {_who(s)} "
             f"(Turn 1 = \"{ADVISOR if s.opens == 'advisor' else s.customer}\").\n"
             f"Länge: ungefähr {s.turns} Turns (mindestens {lo}, höchstens {hi}); die Sprecher wechseln sich ab.\n"
-            f"Dialekt: {s.dialect}.\n"
+            + (f"Dialekt: {s.dialect}.\n" if s.language == "gsw" else "Sprache: Hochdeutsch (Schweizer Schreibweise).\n")
             + (f"Diese Wörter müssen wörtlich vorkommen: {musts}.\n" if musts else "")
             + f"\nSituation: {s.setting}\n\nEntscheidender Inhalt (muss genau so vorkommen): {v.decisive}")
 
@@ -144,7 +171,8 @@ def messages_free(job: Job, feedback: list[str] | None = None) -> list[dict[str,
     user = "Schreib das folgende Telefongespräch.\n\n" + _frame(job)
     if feedback:
         user += "\n\nDein letzter Versuch war ungültig: " + "; ".join(feedback[:6]) + ". Bitte korrigieren."
-    return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]
+    return [{"role": "system", "content": system_prompt(job.scenario.language, job.scenario.dialect)},
+            {"role": "user", "content": user}]
 
 
 def messages_rewrite(job: Job, base: Script, base_job: Job, feedback: list[str] | None = None
@@ -158,7 +186,8 @@ def messages_rewrite(job: Job, base: Script, base_job: Job, feedback: list[str] 
             "Rahmen für die Variante:\n" + _frame(job))
     if feedback:
         user += "\n\nDein letzter Versuch war ungültig: " + "; ".join(feedback[:6]) + ". Bitte korrigieren."
-    return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]
+    return [{"role": "system", "content": system_prompt(job.scenario.language, job.scenario.dialect)},
+            {"role": "user", "content": user}]
 
 
 # --------------------------------------------------------------------------------------------
@@ -211,7 +240,7 @@ def validate_script(data: Any, job: Job, base: Script | None = None) -> tuple[Sc
         if sp is None:
             errors.append(f"Turn {i}: unbekannter Sprecher {t.get('speaker')!r} (nur {ADVISOR} / {s.customer})")
             continue
-        if len(text.split()) < MIN_WORDS_PER_TURN:
+        if len(text.split()) < MIN_WORDS_PER_TURN and i < len(raw_turns) - 1:
             errors.append(f"Turn {i} ist zu kurz")
         turns.append((sp, text))
     lo, hi = job.turn_range
@@ -228,6 +257,7 @@ def validate_script(data: Any, job: Job, base: Script | None = None) -> tuple[Sc
             break
     if turns and {sp for sp, _ in turns} != {ADVISOR, s.customer}:
         errors.append("beide Sprecher müssen vorkommen")
+    errors += repetition_errors(turns)
     full = "\n".join(t for _, t in turns)
     for w in META_WORDS:
         if re.search(rf"\b{re.escape(w)}\b", full, re.IGNORECASE):
@@ -251,6 +281,28 @@ def validate_script(data: Any, job: Job, base: Script | None = None) -> tuple[Sc
     if not turns:
         return None, errors or ["keine gültigen Turns"]
     return Script(title=title, turns=turns, evidence=evidence), errors
+
+
+def repetition_errors(turns: list[tuple[str, str]]) -> list[str]:
+    """Degenerate loops of small models: a turn repeating an earlier one, or one sentence said 3+ times."""
+    errs: list[str] = []
+    seen: dict[str, int] = {}
+    for i, (_, t) in enumerate(turns, 1):
+        k = _turn_key(t)
+        if k in seen:
+            errs.append(f"Turn {i} wiederholt Turn {seen[k]}")
+            break
+        seen[k] = i
+    counts: dict[str, int] = {}
+    for _, t in turns:
+        for sent in re.split(r"(?<=[.!?])\s+", t):
+            k = _turn_key(sent)
+            if len(k.split()) >= 5:
+                counts[k] = counts.get(k, 0) + 1
+    rep = [k for k, n in counts.items() if n >= 3]
+    if rep:
+        errs.append(f"der Satz \"{rep[0][:60]}\" kommt {counts[rep[0]]} Mal vor")
+    return errs
 
 
 def _turn_key(text: str) -> str:

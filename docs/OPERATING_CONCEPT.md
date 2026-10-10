@@ -144,10 +144,21 @@ GPU-hours on one 4070, so one mid-range GPU covers the transcription of a mid-si
 model layer is the cost driver; it is filled in from the experiment cost data:
 
 <!-- SIZING -->
-| LLM setup (checks) | LLM calls / call | GPU-s / call | calls / GPU-day | GPUs for 2,000 calls/day | source |
-|---|---|---|---|---|---|
-| TBD (lead fills from `runs/experiments/*/meta.json` cost) | TBD | TBD | TBD | TBD | TBD |
-| *preliminary: Qwen2.5-7B-AWQ, 4 checks, vLLM on 4070* | *~10* | *31.8 s check time per call at 6 in parallel; 48 calls in 10 min* | *~6,900 (24 h, wall clock)* | *1* | journal 01:43 |
+Measured on one RTX 4070 (12 GB) tonight (research/journal.md). Average case call: 4.7 min of audio. Wall clock with
+the stage running alone on the GPU; "calls / GPU-day" = 86,400 s / wall s per call.
+
+| stage / setup | measured | wall s / call | calls / GPU-day | source |
+|---|---|---|---|---|
+| ASR Swiss German turbo int8 (beam 1) | 60 calls (4 h 40 min audio) in ~3 min | ~3 | ~29,000 | journal 01:15 |
+| ASR gcoli large-v3 MIT fp16 (beam 1) | 2.4 GPU-s per audio minute | ~11 | ~7,800 | journal 02:30 |
+| Diarization sherpa-onnx (CPU) + role LLM | 18 s per call on CPU (parallelisable over cores) | (CPU) | - | checks_ablation cost |
+| Checks v1: keywords + patterns + free judge (3 samples) + G-Eval, Qwen2.5-7B-AWQ | 48 calls in 10 min at 8 parallel, ~10 LLM requests/call | ~12.5 | ~6,900 | journal 01:43 |
+| Checks recommended: `facts` (~20 single-token probes + evidence), Qwen2.5-7B-AWQ | part of a 7-check run (all checks 9 min / 48 calls) | ~3-5 (est.) | ~20,000 (est.) | journal 01:58 |
+| `facts` on Qwen2.5-14B-AWQ (only fits for facts; 2 parallel) | 48 calls in 20 min | ~25 | ~3,400 | journal 03:10 |
+
+Sizing example: a bank with 2,000 recorded advisor calls per day (~9,400 call minutes) needs well under one 4070-class
+GPU for large-v3 ASR + 7B `facts` (~11 + ~5 s per call -> ~9 GPU-hours/day); a 24-48 GB data-centre GPU (L4/L40S)
+runs ASR and a 14B-30B LLM side by side with headroom for re-processing and audits.
 <!-- /SIZING -->
 
 Production shape: 2 GPU nodes (active/active, each ASR + LLM; one can carry the daily load alone), 1 CPU

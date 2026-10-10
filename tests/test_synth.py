@@ -309,3 +309,23 @@ def test_offline_experiment_on_synthetic_text(tmp_path):
         for o in others:
             assert not groups & {next(j.scenario.id for j in jobs if j.dialogue_id == d) for d in o["dialogues"]}
     assert not (tmp_path / "runs" / "holdout_log.jsonl").exists()
+
+
+def test_repetition_loops_are_rejected():
+    job = _job()
+    d = _data(job)
+    d["turns"][9]["text"] = d["turns"][7]["text"]
+    _, errs = sw.validate_script(d, job)
+    assert any("wiederholt" in e for e in errs)
+    d = _data(job)
+    for i in (5, 7, 9):
+        d["turns"][i]["text"] += f" Nummer {i}. Und wir wollen eine Meldung dass die Zulassung kommt."
+    _, errs = sw.validate_script(d, job)
+    assert any("Mal vor" in e for e in errs)
+
+
+def test_language_default_is_standard_german_prompt():
+    job = _job()
+    assert job.scenario.language == "de"
+    sys_msg = sw.messages_free(job)[0]["content"]
+    assert "Hochdeutsch in Schweizer Schreibweise" in sys_msg and "hier ist Marco Steiner" in sys_msg

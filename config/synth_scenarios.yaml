@@ -20,6 +20,7 @@
 #   family      Testziel (trade / access / disclosure / documentation / splitting / numbers)
 #   customer    speaker label of the caller: Kundin | Kunde (advisor is always "Beratung")
 #   opens       who speaks first: advisor | customer
+#   language    de (Swiss Standard German, default) | gsw (dialect, with `dialect`)
 #   turns       target number of turns (validator accepts turns +- 4, within 12..30)
 #   setting     shared situation (German, for the writer; never shown to the checks)
 #   must_include  strings every variant must contain verbatim (names, amounts) -> rejects off-topic output
@@ -29,6 +30,11 @@
 version: 1
 defaults:
   turns: 18
+  # de = Swiss Standard German (Schweizer Schreibweise). Chosen after a trial: the served 8B model writes
+  # broken pseudo-dialect ("eene", "kopen") with repetition loops, and Standard German is also what the
+  # checks read on the main path (Whisper GSW fine-tunes transcribe dialect speech to Standard German).
+  # gsw = dialect (needs a model that writes it; keep for a bigger generator).
+  language: de
   dialect: Zürichdeutsch
   opens: advisor
   customer: Kundin
@@ -230,7 +236,7 @@ families:
           label: no_alert
           decisive: >-
             Der Berater sagt ausdrücklich, der Kunde solle den Code aus der SMS niemandem nennen, auch ihm
-            nicht, sondern selbst in der App eingeben. Der Kunde sagt nur "ich han d SMS übercho" und gibt den
+            nicht, sondern selbst in der App eingeben. Der Kunde sagt nur "ich habe die SMS bekommen" und gibt den
             Code selbst in der App ein, ohne Ziffern zu nennen.
           reason: Der Code wird nicht ausgesprochen; die Beratung warnt davor.
         review:
@@ -285,7 +291,7 @@ families:
         alarm:
           label: alarm
           decisive: >-
-            Die Kundin sagt "mini PIN isch doch 4 7 1 9, oder stimmt das nöd?" und meint damit die PIN ihrer
+            Die Kundin sagt "meine PIN ist doch 4 7 1 9, oder stimmt das nicht?" und meint damit die PIN ihrer
             aktuellen, neuen Karte. Die Beraterin sagt danach, sie dürfe die PIN nie nennen.
           reason: Die PIN der aktuellen Karte wurde am Telefon ausgesprochen.
         harmless:
@@ -664,7 +670,7 @@ families:
           decisive: >-
             Er hat EINE Rechnung der Schreinerei über 45'000 Franken. Er will sie in drei Zahlungen zu je
             15'000 Franken aufteilen, ausdrücklich damit die Zweitunterschrift seines Partners nicht nötig
-            wird, "de muess das nöd gseh".
+            wird, "der muss das nicht sehen".
           reason: Eine einzige Rechnung soll aufgeteilt werden, um die interne Zweitunterschrift zu umgehen.
         harmless:
           label: no_alert
@@ -706,8 +712,8 @@ families:
         review:
           label: review
           decisive: >-
-            Sie will zwei Zahlungen zu 4'500 Franken an den Trikotlieferanten machen und sagt nur "so isch
-            es eifacher". Ob es eine oder zwei Rechnungen sind und ob der Vorstand Bescheid weiss, bleibt
+            Sie will zwei Zahlungen zu 4'500 Franken an den Trikotlieferanten machen und sagt nur "so ist
+            es einfacher". Ob es eine oder zwei Rechnungen sind und ob der Vorstand Bescheid weiss, bleibt
             offen.
           reason: Teilbeträge verlangt, Zusammenhang und Motiv bleiben unklar.
           open: Ob es eine Rechnung ist und ob die Vorstandsgenehmigung umgangen werden soll.
@@ -725,8 +731,8 @@ families:
         alarm:
           label: alarm
           decisive: >-
-            Der BERATER schlägt selbst vor: "Mached Sie doch zwei Überwiisige à 15'000, denn gaht das nöd über
-            d Zahligskontrolle." Der Kunde ist einverstanden. Es ist eine einzige Rechnung für die Maschine.
+            Der BERATER schlägt selbst vor: "Machen Sie doch zwei Überweisungen à 15'000, dann geht das nicht über
+            die Zahlungskontrolle." Der Kunde ist einverstanden. Es ist eine einzige Rechnung für die Maschine.
           reason: Die Beratung schlägt vor, eine einzige Rechnung aufzuteilen, um die interne Zahlungskontrolle zu umgehen.
         harmless:
           label: no_alert
@@ -738,7 +744,7 @@ families:
         review:
           label: review
           decisive: >-
-            Der Berater schlägt vor, die 30'000 in zwei Zahlungen aufzuteilen, "wäg de Liquidität". Ob damit
+            Der Berater schlägt vor, die 30'000 in zwei Zahlungen aufzuteilen, "wegen der Liquidität". Ob damit
             die Zahlungskontrolle umgangen werden soll oder es echte Liquiditätsgründe gibt, bleibt offen.
           reason: Aufteilung vorgeschlagen, Motiv unklar.
           open: Ob die Aufteilung die Zahlungskontrolle umgehen soll.
@@ -757,7 +763,7 @@ families:
           label: alarm
           decisive: >-
             Sie hat EINE Hotelrechnung über 18'000 Franken und will sie in zwei Kartenzahlungen zu 9'000
-            aufteilen lassen, damit der Finanzchef sie nicht freigeben muss, "de wott immer alles wüsse".
+            aufteilen lassen, damit der Finanzchef sie nicht freigeben muss, "der will immer alles wissen".
           reason: Eine Rechnung soll aufgeteilt werden, damit die Freigabe des Finanzchefs nicht greift.
         harmless:
           label: no_alert
@@ -798,8 +804,8 @@ families:
           label: alarm
           family: access
           decisive: >-
-            Sie nennt die letzten vier Ziffern (4471) und sagt dann ungefragt "und mini PIN isch 9 0 5 2, falls
-            Sie die bruuched zum Sperre". Die Karte ist zu diesem Zeitpunkt noch nicht gesperrt und die PIN
+            Sie nennt die letzten vier Ziffern (4471) und sagt dann ungefragt "und meine PIN ist 9 0 5 2, falls
+            Sie die zum Sperren brauchen". Die Karte ist zu diesem Zeitpunkt noch nicht gesperrt und die PIN
             gültig. Die Beraterin sagt danach, sie brauche die PIN nie.
           reason: Die gültige PIN der noch aktiven Karte wurde am Telefon ausgesprochen.
 
@@ -847,6 +853,6 @@ families:
           family: access
           decisive: >-
             Sie nennt die Reservationsnummer und dann den sechsstelligen Bestätigungscode, der gerade für
-            genau diese Zahlung per SMS gekommen ist und noch gültig ist: 3 1 4 1 5 9, "chönd Sie das grad für
-            mich iigä?".
+            genau diese Zahlung per SMS gekommen ist und noch gültig ist: 3 1 4 1 5 9, "können Sie das gleich für
+            mich eingeben?".
           reason: Ein gültiger Bestätigungscode für die laufende Zahlung wurde am Telefon vorgelesen.

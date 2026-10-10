@@ -212,3 +212,90 @@ pushing stages as they land (see docs/STATUS.md). First CPU-only numbers in READ
   unseen-call facts system: AUC ~0.77-0.87.
 - 14B vs 7B on facts: +0.03 AUC, CIs overlap heavily -> no detectable difference at n=24 dialogues; 3x cost.
 - Queued with the 14B up: facts on large-v3 ASR transcripts, facts on ORACLE dialect scripts.
+
+## 2026-10-10T03:17 R2-ish: blind table as review-only second opinion (14B, re-fusion, 0 GPU)
+- hybrid(core=facts, second_opinion=facts_blind): review recall 50% -> 83% (fixed thr), miss 23% -> 15%, but FAR 14% -> 36%
+  (over the 20% cap); AUC unchanged 0.87. A trade-off, not a win -> offer as an officer-selectable "strict review"
+  policy (more reviews, fewer misses), default off.
+
+## 2026-10-10T03:38 facts x ASR x table (Qwen2.5-14B, dev 48 calls, flag AUC [CI] / CV FAR / CV miss)
+| transcripts | tuned table | blind table | tuned + blind (mean) |
+|---|---|---|---|
+| default turbo int8 | 0.87 [0.76, 0.96] / 14% / 23% | 0.77 [0.62, 0.91] / 36% / 23% | 0.88 [0.77, 0.98] / 27% / 19% |
+| gcoli large-v3 MIT | 0.85 [0.73, 0.96] / 18% / 23% | **0.85** [0.72, 0.96] / 27% / 12% | 0.87 [0.76, 0.97] / 27% / 19% |
+- KEY: with the better ASR the BLIND table (never saw a call) matches the tuned one (0.85 vs 0.85); on turbo it lags
+  (0.77). The tuned wording's edge was largely compensation for turbo ASR errors -> large-v3 + a criteria-derived
+  table is the most defensible combination (least dev-fitting). Tuned+blind ensemble (two independent wordings):
+  0.87-0.88, no detectable difference, more robust to wording.
+- Verified served model ids for the l3 run.
+
+## 2026-10-10T03:59 V3 ORACLE ceiling with facts (Qwen2.5-14B, dialect reference scripts = ref_gsw, no ASR)
+- tuned table: flag AUC 0.90 [0.79, 1.00], CV FAR 0% , miss 23%, 3-class acc 88%, review recall 67% (ORACLE).
+- blind table: 0.78 [0.64, 0.92] (vs 0.85 on large-v3 Standard German ASR text).
+- Reading: perfect transcripts add only ~0.03-0.05 AUC over large-v3 ASR (0.85-0.87) -> ASR is no longer the bottleneck
+  once large-v3 + facts are used. Dialect text is not easier for the LLM than Standard German ASR output (blind table
+  0.78 dialect vs 0.85 Standard German) -> supports transcribing to Standard German (RQ3), CIs overlap.
+
+## 2026-10-10T04:01 R4 on 7B (turbo transcripts): blind table 0.73 [0.57, 0.88] vs tuned 0.84; ensemble 0.82.
+- Same pattern as 14B/Qwen3-8B on turbo transcripts: the blind table lags by ~0.1 AUC. Waiting for 7B on large-v3.
+
+## 2026-10-10T04:15 D1 / RQ10 synthetic out-of-sample stress test of `facts` (Qwen2.5-14B-AWQ judge, ORACLE text)
+- Set: data_synth/v1, 74 text scripts, 26 scenarios x twins (alarm / harmless / review; 44 twins are minimal-pair
+  rewrites of their base), written FRESH from config/synth_scenarios.yaml by Qwen3-8B-AWQ (generator) in Swiss Standard
+  German (the 8B's dialect was broken pseudo-dialect with loops -> dropped). Labels from the scenario file, never the LLM.
+  Judge = Qwen2.5-14B-AWQ (a different model than the generator). Split `external` (no holdout look), CV folds and
+  bootstrap units = scenario (26). Label audit by Claude BEFORE results: 4 invalid + 5 doubtful -> audited subset 65.
+- experiments/synth_stress.yaml (74) | synth_stress_audited.yaml (65):
+  v1 (kw+pat+judge+geval) flag AUC 0.83 | 0.89; CV FAR 61% | 56%; miss 4% | 5%; review recall 52% | 62%
+  facts_only               0.82 | 0.84;        14% | 4%;        33% | 35%;      0% (CV; fixed 57%)
+  judge_facts              0.90 | 0.94;        57% | 52%;        7% | 8%;       71% | 75%
+  kwpat_facts              0.86 | 0.92;        18% | 8%;        24% | 25%;      67% | 62%
+  facts_blind_only         0.76 | 0.77;        21% | 20%;       30% | 32%
+- Same model on dev ORACLE (V3 above): tuned facts 0.90 -> 0.82 synthetic (-0.08; alarm AUC 0.91 -> 0.75), blind table
+  0.78 -> 0.76 (-0.02). The tuned wording loses more out of sample (consistent with dev-fitting) but still edges the
+  blind table. CIs overlap everywhere except FAR/miss/review; diff-in-diff has no CI (indicative only).
+- facts keeps its FAR advantage out of sample (14% vs 61%, real) but its extra misses concentrate in ACCESS: 3/12
+  flagged (blind table 10/12): `current` comes back "unknown" for every read-out code (even "noch zehn Minuten gültig"),
+  and no rule catches spoken=yes & current=unclear & validity_open=no -> no_alert. Other families: 28/34 flagged.
+- Other systematic facts errors: advisor as the inside source (trade `inside_info` examples only list family/employer
+  -> unknown -> review instead of alarm); unsolicited advisor disclosure (no "you have no POA" sentence ->
+  not_authorized=no -> review); advisor's leading question "um den Finanzchef zu umgehen, richtig?" -> avoid_control=yes
+  although the customer denies it (review -> alarm).
+- Caveats: synthetic, LLM-written (Qwen family on both sides), more explicit than the case calls (the free judge does
+  much better here than on dev: 0.83-0.89 vs 0.68); 26 units -> wide CIs. Not the case holdout.
+
+## 2026-10-10T04:03 champion candidate: large-v3 MIT ASR + Qwen2.5-7B + tuned facts (dev, 48 calls)
+- qwen25_7b_facts_l3: flag AUC 0.89 [0.77, 0.99], CV flag F1 0.86, FAR 14%, miss 15%, alarm F1 0.86, review recall 67%,
+  3-class acc 79% — best non-ORACLE result of the night; fits 12 GB (staged: ASR then LLM). Blind table on it 0.79.
+- vs v1 (turbo + free judge, 7B): AUC 0.68 -> 0.89. Both ASR (+keyword recall) and check design contribute;
+  with facts the ASR upgrade now shows (7B facts: turbo 0.84 -> large-v3 0.89; CIs overlap).
+- DECISION: freeze config/recommended.yaml = large-v3 MIT fp16 + Qwen2.5-7B-AWQ + facts (w1) + keywords (w0.15) +
+  patterns (w0.1), abstain_on_empty; experiments/champion.yaml queued (dev) after the 7B phase; scripts/run_staged.sh
+  for new calls on one 12 GB GPU. 14B = optional upgrade for bigger GPUs (no detectable gain here).
+
+## 2026-10-10T04:04 RQ3 dialect vs Standard German input, facts check
+| input text | Qwen2.5-7B | Qwen2.5-14B |
+|---|---|---|
+| dialect reference script (ORACLE ref_gsw, perfect words) | 0.76 [0.56, 0.92] | 0.90 [0.79, 1.00] |
+| Standard German ASR (large-v3 MIT) | **0.89** [0.77, 0.99] | 0.85 [0.73, 0.96] |
+| Standard German ASR (turbo int8) | 0.84 | 0.87 |
+- The 7B reads Standard German ASR output better than PERFECT dialect text; the 14B copes with dialect. For a
+  12 GB / 7B deployment "transcribe straight to Standard German" is the right view (RQ3). CIs overlap pairwise.
+
+## 2026-10-10T04:08 D1/RQ10 synthetic out-of-sample stress test (74 fresh twin scripts, text only, judged by Qwen2.5-14B)
+- Scripts written by Qwen3-8B from fresh scenarios (labels from the scenario file, never from the LLM), audited blind by
+  a different model family before results (9 doubtful/contradicting -> results on 74 and on 65 clean).
+- flag AUC (74 / 65): v1 0.83/0.89, facts 0.82/0.84, judge+facts 0.90/0.94, kw+pat+facts 0.86/0.92, blind table 0.76/0.77.
+  FAR: v1 61%/56% vs facts 14%/4% (real -46 pp); miss: facts 33% vs v1 4% (real +28 pp).
+- Out of sample, facts keeps its false-alarm advantage but no longer out-ranks the free judge; the tuned table drops
+  0.90 -> 0.82 (14B, dev ORACLE -> synthetic), the blind one 0.78 -> 0.76 => some dev-fitting confirmed.
+- Misses concentrate in ACCESS (facts flags 3/12): "code spoken, validity unknown" falls to no_alert — a rule gap vs
+  criteria ("validity cannot be established" = undetermined). DECISION: policy_table_v2.yaml adds access.review_2
+  (spoken = yes and current = unclear -> review); evaluated on dev as champion variant `table_v2` (fact answers cached).
+- kw+pat+facts (closest to the recommended profile) is the best balance on synthetic: AUC 0.86/0.92, FAR 18%/8%.
+
+## 2026-10-10T04:06 V1/RQ1 English view (LLM translation of the de ASR view, 7B) with facts
+- facts on en_from_de: flag AUC 0.82 [0.68, 0.95] vs 0.84 on de (same 7B, same turbo transcripts); CV FAR 18% both.
+- No detectable difference; translation costs an extra LLM pass per call and loses a little. DECISION: keep the
+  Standard German view. (en_speech = Whisper speech translation not run: vanilla large-v3 next to vLLM does not fit
+  and the de/en comparison already shows no gain.)
