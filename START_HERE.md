@@ -17,8 +17,8 @@ on `main` (code) and in `research/` (results). The brief it worked from is kept 
 - `config/recommended.yaml`: the frozen champion. Whisper large-v3 Swiss German (MIT) + Qwen2.5-7B `facts` +
   light keywords/patterns.
 - `runs/recommended/`: all 60 case calls processed, with snippets. This is what the demo shows.
-- `runs/experiments/*/summary.md`: every experiment. `runs/holdout_log.jsonl` has the 2 holdout looks (champion
-  + v1 reference).
+- `runs/experiments/*/summary.md`: every experiment. `runs/holdout_log.jsonl` has the 3 holdout looks (7B
+  champion, v1 reference, 14B candidate B); the holdout is spent.
 - `research/leaderboard.md`, `research/report/`, `research/findings/RQ1-RQ12.md` and `research/journal.md`
   (timestamped log of every run and decision).
 - How to run things: README "Quickstart" and "GPU host setup". Component status: `docs/STATUS.md`.
@@ -28,15 +28,17 @@ on `main` (code) and in `research/` (results). The brief it worked from is kept 
    miss 15%, 3-class 79%. Holdout run once: 0 false alarms, alarm F1 0.67. Caveats include the paraphrase
    fragility (AUC 0.87 -> 0.72).
 2. `research/DEMO.md`: the 5-minute jury script with calls, clicks, expected numbers and the fallback plan.
-3. `research/DECISIONS.md`: decision records D0-D5. Last updated 02:20, so D1-D3 still say "proposed", although
-   the champion was frozen at 04:09 (journal).
+3. `research/DECISIONS.md`: decision records D0-D5 (accepted; D2b = policy-table variant is a team decision).
+4. `research/ideas_round3.md`: biggest remaining risk (silent misses on new wording) + Q&A cheat sheet per step.
 
 **Open for the team:**
 - Table v3 (explicit "open fact" review rules): adopt it for Sunday or offer it only as the officer's "strict
   review" policy? It was never run on the holdout, and its builder knew about a holdout failure mode (journal
   04:17-04:20).
-- Paraphrase ensemble (R6, `config/policy_table_para2.yaml`) as the fix for the wording fragility: still being
-  tested at handover.
+- Wording fragility (7B): paraphrase ensemble (R6), confident-clearance rule (S1) and twin few-shot (S2) were tried
+  and rejected (journal 04:35-05:20). Only the 14B was wording-robust on dev, but it was worse on dev and the holdout
+  (`config/recommended-14b.yaml`, candidate B).
+- Single-pass fallback for live processing: `config/recommended-turbo.yaml` (dev AUC 0.85).
 
 **Open questions for the organisers** (record the answers in `docs/CASE.md`):
 - How is `review` scored: as a hit, a separate class, or ignored? Precision/recall on alarm or on alarm+review?

@@ -39,7 +39,7 @@ that used to be here are in git history (`git show 3d6c7bc:docs/STATUS.md`) and 
 | # | component | prio | spec | status | note |
 |---|---|---|---|---|---|
 | 1 | Views, `translator` plugins (`llm_translate`, `hf_mt`, `identity`), multi-view pipeline, check `view`, language-aware keywords | P0 | §1, §5 | done | `views.py`, `translate/`; en_from_de (RQ1: no gain) and ORACLE ref_gsw (RQ3) were run. en_speech never ran (vanilla large-v3 does not fit next to vLLM), `hf_mt` untested |
-| 2 | Holdout lock `config/splits.yaml`, `--split dev/holdout/all`, holdout log | P0 | §1c | done | `--split` defaults to `dev` everywhere. Holdout looked at twice (champion + v1 reference), both in `runs/holdout_log.jsonl` |
+| 2 | Holdout lock `config/splits.yaml`, `--split dev/holdout/all`, holdout log | P0 | §1c | done | `--split` defaults to `dev` everywhere. Holdout looked at three times (7B champion, v1 reference, 14B candidate B), all in `runs/holdout_log.jsonl`; now spent |
 | 3 | Experiment runner `callguard experiment`, `experiments/*.yaml`, dev-fold CV, cost | P0 | §2 | done | 16 specs in `experiments/`, results in `runs/experiments/*/summary.md`; `--dry-run`, `--rescore`, re-fusion variants |
 | 4 | ASR eval `callguard asr-eval` (WER/CER, keyword-spot recall), `asr-eval-compare` | P0 | §2 | done | `eval_asr.py`, `commands/asr_eval.py`. 8 ASR models/settings compared (findings/RQ2.md) |
 | 5 | Statistics + report (paired bootstrap, McNemar, flips, charts), `report`, `leaderboard` | P0 | §9 | done | `stats.py`, `report.py`; flag AUC + CV@FAR20 as the primary metric (DECISIONS D0); audited (stats verified) |
