@@ -301,14 +301,18 @@ class Rule:
     when: str
     text: str = ""
     node: Node = field(default=("true",), repr=False)
+    enabled: bool = True  # `enabled: false` in the table: kept and validated, but never decides
+    basis: str = ""  # optional legal basis shown to the officer (display only, not in the cache key)
 
 
 @dataclass
 class FamilyTable:
     family: str
     facts: list[Fact]
-    rules: list[Rule]
+    rules: list[Rule]  # the enabled rules, in table order (only these decide)
     raw: dict[str, Any] = field(default_factory=dict, repr=False)
+    disabled: list[Rule] = field(default_factory=list)  # `enabled: false`: switched off by the officer
+    basis: str = ""  # optional legal basis of the family (display only)
 
     def fact(self, fid: str) -> Fact:
         return next(f for f in self.facts if f.id == fid)
@@ -335,7 +339,7 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
         where = f"{source}: family {fid}"
         if not isinstance(entry, dict):
             raise PolicyTableError(f"{where}: expected a mapping with facts and rules")
-        bad = set(entry) - {"facts", "rules"}
+        bad = set(entry) - {"facts", "rules", "basis"}
         if bad:
             raise PolicyTableError(f"{where}: unknown keys {sorted(bad)}")
         facts: list[Fact] = []
@@ -361,14 +365,15 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
             raise PolicyTableError(f"{where}: no facts")
         ids = {f.id for f in facts}
         rules: list[Rule] = []
+        all_rules: list[Rule] = []  # enabled and disabled, in table order
         for i, r in enumerate(entry.get("rules") or []):
             if not isinstance(r, dict):
                 raise PolicyTableError(f"{where}: rule #{i} is not a mapping")
-            bad = set(r) - {"id", "label", "when", "text"}
+            bad = set(r) - {"id", "label", "when", "text", "enabled", "basis"}
             if bad:
                 raise PolicyTableError(f"{where}: rule #{i}: unknown keys {sorted(bad)}")
             rid = str(r.get("id") or f"{fid}.rule_{i + 1}")
-            if any(x.id == rid for x in rules):
+            if any(x.id == rid for x in all_rules):
                 raise PolicyTableError(f"{where}: duplicate rule id {rid!r}")
             label = str(r.get("label") or "")
             if label not in RULE_LABELS:
@@ -379,11 +384,23 @@ def parse_policy_table(raw: Any, source: str = "policy table") -> PolicyTable:
                 node = parse_rule(when, ids)
             except PolicyTableError as e:
                 raise PolicyTableError(f"{where}: rule {rid}: {e}") from None
-            rules.append(Rule(id=rid, label=label, when=when, text=str(r.get("text") or ""), node=node))  # type: ignore[arg-type]
+            enabled = r.get("enabled", True)
+            if enabled not in (True, False):
+                raise PolicyTableError(f"{where}: rule {rid}: enabled must be true or false, got {enabled!r}")
+            rule = Rule(id=rid, label=label, when=when, text=str(r.get("text") or ""), node=node,  # type: ignore[arg-type]
+                        enabled=enabled, basis=str(r.get("basis") or ""))
+            all_rules.append(rule)
+            if enabled:
+                rules.append(rule)
+        # cache key material: `enabled` only when false and `basis` never, so tables without disabled
+        # rules hash exactly as before these keys existed
         out[str(fid)] = FamilyTable(family=str(fid), facts=facts, rules=rules,
                                     raw={"facts": [f.__dict__ for f in facts],
-                                         "rules": [{"id": r.id, "label": r.label, "when": r.when,
-                                                    "text": r.text} for r in rules]})
+                                         "rules": [{"id": r.id, "label": r.label, "when": r.when, "text": r.text,
+                                                    **({} if r.enabled else {"enabled": False})}
+                                                   for r in all_rules]},
+                                    disabled=[r for r in all_rules if not r.enabled],
+                                    basis=str(entry.get("basis") or ""))
     return PolicyTable(families=out, path=source)
 
 
