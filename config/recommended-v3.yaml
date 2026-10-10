@@ -1,0 +1,10 @@
+# Recommended profile with policy table v3 (+ criteria-derived "decisive fact open" review questions). Team decision
+# (research/DECISIONS.md D2b): fewer misses with unchanged false alarms on dev, synthetic and re-recorded audio; not
+# holdout-validated. NOTE: `callguard batch -c recommended-v3` over all 60 case calls prints the expected label of the
+# holdout calls next to the v3 decision = a 4th holdout look; log it in research/journal.md if you do that.
+extends: recommended.yaml
+description: Recommended + policy table v3 (strict review questions)
+checks:
+  - {name: keywords, type: keywords, weight: 0.15, fuzzy: 90}
+  - {name: patterns, type: patterns, weight: 0.1}
+  - {name: facts, type: facts, llm: default, parallel: 5, weight: 1.0, policy_table: config/policy_table_v3.yaml}
