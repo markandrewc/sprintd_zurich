@@ -132,14 +132,16 @@ def outcomes(app: AppState, policy: fpol.FactPolicy, doc: dict[str, Any] | Polic
     overrides = app.settings.overrides()
     fams = app.families if app.all_families else None
     key = stable_hash({"p": policy.key(), "t": {k: v.raw for k, v in table.families.items()},
+                       "x": table.cross.raw if table.cross is not None else None,
                        "sig": app.loaded.signature, "o": overrides, "f": [x.id for x in fams or []]})
     hit = _MEMO.get(key)
     if hit is not None:
         _MEMO.move_to_end(key)
         return hit
     families = fams or app.engine.families()
-    out = fpol.redecide(app.loaded.results, table.families, policy,
-                        lambda r, c: f.decide_checks(r.transcript, c, families, overrides), **f.scoring)
+    out = fpol.redecide(app.loaded.results, table, policy,
+                        lambda r, c: f.decide_checks(r.transcript, c, families, overrides),
+                        f._names(app.all_families or families), **f.scoring)
     _MEMO[key] = out
     while len(_MEMO) > 48:
         _MEMO.popitem(last=False)

@@ -379,7 +379,16 @@ def merge_tables(base: dict[str, Any], live: dict[str, Any], draft: dict[str, An
     bf, lf, df = (dict((d or {}).get("families") or {}) for d in (base, live, draft))
     if set(bf) != set(lf):  # a Prüfart added / removed outside this draft
         return None
-    out = {k: v for k, v in draft.items() if k != "families"}
+    out = {k: v for k, v in draft.items() if k not in ("families", "cross_rules")}
+    bc, lc, dc = (d.get("cross_rules") for d in (base, live, draft))  # cross rules: three-way like a family part
+    if lc == bc:
+        cross = dc
+    elif dc in (bc, lc):
+        cross = lc
+    else:
+        return None
+    if cross:
+        out["cross_rules"] = cross
     fams: dict[str, Any] = {}
     for fid, dfam in df.items():
         if fid not in bf:
