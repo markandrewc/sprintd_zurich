@@ -31,7 +31,7 @@ from callguard.ui import backend as be
 
 APP = Path(__file__).resolve().parents[1] / "src" / "callguard" / "demo" / "app.py"
 PAGES = {"cases": None, "call": "pages/call.py", "settings": "pages/rules.py", "quality": "pages/quality.py",
-         "process": "pages/process.py"}
+         "process": "pages/process.py", "facts": "pages/facts.py", "keywords": "pages/keywords.py"}
 
 
 
@@ -81,16 +81,16 @@ def _find_html(node) -> list[str]:
 # --------------------------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("page", [p for p in PAGES if p != "settings"])
+@pytest.mark.parametrize("page", [p for p in PAGES if p not in ("settings", "facts")])
 def test_every_demo_page_renders(env: FixtureEnv, page: str):
     at = run_demo(PAGES[page])
     assert at.title, f"{page} has no title"
 
 
-def test_rules_and_settings_is_one_top_down_page(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """«Regeln & Einstellungen»: explainer, how strict, what is looked for (questions then the rules built from
-    them), keywords, then preview + approval, all on one page; the Regelwerk sections come from the officer
-    UI's page (embedded layout) on a tmp copy of the table, so its version store never writes into the repo."""
+def test_facts_and_rules_tabs_single_reader_profile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """Profile with ONE reader (recommended): «Regeln» keeps «Wie streng?» (threshold + Prüfmodus) and points to the
+    dual-reader profile for rule editing; «Fakten» shows the questions and the four-eyes governance (Regelwerk
+    sections, embedded layout) on a tmp copy of the table, so its version store never writes into the repo."""
     import shutil
 
     import yaml
@@ -106,15 +106,15 @@ def test_rules_and_settings_is_one_top_down_page(tmp_path: Path, monkeypatch: py
     monkeypatch.setenv(be.ENV_ARGS, env.args + f" --set paths.tuning={tmp_path / 'tuning.yaml'}"
                        + f" --set checks.{idx}.policy_table={active}")
     at = run_demo(PAGES["settings"])
-    assert at.title[0].value == "Regeln & Einstellungen"
-    assert [h.value for h in at.header] == ["Wie streng?", "Was wird gesucht?", "Stichwörter",
-                                             "Änderungen prüfen & freigeben"]
-    body = texts(at)
-    assert "So entscheidet callguard" in body and "Regeln ändern kostet keine KI-Zeit" in body
-    assert "1 · Fragen an die KI" in body and "2 · Regeln aus diesen Fragen" in body
-    assert "verwendet in Regel 1" in body  # question -> rule link
-    assert "WENN" in body and "Aktiv: **Version" in body  # rule cards + governance status
+    assert at.title[0].value == "Regeln"
+    assert [h.value for h in at.header] == ["Wie streng?"]
     assert at.slider(key="dm_threshold") is not None
+    assert "dual-facts" in texts(at)
+    at = run_demo(PAGES["facts"])
+    assert at.title[0].value == "Fakten"
+    assert [h.value for h in at.header] == ["Fakten je Prüfart", "Fakten ändern: Freigabe durch zweite Person nötig"]
+    body = texts(at)
+    assert "Aktiv: **Version" in body and "einem** KI-Leser" in body
     assert (active.parent / "policy_versions").is_dir()
     assert sorted(p.name for p in (ROOT / "config" / "policy_versions").glob("*")) == repo_versions
 

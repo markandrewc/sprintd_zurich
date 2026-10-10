@@ -45,6 +45,19 @@ class FactRow:
     question_de: str | None = None  # the full German question of the policy table (what the officer reads)
     p: dict[str, float] = field(default_factory=dict)  # yes / no / unclear probabilities
     evidence: list[str] = field(default_factory=list)  # segment ids the answer rests on (empty: whole call)
+    # two readers (fact policy profiles): reader id -> {label, p, value, rule, band?}; agree: same value
+    readers: dict[str, dict[str, Any]] = field(default_factory=dict)
+    agree: bool | None = None
+    combination: str | None = None
+
+    @property
+    def agreement(self) -> str | None:
+        """«einig» / «uneinig → unklar» / «uneinig» (None: one reader only)."""
+        if self.agree is None:
+            return None
+        if self.agree:
+            return "einig"
+        return "uneinig → unklar" if self.value == "unclear" else "uneinig"
 
     @property
     def text(self) -> str:
@@ -167,7 +180,10 @@ def fact_rows(detail: Mapping[str, Any], ft: FamilyTable | None, decisive: Seque
         rows.append(FactRow(fact=fid, label=str(e.get("label") or fid), value=v,
                             confidence=None if p is None else float(p), role=e.get("role"),
                             decisive=fid in decisive, question=e.get("question"), question_de=de, p=probs,
-                            evidence=[str(s) for s in (e.get("evidence") or [])]))
+                            evidence=[str(s) for s in (e.get("evidence") or [])],
+                            readers=dict(e.get("readers") or {}),
+                            agree=e.get("agree") if isinstance(e.get("agree"), bool) else None,
+                            combination=e.get("combination")))
     return sorted(rows, key=lambda r: not r.decisive)
 
 

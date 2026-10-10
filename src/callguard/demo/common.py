@@ -79,8 +79,27 @@ def table_for(app: AppState, result: CallResult) -> PolicyTable | None:
     return active_table(app)
 
 
+def with_fact_policy(app: AppState, result: CallResult) -> CallResult:
+    """Profiles deciding with the fact policy (two readers): the call with both readers replaced by the combined
+    facts result the live fusion decides on (per fact both readers' p, their values, the band, agreement)."""
+    from callguard.demo import facts_ui as fu
+    from callguard.fact_policy import combined_checks, has_both
+
+    fus = fu.fusion(app)
+    if fus is None:
+        return result
+    try:
+        pol = fus.fact_policy()
+        if not has_both(result, pol):
+            return result
+        return result.model_copy(update={"checks": combined_checks(result, fus.tables(), pol, **fus.scoring)})
+    except Exception as e:  # the card falls back to the stored first reader
+        log.warning("card: fact policy view of %s failed: %s", result.call_id, e)
+        return result
+
+
 def card_for(app: AppState, call_id: str, decision: Decision | None = None) -> cd.Card:
-    result = app.loaded.results[call_id]
+    result = with_fact_policy(app, app.loaded.results[call_id])
     d = decision or app.decided[call_id].decision
     s = app.settings
     try:

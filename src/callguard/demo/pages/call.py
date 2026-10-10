@@ -15,6 +15,7 @@ from callguard.demo import media
 from callguard.demo import review
 from callguard.demo import state as ds
 from callguard.demo.transcript import ROLE_DE, keyword_terms, player_html
+from callguard.fact_policy import combination_label
 from callguard.types import fmt_ts
 from callguard.ui import render as ui
 from callguard.ui.backend import LABEL_RANK, parse_seconds, short_label
@@ -111,11 +112,28 @@ def _seek(seconds: float) -> None:
 def fact_explained(f: cd.FactRow, where: str) -> None:
     """One fact: the answer in the title; inside the full question, the probabilities and the passage of the
     call the answer rests on, with a button that plays it (10 s early)."""
-    with st.expander(f"{f.label}: **{cd.VALUE_DE.get(f.value, f.value)}**"
-                     + (f" ({f.confidence:.2f})" if f.confidence is not None else ""),
-                     icon=review.VALUE_ICON.get(f.value)):
+    agreement = f.agreement
+    title = f"{f.label}: **{cd.VALUE_DE.get(f.value, f.value)}**"
+    if agreement is None:
+        title += f" ({f.confidence:.2f})" if f.confidence is not None else ""
+    else:
+        title += f" · {agreement}"
+    with st.expander(title, icon=review.VALUE_ICON.get(f.value)):
         st.markdown(f"**Frage an die KI:** {ui.esc(f.question_de or f.question or f.label)}")
-        if f.p:
+        if f.readers:  # two readers side by side: p(ja), the rule that turns it into a value, the value
+            cols = st.columns(len(f.readers) + 1)
+            for col, rd_ in zip(cols, f.readers.values()):
+                p = rd_.get("p") or {}
+                col.metric(f"{rd_.get('label', '?')} p(ja)", "–" if not p else f"{float(p.get('yes', 0.0)):.2f}",
+                           help=f"Regel dieses Lesers: {rd_.get('rule', '')}")
+                col.markdown(f"→ **{cd.VALUE_DE.get(str(rd_.get('value')), '?')}**  \n:small[{rd_.get('rule', '')}]")
+            badge = {"einig": ":green-badge[einig]", "uneinig → unklar": ":orange-badge[uneinig → unklar]"}.get(
+                agreement or "", f":orange-badge[{agreement}]")
+            cols[-1].metric("zusammen", cd.VALUE_DE.get(f.value, f.value))
+            names = [str(r.get("label") or "?") for r in f.readers.values()] + ["A", "B"]
+            comb = combination_label(str(f.combination or ""), names[0], names[1]) if f.combination else ""
+            cols[-1].markdown(f"{badge}  \n:small[{ui.esc(comb)}]")
+        elif f.p:
             st.caption("Antwort der KI: " + " · ".join(
                 f"{'**' if k == f.value else ''}{cd.VALUE_DE[k]} {f.p.get(k, 0.0):.2f}{'**' if k == f.value else ''}"
                 for k in ("yes", "no", "unclear")))

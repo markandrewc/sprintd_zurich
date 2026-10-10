@@ -98,7 +98,10 @@ def test_rule_builder_live_hits(env: FixtureEnv):
 def test_call_card_shows_both_readers(env: FixtureEnv):
     at = run("pages/call.py", {"call": REVIEW_ID})
     text = body(at) + "\n".join(e.label for e in at.expander)
-    assert "Qwen" in text and "Kev" in text and "uneinig" in text
+    assert "uneinig → unklar" in text and "Einigkeit" in text
+    metrics = [(m.label, m.value) for m in at.metric]
+    assert ("Qwen p(ja)", "0.80") in metrics and ("Kev p(ja)", "0.50") in metrics  # «current», side by side
+    assert ("zusammen", "unklar") in metrics
 
 
 def test_keywords_tab(env: FixtureEnv):
