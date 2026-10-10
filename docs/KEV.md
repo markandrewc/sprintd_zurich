@@ -116,3 +116,19 @@ Run in stages:
 
 Without step 2 the pinned stand-in refuses the role request, roles fall back to "first speaker = advisor", the
 fallback is flagged as `role_error` and it is not cached.
+
+## Two readers (Qwen + Kev on one fact sheet)
+Pre-registered in `research/findings/two_readers_prereg.md`; result in `research/findings/two_readers.md`
+(both rules FAIL the acceptance criteria, the champion stays). Fusion plugin `two_readers`
+(`src/callguard/fusion/two_readers.py`): rule `labels` (R1, each reader's label, disagreement -> review) or
+`facts` (R2, per fact |p_A(yes) - p_B(yes)| > 0.5 -> unclear), plus `a` / `b` (one reader alone).
+- Stored runs, no model: `uv run callguard agreement run` joins the finished `kev_vs_facts` variants per wording,
+  re-fuses them (`experiments/two_readers.yaml`) and writes `runs/experiments/two_readers/acceptance.md`.
+  Re-recorded audio once `kev_perturbed/kev_facts` exists: `uv run callguard agreement run --only perturbed`.
+- New calls, one 24 GB card (A5000 / 3090 / 4090): vLLM Qwen2.5-7B-AWQ (~6 GB weights; keep
+  `--gpu-memory-utilization` near 0.4 so the KV cache leaves room), Kev bf16 via serve_kev.py (~8 GB) and
+  large-v3 fp16 (~4 GB) fit together, so `uv run callguard run <wavs> -c two-readers` runs both readers in one
+  pass. Not tested on hardware yet (no 24 GB run so far).
+- 12 GB card (4070): Kev and vLLM do not fit together. Run `recommended` (vLLM) and the `kev_facts`-style Kev
+  pass in stages, then join the two result sets with `uv run callguard agreement merge <A dir> <B dir> <out dir>`
+  and re-fuse with `-c two-readers`-based experiment variants; the profile itself expects both servers up.

@@ -1,0 +1,128 @@
+"""Two-readers fusion: two facts checks (two model families, same fact sheet); agreement decides,
+disagreement goes to review. Logic and rationale: :mod:`callguard.agreement`; pre-registration:
+``research/findings/two_readers_prereg.md``.
+
+Config (see config/two-readers.yaml)::
+
+    checks:
+      - {name: facts, type: facts, llm: default}                      # reader A (Qwen, with evidence)
+      - {name: facts_kev, type: facts, llm: kev, evidence: false}     # reader B (Kev), same policy table
+    fusion:
+      type: two_readers
+      rule: labels          # labels (R1) | facts (R2) | a | b (one reader alone)
+      readers: [facts, facts_kev]
+      gap: 0.5              # R2: |p_A(yes) - p_B(yes)| > gap -> fact unclear
+      # + every weighted-fusion knob (threshold, review_band, max_uncertainty, abstain_on_empty, ...)
+
+Every other check (keywords, patterns, ...) enters each reader's weighted fusion unchanged. Pure re-fusion: it
+only reads stored CheckResults, so the UI slider, CV and ``refuse_from`` work as for the weighted fusion.
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
+from callguard import agreement as ag
+from callguard.checks.facts import DEFAULT_TABLE, FamilyTable, load_policy_table
+from callguard.fusion.weighted import WeightedFusion
+from callguard.types import CheckResult, Decision, Family, Transcript
+
+if TYPE_CHECKING:
+    from callguard.context import Context
+
+_LABEL_DE = {"alarm": "Alarm", "review": "Prüfen", "no_alert": "Kein Alarm"}
+_SCORING = ("alarm_base", "review_score", "review_confidence", "no_alert_scale")
+
+
+class TwoReadersFusion(WeightedFusion):
+    def __init__(self, ctx: "Context", *, rule: str = "labels", readers: list[str] | tuple[str, ...] = ("facts", "facts_kev"),
+                 gap: float = ag.DEFAULT_GAP, decide_at: float | None = None, policy_table: str | None = None,
+                 reader_labels: list[str] | tuple[str, ...] | None = None, **kw: Any):
+        super().__init__(ctx, **kw)
+        if rule not in ag.RULES:
+            raise ValueError(f"two_readers: rule must be one of {ag.RULES}, got {rule!r}")
+        if len(readers) != 2 or readers[0] == readers[1]:
+            raise ValueError(f"two_readers: readers must name two different checks, got {readers!r}")
+        if not 0.0 <= float(gap) <= 1.0:
+            raise ValueError(f"two_readers: gap must be within 0..1, got {gap}")
+        self.rule = rule
+        self.readers = (str(readers[0]), str(readers[1]))
+        self.gap = float(gap)
+        self.reader_labels = tuple(reader_labels) if reader_labels else self.readers
+        # R2 re-evaluates reader A's policy table with A's scoring constants (as configured on that check)
+        spec_a = self._check_spec(self.readers[0])
+        spec_b = self._check_spec(self.readers[1])
+        self.policy_table = str(policy_table or spec_a.get("policy_table") or DEFAULT_TABLE)
+        table_b = str(spec_b.get("policy_table") or DEFAULT_TABLE) if spec_b else self.policy_table
+        if rule == "facts" and spec_b and table_b != self.policy_table:
+            raise ValueError(f"two_readers: rule facts needs one policy table for both readers "
+                             f"({self.readers[0]}: {self.policy_table}, {self.readers[1]}: {table_b})")
+        self.decide_at = float(decide_at if decide_at is not None else spec_a.get("decide_at", 0.5))
+        self.scoring = {k: float(spec_a[k]) for k in _SCORING if k in spec_a}
+        self.params.update(rule=rule, readers=list(self.readers), gap=self.gap)
+        if rule == "facts":
+            self.params.update(policy_table=self.policy_table, decide_at=self.decide_at)
+            self.tables()  # a broken table fails at startup
+
+    def _check_spec(self, name: str) -> dict[str, Any]:
+        cfg = getattr(self.ctx, "cfg", None)
+        for spec in getattr(cfg, "checks", None) or []:
+            if (spec.get("name") or spec.get("type")) == name:
+                return dict(spec)
+        return {}
+
+    def tables(self) -> dict[str, FamilyTable]:
+        return load_policy_table(self.policy_table).families
+
+    # -- one reader --------------------------------------------------------------------------------
+
+    def _as_reader(self, results: dict[str, CheckResult], which: int) -> dict[str, CheckResult]:
+        """The call as seen by one reader: its facts result under reader A's name (so A's weight applies),
+        the other reader removed, every other check unchanged."""
+        a, b = self.readers
+        out = {k: v for k, v in results.items() if k not in (a, b)}
+        r = results.get(self.readers[which])
+        if r is not None:
+            out[a] = r
+        return out
+
+    def decide(self, transcript: Transcript, results: dict[str, CheckResult], families: list[Family],
+               overrides: dict[str, Any] | None = None,
+               views: dict[str, Transcript] | None = None) -> Decision:
+        a, b = self.readers
+        if self.rule in ("a", "b"):
+            return super().decide(transcript, self._as_reader(results, 0 if self.rule == "a" else 1), families,
+                                  overrides, views)
+        if self.rule == "facts":
+            combined = ag.combine_facts_results(self.tables(), results.get(a), results.get(b), name=a, gap=self.gap,
+                                                decide_at=self.decide_at, names=self.reader_labels, **self.scoring)
+            rest = {k: v for k, v in results.items() if k not in (a, b)}
+            d = super().decide(transcript, {**rest, a: combined}, families, overrides, views)
+            split = {f: ids for f, ids in combined.meta["two_readers"]["disagree"].items()}
+            if split:
+                fam_label = {f.id: f.label.split(" (")[0] for f in families}
+                d.reasons.append("Zwei Leser uneinig bei Fakten: " + "; ".join(
+                    f"{fam_label.get(f, f)}: {', '.join(ids)}" for f, ids in split.items()) + " (als offen gewertet).")
+            return d
+        # labels (R1)
+        da = super().decide(transcript, self._as_reader(results, 0), families, overrides, views)
+        db = super().decide(transcript, self._as_reader(results, 1), families, overrides, views)
+        missing = [n for n, r in zip(self.reader_labels, (results.get(a), results.get(b))) if ag.usable(r) is None]
+        label = "review" if missing else ag.label_agreement(da.label, db.label)
+        base = da if da.score >= db.score else db
+        d = base.model_copy(deep=True)
+        if not d.passages and (da.passages or db.passages):
+            d.passages = list(da.passages or db.passages)
+        d.label = label  # type: ignore[assignment]
+        d.score = round((da.score + db.score) / 2, 4)
+        d.uncertainty = round(max(da.uncertainty, db.uncertainty), 4)
+        la, lb = self.reader_labels
+        head = f"Zwei Leser: {la} {_LABEL_DE[da.label]}, {lb} {_LABEL_DE[db.label]}"
+        if missing:
+            head += f"; Leser {', '.join(missing)} fehlt/ausgefallen -> Prüfen."
+        elif da.label == db.label:
+            head += " (einig)."
+        else:
+            head += " -> uneinig, bitte prüfen."
+        d.reasons = [head, *base.reasons]
+        return d

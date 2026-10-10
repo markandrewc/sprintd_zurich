@@ -52,6 +52,7 @@ BUILTINS: dict[str, dict[str, str]] = {
         "learned": "callguard.fusion.learned:LearnedFusion",
         "hybrid": "callguard.fusion.hybrid:HybridFusion",
         "no_silent": "callguard.fusion.no_silent:NoSilentFusion",
+        "two_readers": "callguard.fusion.two_readers:TwoReadersFusion",
     },
     "llm": {
         "openai_compat": "callguard.llm.openai_compat:OpenAICompatLLM",

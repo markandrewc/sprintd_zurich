@@ -305,6 +305,67 @@ factors:
         unpaired: true
         differs: "different calls (74 synthetic scripts, reference text instead of ASR): side by side only"
 
+  # ---- two readers (pre-registered: research/findings/two_readers_prereg.md; uv run callguard agreement run).
+  # Every two_readers/* variant is a re-fusion of ONE joined source per wording (Qwen + Kev results of
+  # kev_vs_facts); two_readers/champion etc. reproduce the stored single-reader runs exactly (sanity check).
+  - id: two_readers
+    short: Zwei Leser
+    title: "Zwei Leser: Qwen 7B + Kev-4B lesen dieselben Fakten"
+    meaning: "Einig -> deren Urteil; uneinig -> Prüfen (R1 je Anruf, R2 je Fakt). Vorregistriert; beide Regeln nicht bestanden."
+    lead: "Champion → R1 Label-Einigkeit (abgestimmt)"
+    pairs:
+      - label: "Champion → R1 Label-Einigkeit (abgestimmt)"
+        a: two_readers/champion
+        b: two_readers/r1
+        status: exact
+        differs: "fusion.rule a -> labels (re-fusion of one joined source; one threshold for both readers)"
+      - label: "Champion → R2 Fakt-Einigkeit (abgestimmt)"
+        a: two_readers/champion
+        b: two_readers/r2
+        status: exact
+        differs: "fusion.rule a -> facts (gap 0.5)"
+      - label: "Kev allein → R1 (abgestimmt)"
+        a: two_readers/kev
+        b: two_readers/r1
+        status: exact
+        differs: "fusion.rule b -> labels"
+      - label: "Qwen Paraphrase 1 → R1"
+        a: two_readers/qwen_para
+        b: two_readers/r1_para
+        status: exact
+        differs: "fusion.rule a -> labels (policy_table_para.yaml for both readers)"
+      - label: "Qwen Paraphrase 1 → R2"
+        a: two_readers/qwen_para
+        b: two_readers/r2_para
+        status: exact
+        differs: "fusion.rule a -> facts"
+      - label: "Qwen Paraphrase 2 → R1"
+        a: two_readers/qwen_para2
+        b: two_readers/r1_para2
+        status: exact
+        differs: "fusion.rule a -> labels (policy_table_para2.yaml)"
+      - label: "Qwen Paraphrase 2 → R2"
+        a: two_readers/qwen_para2
+        b: two_readers/r2_para2
+        status: exact
+        differs: "fusion.rule a -> facts"
+      - label: "Qwen blinde Tabelle → R1"
+        a: two_readers/qwen_blind
+        b: two_readers/r1_blind
+        status: exact
+        differs: "fusion.rule a -> labels (policy_table_blind.yaml)"
+      - label: "Qwen blinde Tabelle → R2"
+        a: two_readers/qwen_blind
+        b: two_readers/r2_blind
+        status: exact
+        differs: "fusion.rule a -> facts"
+      - label: "Neu aufgenommenes Audio: Champion → R1"
+        a: two_readers_perturbed/perturbed
+        b: two_readers_perturbed/r1
+        pending: true
+        status: exact
+        differs: "fusion.rule a -> labels (needs kev_perturbed/kev_facts)"
+
   - id: rejected
     short: Verworfen
     title: "Weitere geprüfte Ideen"
@@ -448,6 +509,12 @@ generalisation:
       - {label: "Dev", ref: kev_vs_facts/kev_general, kind: dev, pending: true}
       - {label: "Paraphrase", ref: kev_vs_facts/kev_para, kind: paraphrase, pending: true}
       - {label: "Blinde Tabelle", ref: kev_vs_facts/kev_blind, kind: blind, pending: true}
+  - title: "Zwei Leser R1 (Qwen 7B + Kev-4B, Label-Einigkeit)"
+    entries:
+      - {label: "Dev, abgestimmte Tabelle", ref: two_readers/r1, kind: dev}
+      - {label: "Paraphrase 1", ref: two_readers/r1_para, kind: paraphrase}
+      - {label: "Paraphrase 2", ref: two_readers/r1_para2, kind: paraphrase}
+      - {label: "Blinde Tabelle", ref: two_readers/r1_blind, kind: blind}
 
 # Systems for the per-family heat map and the quality/cost table (UI default selection = all available).
 systems:
@@ -464,6 +531,8 @@ systems:
   - {label: "Kev-4B allgemein", ref: kev_vs_facts/kev_general, pending: true}
   - {label: "Kev-4B abgestimmt", ref: kev_vs_facts/kev_facts, pending: true}
   - {label: "Qwen 7B allgemein", ref: kev_vs_facts/qwen_general, pending: true}
+  - {label: "Zwei Leser R1 (Label-Einigkeit)", ref: two_readers/r1}
+  - {label: "Zwei Leser R2 (Fakt-Einigkeit)", ref: two_readers/r2}
 
 baselines:
   reference: champion/champion       # flag-all / flag-none computed live on these calls
