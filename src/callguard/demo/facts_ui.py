@@ -108,6 +108,15 @@ def extra_paths(app: AppState) -> dict[str, Path]:
     return out
 
 
+def assistant_enabled(app: AppState) -> bool:
+    """``app.assistant_enabled`` (profile): the KI-Assistent of the wizards and «Qwen jetzt fragen». False = the
+    demo makes no LLM call at all (manual wizards only)."""
+    return bool((getattr(app.cfg, "app", None) or {}).get("assistant_enabled", True))
+
+
+ASSISTANT_OFF = "KI-Assistent ist in diesem Profil ausgeschaltet (keine KI-Aufrufe); der Assistent links funktioniert von Hand."
+
+
 def store(app: AppState) -> VersionStore:
     """Same files as the Regelwerk page's store (ui/views/rules.py), so versions stay one history."""
     return VersionStore(table_path(app), audit_dir=app.runs_dir, extras=extra_paths(app))

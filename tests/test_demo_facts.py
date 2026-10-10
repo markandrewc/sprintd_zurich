@@ -234,6 +234,44 @@ def test_ai_assistant_new_fact_goes_to_approval(env: FixtureEnv, monkeypatch: py
     assert not any(f.get("label") == "Code von Dritten" for f in table(env)["families"]["access"]["facts"])
 
 
+def test_assistant_switched_off_makes_no_llm_call(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """``app.assistant_enabled: false`` (the dual-facts profile): no assistant panel, no LLM constructed, the manual
+    wizards still work end to end."""
+    from callguard.context import Context
+
+    e = write_dual_env(tmp_path)
+    e.sets = [s for s in e.sets if not s.startswith("app.assistant_enabled")] + ["app.assistant_enabled=false"]
+    monkeypatch.setenv(be.ENV_ARGS, e.args)
+    asked: list[str] = []
+    orig = Context.llm
+
+    def guarded(self, name="default"):
+        if name in ("assistant", "default"):
+            asked.append(name)
+            raise AssertionError(f"LLM {name!r} must not be built with the assistant off")
+        return orig(self, name)
+
+    monkeypatch.setattr(Context, "llm", guarded)
+    at = run("pages/settings.py", user="Anna")
+    at.button(key="dm_rg_new").click().run()
+    ok(at)
+    assert "KI-Assistent ist in diesem Profil ausgeschaltet" in body(at)
+    assert not any(b.key == "dm_rw_ai_go" for b in at.button)
+    at.checkbox(key="dm_rw_f_access.spoken_0").check().run()
+    at.button(key="dm_rw_next").click().run()
+    at.button(key="dm_rw_next").click().run()
+    at.text_input(key="dm_rw_title_0").input("Von Hand").run()
+    at.button(key="dm_rw_save").click().run()
+    ok(at)
+    assert any(r.get("title") == "Von Hand" for r in table(e)["families"]["access"]["rules"])
+    at = run("pages/settings.py", user="Anna")
+    at.button(key="dm_fk_new").click().run()
+    ok(at)
+    assert "KI-Assistent ist in diesem Profil ausgeschaltet" in body(at)
+    assert not any(b.key == "dm_fw_ai_go" for b in at.button)
+    assert asked == []
+
+
 def test_ai_assistant_llm_down_is_graceful(env: FixtureEnv, monkeypatch: pytest.MonkeyPatch):
     from callguard import rule_drafter as rd
 

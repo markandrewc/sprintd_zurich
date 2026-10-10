@@ -195,6 +195,9 @@ def _band_text(pol: fpol.FactPolicy, fam: str, fid: str) -> str:
 def _ai_panel(app: Any, work: dict[str, Any], names: dict[str, str]) -> None:
     ss = st.session_state
     state = _state()
+    if not fu.assistant_enabled(app):  # no LLM is constructed or called
+        st.caption(f":material/smart_toy: {fu.ASSISTANT_OFF}")
+        return
     st.markdown("##### :material/smart_toy: KI-Assistent")
     st.caption("Beschreiben Sie die Regel in eigenen Worten. Die KI wählt die Fakten und füllt den Assistenten aus; "
                "Sie prüfen jeden Schritt und speichern selbst.")

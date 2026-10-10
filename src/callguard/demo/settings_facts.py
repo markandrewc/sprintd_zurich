@@ -105,6 +105,9 @@ def _step(delta: int) -> None:
 def _ai_phrase(app: Any, names: dict[str, str]) -> None:
     ss = st.session_state
     state = _state()
+    if not fu.assistant_enabled(app):  # no LLM is constructed or called
+        st.caption(f":material/smart_toy: {fu.ASSISTANT_OFF}")
+        return
     st.markdown("##### :material/smart_toy: KI-Assistent")
     st.caption("Beschreiben Sie, was die KI im Gespräch herausfinden soll. Sie formuliert daraus eine klare "
                "Ja/Nein-Frage; Sie können sie danach frei ändern.")
@@ -237,7 +240,12 @@ def proposals(app: Any) -> None:
         st.success(f"Version {ss['dm_fk_approved']} ist freigegeben und aktiv. Die KI beantwortet neue oder geänderte "
                    "Fragen: Qwen jetzt (wenn erreichbar), Kev beim nächsten GPU-Lauf. Bis dahin gelten sie als «unklar».",
                    icon=":material/verified:")
-        st.button("Qwen jetzt fragen", icon=":material/play_arrow:", on_click=_ask_qwen, args=(app,), key="dm_fk_qwen")
+        if fu.assistant_enabled(app):
+            st.button("Qwen jetzt fragen", icon=":material/play_arrow:", on_click=_ask_qwen, args=(app,),
+                      key="dm_fk_qwen")
+        else:
+            st.caption("Die neue Frage wird beim nächsten Lauf auf dem GPU-Rechner beantwortet (KI-Aufrufe sind in "
+                       "diesem Profil ausgeschaltet).")
         if ss.get("dm_fk_probe"):
             st.caption(ss["dm_fk_probe"])
     if not drafts:
