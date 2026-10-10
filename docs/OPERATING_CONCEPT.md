@@ -153,12 +153,14 @@ the stage running alone on the GPU; "calls / GPU-day" = 86,400 s / wall s per ca
 | ASR gcoli large-v3 MIT fp16 (beam 1) | 2.4 GPU-s per audio minute | ~11 | ~7,800 | journal 02:30 |
 | Diarization sherpa-onnx (CPU) + role LLM | 18 s per call on CPU (parallelisable over cores) | (CPU) | - | checks_ablation cost |
 | Checks v1: keywords + patterns + free judge (3 samples) + G-Eval, Qwen2.5-7B-AWQ | 48 calls in 10 min at 8 parallel, ~10 LLM requests/call | ~12.5 | ~6,900 | journal 01:43 |
-| Checks recommended: `facts` (~20 single-token probes + evidence), Qwen2.5-7B-AWQ | part of a 7-check run (all checks 9 min / 48 calls) | ~3-5 (est.) | ~20,000 (est.) | journal 01:58 |
+| Checks recommended: `facts` (~22 single-token probes + evidence), Qwen2.5-7B-AWQ | measured: 4.1-4.8 s check compute per call, ~22 LLM requests/call (experiments/champion) | ~4.5 | ~19,000 | journal 04:45 |
 | `facts` on Qwen2.5-14B-AWQ (only fits for facts; 2 parallel) | 48 calls in 20 min | ~25 | ~3,400 | journal 03:10 |
 
 Sizing example: a bank with 2,000 recorded advisor calls per day (~9,400 call minutes) needs well under one 4070-class
 GPU for large-v3 ASR + 7B `facts` (~11 + ~5 s per call -> ~9 GPU-hours/day); a 24-48 GB data-centre GPU (L4/L40S)
 runs ASR and a 14B-30B LLM side by side with headroom for re-processing and audits.
+End to end on new audio (staged, 3 calls, journal 04:50): ASR 45 s incl. model load, vLLM restart 28 s, diarization
++ facts + fusion + snippets 20 s -> ~30 s per call wall clock for a small batch; large batches amortise the restarts.
 <!-- /SIZING -->
 
 Production shape: 2 GPU nodes (active/active, each ASR + LLM; one can carry the daily load alone), 1 CPU
