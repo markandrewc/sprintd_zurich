@@ -5,45 +5,45 @@
 
 items:
   # ---------------------------------------------------------------- bring-up
-  - {id: B1, group: bringup, priority: 1, status: todo, rq: [RQ12], needs: [gpu-setup],
+  - {id: B1, group: bringup, priority: 1, status: done, rq: [RQ12], needs: [gpu-setup],
      title: "Bring-up: setup, doctor all OK, one call end to end on gpu-12gb, timings + VRAM in journal"}
-  - {id: B2, group: bringup, priority: 1, status: todo, needs: [B1],
+  - {id: B2, group: bringup, priority: 1, status: done, needs: [B1],
      title: "Transcribe all 60 calls with the default ASR (Swiss German turbo int8_float16) and run the v1 checks: first real baseline numbers on GPU"}
 
   # ---------------------------------------------------------------- ASR / transcription (RQ2, RQ3, RQ8)
-  - {id: A1, group: asr, priority: 2, status: todo, rq: [RQ2], needs: [B1, asr-eval],
+  - {id: A1, group: asr, priority: 2, status: done, rq: [RQ2], needs: [B1, asr-eval],
      title: "asr-eval of the default model: WER/CER vs pseudo-refs, keyword-spot recall, clean vs noisy"}
-  - {id: A2, group: asr, priority: 2, status: todo, rq: [RQ2], needs: [B1], cost: "~15-30 min",
+  - {id: A2, group: asr, priority: 2, status: done, rq: [RQ2], needs: [B1], cost: "~15-30 min",
      title: "Vanilla baselines: openai large-v3 and large-v3-turbo (CT2) - transcribe all 60 + asr-eval"}
-  - {id: A3, group: asr, priority: 2, status: todo, rq: [RQ2], needs: [B1], cost: "~30-60 min",
+  - {id: A3, group: asr, priority: 2, status: done, rq: [RQ2], needs: [B1], cost: "~30-60 min",
      title: "Other Swiss German fine-tunes: large-v3 SPC (MIT, CT2 subfolder), turbo fp16 CT2, flix (hf_whisper, needs torch on host)"}
-  - {id: A4, group: asr, priority: 2, status: todo, rq: [RQ3], needs: [B1, views],
+  - {id: A4, group: asr, priority: 2, status: rejected, rq: [RQ3], needs: [B1, views],
      title: "Dialect-output ASR (model per docs/research/dialect_asr.md) as view gsw; WER/CER vs reference scripts"}
-  - {id: A5, group: asr, priority: 3, status: todo, rq: [RQ1], needs: [B1, views],
+  - {id: A5, group: asr, priority: 3, status: rejected, rq: [RQ1], needs: [B1, views],
      title: "Whisper task=translate (large-v3, not turbo) as view en_speech"}
-  - {id: A6, group: asr, priority: 4, status: todo, rq: [RQ8], needs: [A1],
+  - {id: A6, group: asr, priority: 4, status: done, rq: [RQ8], needs: [A1],
      title: "Decoding knobs: initial_prompt on/off, beam 1 vs 5, vad on/off - keyword-spot recall + F1"}
-  - {id: A7, group: asr, priority: 5, status: todo, rq: [RQ8], needs: [A1, denoise],
+  - {id: A7, group: asr, priority: 5, status: done, rq: [RQ8], needs: [A1, denoise],
      title: "Denoise front end (A10) on noisy calls"}
 
   # ---------------------------------------------------------------- views (RQ1, RQ3)
-  - {id: V1, group: views, priority: 2, status: todo, rq: [RQ1, RQ3], needs: [views, experiment-runner, B2],
+  - {id: V1, group: views, priority: 2, status: done, rq: [RQ1, RQ3], needs: [views, experiment-runner, B2],
      title: "View comparison: de vs gsw vs de_from_gsw vs en_from_de vs en_from_gsw (vs en_speech) with fixed checks (keywords+llm_judge+geval)"}
   - {id: V2, group: views, priority: 3, status: todo, rq: [RQ1], needs: [V1],
      title: "Multi-view ensemble (llm_judge on de + gsw (+ en)); agreement as uncertainty"}
-  - {id: V3, group: views, priority: 3, status: todo, rq: [RQ1], needs: [views, experiment-runner],
+  - {id: V3, group: views, priority: 3, status: done, rq: [RQ1], needs: [views, experiment-runner],
      title: "ORACLE ceiling: ref_gsw vs ref_de vs ref_en (no audio) - how much do ASR errors cost?"}
-  - {id: V4, group: views, priority: 4, status: todo, rq: [RQ1, RQ8], needs: [V1, correction-view],
+  - {id: V4, group: views, priority: 4, status: done, rq: [RQ1, RQ8], needs: [V1, correction-view],
      title: "LLM transcript correction view (A4) fusing de + gsw (+ vanilla) hypotheses"}
 
   # ---------------------------------------------------------------- checks (RQ4, RQ5, RQ7)
-  - {id: C1, group: checks, priority: 2, status: todo, rq: [RQ4], needs: [experiment-runner, B2],
+  - {id: C1, group: checks, priority: 2, status: done, rq: [RQ4], needs: [experiment-runner, B2],
      title: "Ablation both ways over keywords, patterns, llm_judge, geval (+ new checks as they land)"}
-  - {id: C2, group: checks, priority: 2, status: todo, rq: [RQ7], needs: [keyword_context, B2],
+  - {id: C2, group: checks, priority: 2, status: blocked, rq: [RQ7], needs: [keyword_context, B2],
      title: "keyword_context (G-Eval on keyword windows): FAR on harmless keyword calls, level-1 recall"}
-  - {id: C3, group: checks, priority: 3, status: todo, rq: [RQ4], needs: [semantic_windows, B2],
+  - {id: C3, group: checks, priority: 3, status: blocked, rq: [RQ4], needs: [semantic_windows, B2],
      title: "semantic_windows: recall on level-2 (no-keyword) calls"}
-  - {id: C4, group: checks, priority: 2, status: todo, rq: [RQ5, RQ9], needs: [facts, B2],
+  - {id: C4, group: checks, priority: 2, status: done, rq: [RQ5, RQ9], needs: [facts, B2],
      title: "Fact sheet + policy table (A1) vs llm_judge vs geval"}
   - {id: C5, group: checks, priority: 3, status: todo, rq: [RQ4], needs: [role-aware, B2],
      title: "Role-aware LLM checks (A7)"}
@@ -59,21 +59,21 @@ items:
      title: "Audio-LLM verification (A3: Voxtral Mini / Qwen2.5-Omni) of candidate windows - does it understand Swiss German at all?"}
 
   # ---------------------------------------------------------------- LLM (RQ6)
-  - {id: L1, group: llm, priority: 3, status: todo, rq: [RQ6], needs: [B2],
+  - {id: L1, group: llm, priority: 3, status: done, rq: [RQ6], needs: [B2],
      title: "LLM sweep with transcripts cached (Whisper unloaded -> more VRAM): Qwen2.5-7B-AWQ vs Qwen3-8B-AWQ (thinking off) vs Llama-3.1-8B-AWQ vs Mistral-Nemo-12B vs Qwen2.5-14B-AWQ (if it fits)"}
 
   # ---------------------------------------------------------------- fusion / uncertainty (RQ9)
-  - {id: F1, group: fusion, priority: 3, status: todo, rq: [RQ9], needs: [B2],
+  - {id: F1, group: fusion, priority: 3, status: done, rq: [RQ9], needs: [B2],
      title: "Threshold policy: global vs per-family thresholds, review band width; CV-chosen"}
-  - {id: F2, group: fusion, priority: 3, status: todo, rq: [RQ9], needs: [calibrated-fusion, B2],
+  - {id: F2, group: fusion, priority: 3, status: blocked, rq: [RQ9], needs: [calibrated-fusion, B2],
      title: "Calibrated + conformal abstention (A5) vs current uncertainty escalation"}
-  - {id: F3, group: fusion, priority: 4, status: todo, rq: [RQ4], needs: [learned-fusion, C1],
+  - {id: F3, group: fusion, priority: 4, status: blocked, rq: [RQ4], needs: [learned-fusion, C1],
      title: "Learned fusion (logistic regression, fold-fitted) vs weighted"}
   - {id: F4, group: fusion, priority: 4, status: todo, rq: [RQ12], needs: [cascade, C1],
      title: "Cascade (A2): quality vs LLM calls per call"}
 
   # ---------------------------------------------------------------- data (RQ10, RQ11)
-  - {id: D1, group: data, priority: 4, status: todo, rq: [RQ10], needs: [synth-scripts, B1],
+  - {id: D1, group: data, priority: 4, status: done, rq: [RQ10], needs: [synth-scripts, B1],
      title: "Generate ~60 synthetic text scripts (twins per family, incl. hard negatives/positives) with the GPU LLM; use as few-shot pool + fusion training"}
   - {id: D2, group: data, priority: 5, status: todo, rq: [RQ11], needs: [finetune-kit, A1],
      title: "Whisper LoRA fine-tune on dev-fold audio (12 GB recipe), evaluate on held-out fold"}
@@ -81,27 +81,27 @@ items:
      title: "Synthetic audio via TTS + telephone augmentation for ASR robustness"}
 
   # ---------------------------------------------------------------- product / demo
-  - {id: P1, group: product, priority: 3, status: todo, rq: [RQ12], needs: [B2],
+  - {id: P1, group: product, priority: 3, status: done, rq: [RQ12], needs: [B2],
      title: "Cost model: GPU s per call minute per config; sizing for 10k call minutes/day -> docs/OPERATING_CONCEPT.md"}
-  - {id: P2, group: product, priority: 4, status: todo, needs: [C2],
+  - {id: P2, group: product, priority: 4, status: done, needs: [C2],
      title: "Pick demo calls: best alarm (clear snippet), best borderline harmless keyword call, a review case; note in MORNING_REPORT"}
-  - {id: Z1, group: final, priority: 9, status: todo, needs: [],
+  - {id: Z1, group: final, priority: 9, status: done, needs: [],
      title: "07:00: freeze champion -> config/recommended.yaml -> one holdout run -> final MORNING_REPORT + DECISIONS"}
 
   # ---------------------------------------------------------------- ideas round 1 (research/ideas_round1.md)
   # Outside research lead, 2026-10-10. Details, falsification and cost per item: research/ideas_round1.md.
   # Implement as new plugin classes / default-off knobs so existing cache keys stay stable.
-  - {id: N14, group: ideas, priority: 2, status: todo, rq: [RQ4, RQ9], needs: [B2], cost: "0 GPU (fusion replay on cache)",
+  - {id: N14, group: ideas, priority: 2, status: done, rq: [RQ4, RQ9], needs: [B2], cost: "0 GPU (fusion replay on cache)",
      title: "Fusion fix: keyword/pattern 'nothing found' (score 0, conf 0.25) must not add disagreement - today a no-keyword alarm with geval conf <=0.6 is escalated to review (simulated); knob absent_rule_checks ignore|mean_only|full; count flips on dev"}
-  - {id: N1, group: ideas, priority: 2, status: todo, rq: [RQ1, RQ4, RQ9], needs: [B2], cost: "0 GPU",
+  - {id: N1, group: ideas, priority: 2, status: done, rq: [RQ1, RQ4, RQ9], needs: [B2], cost: "0 GPU",
      title: "Twin-aware evaluation: Stufe2 twins are 90-97% identical; C02/C04/C06 (holdout) have twins in dev, C07/08, C11/12, C15/16 split across dev folds -> report dev-CV also with twin-grouped folds, exclude twins from few-shot pools / learned fusion / synth seeds"}
-  - {id: N2, group: ideas, priority: 2, status: todo, rq: [RQ9], needs: [B2], cost: "0 GPU",
+  - {id: N2, group: ideas, priority: 2, status: done, rq: [RQ9], needs: [B2], cost: "0 GPU",
      title: "Threshold policy for the hidden set: per-family thresholds at fixed FP rate on ~200 cross-family negatives + plateau-centre global knob vs argmax; leave-one-fold-out mean and worst-fold FA+miss, threshold SD"}
-  - {id: N6, group: ideas, priority: 2, status: todo, rq: [RQ5, RQ9], needs: [B2], cost: "~5 min",
+  - {id: N6, group: ideas, priority: 2, status: done, rq: [RQ5, RQ9], needs: [B2], cost: "~5 min",
      title: "Log-prob fact probes (sharper A1): 3-5 atomic Ja/Nein/Unklar questions per family via choice_probs on the cached transcript prefix, noisy-AND policy; questions in config/facts.yaml; vs geval/llm_judge: dev-CV F1, twin-pair AUC, review recall"}
   - {id: N4, group: ideas, priority: 3, status: todo, rq: [RQ7], needs: [B2], cost: "~5 min",
      title: "Anchored full-call probes: G-Eval digit per anchor (keyword/pattern/geval-located segment) with the WHOLE call as context vs keyword_context +-3 windows vs plain geval; twin-pair AUC (decisive context can be 7 turns from the act)"}
-  - {id: N3, group: ideas, priority: 3, status: todo, rq: [RQ4, RQ5], needs: [B2], cost: "~15 min",
+  - {id: N3, group: ideas, priority: 3, status: done, rq: [RQ4, RQ5], needs: [B2], cost: "~15 min",
      title: "Quote-grounded judge (verbatim quotes + alarm_when clause id, fuzzy-verified against cited segments; unverified 'present' -> undetermined) + fusion gate 'no verified passage, no alarm'; FAR, F1, Belege hit rate"}
   - {id: N7, group: ideas, priority: 3, status: todo, rq: [RQ9], needs: [N6], cost: "~3 min",
      title: "Two-axis decision: P(act happened) x P(decisive context unresolved) -> alarm / review / no_alert instead of a 1-D review band; review precision/recall (only 3 dev review dialogues: qualitative + N13 review twins)"}
@@ -125,28 +125,28 @@ items:
   # ---------------------------------------------------------------- ideas round 2 (research/ideas_round2.md)
   # Skeptical review of `facts` (7B, dev). Rule sims run on CACHED fact probabilities (0 GPU, any model's results.jsonl).
   # Every rule change is in-sample (found on dev errors) until R4/R5 or the holdout confirms it.
-  - {id: R1, group: ideas2, priority: 1, status: todo, rq: [RQ5, RQ9], needs: [facts], cost: "0 GPU (re-decide cached facts)",
+  - {id: R1, group: ideas2, priority: 1, status: done, rq: [RQ5, RQ9], needs: [facts], cost: "0 GPU (re-decide cached facts)",
      title: "Criteria-derived policy fixes: disclosure review_when as rule (third_party_request=yes and authorized!=yes -> review; fixes C18-K3), exculpatory conflict p<0.9 -> review (D05-K2), patterns digit run >=0.2 but spoken!=yes -> review/re-ask (C09); sim 7B: miss 7->3/26, FAR 4/22 unchanged, review recall 50->67% (in-sample); re-sim on 14B cache"}
-  - {id: R2, group: ideas2, priority: 1, status: todo, rq: [RQ5, RQ9], needs: [facts], cost: "~2 GPU-min",
+  - {id: R2, group: ideas2, priority: 1, status: done, rq: [RQ5, RQ9], needs: [facts], cost: "~2 GPU-min",
      title: "Explicit '*_open' facts per family copied from criteria review_when (source_open, authorization_open, relevance_open, purpose_open; like access.validity_open, the only family where review works: C17 2/2), gated by act in [yes, unclear]; review recall on 6 dev review calls (C20 0/2 now), kill if >=2 harmless dialogues newly flagged"}
-  - {id: R3, group: ideas2, priority: 2, status: todo, rq: [RQ5], needs: [facts], cost: "~5 GPU-min",
+  - {id: R3, group: ideas2, priority: 2, status: done, rq: [RQ5], needs: [facts], cost: "~5 GPU-min",
      title: "Paraphrase robustness: 2 paraphrase sets of all fact questions written blind (from criteria.yaml only), asked on 48 dev calls; per-fact value agreement, mean |dp(yes)|, call-decision flip rate, flag AUC per set; fragile if >15% calls flip or AUC -0.10"}
-  - {id: R4, group: ideas2, priority: 1, status: todo, rq: [RQ5], needs: [facts], cost: "~3 GPU-min",
+  - {id: R4, group: ideas2, priority: 1, status: done, rq: [RQ5], needs: [facts], cost: "~3 GPU-min",
      title: "Overfit test: blind policy table (facts + rules written from criteria.yaml + brief by an agent who never saw transcripts) vs tuned table on dev; method carries the gain if blind flag AUC >=0.79 and FAR <=27%; report blind number as hidden-set expectation"}
-  - {id: R5, group: ideas2, priority: 2, status: todo, rq: [RQ5, RQ10], needs: [synth-scripts, facts], cost: "~5 GPU-min",
+  - {id: R5, group: ideas2, priority: 2, status: done, rq: [RQ5, RQ10], needs: [synth-scripts, facts], cost: "~5 GPU-min",
      title: "Pre-registered synthetic twins: freeze + journal the policy-table hash BEFORE scoring; facts vs llm_judge pair-AUC (alarm twin > harmless twin) and review recall on synthetic review cases; seeds exclude holdout scenarios (C03/C04, C15/C16, D07, C19); stress test only, never a jury number"}
-  - {id: R6, group: ideas2, priority: 3, status: todo, rq: [RQ8, RQ9], needs: [facts, R3], cost: "~10 GPU-min",
+  - {id: R6, group: ideas2, priority: 3, status: rejected, rq: [RQ8, RQ9], needs: [facts, R3], cost: "~10 GPU-min",
      title: "Perturbation ensemble for boundary facts: average fact p over wordings (R3) x ASR views (turbo nocond/noprompt + cached large-v3 MIT) + anchored context questions naming the act evidence segments; label-free metric clean/noisy pair consistency (7/24 dialogues inconsistent now, 4 of 7 wrong on CLEAN), noisy miss rate"}
-  - {id: R7, group: ideas2, priority: 1, status: todo, rq: [RQ9], needs: [facts], cost: "0 GPU",
+  - {id: R7, group: ideas2, priority: 1, status: done, rq: [RQ9], needs: [facts], cost: "0 GPU",
      title: "Threshold policy for facts: score is near-discrete (flag decision flat for t in 0.25-0.80), CV max-F1 picks edge 0.20 which turns every facts review into alarm; pin rule labels, t=0.55 band 0.15, choose decide_at (0.5/0.55/0.6) by worst-fold 3-class acc, redo per LLM; no per-family thresholds (0/198 cross-family false flags)"}
   - {id: R8, group: ideas2, priority: 3, status: todo, rq: [RQ5, RQ12], needs: [facts], cost: "0 GPU",
      title: "Product: 'Gegenprobe' minimal fact flips that would change the label (why not an alarm), policy-table editor with instant impact preview from cached fact probs + table hash in result.json, open fact as officer question (fact-level feedback), fact markers on the audio timeline"}
 
   # ---------------------------------------------------------------- ideas round 3 (research/ideas_round3.md)
   # Last review before submission. Holdout untouched; every rule change is unvalidated on the holdout -> say so.
-  - {id: S1, group: ideas3, priority: 1, status: todo, rq: [RQ5, RQ9], needs: [facts], cost: "0 GPU (re-decide cached facts), 1-2 h",
+  - {id: S1, group: ideas3, priority: 1, status: rejected, rq: [RQ5, RQ9], needs: [facts], cost: "0 GPU (re-decide cached facts), 1-2 h",
      title: "Wording-shift bench + review hardening: re-decide cached dev champion/para/para2/table_v3 and synthetic facts7b_* results with (a) asymmetric no (no_at 0.8 for context/authorization facts) + v3 open facts, (b) para/para2 disagreement -> review (escalate only); PRE-REGISTER: dev <= +1 harmless dialogue, CV FAR <= 20%, synthetic FAR <= +7 pp, para/para2 miss -10 pp; else keep champion, show as UI strict policy. Never a generic net in access (= table_v2, C01/C02 4242 FAR 36%)"}
-  - {id: S2, group: ideas3, priority: 3, status: todo, rq: [RQ5, RQ10], needs: [facts], cost: "~30-40 GPU-min, 2-3 h",
+  - {id: S2, group: ideas3, priority: 3, status: running, rq: [RQ5, RQ10], needs: [facts], cost: "~30-40 GPU-min, 2-3 h",
      title: "Contrastive twin few-shot in fact probes (dev minimal pair per family as fixed prefix, fold-aware: exemplars only from training folds, never holdout twins C03/C04, C15/C16); primary: champion<->para flip rate 11/48 -> <=5/48; dev AUC >= -0.03, synthetic 7B AUC >= 0.80, FAR <= 20%"}
   - {id: S3, group: ideas3, priority: 2, status: todo, rq: [RQ5, RQ7, RQ9], needs: [facts], cost: "~3 GPU-min dev, ~2 h",
      title: "No silent clearance: act=yes (or non-negated keyword hit) but no_alert -> ask for the verbatim exculpating sentence + segment id, fuzzy-verify; unverified -> review, verified -> quoted+playable in 'Warum kein Alarm?'; kill if >=2 harmless dev dialogues lose clearance; synthetic 7B miss -5 pp at FAR <= +7 pp"}
@@ -154,5 +154,5 @@ items:
      title: "Evaluate the built but never-run facts prefix_max (experiments/facts.yaml) + anchored re-ask of boundary context facts (p in [0.3, 0.7]) on the prefix up to act evidence + 3 turns (exculpatory always whole call); label-free clean/noisy consistency first, kill if any harmless twin flips"}
   - {id: S5, group: ideas3, priority: 5, status: todo, rq: [RQ8, RQ9], needs: [facts], cost: "~30 GPU-min, 1-2 h",
      title: "Audio test-time augmentation: facts over 3 decodes (original, speed 0.97/1.03, telephone band-pass + light noise), average fact p, label disagreement -> review; primary dev clean/noisy pair consistency; kill if AUC -0.03 or clean miss rises; new views so cache keys stay stable"}
-  - {id: S6, group: ideas3, priority: 2, status: todo, rq: [RQ12], needs: [facts], cost: "0 GPU, 2-3 h UI",
+  - {id: S6, group: ideas3, priority: 2, status: done, rq: [RQ12], needs: [facts], cost: "0 GPU, 2-3 h UI",
      title: "Pitch: fact-level officer feedback - review card asks the open fact (Ja/Nein), instant re-decision from the policy table, fact label + table hash in feedback.jsonl, per-fact overrule rate on Feedback page; demo C17-K3 'gueltig = ja' -> Alarm; test: newcomer resolves 3 cards < 60 s each, re-decision == sim_rules"}
