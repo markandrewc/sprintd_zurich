@@ -297,3 +297,278 @@ def grid_entry(name: str, policy: fpol.FactPolicy, fixed: Mapping[str, Any], cv:
         out["vs_champion_v3"] = {"calls_changed": paired.get("changed"),
                                  **{k: paired[k]["diff"] for k in COLS if paired.get(k)}}
     return out
+
+
+# --------------------------------------------------------------------------------------------
+# evaluation sets + the two reports (callguard dualfacts eval)
+# --------------------------------------------------------------------------------------------
+
+SETS = {"dev": "dual-facts", "test50": "dual-facts-test50"}  # set -> profile
+DEFAULT_THRESHOLD = 0.55
+
+
+@dataclass
+class EvalSet:
+    """One evaluation set: the profile's pipeline (only its fusion is used), the stored results of the set's
+    calls, their ground truth, the active policy table and (dev) the locked CV folds."""
+    name: str
+    profile: str
+    pipe: Any
+    results: list[CallResult]
+    calls: list[Any]
+    tables: dict[str, Any]
+    fold_of: dict[str, int] | None
+    threshold: float
+    runs_dir: str = ""
+    policy_table: str = ""
+    missing: list[str] | None = None
+
+
+def load_set(name: str, profile: str | None = None, overrides: Sequence[str] = (),
+             threshold: float = DEFAULT_THRESHOLD) -> EvalSet:
+    """``dev``: the case calls of the dev folds only (never the holdout), CV over the locked dev folds.
+    ``test50``: every call of the external set (split ``external``; rows carry the dataset's twin group via
+    ``Call.group``, so the bootstrap resamples twin groups as ``callguard experiment`` does)."""
+    from callguard import splits as sp
+    from callguard.config import load_config
+    from callguard.data import load_calls
+    from callguard.ui import backend as be
+
+    if name not in SETS:
+        raise ValueError(f"set must be one of {tuple(SETS)}, got {name!r}")
+    cfg = load_config(profile or SETS[name], list(overrides))
+    eng = be.Engine(cfg, use_cache=True)
+    if eng.pipeline is None:
+        raise RuntimeError(eng.error or "pipeline unavailable")
+    pipe = eng.pipeline
+    PolicyPipe(pipe)  # fails early unless the fusion is two_readers
+    calls = load_calls(eng.ctx.data_dir)
+    fold_of = None
+    if name == "dev":
+        splits = sp.load_splits()
+        calls = splits.select(calls, "dev")
+        fold_of = splits.dev_fold_of()
+    loaded = be.load_results(eng.ctx.runs_dir).results
+    ids = [c.call_id for c in calls]
+    results = [loaded[i] for i in ids if i in loaded]
+    return EvalSet(name, cfg.name, pipe, results, calls, pipe.fusion.tables(), fold_of, float(threshold),
+                   str(eng.ctx.runs_dir), str(pipe.fusion.policy_table), [i for i in ids if i not in loaded])
+
+
+def rule_a_rows(pipe: Any, results: Sequence[CallResult], calls: Sequence[Any], threshold: float) -> list[Row]:
+    """Sanity reference: the same fusion with rule ``a`` (reader A's stored facts result as computed, reader B
+    dropped), fixed threshold. Combination ``only_a`` must give the same labels."""
+    import copy
+
+    from callguard import eval as ev
+    from callguard import experiments as ex
+
+    fa = copy.copy(pipe.fusion)
+    fa.rule = "a"
+    families = pipe.ctx.families()
+    can_alarm = {f.id for f in families if f.can_alarm}
+    weights = ev.check_weights(pipe)
+    ov = {"threshold": threshold, "weights": {c.name: c.weight for c in pipe.checks}}
+    idx = {c.call_id: c for c in calls}
+    out = []
+    for r in results:
+        d = fa.decide(r.transcript, r.checks, families, dict(ov))
+        out.append(ex.result_row(r.model_copy(update={"decision": d}), idx.get(r.call_id), can_alarm, weights))
+    return out
+
+
+def set_agreement(results: Sequence[CallResult], tables: Mapping[str, Any], policy: fpol.FactPolicy
+                  ) -> dict[str, Any]:
+    return agreement_counts(stored_answers({r.call_id: r for r in results}, policy, tables), policy)
+
+
+def _set_meta(es: EvalSet, n_boot: int, seed: int) -> dict[str, Any]:
+    import datetime as dt
+
+    return {"set": es.name, "profile": es.profile, "runs_dir": es.runs_dir, "policy_table": es.policy_table,
+            "n_results": len(es.results), "missing": es.missing or [], "threshold": es.threshold,
+            "n_boot": n_boot, "seed": seed, "created": dt.datetime.now().isoformat(timespec="seconds"),
+            "bootstrap_unit": "twin group (case: config/splits.yaml groups; test50: data_test50 dataset.yaml groups)"}
+
+
+def evaluate_dev(es: EvalSet, n_boot: int = 2000, seed: int = 13,
+                 bands: Iterable[tuple[float, float]] = GRID_BANDS) -> dict[str, Any]:
+    """Dev report: default vs champion v3 (fixed + CV rows, metric blocks, paired deltas), the 12-setting grid
+    (Kev band x combination, Qwen three-way), reader agreement per Kev band, and the only_a == rule a sanity."""
+    bands = list(bands)
+    default = fpol.default_policy()
+    champ = champion_v3(default)
+    kw: dict[str, Any] = {"threshold": es.threshold, "fold_of": es.fold_of}
+    pr = {"default": policy_rows(es.pipe, es.results, es.calls, default, es.tables, **kw),
+          "champion_v3": policy_rows(es.pipe, es.results, es.calls, champ, es.tables, **kw)}
+    blocks = {k: {"fixed": metric_block(v.fixed, n_boot, seed), "cv": metric_block(v.cv, n_boot, seed),
+                  "cv_folds": v.cv_folds} for k, v in pr.items()}
+    paired = {"fixed": paired_block(pr["champion_v3"].fixed, pr["default"].fixed, n_boot, seed),
+              "cv": paired_block(pr["champion_v3"].cv, pr["default"].cv, n_boot, seed)}
+    entries = []
+    for pol in grid(default, bands):
+        rows = policy_rows(es.pipe, es.results, es.calls, pol, es.tables, **kw)
+        fb = metric_block(rows.fixed, n_boot, seed)
+        cb = metric_block(rows.cv, n_boot, seed, with_auc=False)
+        pb = paired_block(pr["champion_v3"].fixed, rows.fixed, n_boot, seed)
+        entries.append(flag_entry(grid_entry(setting_name(pol), pol, fb, cb, pb), pol, default))
+    agreement = {f"dev, Kev {lo:.1f}-{hi:.1f}": set_agreement(es.results, es.tables, kev_band(default, lo, hi))
+                 for lo, hi in bands}
+    ra = rule_a_rows(es.pipe, es.results, es.calls, es.threshold)
+    return {"meta": _set_meta(es, n_boot, seed) | {"folds": "locked dev folds (config/splits.yaml), holdout excluded"},
+            "policies": {"default": default.as_dict(), "champion_v3": champ.as_dict()},
+            "blocks": blocks, "paired": paired, "grid": entries, "ui_text": ui_text(entries, default),
+            "agreement": agreement, "sanity": {"only_a_vs_rule_a": label_diff(pr["champion_v3"].fixed, ra)},
+            "rows": {k: {"fixed": v.fixed, "cv": v.cv} for k, v in pr.items()}}
+
+
+def flag_entry(e: dict[str, Any], pol: fpol.FactPolicy, default: fpol.FactPolicy) -> dict[str, Any]:
+    """Mark the pre-registered default and the champion v3 (only_a at the default Kev band; the other only_a
+    rows ignore Kev too and are equivalent)."""
+    same_band = (pol.b.lo, pol.b.hi) == (default.b.lo, default.b.hi)
+    e["default"] = same_band and pol.combination == default.combination
+    e["champion_v3"] = same_band and pol.combination == "only_a"
+    e["equivalent_to_champion_v3"] = pol.combination == "only_a"
+    return e
+
+
+def evaluate_test50(es: EvalSet, n_boot: int = 2000, seed: int = 13) -> dict[str, Any]:
+    """test50 report (ONE look): default vs champion v3 at the fixed threshold only, paired deltas, agreement
+    (default Kev band), sanity. No grid, no CV, nothing is chosen from it."""
+    default = fpol.default_policy()
+    champ = champion_v3(default)
+    pr = {"default": policy_rows(es.pipe, es.results, es.calls, default, es.tables, threshold=es.threshold),
+          "champion_v3": policy_rows(es.pipe, es.results, es.calls, champ, es.tables, threshold=es.threshold)}
+    blocks = {k: {"fixed": metric_block(v.fixed, n_boot, seed)} for k, v in pr.items()}
+    paired = {"fixed": paired_block(pr["champion_v3"].fixed, pr["default"].fixed, n_boot, seed)}
+    ra = rule_a_rows(es.pipe, es.results, es.calls, es.threshold)
+    return {"meta": _set_meta(es, n_boot, seed) | {"look": "test50 one look (research/findings/test50_prereg.md)"},
+            "policies": {"default": default.as_dict(), "champion_v3": champ.as_dict()},
+            "blocks": blocks, "paired": paired,
+            "agreement": {f"test50, Kev {default.b.lo:.1f}-{default.b.hi:.1f}":
+                          set_agreement(es.results, es.tables, default)},
+            "sanity": {"only_a_vs_rule_a": label_diff(pr["champion_v3"].fixed, ra)},
+            "rows": {k: {"fixed": v.fixed} for k, v in pr.items()}}
+
+
+# --------------------------------------------------------------------------------------------
+# plain-German one-liners for the officer UI (dev numbers)
+# --------------------------------------------------------------------------------------------
+
+UI_COMBINATION = {"only_a": "Nur Qwen entscheidet (= Champion v3), Kev wird nur angezeigt.",
+                  "only_b": "Nur Kev entscheidet, Qwen wird nur angezeigt.",
+                  "agree": "Einigkeit: zählt nur, wenn beide gleich antworten, sonst «unklar» → Prüfen.",
+                  "a_checked": "Qwen entscheidet; sagt Kev klar das Gegenteil, wird es «unklar» → Prüfen."}
+UI_BAND = {"0.2-0.8": "Kev muss sehr sicher sein (ja ab 80 %, nein bis 20 %), sonst «unklar».",
+           "0.3-0.7": "Kev muss recht sicher sein (ja ab 70 %, nein bis 30 %), sonst «unklar» (Standard).",
+           "0.4-0.6": "Kev darf knapp entscheiden (ja ab 60 %, nein bis 40 %), seltener «unklar»."}
+
+
+def band_key(e: Mapping[str, Any]) -> str:
+    lo, hi = e["kev_band"]
+    return f"{lo:.1f}-{hi:.1f}"
+
+
+def numbers_line(e: Mapping[str, Any], set_label: str = "Dev") -> str:
+    def pct(x: Any) -> str:
+        return "–" if x is None else f"{100 * x:.0f} %"
+
+    return (f"{set_label} ({e['n']} Anrufe): {e['flagged']} markiert ({e['alarms']} Alarm, {e['reviews']} Prüfen), "
+            f"FAR {pct(e['false_alarm_rate'])}, Miss {pct(e['miss_rate'])}")
+
+
+def ui_text(entries: Sequence[Mapping[str, Any]], default: fpol.FactPolicy | None = None) -> dict[str, dict[str, str]]:
+    """{"combination": {mode: text}, "band": {"lo-hi": text}}: each combination at the default Kev band, each
+    band at the default combination; text = plain-German meaning + the dev numbers of that setting."""
+    default = default or fpol.default_policy()
+    dband = f"{default.b.lo:.1f}-{default.b.hi:.1f}"
+    out: dict[str, dict[str, str]] = {"combination": {}, "band": {}}
+    for e in entries:
+        if band_key(e) == dband:
+            out["combination"][e["combination"]] = f"{UI_COMBINATION.get(e['combination'], '')} {numbers_line(e)}."
+        if e["combination"] == default.combination:
+            out["band"][band_key(e)] = f"{UI_BAND.get(band_key(e), '')} {numbers_line(e)}."
+    return out
+
+
+# --------------------------------------------------------------------------------------------
+# markdown
+# --------------------------------------------------------------------------------------------
+
+
+def grid_table(entries: Sequence[Mapping[str, Any]]) -> str:
+    def p(x: Any) -> str:
+        return "–" if x is None else f"{100 * x:.0f}%"
+
+    head = ["setting", "flagged / alarm / review", "FAR", "miss", "3-class acc", "review recall", "flag AUC",
+            "CV FAR", "CV miss", "CV acc", "calls changed vs v3", ""]
+    lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+    for e in entries:
+        cv = e.get("cv") or {}
+        tag = " ".join(t for t, k in (("**default**", "default"), ("**champion v3**", "champion_v3")) if e.get(k))
+        if not tag and e.get("equivalent_to_champion_v3"):
+            tag = "(= v3)"
+        auc = "–" if e.get("auc") is None else f"{e['auc']:.2f}"
+        lines.append("| " + " | ".join([
+            e["setting"], f"{e['flagged']} / {e['alarms']} / {e['reviews']}", p(e["false_alarm_rate"]),
+            p(e["miss_rate"]), p(e["accuracy"]), p(e["review_recall"]), auc, p(cv.get("false_alarm_rate")),
+            p(cv.get("miss_rate")), p(cv.get("accuracy")), str((e.get("vs_champion_v3") or {}).get("calls_changed")),
+            tag]) + " |")
+    return "\n".join(lines)
+
+
+def sanity_line(s: Mapping[str, Any]) -> str:
+    return (f"only_a vs rule `a` (fixed threshold): {s['differ']} of {s['n']} calls differ in label "
+            f"(max |score diff| {s['max_score_diff']}, unmatched calls {len(s['missing'])}).")
+
+
+def _flip_line(p: Mapping[str, Any]) -> str:
+    return ", ".join(f"{f['call_id']} ({f['expected']}: {f['a']}→{f['b']})" for f in p["flips"]) or "none"
+
+
+DEFAULT_NAME = "default (agree, Kev 0.3-0.7)"
+CHAMP_NAME = "champion v3 (only_a)"
+
+
+def dev_markdown(rep: Mapping[str, Any]) -> str:
+    m, b, p = rep["meta"], rep["blocks"], rep["paired"]
+
+    def folds(k: str) -> str:
+        return ", ".join(f"{f['fold']}: {f['threshold']:.2f}" for f in b[k]["cv_folds"])
+
+    out = [f"# Dual-reader facts: DEV evaluation ({m['created']})", "",
+           f"Profile `{m['profile']}`, table `{m['policy_table']}`, {m['n_results']} dev calls (dev folds only, "
+           f"holdout excluded), fixed threshold {m['threshold']}, 95% bootstrap CIs over twin groups "
+           f"({m['n_boot']}x, seed {m['seed']}). Pure re-fusion of stored answers, no model ran. "
+           "Default = pre-registered (Qwen three-way, Kev band [0.3, 0.7], Einigkeit); champion v3 = Qwen alone "
+           "(combination only_a).", "", "## Fixed threshold", "",
+           metrics_table([(DEFAULT_NAME, b["default"]["fixed"]), (CHAMP_NAME, b["champion_v3"]["fixed"])]),
+           "", "## CV (out-of-fold max-F1 threshold over the 4 dev folds)", "",
+           metrics_table([(DEFAULT_NAME, b["default"]["cv"]), (CHAMP_NAME, b["champion_v3"]["cv"])]),
+           "", f"CV thresholds per fold: default {folds('default')}; champion v3 {folds('champion_v3')}.", "",
+           "## Paired: default − champion v3 (same calls, paired bootstrap over twin groups; * = CI excludes 0)", "",
+           paired_table([("fixed threshold", p["fixed"]), ("CV", p["cv"])]), "",
+           f"Calls whose label changes (fixed threshold): {_flip_line(p['fixed'])}.", "",
+           f"Calls whose label changes (CV): {_flip_line(p['cv'])}.", "",
+           "## Grid (DEV ONLY; Qwen three-way; for the officer UI, nothing is selected from it)", "",
+           grid_table(rep["grid"]), "",
+           "only_a ignores Kev, so its three rows are the champion v3 regardless of the band.", "",
+           "## Reader agreement (dev calls, stored answers of the table's facts)", "",
+           agreement_table(list(rep["agreement"].items())), "",
+           "## Sanity", "", sanity_line(rep["sanity"]["only_a_vs_rule_a"]), ""]
+    return "\n".join(out)
+
+
+def test50_markdown(rep: Mapping[str, Any]) -> str:
+    m, b, p = rep["meta"], rep["blocks"], rep["paired"]
+    out = [f"# Dual-reader facts: test50 (ONE look, {m['created']})", "",
+           f"Profile `{m['profile']}`, table `{m['policy_table']}`, {m['n_results']} calls (external set, never "
+           f"pooled with dev), fixed threshold {m['threshold']}, 95% bootstrap CIs over twin groups ({m['n_boot']}x, "
+           f"seed {m['seed']}). Default vs champion v3 only, as pre-registered. Nothing is tuned on this.", "",
+           metrics_table([(DEFAULT_NAME, b["default"]["fixed"]), (CHAMP_NAME, b["champion_v3"]["fixed"])]),
+           "", "## Paired: default − champion v3 (* = CI excludes 0)", "",
+           paired_table([("fixed threshold", p["fixed"])]), "",
+           f"Calls whose label changes: {_flip_line(p['fixed'])}.", "",
+           "## Reader agreement (test50 calls)", "", agreement_table(list(rep["agreement"].items())), "",
+           "## Sanity", "", sanity_line(rep["sanity"]["only_a_vs_rule_a"]), ""]
+    return "\n".join(out)

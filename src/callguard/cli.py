@@ -595,6 +595,7 @@ from callguard.commands import agreement as _agreement  # noqa: E402
 from callguard.commands import asr_eval as _asr_eval  # noqa: E402
 from callguard.commands import candidates as _candidates  # noqa: E402
 from callguard.commands import contrib as _contrib  # noqa: E402
+from callguard.commands import dualfacts as _dualfacts  # noqa: E402
 from callguard.commands import evidence_eval as _evidence_eval  # noqa: E402
 from callguard.commands import experiment as _experiment  # noqa: E402
 from callguard.commands import feedback as _feedback  # noqa: E402
@@ -609,7 +610,7 @@ from callguard.commands import triggers as _triggers  # noqa: E402
 
 for _mod in (_asr_eval, _splits, _experiment, _leaderboard, _report, _fit_fusion,
              _route, _feedback, _patterns, _synth, _contrib, _evidence_eval, _agreement, _triggers,
-             _candidates):
+             _candidates, _dualfacts):
     _mod.register(app)
 
 from callguard.commands import learn as _learn  # noqa: E402  (learning from officer feedback)
