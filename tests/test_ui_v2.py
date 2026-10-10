@@ -73,7 +73,7 @@ def metrics(at: AppTest) -> dict[str, str]:
 
 def test_pages_registry_resolves_every_builtin_page():
     keys = [p.key for p in pr.pages()]
-    assert keys[:6] == ["inbox", "detail", "keywords", "process", "quality", "experiments"]
+    assert keys[:7] == ["inbox", "detail", "keywords", "rules", "process", "quality", "experiments"]
     builtin = {"inbox", "detail", "keywords", "process", "quality", "experiments"}
     assert not [p for p in pr.missing() if p.key in builtin]
     assert sum(p.default for p in pr.PAGES) == 1

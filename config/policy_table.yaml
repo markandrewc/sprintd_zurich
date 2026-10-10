@@ -24,12 +24,19 @@
 #   when   condition over the facts:  fact = yes|no|unclear,  fact != ...,  fact in [yes, unclear],
 #          combined with and / or / not and brackets; `true` always holds (use it for a default rule)
 #   text   German explanation shown to the officer
+#   enabled  optional, default true; `false` switches the rule off without deleting it (UI "Regelwerk")
+#   basis  optional legal basis shown on the rule card (display only)
+#
+# Family key `basis`: the legal basis shown for the whole family (display only; the defaults below are
+# suggestions for compliance to confirm, editable in the UI page "Regelwerk"). Neither `basis` nor
+# `enabled: true` changes the cache key. Versions + four-eyes approval: config/policy_versions/.
 #
 # Speaker roles: the transcript lines carry the diarizer's roles (advisor = Beratung, customer = Kunde);
 # they may be wrong, so questions name the role but the model is told to judge from the content.
 
 families:
   trade:
+    basis: "FinfraG Art. 142 (Ausnützen von Insiderinformationen) – Vorschlag, durch Compliance zu bestätigen"
     facts:
       - id: wish
         label: Eigener Handelswunsch geäussert
@@ -78,6 +85,7 @@ families:
         text: Kein Handelswunsch auf Basis nicht öffentlicher Information.
 
   access:
+    basis: "Interne Weisung Informationssicherheit (Zugangsdaten nie am Telefon) – Vorschlag, durch Compliance zu bestätigen"
     facts:
       - id: spoken
         label: Code/Wert am Telefon vorgelesen
@@ -147,6 +155,7 @@ families:
         text: Kein gültiger Zugangswert ausgesprochen.
 
   disclosure:
+    basis: "BankG Art. 47 (Bankkundengeheimnis) – Vorschlag, durch Compliance zu bestätigen"
     facts:
       - id: data_given
         label: Konkrete Daten einer Drittperson herausgegeben
@@ -218,6 +227,7 @@ families:
         text: Keine unberechtigte Auskunft an Dritte.
 
   documentation:
+    basis: "FIDLEG Art. 15 (Dokumentation) / interne Weisung Kreditprüfung – Vorschlag, durch Compliance zu bestätigen"
     facts:
       - id: omit_request
         label: Verlangt, etwas nicht zu protokollieren
@@ -263,6 +273,7 @@ families:
         text: Keine relevante Angabe soll verschwiegen werden.
 
   splitting:
+    basis: "GwG (Sorgfaltspflichten) / interne Kompetenzordnung – Vorschlag, durch Compliance zu bestätigen"
     facts:
       - id: split_request
         label: Aufteilung in Teilbeträge verlangt

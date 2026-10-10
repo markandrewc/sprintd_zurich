@@ -53,6 +53,7 @@ PAGES: list[PageSpec] = [
     PageSpec("inbox", "Eingang", ":material/inbox:", _V + "inbox", order=10, default=True),
     PageSpec("detail", "Anruf", ":material/graphic_eq:", _V + "detail", order=20, url_path="call"),
     PageSpec("keywords", "Stichwörter & Kriterien", ":material/tune:", _V + "keywords", order=30),
+    PageSpec("rules", "Regelwerk", ":material/rule:", _V + "rules", order=32),
     PageSpec("process", "Anruf verarbeiten", ":material/upload_file:", _V + "process", order=40),
     PageSpec("quality", "Qualität", ":material/insights:", _V + "quality", order=50),
     PageSpec("experiments", "Experimente", ":material/science:", _V + "experiments", order=60),
