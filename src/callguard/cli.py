@@ -593,6 +593,7 @@ def _sweep_table(swept: list[dict[str, Any]], suggestion: dict[str, Any] | None,
 # commands living in callguard/commands/<name>.py, each with register(app)
 from callguard.commands import agreement as _agreement  # noqa: E402
 from callguard.commands import asr_eval as _asr_eval  # noqa: E402
+from callguard.commands import candidates as _candidates  # noqa: E402
 from callguard.commands import contrib as _contrib  # noqa: E402
 from callguard.commands import evidence_eval as _evidence_eval  # noqa: E402
 from callguard.commands import experiment as _experiment  # noqa: E402
@@ -606,7 +607,7 @@ from callguard.commands import splits as _splits  # noqa: E402
 from callguard.commands import synth as _synth  # noqa: E402
 
 for _mod in (_asr_eval, _splits, _experiment, _leaderboard, _report, _fit_fusion,
-             _route, _feedback, _patterns, _synth, _contrib, _evidence_eval, _agreement):
+             _route, _feedback, _patterns, _synth, _contrib, _evidence_eval, _agreement, _candidates):
     _mod.register(app)
 
 
