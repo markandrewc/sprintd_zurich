@@ -1,0 +1,37 @@
+# EXTERNAL held-out test: the teammate's test50 set (50 dialogues x clean/noisy = 100 calls, FHNW STT4SG TTS,
+# 8 dialect voices; 17 alarm / 6 review / 27 no_alert; 15 contrastive A/B pairs = twin groups, 5 review,
+# 5 keyword traps, 3 numbers pairs, 4 multi-topic). Imported by scripts/data/import_test50.py into data_test50/v1.
+# Pre-registered (research/findings/test50_prereg.md): the candidate list below is fixed before any test50 number
+# exists; each runs once; nothing is tuned on test50 afterwards. Results live in runs/test50/ and are NEVER pooled
+# with dev / holdout / synth numbers (own dataset, own runs dir, split `external`).
+# Stages (one 12 GB card): ASR (no LLM) -> vLLM Qwen2.5-7B (champion*, qwen_general) -> Kev (kev_*) ;
+# Qwen3.8 Q6 runs on the 24 GB box with the transcripts copied over (.cache/asr).
+name: test50
+description: External held-out test50 (FHNW TTS, 8 dialects) - fixed candidate list, one run each
+rq: [RQ10]
+base: recommended-test50
+split: external
+compare_to: champion
+variants:
+  - {name: champion, description: "config/recommended.yaml (Qwen2.5-7B facts, table v1 + light kw/pat)"}
+  - {name: champion_v3, set: [checks.facts.policy_table=config/policy_table_v3.yaml], description: "champion with policy table v3"}
+  - {name: facts_only, refuse_from: champion, checks: [facts]}
+  - name: qwen_general
+    description: "Qwen2.5-7B asked the teammate's 15 general questions; max p(yes)"
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: default, questions: config/general_questions.yaml, parallel: 5, weight: 1.0}]
+    set: [fusion.threshold=0.7]
+  - name: kev_facts
+    profile: kev-test50
+    description: "Kev-4B as the facts backend (tuned table v1)"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0}]
+    set: [fusion.threshold=0.55]
+  - {name: kev_general, profile: kev-test50, description: "Kev-4B + 15 general questions (the teammate's design)"}
+  - {name: q38q6_facts, profile: qwen38-q6-test50, set: [fusion.threshold=0.55], description: "Qwen3.8-27B Q6_K facts (24 GB box)"}
+  - name: q38q6_general
+    profile: qwen38-q6-test50
+    description: "Qwen3.8-27B Q6_K + 15 general questions"
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions.yaml, parallel: 4, weight: 1.0}]
+    set: [fusion.threshold=0.7]

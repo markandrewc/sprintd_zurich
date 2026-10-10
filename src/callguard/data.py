@@ -113,6 +113,23 @@ def dialogue_of(call_id: str) -> str:
     return call_id.split("-K")[0]
 
 
+_EXT_CALL_RE = re.compile(r"^(?P<dlg>[A-Za-z0-9][A-Za-z0-9_-]*?)-K(?P<v>\d)$")
+
+
+def external_dataset(data_dir: str | Path) -> dict | None:
+    """``<data_dir>/dataset.yaml`` of an imported EXTERNAL audio set (e.g. test50, scripts/data/import_test50.py):
+    its call ids need not follow the case naming (``<dialogue>-K1`` clean, ``-K2`` noisy), level and twin group
+    come from the file, and none of its dialogues is in the locked case split (split ``external`` only).
+    None for the case data (no such file, or not marked external)."""
+    f = Path(data_dir) / "dataset.yaml"
+    if not f.is_file():
+        return None
+    import yaml
+
+    raw = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+    return raw if raw.get("external") else None
+
+
 def load_calls(data_dir: str | Path, text_only: bool | None = None) -> list[Call]:
     """Calls of a data dir. ``text_only``: None = auto (a dir with ``Transkript/`` but no ``Audio/`` is a
     text-only set, e.g. synthetic scripts), True = force it, False = audio only (case behaviour)."""
@@ -121,15 +138,19 @@ def load_calls(data_dir: str | Path, text_only: bool | None = None) -> list[Call
         text_only = not (data_dir / "Audio").is_dir() and (data_dir / "Transkript").is_dir()
     if text_only:
         return load_text_calls(data_dir)
+    ext = external_dataset(data_dir)
     calls: list[Call] = []
     for wav in sorted((data_dir / "Audio").glob("*.wav")):
-        m = _CALL_RE.match(wav.stem)
+        m = (_EXT_CALL_RE if ext else _CALL_RE).match(wav.stem)
         if not m:
             continue
         dlg = dialogue_of(wav.stem)
-        variant = int(m.group(4))
-        call = Call(call_id=wav.stem, dialogue_id=dlg, level=int(m.group(2)), variant=variant,
+        variant = int(m.group("v") if ext else m.group(4))
+        level = int(ext.get("levels", {}).get(dlg, 0)) if ext else int(m.group(2))
+        call = Call(call_id=wav.stem, dialogue_id=dlg, level=level, variant=variant,
                     noisy=variant in (2, 4), audio_path=wav)
+        if ext:
+            call.group = str(ext.get("groups", {}).get(dlg, ""))
         exp_file = data_dir / "Skript_mit_Sollbewertung" / f"{dlg}.txt"
         if exp_file.exists():
             call.title, call.expected = parse_expected(exp_file.read_text())
