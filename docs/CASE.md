@@ -59,6 +59,9 @@ Outcept trigger API (`server.py` in the case repo: POST /triggers {url, title, d
 
 ## Open questions for the organizers (ask on site; record answers here)
 - Is `review` scored as a hit, a separate class, or ignored? Precision/recall on alarm or on alarm+review?
+  - **Answer (organisers, Sat 2026-10-10 ~13:00):** the exact values matter less (still relevant); what matters more is
+    that the behaviour is configurable. -> We expose the review trade-off as an officer setting (Prüfmodus) with its
+    measured workload consequences instead of fixing one scoring choice.
 - The brief mentions 8 calls recorded by two people - are they available?
 - Sunday: do they run our code or do we run on their files? Time limit, output format?
 - Same TTS voices / level structure in the hidden set? Is fine-tuning on the given calls allowed?
