@@ -27,12 +27,12 @@ CREATE TABLE IF NOT EXISTS calls (
     error TEXT,
     transcript TEXT,
     segments TEXT,                     -- JSON [{start, end, speaker, text}]
-    analysis TEXT,                     -- JSON, Antwort von POST /analyze
-    risk REAL,
+    analysis TEXT,                     -- JSON, Antwort von POST /analyze (Fakten mit p, Regeln)
+    risk REAL,                         -- nur noch bei Anrufen aus der Zeit der früheren Prüfpunkte
     label TEXT,                        -- fraud | no_fraud | unclear | NULL (noch nicht geprüft)
-    label_categories TEXT,             -- JSON [Kategorie, ...]: bestätigte und übersehene Kategorien
-    label_checks TEXT,                 -- JSON {check_id: true|false}: Befund korrekt / falsch
-    label_missed TEXT,                 -- JSON [Kategorie, ...]: übersehen (kein Befund, aber Verstoss)
+    label_categories TEXT,             -- JSON [Regelname, ...]: bestätigte und übersehene Regeln
+    label_checks TEXT,                 -- JSON {fakt_id: true|false}: Fakt einer ausgelösten Regel stimmt / stimmt nicht
+    label_missed TEXT,                 -- JSON [Regelname, ...]: übersehen (kein Alarm, aber Verstoss)
     label_comment TEXT,
     labeled_by TEXT,
     labeled_at TEXT
@@ -82,7 +82,12 @@ def save_result(cid, transcription, analysis):
     with connect() as con:
         con.execute("UPDATE calls SET status = 'fertig', error = NULL, transcript = ?, segments = ?, analysis = ?, risk = ? WHERE id = ?",
                     (transcription["text"], json.dumps(transcription["segments"], ensure_ascii=False),
-                     json.dumps(analysis, ensure_ascii=False), analysis["risk"], cid))
+                     json.dumps(analysis, ensure_ascii=False), analysis.get("risk"), cid))
+
+
+def set_status(cid, status):
+    with connect() as con:
+        con.execute("UPDATE calls SET status = ? WHERE id = ?", (status, cid))
 
 
 def save_error(cid, message):
@@ -91,8 +96,8 @@ def save_error(cid, message):
 
 
 def save_label(cid, label, checks, missed, categories, comment, labeled_by):
-    """checks: {check_id: korrekt?} für die Befunde des Anrufs; missed: übersehene Kategorien; categories: alle
-    Kategorien mit Verstoss (bestätigte Befunde + übersehene)."""
+    """checks: {fakt_id: stimmt?} für die Fakten der ausgelösten Regeln; missed: übersehene Regeln (Namen);
+    categories: alle Regeln mit Verstoss (bestätigte + übersehene)."""
     with connect() as con:
         con.execute("UPDATE calls SET label = ?, label_checks = ?, label_missed = ?, label_categories = ?, label_comment = ?, "
                     "labeled_by = ?, labeled_at = ? WHERE id = ?",
@@ -131,3 +136,14 @@ def snippet(call, start, end):
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", f"{a:.2f}", "-to", f"{b:.2f}", "-i", call["audio_path"], str(out)],
                        check=True)
     return str(out)
+
+
+def delete_call(cid):
+    """Löscht den Anruf endgültig: Eintrag (mit Ergebnis und Beurteilung), Audio-Kopie und Ausschnitte."""
+    call = get_call(cid)
+    if call is None: return False
+    with connect() as con:
+        con.execute("DELETE FROM calls WHERE id = ?", (cid,))
+    Path(call["audio_path"]).unlink(missing_ok=True)
+    for f in SNIPPET_DIR.glob(f"{cid:06d}_*"): f.unlink(missing_ok=True)
+    return True

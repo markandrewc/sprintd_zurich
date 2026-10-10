@@ -1,83 +1,19 @@
-"""Fraud-Analyse eines Transkripts mit Kev.
+"""Fraud-Analyse eines Transkripts mit Kev, hierarchisch: Fakten -> Regeln -> Alarm (Konfiguration: facts.json).
 
-Entscheid: Kev liest das ganze Transkript, ein p(yes) pro Check. Das Risiko eines Anrufs ist das höchste p(yes) über
-alle Checks; ab der Schwelle gibt es einen Alarm (geht zur manuellen Prüfung). Lokalisierung: für jeden Check ab der
-Schwelle sucht ein gleitender Kev über überlappende Fenster den Kontext und grenzt darin die Stelle auf ~passage_words
-Wörter (~10 s) ein, mit Zeitstempeln aus den Abschnitten der Transkription. Die Checks stehen in questions.json, in zwei Listen ("gesetzlich", "intern").
+Entscheid: Kev liest das ganze Transkript und beantwortet jeden Grundfakt (Ja/Nein-Frage) mit einem p(yes). Ein Fakt
+ist ja, wenn p die Schwelle erreicht (eine für alle). Eine Regel legt pro Fakt ja, nein oder egal fest und löst aus,
+wenn alle Bedingungen erfüllt sind; löst mindestens eine aus, gibt es einen Alarm (geht zur manuellen Prüfung).
+Lokalisierung: für die Fakten, die in ausgelösten Regeln ja sein müssen, sucht ein
+gleitender Kev über überlappende Fenster den Kontext und grenzt darin die Stelle auf ~passage_words Wörter (~10 s) ein,
+mit Zeitstempeln aus den Abschnitten der Transkription.
 """
-import json
-import os
 import re
-from pathlib import Path
 
-from .kev.api import Noul, SystemOneRequest
-
-CONFIG = Path(__file__).parent / "questions.json"
+from .kev.api import SystemOneRequest
+from .rules import fired_rules, load_config, validate   # noqa: F401  (load_config für api.py)
 
 SENTENCE_END = re.compile(r"(?<=[.!?…])\s+(?=[A-ZÄÖÜ0-9„\"])")
 TURN = re.compile(r"^(T\d{3})\s*·\s*(.+?)\s*$", re.M)   # Sprecher-Turn im Format der Inventx-Skripte: "T003 · Beratung"
-
-
-def load_config(path=CONFIG):
-    return json.loads(Path(path).read_text(encoding="utf-8"))
-
-
-HISTORY = Path(__file__).parent / "questions_history"   # frühere Fassungen von questions.json, eine pro Version
-QID = re.compile(r"^[a-z][a-z0-9_]{1,40}$")
-
-
-def validate_questions(questions):
-    """Prüfpunkte in Listen-Form {liste: {id: prüfpunkt}} prüfen und bereinigen (type = noul, leere criteria weg).
-    -> bereinigte Form. ValueError mit einer Meldung, die man ohne Code-Kenntnis versteht."""
-    if not isinstance(questions, dict): raise ValueError("Prüfpunkte fehlen")
-    clean, seen = {}, set()
-    for source, qs in questions.items():
-        if source.startswith("_"): continue
-        if not isinstance(qs, dict): raise ValueError(f"Liste '{source}' enthält keine Prüfpunkte")
-        clean[source] = {}
-        for qid, q in qs.items():
-            if not QID.match(qid): raise ValueError(f"ID '{qid}': nur Kleinbuchstaben, Ziffern und _, z.B. insider_trading")
-            if qid in seen: raise ValueError(f"ID '{qid}' kommt mehrfach vor")
-            seen.add(qid)
-            if not str(q.get("instructions", "")).strip(): raise ValueError(f"Prüfpunkt '{qid}': die Frage fehlt")
-            crit = {k: str(v).strip() for k, v in (q.get("criteria") or {}).items() if k in ("true", "false") and str(v).strip()}
-            q = {k: v for k, v in q.items() if k != "criteria"} | {"type": "noul"} | ({"criteria": crit} if crit else {})
-            Noul.model_validate({k: q[k] for k in ("type", "instructions", "criteria") if k in q})
-            clean[source][qid] = q
-    if not seen: raise ValueError("Mindestens ein Prüfpunkt ist nötig")
-    return clean
-
-
-def save_questions(questions, path=CONFIG):
-    """Ersetzt die Prüfpunkte in questions.json, zählt "version" hoch und legt die vorherige Fassung in
-    questions_history/ ab. Schwelle und localization bleiben. -> neue Config."""
-    cfg = load_config(path)
-    clean = validate_questions(questions)
-    version = int(cfg.get("version", 1))
-    HISTORY.mkdir(exist_ok=True)
-    (HISTORY / f"questions_v{version}.json").write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
-    new = {k: v for k, v in cfg.items() if k not in ("version", "questions")} | {"version": version + 1, "questions": clean}
-    tmp = Path(path).with_suffix(".tmp")
-    tmp.write_text(json.dumps(new, ensure_ascii=False, indent=2), encoding="utf-8")
-    os.replace(tmp, path)   # atomar: eine laufende Analyse liest nie eine halb geschriebene Datei
-    return new
-
-
-def flatten(questions):
-    """{"gesetzlich": {id: frage}, "intern": {...}} -> {id: frage}; jede Frage bekommt ihre Liste als "source".
-    Ein schon flaches {id: frage} (jede Frage hat "type") bleibt, wie es ist; die ganze Config ({"questions": ...})
-    geht auch. Schlüssel mit "_" werden ignoriert. Unbrauchbare Struktur -> ValueError."""
-    if isinstance(questions.get("questions"), dict):
-        questions = questions["questions"]
-    questions = {k: v for k, v in questions.items() if not k.startswith("_")}
-    if all(isinstance(v, dict) and "type" in v for v in questions.values()):
-        return questions
-    flat = {}
-    for source, qs in questions.items():
-        if not isinstance(qs, dict) or not all(isinstance(q, dict) for q in qs.values()):
-            raise ValueError(f"'{source}' ist weder eine Frage (mit \"type\") noch eine Liste von Fragen")
-        flat.update({qid: {**q, "source": source} for qid, q in qs.items()})
-    return flat
 
 
 def prepare(text):
@@ -180,28 +116,29 @@ def localize(kev, items, checks, words=40, overlap=20, passage_words=25):
     return out
 
 
-def analyze(kev, transcript, questions, threshold, segments=None, localization=None):
-    """1. Kev liest das ganze Transkript und beantwortet alle Checks in einem Forward-Pass (Entscheid).
-    2. Für jeden Check ab der Schwelle sucht der gleitende Kev die Stelle (localize); sie steht als "passage" am Check.
-    questions: Listen-Form oder flach (siehe flatten). segments: Abschnitte der Transkription [{start, end, speaker,
-    text}]; ohne sie wird der Text aus transcript gebildet und die Stellen haben keine Zeitstempel.
-    localization: {"window_words", "overlap_words", "passage_words"} (Default 40 / 20 / 25).
-    -> Ergebnis-Dict, wie es POST /analyze zurückgibt."""
-    checks = {qid: q for qid, q in flatten(questions).items() if q.get("type") == "noul"}
-    if not checks: raise ValueError("Keine Checks (noul-Fragen) konfiguriert.")
+def analyze(kev, transcript, facts, rules, threshold, segments=None, localization=None):
+    """1. Kev liest das ganze Transkript und beantwortet alle Fakten in einem Durchgang.
+    2. Fakten ab der Schwelle sind ja; Regeln, deren Bedingungen (ja/nein pro Fakt) alle erfüllt sind, lösen aus;
+       mindestens eine -> Alarm.
+    3. Für die Fakten, die in ausgelösten Regeln ja sein müssen, sucht der gleitende Kev die Stelle (localize); sie
+       steht als "passage" am Fakt. (Was nein sein muss, hat keine Stelle.)
+    segments: Abschnitte der Transkription [{start, end, speaker, text}]; ohne sie wird der Text aus transcript gebildet
+    und die Stellen haben keine Zeitstempel. localization: {"window_words", "overlap_words", "passage_words"}.
+    -> Ergebnis-Dict, wie es POST /analyze zurückgibt (Fakten und Regeln in der Reihenfolge der Konfiguration)."""
+    facts, rules = validate(facts, rules)
+    qs = {fid: {"type": "noul", "instructions": f["instructions"]} for fid, f in facts.items()}
     items = units(transcript, segments)
-    # Kev ignoriert category/basis/source; SystemOneRequest validiert type/instructions/criteria
-    resp = kev.systemone(SystemOneRequest(state=render(items), questions=checks))
-    rows = [{"id": qid, "p": a["noul"], "category": checks[qid].get("category", ""), "source": checks[qid].get("source", ""),
-             "basis": checks[qid].get("basis", ""), "question": checks[qid].get("instructions", ""), "passage": None}
-            for qid, a in resp["answers"].items()]
-    rows.sort(key=lambda r: r["p"], reverse=True)
-    fired = {r["id"]: checks[r["id"]] for r in rows if decide(r["p"], threshold)}
-    if fired:
+    resp = kev.systemone(SystemOneRequest(state=render(items), questions=qs))
+    p = {fid: a["noul"] for fid, a in resp["answers"].items()}
+    fired = fired_rules(p, rules, threshold)
+    involved = {f: qs[f] for rid in fired for f, v in rules[rid]["conditions"].items() if v == "ja"}
+    passages = {}
+    if involved:
         loc = localization or {}
-        passages = localize(kev, items, fired, int(loc.get("window_words", 40)), int(loc.get("overlap_words", 20)),
+        passages = localize(kev, items, involved, int(loc.get("window_words", 40)), int(loc.get("overlap_words", 20)),
                             int(loc.get("passage_words", 25)))
-        for r in rows: r["passage"] = passages.get(r["id"])
-    risk = rows[0]["p"]
-    return {"alert": decide(risk, threshold), "risk": risk, "threshold": threshold, "top_check": rows[0]["id"],
-            "checks": rows, "model": resp["model"], "input_tokens": resp["usage"]["input_tokens"], "latency_ms": resp["latency_ms"]}
+    return {"alert": bool(fired), "threshold": threshold, "fired": fired,
+            "facts": [{"id": fid, "label": f["label"], "question": f["instructions"], "p": p[fid], "yes": p[fid] >= threshold,
+                       "passage": passages.get(fid)} for fid, f in facts.items()],
+            "rules": [{"id": rid, **r, "fired": rid in fired} for rid, r in rules.items()],
+            "model": resp["model"], "input_tokens": resp["usage"]["input_tokens"], "latency_ms": resp["latency_ms"]}

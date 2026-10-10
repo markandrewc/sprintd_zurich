@@ -2,17 +2,16 @@
 
   python -m fraud_analysis.api          # -> http://127.0.0.1:8002  (Doku: /docs)
 
-  POST /analyze   {"transcript": "...", "segments": [...]?, "threshold": 0.7?, "questions": {...}?}
-                  -> Alarm, Risiko, Wert pro Check; für Checks ab der Schwelle die Fundstelle ("passage", siehe analysis.py)
-                  segments: Abschnitte der Transkription mit Zeitstempeln [{"start", "end", "text", "speaker"?}]; fehlt
-                  transcript, wird es aus den segments zusammengesetzt
-  GET  /config    aktuelle Prüfpunkte, Schwelle und Version aus questions.json
-  PUT  /questions {"questions": {"gesetzlich": {...}, "intern": {...}}}  Prüfpunkte ersetzen (geprüft, Version +1,
-                  vorherige Fassung in questions_history/)
+  POST /analyze   {"transcript": "...", "segments": [...]?, "threshold": 0.7?, "passage_words": 25?}
+                  -> Alarm, ausgelöste Regeln, p(yes) und ja/nein pro Fakt; für die Fakten ausgelöster Regeln die
+                  Fundstelle ("passage", siehe analysis.py). segments: Abschnitte der Transkription mit Zeitstempeln
+                  [{"start", "end", "text", "speaker"?}]; fehlt transcript, wird es aus den segments zusammengesetzt
+  GET  /config    Fakten, Regeln, Schwelle und Version aus facts.json
+  PUT  /config    {"facts": {...}, "rules": {...}}  ersetzen (geprüft, Version +1, vorherige Fassung in config_history/)
   POST /unload    Kev sofort von der GPU entladen (die nächste Analyse lädt es wieder, ~10 s)
   GET  /health    Dienst erreichbar; "loaded": ob Kev gerade auf der GPU liegt
 
-questions.json wird bei jedem Aufruf neu gelesen: Änderungen gelten ohne Neustart.
+facts.json wird bei jedem Aufruf neu gelesen: Änderungen gelten ohne Neustart.
 Umgebungsvariablen: FRAUD_HOST (127.0.0.1), FRAUD_PORT (8002), FRAUD_IDLE_SECONDS (120; 0 = nie entladen),
 dazu KEV_* aus runtime.py.
 """
@@ -23,27 +22,27 @@ from pydantic import BaseModel, ValidationError
 
 from shared.model_slot import ModelSlot
 
-from .analysis import analyze, load_config, save_questions
+from .analysis import analyze, load_config
+from .rules import save_config
 from .runtime import DEVICE, MODEL_REPO, Kev
 
 KEV = ModelSlot("kev", loader=Kev, idle_seconds=float(os.environ.get("FRAUD_IDLE_SECONDS", "120")))
 
-app = FastAPI(title="Fraud-Analyse", version="1.1")
+app = FastAPI(title="Fraud-Analyse", version="2.0")
 
 
 class Segment(BaseModel):
     start: float | None = None          # Sekunden ab Anrufbeginn
     end: float | None = None
     text: str
-    speaker: str | None = None          # folgt mit der Sprechererkennung
+    speaker: str | None = None
 
 
 class AnalyzeRequest(BaseModel):
     transcript: str | None = None       # None: aus segments zusammengesetzt
     segments: list[Segment] | None = None
-    threshold: float | None = None      # None: Schwelle aus questions.json
-    questions: dict | None = None       # None: Fragen aus questions.json (Listen-Form oder flach)
-    passage_words: int | None = None    # Länge der Fundstelle in Wörtern; None: localization.passage_words aus questions.json
+    threshold: float | None = None      # None: Schwelle aus facts.json
+    passage_words: int | None = None    # Länge der Fundstelle in Wörtern; None: localization.passage_words aus facts.json
 
 
 @app.post("/analyze")
@@ -56,10 +55,10 @@ def post_analyze(req: AnalyzeRequest):
     try:
         with KEV.use() as kev:
             loc = {**cfg.get("localization", {}), **({"passage_words": req.passage_words} if req.passage_words else {})}
-            result = analyze(kev, transcript, req.questions or cfg["questions"], threshold, segments=segments, localization=loc)
-        result["questions_version"] = None if req.questions else cfg.get("version", 1)   # mit welchen Prüfpunkten analysiert
+            result = analyze(kev, transcript, cfg["facts"], cfg["rules"], threshold, segments=segments, localization=loc)
+        result["config_version"] = cfg.get("version", 1)   # mit welchen Fakten und Regeln analysiert
         return result
-    except (ValueError, ValidationError) as e:   # z.B. Transkript zu lang, ungültige Frage
+    except (ValueError, ValidationError) as e:   # z.B. Transkript zu lang, ungültige Konfiguration
         raise HTTPException(422, str(e)) from None
 
 
@@ -68,17 +67,18 @@ def get_config():
     return load_config()
 
 
-class QuestionsRequest(BaseModel):
-    questions: dict
+class ConfigRequest(BaseModel):
+    facts: dict
+    rules: dict
 
 
-@app.put("/questions")
-def put_questions(req: QuestionsRequest):
+@app.put("/config")
+def put_config(req: ConfigRequest):
     try:
-        cfg = save_questions(req.questions)
+        cfg = save_config(req.facts, req.rules)
     except (ValueError, ValidationError) as e:
         raise HTTPException(422, str(e)) from None
-    return {"version": cfg["version"], "questions": cfg["questions"]}
+    return {"version": cfg["version"], "facts": cfg["facts"], "rules": cfg["rules"]}
 
 
 @app.post("/unload")

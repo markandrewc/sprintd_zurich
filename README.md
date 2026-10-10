@@ -12,7 +12,7 @@ flowchart LR
 
     T["<b>Transkriptions-API</b> :8001<br/>transcription/<br/>―――<br/>1. Nemotron-3-Diarization:<br/>Sprachabschnitte + Sprecher<br/>2. Flix Whisper large-v3:<br/>Schweizerdeutsch → Hochdeutsch"]
     D["<b>Dashboard</b> :7860<br/>dashboard/<br/>―――<br/>Anrufe ansehen<br/>Fundstelle anhören<br/>Befunde beurteilen<br/>Einstellungen"]
-    F["<b>Fraud-Analyse-API</b> :8002<br/>fraud_analysis/<br/>―――<br/>1. Kev-4B, ganzes Transkript:<br/>Entscheid + Kategorie<br/>2. Kev im gleitenden Fenster:<br/>Fundstelle<br/>Checks: questions.json"]
+    F["<b>Fraud-Analyse-API</b> :8002<br/>fraud_analysis/<br/>―――<br/>1. Kev-4B, ganzes Transkript:<br/>p pro Fakt<br/>2. UND-Regeln über die Fakten:<br/>Alarm<br/>3. Kev im gleitenden Fenster:<br/>Fundstelle<br/>Fakten und Regeln: facts.json"]
     FT["<b>Finetuning</b><br/>finetuning/"]
     DEV["<b>Analyse-UI</b> :7861<br/>misc/analysis_ui/<br/>Auswertung gegen Inventx"]
 
@@ -33,8 +33,8 @@ Gestrichelt: geplant. Die beiden APIs laden ihre Modelle erst bei Bedarf und geb
 | Ordner | Inhalt |
 |---|---|
 | `transcription/` | Nemotron-3-Diarization (Sprachabschnitte und Sprecher, Standard 2 via `MAX_SPEAKERS`), dann Flix-AI/flix-swissgerman-full pro Abschnitt (Schweizerdeutsch → Hochdeutsch). Dienst `api.py`, Batch `batch.py` |
-| `fraud_analysis/` | Kev-4B (jaredpalmer/kev-4b): Entscheid über das ganze Transkript, gleitender Kev sucht für jeden Befund die Fundstelle. Checks in `questions.json`. Dienst `api.py` |
-| `dashboard/` | Gradio-App für Endnutzer. Daten (SQLite, Audio) in `dashboard/data/` |
+| `fraud_analysis/` | Kev-4B (jaredpalmer/kev-4b) beantwortet über das ganze Transkript jeden Fakt; Regeln (UND über Fakten) entscheiden über den Alarm; gleitender Kev sucht für die Fakten ausgelöster Regeln die Fundstelle. Fakten und Regeln in `facts.json`, Auswertung in `rules.py`. Dienst `api.py` |
+| `dashboard/` | Web-App für Endnutzer: FastAPI (`app.py`, JSON-API unter `/api`, Doku `/api/docs`) mit Oberfläche in `web/` (HTML/CSS/JS, ohne Build), Hintergrund-Prüfung in `worker.py`, Anzeige-Logik in `views.py`. Daten (SQLite, Audio) in `dashboard/data/` |
 | `finetuning/` | Export der Beurteilungen als Trainingsdaten |
 | `misc/analysis_ui/` | Entwickler-Oberfläche und Auswertung gegen die Inventx-Sollbewertung (nicht Teil der App) |
 | `misc/SwissDial/` | TTS für Schweizer Dialekte: Ausweichlösung, um synthetische Testaufnahmen zu erzeugen (nicht Teil der App) |
@@ -59,11 +59,14 @@ API-Doku der Dienste: http://127.0.0.1:8001/docs und http://127.0.0.1:8002/docs.
 
 ## Konfiguration
 
-- **Prüfpunkte (Fragen an Kev):** im Dashboard unter „Prüfpunkte“ ansehen, bearbeiten, hinzufügen, löschen. Gespeichert in
-  `fraud_analysis/questions.json` (zwei Listen: `gesetzlich`, `intern`) über `PUT /questions` der Fraud-Analyse; jede
-  Änderung erhöht `version`, die vorherige Fassung liegt in `fraud_analysis/questions_history/`. Jede Analyse speichert
-  ihre `questions_version`. Wird bei jeder Analyse neu gelesen, gilt also ohne Neustart für neu geprüfte Anrufe.
-- **Alarm-Schwelle und Länge der Fundstelle:** im Dashboard unter „Einstellungen“.
+- **Regeln und Fakten (hierarchische Prüfung):** Kev beantwortet zu jedem Anruf alle Fakten (Ja/Nein-Fragen). Ein Fakt
+  ist ja, wenn sein Wert die Schwelle erreicht. Eine Regel verbindet Fakten mit UND (der erste ist die Grundfrage); löst
+  mindestens eine Regel aus, gibt es einen Alarm. Im Dashboard unter „Regeln & Fakten“ ansehen, bearbeiten, hinzufügen,
+  löschen. Gespeichert in `fraud_analysis/facts.json` über `PUT /config` der Fraud-Analyse; jede Änderung erhöht
+  `version`, die vorherige Fassung liegt in `fraud_analysis/config_history/`. Die Werte pro Fakt werden pro Anruf
+  gespeichert: Schwelle und Regeln über bestehende Fakten gelten sofort für alle Anrufe; neue oder geänderte Fragen
+  brauchen „Neu prüfen“ beim Anruf.
+- **Schwelle (für alle Fakten) und Länge der Fundstelle:** im Dashboard unter „Einstellungen“.
 - **GPU:** Kev braucht ~8 GB, die Transkription ~3.4 GB (Whisper + Nemotron, plus Arbeitsspeicher beim Rechnen). Beide Dienste laden ihr
   Modell erst bei der ersten Anfrage und entladen es nach `TRANSCRIPTION_IDLE_SECONDS` bzw. `FRAUD_IDLE_SECONDS`
   (Default 120 s) ohne Anfrage; `POST /unload` entlädt sofort. Das Dashboard transkribiert zuerst alle Dateien,
@@ -77,8 +80,8 @@ Jeder Teil ist ein eigener Dienst bzw. Ordner und soll unabhängig wachsen:
 | Erweiterung | Wo | Andockpunkt heute |
 |---|---|---|
 | ~~Sprechererkennung (Nemotron)~~ umgesetzt | `transcription/` | `segments[].speaker`. In den Inventx-Aufnahmen spricht eine einzige Stimme alles, dort gibt es daher nur „Sprecher 1“ |
-| ~~Lokalisierung mit gleitendem Kev~~ umgesetzt | `fraud_analysis/` | `checks[].passage`: Kontextfenster ~40 Wörter, darin auf ~25 Wörter eingegrenzt; Länge im Dashboard unter „Einstellungen“, Fenster in `questions.json` → `localization` |
-| Finetuning von Kev mit den Dashboard-Labels | `finetuning/` | `export_labels.py`: Ja/Nein pro Check und korrekt/falsch pro Fundstelle |
+| ~~Lokalisierung mit gleitendem Kev~~ umgesetzt | `fraud_analysis/` | `facts[].passage`: Kontextfenster ~40 Wörter, darin auf ~25 Wörter eingegrenzt; Länge im Dashboard unter „Einstellungen“, Fenster in `facts.json` → `localization` |
+| Finetuning von Kev mit den Dashboard-Labels | `finetuning/` | `export_labels.py`: Ja/Nein pro Fakt und stimmt/stimmt nicht pro Fundstelle |
 | Ablauf ohne Upload (Aufnahmen automatisch abholen) | neuer Dienst | heute stösst das Dashboard Transkription und Analyse an |
 | Schweizerdeutsch → Schweizerdeutsch (ch→ch) | `transcription/` | zurückgestellt |
 

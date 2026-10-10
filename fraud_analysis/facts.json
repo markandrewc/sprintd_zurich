@@ -1,0 +1,259 @@
+{
+  "_comment": "Hierarchische Prüfung. Grundfakten: Ja/Nein-Fragen, die Kev zu jedem Anruf beantwortet ('instructions' ist die Frage, die Kev liest); ein Fakt gilt als ja, wenn p(yes) die Schwelle erreicht (eine Schwelle für alle, in den Einstellungen änderbar). Regeln: Kombinationen der Fakten; 'conditions' legt pro Fakt 'ja' oder 'nein' fest, nicht genannte Fakten sind egal. Eine Regel löst aus, wenn alle Bedingungen erfüllt sind; löst mindestens eine aus, gibt es einen Alarm. 'label' (Fakt) und 'name' (Regel) sind nur Anzeige.",
+  "version": 1,
+  "threshold": 0.7,
+  "localization": {
+    "window_words": 40,
+    "overlap_words": 20,
+    "passage_words": 25
+  },
+  "facts": {
+    "trade_wish": {
+      "type": "noul",
+      "label": "Kauf- oder Verkaufswunsch",
+      "instructions": "Does someone express their own wish to buy or sell a financial instrument at any point in the call? A later refusal or non-execution does not change the answer."
+    },
+    "nonpublic_info": {
+      "type": "noul",
+      "label": "Stützt sich auf nicht öffentliche Information",
+      "instructions": "Does someone rely on information that is not yet public? Information that has already been published counts as no."
+    },
+    "info_passed_on": {
+      "type": "noul",
+      "label": "Gibt Insiderinformation weiter",
+      "instructions": "Does someone pass on non-public, price-relevant information to another person, or recommend a trade based on it?"
+    },
+    "price_influence": {
+      "type": "noul",
+      "label": "Zweck: Kurs beeinflussen",
+      "instructions": "Is the purpose of an order or of spreading information to move or fix a market price or to fake trading activity?"
+    },
+    "credential_read_out": {
+      "type": "noul",
+      "label": "Zugangsgeheimnis ausgesprochen",
+      "instructions": "Does someone actually say out loud a secret that grants access or confirms a transaction? Only mentioning or refusing it counts as no."
+    },
+    "credential_valid": {
+      "type": "noul",
+      "label": "Geheimnis gültig",
+      "instructions": "Is the secret that was said out loud currently valid for an ongoing process of its owner? Expired values and samples from instructions count as no."
+    },
+    "credential_asked": {
+      "type": "noul",
+      "label": "Fragt nach fremdem Zugangsgeheimnis",
+      "instructions": "Does someone ask another person for that person's access secret?"
+    },
+    "third_party_data": {
+      "type": "noul",
+      "label": "Geschützte Daten einer Drittperson",
+      "instructions": "Is the call about protected account or personal data of a third person?"
+    },
+    "no_authorization": {
+      "type": "noul",
+      "label": "Keine Berechtigung festgestellt",
+      "instructions": "Has the bank established that there is no authorization for this specific information? A confirmed authorization counts as no."
+    },
+    "third_party_data_revealed": {
+      "type": "noul",
+      "label": "Bank nennt geschütztes Detail",
+      "instructions": "Does the bank actually reveal a protected detail about the third person?"
+    },
+    "third_party_data_requested": {
+      "type": "noul",
+      "label": "Verlangt geschützte Daten",
+      "instructions": "Does someone ask to be told protected data of a third person?"
+    },
+    "omission_request": {
+      "type": "noul",
+      "label": "Wunsch, Angabe wegzulassen",
+      "instructions": "Does someone ask for a piece of information to be deliberately left out of, or hidden in, the documentation for an internal decision-making body? A mere correction counts as no."
+    },
+    "relevant_fact": {
+      "type": "noul",
+      "label": "Angabe ist relevant und wahr",
+      "instructions": "Is the information in question a true fact that is relevant for the decision? False or unrelated information counts as no."
+    },
+    "false_record_request": {
+      "type": "noul",
+      "label": "Will Falsches festhalten",
+      "instructions": "Does someone want information recorded that they know to be false?"
+    },
+    "split_request": {
+      "type": "noul",
+      "label": "Aufteilung angefragt",
+      "instructions": "Does someone ask for a payment, deposit or booking to be split into partial amounts?"
+    },
+    "single_transaction": {
+      "type": "noul",
+      "label": "Gehört zu einem einzigen Vorgang",
+      "instructions": "Do the partial amounts belong to one single invoice, delivery or transaction? Independent genuine invoices count as no."
+    },
+    "control_motive": {
+      "type": "noul",
+      "label": "Zweck: interne Kontrolle verhindern",
+      "instructions": "Is it stated that the purpose of splitting is to prevent an internal approval or control from being applied?"
+    },
+    "control_bypass": {
+      "type": "noul",
+      "label": "Versucht Kontrolle auszulassen",
+      "instructions": "Does someone try to skip or switch off an internal approval, limit or control so that it is not applied at all?"
+    },
+    "reporting_motive": {
+      "type": "noul",
+      "label": "Zweck: Meldepflicht vermeiden",
+      "instructions": "Is the purpose of splitting to keep a legal reporting or identification obligation from applying?"
+    },
+    "funds_origin_topic": {
+      "type": "noul",
+      "label": "Herkunft von Vermögen ist Thema",
+      "instructions": "Is the origin of assets or incoming funds discussed?"
+    },
+    "origin_concealed": {
+      "type": "noul",
+      "label": "Herkunft wird verschleiert",
+      "instructions": "Does someone evade, refuse or deliberately obscure the explanation of where the assets come from?"
+    },
+    "beneficiary_topic": {
+      "type": "noul",
+      "label": "Berechtigung an Vermögen ist Thema",
+      "instructions": "Is it discussed who owns assets or who benefits from them?"
+    },
+    "beneficiary_hidden": {
+      "type": "noul",
+      "label": "Wahrer Berechtigter soll verborgen bleiben",
+      "instructions": "Is the person who actually owns or benefits from the assets to be kept hidden from the bank?"
+    },
+    "advantage_offered": {
+      "type": "noul",
+      "label": "Persönlicher Vorteil angeboten oder verlangt",
+      "instructions": "Does someone offer or ask for a personal advantage?"
+    },
+    "quid_pro_quo": {
+      "type": "noul",
+      "label": "Vorteil gegen Handlung",
+      "instructions": "Is the advantage tied to an action in return?"
+    },
+    "third_party_instruction": {
+      "type": "noul",
+      "label": "Handelt auf Anweisung oder Druck Dritter",
+      "instructions": "Does someone act, or want to act, on the instruction of or under pressure from a third person?"
+    },
+    "deception_signs": {
+      "type": "noul",
+      "label": "Anzeichen von Täuschung durch Dritte",
+      "instructions": "Are there clear signs that this third person is deceiving or exploiting them?"
+    }
+  },
+  "rules": {
+    "insider_trading": {
+      "name": "Insiderhandel",
+      "conditions": {
+        "trade_wish": "ja",
+        "nonpublic_info": "ja"
+      }
+    },
+    "insider_disclosure": {
+      "name": "Weitergabe von Insiderinformationen",
+      "conditions": {
+        "info_passed_on": "ja"
+      }
+    },
+    "market_manipulation": {
+      "name": "Marktmanipulation",
+      "conditions": {
+        "price_influence": "ja"
+      }
+    },
+    "aml_source_of_funds": {
+      "name": "Verschleierte Herkunft von Vermögen",
+      "conditions": {
+        "funds_origin_topic": "ja",
+        "origin_concealed": "ja"
+      }
+    },
+    "aml_structuring": {
+      "name": "Umgehung von Meldepflichten",
+      "conditions": {
+        "split_request": "ja",
+        "reporting_motive": "ja"
+      }
+    },
+    "aml_hidden_beneficiary": {
+      "name": "Verdeckter wirtschaftlich Berechtigter",
+      "conditions": {
+        "beneficiary_topic": "ja",
+        "beneficiary_hidden": "ja"
+      }
+    },
+    "third_party_disclosure": {
+      "name": "Auskunft an Unberechtigte",
+      "conditions": {
+        "third_party_data": "ja",
+        "no_authorization": "ja",
+        "third_party_data_revealed": "ja"
+      }
+    },
+    "confidential_request": {
+      "name": "Erschleichen vertraulicher Informationen",
+      "conditions": {
+        "third_party_data": "ja",
+        "no_authorization": "ja",
+        "third_party_data_requested": "ja"
+      }
+    },
+    "false_records": {
+      "name": "Falsche Angaben",
+      "conditions": {
+        "false_record_request": "ja"
+      }
+    },
+    "bribery": {
+      "name": "Bestechung",
+      "conditions": {
+        "advantage_offered": "ja",
+        "quid_pro_quo": "ja"
+      }
+    },
+    "withheld_information": {
+      "name": "Verschweigen relevanter Angaben",
+      "conditions": {
+        "omission_request": "ja",
+        "relevant_fact": "ja"
+      }
+    },
+    "split_circumvention": {
+      "name": "Aufteilung zur Kontrollumgehung",
+      "conditions": {
+        "split_request": "ja",
+        "single_transaction": "ja",
+        "control_motive": "ja"
+      }
+    },
+    "control_circumvention": {
+      "name": "Kontrollumgehung",
+      "conditions": {
+        "control_bypass": "ja"
+      }
+    },
+    "credential_disclosure": {
+      "name": "Preisgabe von Zugangsdaten",
+      "conditions": {
+        "credential_read_out": "ja",
+        "credential_valid": "ja"
+      }
+    },
+    "credential_request": {
+      "name": "Abfrage von Zugangsdaten",
+      "conditions": {
+        "credential_asked": "ja"
+      }
+    },
+    "manipulated_customer": {
+      "name": "Kunde als Betrugsopfer",
+      "conditions": {
+        "third_party_instruction": "ja",
+        "deception_signs": "ja"
+      }
+    }
+  }
+}

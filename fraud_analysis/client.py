@@ -9,11 +9,10 @@ import httpx
 URL = os.environ.get("FRAUD_URL", "http://127.0.0.1:8002")
 
 
-def analyze(transcript=None, segments=None, threshold=None, questions=None, passage_words=None, url=URL, timeout=300):
-    """-> Ergebnis von POST /analyze. segments: [{start, end, text, speaker?}] aus der Transkription.
-    Wirft RuntimeError mit der Meldung des Dienstes bei einem Fehler."""
-    body = {"transcript": transcript, "segments": segments, "threshold": threshold, "questions": questions,
-            "passage_words": passage_words}
+def analyze(transcript=None, segments=None, threshold=None, passage_words=None, url=URL, timeout=300):
+    """-> Ergebnis von POST /analyze (Fakten, ausgelöste Regeln, Alarm). segments: [{start, end, text, speaker?}] aus der
+    Transkription. Wirft RuntimeError mit der Meldung des Dienstes bei einem Fehler."""
+    body = {"transcript": transcript, "segments": segments, "threshold": threshold, "passage_words": passage_words}
     try:
         r = httpx.post(f"{url}/analyze", json=body, timeout=timeout)
     except httpx.HTTPError as e:
@@ -23,10 +22,10 @@ def analyze(transcript=None, segments=None, threshold=None, questions=None, pass
     return r.json()
 
 
-def save_questions(questions, url=URL, timeout=30):
-    """Prüfpunkte ersetzen (PUT /questions). -> {"version", "questions"}. RuntimeError mit der Meldung des Dienstes."""
+def save_config(facts, rules, url=URL, timeout=30):
+    """Fakten und Regeln ersetzen (PUT /config). -> {"version", "facts", "rules"}. RuntimeError mit der Meldung des Dienstes."""
     try:
-        r = httpx.put(f"{url}/questions", json={"questions": questions}, timeout=timeout)
+        r = httpx.put(f"{url}/config", json={"facts": facts, "rules": rules}, timeout=timeout)
     except httpx.HTTPError as e:
         raise RuntimeError(f"Fraud-Analyse-Dienst nicht erreichbar ({url}): {e}") from None
     if r.status_code != 200:
