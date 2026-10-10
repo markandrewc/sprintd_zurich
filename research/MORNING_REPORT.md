@@ -1,6 +1,7 @@
 # Morning report — overnight research on the GPU host (2026-10-10)
 
-_Last update: 04:35. Everything below is reproducible from `experiments/*.yaml` + caches; numbers come from
+_Last update: 05:20. Read with `research/DEMO.md` (5-minute demo script) and `research/ideas_round3.md` (Q&A cheat sheet)._
+_ Everything below is reproducible from `experiments/*.yaml` + caches; numbers come from
 `runs/experiments/*/summary.md` and `research/journal.md` (timestamped log of every run and decision)._
 
 ## TL;DR
@@ -10,14 +11,19 @@ _Last update: 04:35. Everything below is reproducible from `experiments/*.yaml` 
    - Decision: **`facts`**, which asks atomic yes/no/unknown questions (scored by log-probability) and decides with an
      officer-editable policy table (`config/policy_table.yaml`). Every alarm names the facts and the rule.
    - Keywords + patterns stay visible and editable with a light weight. No keyword hit means "abstain", not "harmless".
-   - New calls on one 12 GB GPU: `scripts/run_staged.sh recommended` (ASR first, then the LLM).
+   - New calls on one 12 GB GPU: `scripts/run_staged.sh recommended` (ASR first, then the LLM). Verified end to end
+     on 3 re-encoded audio files with neutral names (nothing cached): alarm / no alert / review all correct, ~90 s.
+   - Single-pass fallback (live demo, UI "Anruf verarbeiten"): `config/recommended-turbo.yaml` (turbo ASR without
+     prompt/conditioning fits next to the LLM): dev AUC 0.85, FAR 14%, miss 23%.
+   - Officer UI: evidence timeline, "Warum kein Alarm?", review reasons, and the new **"Offene Fakten"** panel — the
+     officer answers the open fact (e.g. "Code gültig? Ja/Nein") and the call is re-decided from the policy table, audited.
 2. **Dev (48 calls, cross-validated):**
    - flag AUC **0.87 [0.72, 0.99]**, flag F1 0.86, false-alarm rate **14%**, miss rate 15%
    - alarm F1 0.86, review recall 67%, 3-class accuracy 79%
    - v1 (turbo ASR + free LLM judge + G-Eval): AUC 0.68, false alarms 86%, 3-class accuracy 38%.
    - Threshold-robust: flag decisions are identical anywhere from 0.45 to 0.65; 3-class labels from 0.55 to 0.65
      (at 0.45 the 10 "open fact" calls scored 0.50 turn from review into alarm).
-3. **Holdout (run once, 12 calls / 6 dialogues, logged):**
+3. **Holdout (champion run once; 12 calls / 6 dialogues; 3 logged looks in total — see Candidate B):**
    - champion: **0 false alarms** (6/6 harmless correct), the disclosure alarm D07 caught (both versions), alarm F1 0.67, 3-class accuracy 67%.
    - Missed: the splitting alarm C16 (one version only went to review) and the open documentation case C19.
    - v1 on the same 12 calls (one llm_judge check failed on one call: DEGRADED) sends *everything* to review: 100% false alarms, 3-class accuracy 17%.
@@ -82,8 +88,10 @@ See `research/findings/RQ*.md`. Each has the setup, a CI table, flips, a recomme
 - Review side of facts (Stufe3) and the splitting family; table v3 with criteria-derived "open fact" questions was
   evaluated on dev + synthetic: team decision, see DECISIONS.md D2b (cannot be validated on the used holdout).
 - Ask the organisers how `review` is scored. Flag F1 is meaningless here (flag-all = 0.70); we report AUC + FAR.
-- Event GPUs: with ≥24 GB, Qwen2.5-14B (or larger) + large-v3 run side by side. The 14B is no detectable gain here,
-  but it is more robust on dialect text.
+- Event GPUs: with ≥24 GB, Qwen2.5-14B (or larger) + large-v3 run side by side (`config/recommended-14b.yaml`): more
+  robust to question wording on dev, but not better on dev or the holdout here (candidate B above).
+- Tried and rejected after the freeze: S1 "confident clearance" rule (failed its pre-registered tests), paraphrase
+  ensemble (R6). S2 (fold-aware twin few-shot for the fact probes) — see the journal for the result.
 
 ## How to use what is running
 - vLLM (Qwen2.5-7B-AWQ) on :8000: `scripts/remote/swap_llm.sh <hf-id> [util] [max_len]`; stop: `kill $(cat runs/logs/vllm.pid)`.
