@@ -266,59 +266,18 @@ def rule_wizard(app: Any) -> None:
         st.markdown(" → ".join(f"**{i}. {t}**" if state["step"] == i else f"{i}. {t}"
                                for i, t in ((1, "Fakten wählen"), (2, "Bedingungen"), (3, "Ergebnis"))))
         fams = list((work.get("families") or {}).keys())
-        if state["step"] == 1:
-            q = st.text_input("Suchen", key="dm_rw_q", placeholder="z.B. Code, Handelswunsch, Vollmacht …",
-                              label_visibility="collapsed")
-            chosen_fam = state_family(state)
-            for fam in fams:
-                facts = [f for f in pe.family_doc(work, fam)["facts"]
-                         if not q or q.lower() in f"{f.get('label')} {f.get('de')}".lower()]
-                if not facts:
-                    continue
-                st.markdown(f"**{ui.esc(names.get(fam, fam))}**")
-                for f in facts:
-                    key = f"{fam}.{f['id']}"
-                    st.checkbox(str(f.get("label") or f["id"]), value=key in state["facts"], key=f"dm_rw_f_{key}_{n}",
-                                on_change=_toggle_fact, args=(key, f"dm_rw_f_{key}_{n}"),
-                                help=str(f.get("de") or ""),
-                                disabled=chosen_fam is not None and fam != chosen_fam and key not in state["facts"])
-            if len({k.split('.', 1)[0] for k in state["facts"]}) > 1:
-                st.warning("Eine Regel gehört zu genau einer Prüfart: bitte Fakten nur einer Prüfart wählen.")
-        elif state["step"] == 2:
-            fam = state_family(state)
-            labels = pe.fact_labels(work, fam) if fam else {}
-            for key in state["facts"]:
-                fid = key.split(".", 1)[1]
-                c = state["conds"].setdefault(key, {"value": "yes", "neg": False})
-                with st.container(border=True):
-                    a, b, d = st.columns([3, 3, 1], vertical_alignment="center")
-                    a.markdown(f"«{ui.esc(labels.get(fid, fid))}»")
-                    b.segmented_control("Wert", list(VALUE_OPTS), default=c["value"], key=f"dm_rw_v_{key}_{n}",
-                                        format_func=fpol.VALUE_DE.get, label_visibility="collapsed", required=True,
-                                        on_change=_set_cond, args=(key, "value", f"dm_rw_v_{key}_{n}"))
-                    d.checkbox("nicht", value=c["neg"], key=f"dm_rw_n_{key}_{n}", on_change=_set_cond,
-                               args=(key, "neg", f"dm_rw_n_{key}_{n}"))
-                    st.caption(_band_text(pol, fam, fid))
-            st.toggle("ODER statt UND (eine der Bedingungen genügt)", value=state["join"] == "or",
-                      key=f"dm_rw_join_{n}", on_change=_set, args=("join", f"dm_rw_join_{n}"))
-        else:
-            st.segmented_control("Ergebnis", list(OUTCOMES), default=state["label"], key=f"dm_rw_lab_{n}",
-                                 format_func=LABEL_DE.get, required=True, on_change=_set,
-                                 args=("label", f"dm_rw_lab_{n}"))
-            st.text_input("Titel", value=state["title"], key=f"dm_rw_title_{n}", on_change=_set,
-                          args=("title", f"dm_rw_title_{n}"), placeholder="z.B. Code vorgelesen, Gültigkeit offen")
-            st.text_area("Beschreibung (sieht die Fallbearbeitung als Begründung)", value=state["text"],
-                         key=f"dm_rw_text_{n}", on_change=_set, args=("text", f"dm_rw_text_{n}"), height=90)
-            built = state_rule(state, work)
-            if built:
-                labels = pe.fact_labels(work, built[0])
-                st.markdown(f"**{ui.esc(pe.render_rule(built[1], labels))}**")
+        sel_fam = state_family(state)
+        sel_labels = pe.fact_labels(work, sel_fam) if sel_fam else {}
+        if state["facts"]:
+            st.markdown("Gewählt: " + " ".join(
+                f":blue-badge[{ui.esc(sel_labels.get(k.split('.', 1)[1], k.split('.', 1)[1]))}]" for k in state["facts"]))
+        # live effect + navigation on top, so they stay in view while the list below is long
         cand, fam = _hits_line(app, pol, work, state, base)
-        b1, b2, b3 = st.columns(3)
+        b1, _, b3 = st.columns(3)
         b1.button("Zurück", icon=":material/arrow_back:", on_click=_step, args=(-1,), disabled=state["step"] == 1,
                   key="dm_rw_back", width="stretch")
         if state["step"] < 3:
-            ok = bool(state["facts"]) and state_family(state) is not None
+            ok = bool(state["facts"]) and sel_fam is not None
             b3.button("Weiter", icon=":material/arrow_forward:", on_click=_step, args=(1,), type="primary",
                       disabled=not ok, key="dm_rw_next", width="stretch")
         else:
@@ -337,6 +296,52 @@ def rule_wizard(app: Any) -> None:
                 _flash(f"Regel «{state['title']}» gespeichert: Version {v.n} gilt sofort.")
                 _close()
                 st.rerun()
+        if state["step"] == 1:
+            q = st.text_input("Suchen", key="dm_rw_q", placeholder="Fakten suchen, z.B. Code, Handelswunsch, Vollmacht …",
+                              label_visibility="collapsed")
+            if len({k.split('.', 1)[0] for k in state["facts"]}) > 1:
+                st.warning("Eine Regel gehört zu genau einer Prüfart: bitte Fakten nur einer Prüfart wählen.")
+            for fam_id in fams:
+                facts = [f for f in pe.family_doc(work, fam_id)["facts"]
+                         if not q or q.lower() in f"{f.get('label')} {f.get('de')}".lower()]
+                if not facts:
+                    continue
+                st.markdown(f"**{ui.esc(names.get(fam_id, fam_id))}**")
+                cols = st.columns(2)
+                for i, f in enumerate(facts):
+                    key = f"{fam_id}.{f['id']}"
+                    cols[i % 2].checkbox(str(f.get("label") or f["id"]), value=key in state["facts"],
+                                         key=f"dm_rw_f_{key}_{n}", on_change=_toggle_fact,
+                                         args=(key, f"dm_rw_f_{key}_{n}"), help=str(f.get("de") or ""),
+                                         disabled=sel_fam is not None and fam_id != sel_fam and key not in state["facts"])
+        elif state["step"] == 2:
+            for key in state["facts"]:
+                fid = key.split(".", 1)[1]
+                c = state["conds"].setdefault(key, {"value": "yes", "neg": False})
+                with st.container(border=True):
+                    a, b, d = st.columns([3, 3, 1], vertical_alignment="center")
+                    a.markdown(f"«{ui.esc(sel_labels.get(fid, fid))}»")
+                    b.segmented_control("Wert", list(VALUE_OPTS), default=c["value"], key=f"dm_rw_v_{key}_{n}",
+                                        format_func=fpol.VALUE_DE.get, label_visibility="collapsed", required=True,
+                                        on_change=_set_cond, args=(key, "value", f"dm_rw_v_{key}_{n}"))
+                    d.checkbox("nicht", value=c["neg"], key=f"dm_rw_n_{key}_{n}", on_change=_set_cond,
+                               args=(key, "neg", f"dm_rw_n_{key}_{n}"))
+                    st.caption(_band_text(pol, sel_fam, fid))
+            st.toggle("ODER statt UND (eine der Bedingungen genügt)", value=state["join"] == "or",
+                      key=f"dm_rw_join_{n}", on_change=_set, args=("join", f"dm_rw_join_{n}"))
+        else:
+            st.segmented_control("Ergebnis", list(OUTCOMES), default=state["label"], key=f"dm_rw_lab_{n}",
+                                 format_func=LABEL_DE.get, required=True, on_change=_set,
+                                 args=("label", f"dm_rw_lab_{n}"))
+            st.text_input("Titel", value=state["title"], key=f"dm_rw_title_{n}", on_change=_set,
+                          args=("title", f"dm_rw_title_{n}"), placeholder="z.B. Code vorgelesen, Gültigkeit offen")
+            st.text_area("Beschreibung (sieht die Fallbearbeitung als Begründung)", value=state["text"],
+                         key=f"dm_rw_text_{n}", on_change=_set, args=("text", f"dm_rw_text_{n}"), height=90)
+            built = state_rule(state, work)
+            if built:
+                st.markdown(f"**{ui.esc(pe.render_rule(built[1], sel_labels))}**")
+
+
 
 
 # --------------------------------------------------------------------------------------------

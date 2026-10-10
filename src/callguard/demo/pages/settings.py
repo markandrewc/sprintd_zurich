@@ -25,6 +25,14 @@ name.text_input("Ihr Name", key="dm_user", help="Wird bei jeder Änderung im Aud
 for msg in ss.pop("dm_set_messages", []):
     st.toast(msg, icon=":material/check_circle:")
 
+opener = st.query_params.get("neu")  # deep link: ?neu=regel / ?neu=fakt opens the wizard
+if opener in ("regel", "fakt"):
+    del st.query_params["neu"]
+    if opener == "regel":
+        settings_rules._open()
+    else:
+        settings_facts._open(None, None, settings_facts.fu.live_policy(app))
+
 t_rules, t_facts, t_kw = st.tabs([":material/rule: Regeln", ":material/fact_check: Fakten", ":material/label: Stichwörter"])
 with t_rules:
     settings_rules.render(app)

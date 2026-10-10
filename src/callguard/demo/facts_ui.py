@@ -282,7 +282,15 @@ def answer_spread(results: dict[str, Any], policy: fpol.FactPolicy, tables: dict
                 readers[v] += 1
                 b = min(bins - 1, int(p * bins))
                 hist[(b, v)] = hist.get((b, v), 0) + 1
-    rows = [{"von": b / bins, "bis": (b + 1) / bins, "Wert": VALUE_DE[v], "Anzahl": n} for (b, v), n in sorted(hist.items())]
+    rows = []  # stacked by hand (y0 / y1): Vega-Lite does not stack on a sqrt scale
+    for b in range(bins):
+        y0 = 0
+        for v in ("no", "unclear", "yes"):
+            n = hist.get((b, v), 0)
+            if n:
+                rows.append({"von": b / bins, "bis": (b + 1) / bins, "Wert": VALUE_DE[v], "Anzahl": n, "y0": y0,
+                             "y1": y0 + n})
+                y0 += n
     out = {"rows": rows, "readers": readers, "combined": combined}
     if key:
         _SPREAD_MEMO[key] = out
@@ -310,13 +318,13 @@ def spread_chart(rows: list[dict[str, Any]], lo: float, hi: float) -> Any:
                 axis=alt.Axis(values=[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], format=".1f", grid=False,
                               labelColor=INK_MUTED, titleColor=INK_MUTED)),
         x2="bis:Q",
-        y=alt.Y("sum(Anzahl):Q", stack="zero", scale=alt.Scale(type="sqrt"), title="Antworten (Wurzelskala)",
+        y=alt.Y("y0:Q", scale=alt.Scale(type="sqrt"), title="Antworten (Wurzelskala)",
                 axis=alt.Axis(labelColor=INK_MUTED, titleColor=INK_MUTED, gridColor="#efeeea")),
+        y2="y1:Q",
         color=alt.Color("Wert:N", sort=order, scale=alt.Scale(domain=order, range=[SPREAD_COLORS[v] for v in order]),
                         legend=alt.Legend(orient="top", title=None, labelColor="#0b0b0b")),
-        order=alt.Order("Wert:N", sort="ascending"),
         tooltip=[alt.Tooltip("von:Q", title="p(ja) ab", format=".2f"), alt.Tooltip("bis:Q", title="bis", format=".2f"),
-                 alt.Tooltip("Wert:N"), alt.Tooltip("sum(Anzahl):Q", title="Antworten")])
+                 alt.Tooltip("Wert:N"), alt.Tooltip("Anzahl:Q", title="Antworten")])
     return alt.layer(zone, bars, rule, text).properties(height=220).configure_view(stroke=None)
 
 
