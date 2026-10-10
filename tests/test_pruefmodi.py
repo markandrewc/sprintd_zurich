@@ -106,17 +106,19 @@ def _summary(tmp: Path) -> Path:
                 "false_alarm_rate": fp / (fp + tn), "flag_recall": tp / (tp + fn), "review_recall": 0.5,
                 "accuracy": 0.7, "ci": {"false_alarm_rate": {"lo": far_ci[0], "hi": far_ci[1]},
                                         "flag_recall": {"lo": rec_ci[0], "hi": rec_ci[1]}}}
+    spec = md.load_spec()  # variant names come from config/pruefmodi.yaml (they follow the adopted table)
+    kv, ch, r1 = (spec.get(i).metrics for i in ("zurueckhaltend", "ausgewogen", "vorsichtig"))
     exp = tmp / "runs" / "experiments" / "two_readers"
     exp.mkdir(parents=True)
     (exp / "summary.json").write_text(json.dumps({"split": "dev", "created": "2026-10-10", "variants": {
-        "kev": {"cv": cv(7, 3, 0, 10, (0.0, 0.0), (0.4, 0.9)), "suggestion": {"threshold": 0.2}},
-        "champion": {"cv": cv(8, 2, 2, 8, (0.0, 0.4), (0.6, 1.0)), "suggestion": {"threshold": 0.65}},
-        "r1": {"cv": cv(9, 1, 2, 8, (0.0, 0.4), (0.7, 1.0))},
+        kv: {"cv": cv(7, 3, 0, 10, (0.0, 0.0), (0.4, 0.9)), "suggestion": {"threshold": 0.2}},
+        ch: {"cv": cv(8, 2, 2, 8, (0.0, 0.4), (0.6, 1.0)), "suggestion": {"threshold": 0.65}},
+        r1: {"cv": cv(9, 1, 2, 8, (0.0, 0.4), (0.7, 1.0))},
     }}))
-    (exp / "kev").mkdir()
+    (exp / kv).mkdir()
     rows = [{"expected": "review", "predicted": "review"}, {"expected": "review", "predicted": "no_alert"},
             {"expected": "alarm", "predicted": "alarm"}]
-    (exp / "kev" / "rows.json").write_text(json.dumps({"cv": rows}))
+    (exp / kv / "rows.json").write_text(json.dumps({"cv": rows}))
     return tmp / "runs"
 
 
