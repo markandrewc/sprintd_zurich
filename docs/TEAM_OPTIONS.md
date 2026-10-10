@@ -1,6 +1,6 @@
 # Team-Optionen: alle Kandidaten mit denselben Zahlen
 
-Generiert 2026-10-10T13:36:17+0200 von `callguard candidates` (Spezifikation `experiments/contrib/candidates.yaml`, 2000 Bootstrap-Stichproben, Seed 13). Nicht von Hand bearbeiten: Texte in `experiments/contrib/decisions.yaml` / `comparison_zurich.yaml` ändern und neu erzeugen.
+Generiert 2026-10-10T15:33:35+0200 von `callguard candidates` (Spezifikation `experiments/contrib/candidates.yaml`, 2000 Bootstrap-Stichproben, Seed 13). Nicht von Hand bearbeiten: Texte in `experiments/contrib/decisions.yaml` / `comparison_zurich.yaml` ändern und neu erzeugen.
 
 Lesehilfe: Dev-Split (48 Anrufe / 24 Dialoge), 95%-Bootstrap-KI über Zwillingsgruppen/Dialoge. AUC = Flag-AUC aus den Scores (schwellenfrei); Fehlalarme / Verpasst / Prüf-Recall / Exakt an der out-of-fold CV-Schwelle. **Fett** = bester Wert der Spalte unter den Kandidaten; „belegt“ nur, wenn das gepaarte KI gegen den Champion 0 ausschliesst, sonst „≈ Champion“. Δ = gepaarte Differenz zum eigenen abgestimmten Lauf (gleiche Anrufe). „ausstehend“ / „läuft noch“ füllt sich beim nächsten Lauf von `callguard candidates` automatisch. Der Holdout ist verbraucht und kommt hier nicht vor.
 
@@ -37,22 +37,35 @@ Eigene Spaltengruppe, eigene Anrufe: fixe Schwelle = die auf Dev eingefrorene Ko
 
 | Kandidat | Flag-AUC [KI] | Fehlalarme (fix) | Verpasst (fix) | Exakt 3 Klassen (fix) | Prüf-Recall (fix) | CV in test50: Fehlalarme / Verpasst / Exakt | gepaart vs. Champion (test50) | Dev → test50 AUC (ungepaart) |
 |---|---|---|---|---|---|---|---|---|
-| Champion: Qwen2.5-7B Fakten, Tabelle v1 | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend |
-| Champion mit Tabelle v3 | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend |
-| Kev-4B Fakten, Tabelle v1 | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend |
+| Champion: Qwen2.5-7B Fakten, Tabelle v1 | 0.80 [0.68, 0.90] | 35% [18, 53] | 22% [6, 39] | 60% [45, 73] | 42% [12, 75] | 39% / 22% / 61% | Referenz | -0.06 [-0.24, +0.11] ≈ |
+| Champion mit Tabelle v3 | 0.83 [0.72, 0.92] | 35% [18, 53] | **13% [0, 29]** (≈ Champion) | 64% [50, 77] | **75% [50, 100]** (≈ Champion) | 39% / 13% / 65% | ▲ Flag-AUC +0.031 [+0.002, +0.072] | -0.09 [-0.22, +0.07] ≈ |
+| Kev-4B Fakten, Tabelle v1 | 0.85 [0.74, 0.94] | 11% [0, 25] | 46% [26, 66] | 61% [48, 73] | 0% [0, 0] | 20% / 37% / 59% | ▲ Fehlalarme (fix) -24 Pkt. [-44, -5]; ▼ Verpasst (fix) +24 Pkt. [+8, +41]; ▼ Prüf-Recall (fix) -42 Pkt. [-75, -12] | -0.01 [-0.18, +0.21] ≈ |
 | Kev-4B Fakten, Tabelle v3 | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant |
 | Qwen3.8-27B 3-bit Fakten, Tabelle v1 | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant |
 | Qwen3.8-27B 3-bit Fakten, Tabelle v3 | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant |
-| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend |
+| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | **0.87 [0.76, 0.96]** (≈ Champion) | **7% [0, 19]** belegt | 39% [20, 59] | **73% [60, 85]** belegt | 17% [0, 50] | 11% / 30% / 74% | ▲ Fehlalarme (fix) -28 Pkt. [-44, -13]; ▲ Exakt (fix) +13 Pkt. [+1, +25] | +0.02 [-0.16, +0.24] ≈ |
 | Qwen3.8-27B 6-bit Fakten, Tabelle v3 | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant |
-| Allgemeine Fragen auf Qwen2.5-7B | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend |
-| Allgemeine Fragen auf Kev-4B (Teamkollege) | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend |
+| Allgemeine Fragen auf Qwen2.5-7B | 0.70 [0.59, 0.81] | 30% [15, 48] | 35% [15, 56] | 58% [47, 69] | 8% [0, 30] | 39% / 28% / 55% | ▼ Flag-AUC -0.102 [-0.203, -0.001] | -0.02 [-0.21, +0.17] ≈ |
+| Allgemeine Fragen auf Kev-4B (Teamkollege) | 0.75 [0.65, 0.84] | 26% [11, 43] | 50% [31, 69] | 58% [47, 69] | 17% [0, 40] | 56% / 11% / 51% | ▼ Verpasst (fix) +28 Pkt. [+6, +50] | -0.04 [-0.21, +0.16] ≈ |
 | Allgemeine Fragen auf Qwen3.8 3-bit | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant |
-| Allgemeine Fragen auf Qwen3.8 6-bit | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend |
+| Allgemeine Fragen auf Qwen3.8 6-bit | 0.83 [0.72, 0.92] | 24% [10, 42] | 28% [11, 47] | 68% [55, 79] | 0% [0, 0] | 37% / 17% / 62% | ▼ Prüf-Recall (fix) -42 Pkt. [-75, -12] | -0.04 [-0.20, +0.15] ≈ |
 | Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit) | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant |
 | v1 (Stichwörter + freier LLM-Richter, Turbo-ASR) | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant |
 | Nur Stichwörter | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant | nicht geplant |
-| Alles markieren (Alarm) | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend |
+| Alles markieren (Alarm) | 0.50 [0.50, 0.50] | 100% [100, 100] | 0% [0, 0] | 34% [24, 42] | 0% [0, 0] | 100% / 0% / 34% | Untergrenze | – |
+
+Exakt richtig je Anruf-Typ und Aufnahme (fixe Schwelle, Anzahl Anrufe in Klammern):
+
+| Kandidat | Paar (A/B) | Stichwort-Falle | Prüfen-Fall | Zahlen-Paar | Mehrere Themen | sauber | verrauscht |
+|---|---|---|---|---|---|---|---|
+| Champion: Qwen2.5-7B Fakten, Tabelle v1 | 60% (60) | 60% (10) | 40% (10) | 92% (12) | 38% (8) | 60% (50) | 60% (50) |
+| Champion mit Tabelle v3 | 60% (60) | 60% (10) | 70% (10) | 92% (12) | 50% (8) | 62% (50) | 66% (50) |
+| Kev-4B Fakten, Tabelle v1 | 65% (60) | 90% (10) | 0% (10) | 75% (12) | 50% (8) | 64% (50) | 58% (50) |
+| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | 75% (60) | 100% (10) | 20% (10) | 100% (12) | 50% (8) | 74% (50) | 72% (50) |
+| Allgemeine Fragen auf Qwen2.5-7B | 62% (60) | 60% (10) | 10% (10) | 83% (12) | 50% (8) | 62% (50) | 54% (50) |
+| Allgemeine Fragen auf Kev-4B (Teamkollege) | 57% (60) | 80% (10) | 20% (10) | 92% (12) | 38% (8) | 60% (50) | 56% (50) |
+| Allgemeine Fragen auf Qwen3.8 6-bit | 73% (60) | 80% (10) | 0% (10) | 83% (12) | 75% (8) | 70% (50) | 66% (50) |
+| Alles markieren (Alarm) | 50% (60) | 0% (10) | 0% (10) | 0% (12) | 50% (8) | 34% (50) | 34% (50) |
 
 ### Anmerkungen je Kandidat
 
@@ -69,39 +82,31 @@ Eigene Spaltengruppe, eigene Anrufe: fixe Schwelle = die auf Dev eingefrorene Ko
 
 | Kandidat | abgestimmt | umformuliert | blinde Tabelle | neu aufgenommen | test50 (extern) |
 |---|---|---|---|---|---|
-| Champion: Qwen2.5-7B Fakten, Tabelle v1 | `champion/champion` (da) | `kev_vs_facts/qwen_facts_para` (da), `kev_vs_facts/qwen_facts_para2` (da) | `kev_vs_facts/qwen_facts_blind` (da) | `perturbed:perturbed/perturbed` (da) | `test50:test50/champion` (ausstehend) |
-| Champion mit Tabelle v3 | `champion/table_v3` (da) | n/a | n/a | `perturbed:perturbed/table_v3` (da) | `test50:test50/champion_v3` (ausstehend) |
-| Kev-4B Fakten, Tabelle v1 | `kev_vs_facts/kev_facts` (da) | `kev_vs_facts/kev_facts_para` (da), `kev_vs_facts/kev_facts_para2` (da) | `kev_vs_facts/kev_facts_blind` (da) | `perturbed:kev_perturbed/kev_facts` (da) | `test50:test50/kev_facts` (ausstehend) |
+| Champion: Qwen2.5-7B Fakten, Tabelle v1 | `champion/champion` (da) | `kev_vs_facts/qwen_facts_para` (da), `kev_vs_facts/qwen_facts_para2` (da) | `kev_vs_facts/qwen_facts_blind` (da) | `perturbed:perturbed/perturbed` (da) | `test50:test50/champion` (da) |
+| Champion mit Tabelle v3 | `champion/table_v3` (da) | n/a | n/a | `perturbed:perturbed/table_v3` (da) | `test50:test50/champion_v3` (da) |
+| Kev-4B Fakten, Tabelle v1 | `kev_vs_facts/kev_facts` (da) | `kev_vs_facts/kev_facts_para` (da), `kev_vs_facts/kev_facts_para2` (da) | `kev_vs_facts/kev_facts_blind` (da) | `perturbed:kev_perturbed/kev_facts` (da) | `test50:test50/kev_facts` (da) |
 | Kev-4B Fakten, Tabelle v3 | `kev_vs_facts/kev_facts_v3` (da) | n/a | n/a | `perturbed:kev_perturbed/kev_facts_v3` (da) | nicht geplant |
 | Qwen3.8-27B 3-bit Fakten, Tabelle v1 | `qwen38/q38_facts` (da) | `qwen38/q38_facts_para` (da) | `qwen38/q38_facts_blind` (da) | n/a | nicht geplant |
 | Qwen3.8-27B 3-bit Fakten, Tabelle v3 | `qwen38/q38_facts_v3` (da) | n/a | n/a | n/a | nicht geplant |
-| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | `qwen38_q6/q38q6_facts` (da) | `qwen38_q6/q38q6_facts_para` (da) | `qwen38_q6/q38q6_facts_blind` (läuft noch) | `perturbed:qwen38_q6_perturbed/q38q6_facts` (ausstehend) | `test50:test50/q38q6_facts` (ausstehend) |
+| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | `qwen38_q6/q38q6_facts` (da) | `qwen38_q6/q38q6_facts_para` (da) | `qwen38_q6/q38q6_facts_blind` (läuft noch) | `perturbed:qwen38_q6_perturbed/q38q6_facts` (ausstehend) | `test50:test50/q38q6_facts` (da) |
 | Qwen3.8-27B 6-bit Fakten, Tabelle v3 | `qwen38_q6/q38q6_facts_v3` (ausstehend) | n/a | n/a | `perturbed:qwen38_q6_perturbed/q38q6_facts_v3` (ausstehend) | nicht geplant |
-| Allgemeine Fragen auf Qwen2.5-7B | `kev_vs_facts/qwen_general` (da) | `kev_vs_facts/qwen_general_para` (da) | n/a | `perturbed:kev_perturbed/qwen_general` (da) | `test50:test50/qwen_general` (ausstehend) |
-| Allgemeine Fragen auf Kev-4B (Teamkollege) | `kev_vs_facts/kev_general` (da) | `kev_vs_facts/kev_general_para` (da) | n/a | `perturbed:kev_perturbed/kev_general` (da) | `test50:test50/kev_general` (ausstehend) |
+| Allgemeine Fragen auf Qwen2.5-7B | `kev_vs_facts/qwen_general` (da) | `kev_vs_facts/qwen_general_para` (da) | n/a | `perturbed:kev_perturbed/qwen_general` (da) | `test50:test50/qwen_general` (da) |
+| Allgemeine Fragen auf Kev-4B (Teamkollege) | `kev_vs_facts/kev_general` (da) | `kev_vs_facts/kev_general_para` (da) | n/a | `perturbed:kev_perturbed/kev_general` (da) | `test50:test50/kev_general` (da) |
 | Allgemeine Fragen auf Qwen3.8 3-bit | `qwen38/q38_general` (da) | `qwen38/q38_general_para` (da) | n/a | n/a | nicht geplant |
-| Allgemeine Fragen auf Qwen3.8 6-bit | `qwen38_q6/q38q6_general` (da) | `qwen38_q6/q38q6_general_para` (ausstehend) | n/a | `perturbed:qwen38_q6_perturbed/q38q6_general` (ausstehend) | `test50:test50/q38q6_general` (ausstehend) |
+| Allgemeine Fragen auf Qwen3.8 6-bit | `qwen38_q6/q38q6_general` (da) | `qwen38_q6/q38q6_general_para` (ausstehend) | n/a | `perturbed:qwen38_q6_perturbed/q38q6_general` (ausstehend) | `test50:test50/q38q6_general` (da) |
 | Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit) | `two_readers/r1` (da) | `two_readers/r1_para` (da), `two_readers/r1_para2` (da) | `two_readers/r1_blind` (da) | `perturbed:two_readers_perturbed/r1` (da) | nicht geplant |
 | v1 (Stichwörter + freier LLM-Richter, Turbo-ASR) | `llm_models/qwen25_7b` (da) | n/a | n/a | n/a | nicht geplant |
 | Nur Stichwörter | `checks_ablation/keywords` (da) | n/a | n/a | n/a | nicht geplant |
-| Alles markieren (Alarm) | `trivial/flag_all` (da) | n/a | n/a | n/a | `test50:test50/champion` (ausstehend) |
+| Alles markieren (Alarm) | `trivial/flag_all` (da) | n/a | n/a | n/a | `trivial/flag_all@test50` (da) |
 
 ### Ausstehend / läuft noch
 
-- Champion: Qwen2.5-7B Fakten, Tabelle v1: test50 (extern) `test50:test50/champion` (ausstehend)
-- Champion mit Tabelle v3: test50 (extern) `test50:test50/champion_v3` (ausstehend)
-- Kev-4B Fakten, Tabelle v1: test50 (extern) `test50:test50/kev_facts` (ausstehend)
 - Qwen3.8-27B 6-bit Fakten, Tabelle v1: blinde Tabelle `qwen38_q6/q38q6_facts_blind` (läuft noch)
 - Qwen3.8-27B 6-bit Fakten, Tabelle v1: neu aufgenommen `perturbed:qwen38_q6_perturbed/q38q6_facts` (ausstehend)
-- Qwen3.8-27B 6-bit Fakten, Tabelle v1: test50 (extern) `test50:test50/q38q6_facts` (ausstehend)
 - Qwen3.8-27B 6-bit Fakten, Tabelle v3: abgestimmt (Dev) `qwen38_q6/q38q6_facts_v3` (ausstehend)
 - Qwen3.8-27B 6-bit Fakten, Tabelle v3: neu aufgenommen `perturbed:qwen38_q6_perturbed/q38q6_facts_v3` (ausstehend)
-- Allgemeine Fragen auf Qwen2.5-7B: test50 (extern) `test50:test50/qwen_general` (ausstehend)
-- Allgemeine Fragen auf Kev-4B (Teamkollege): test50 (extern) `test50:test50/kev_general` (ausstehend)
 - Allgemeine Fragen auf Qwen3.8 6-bit: umformuliert `qwen38_q6/q38q6_general_para` (ausstehend)
 - Allgemeine Fragen auf Qwen3.8 6-bit: neu aufgenommen `perturbed:qwen38_q6_perturbed/q38q6_general` (ausstehend)
-- Allgemeine Fragen auf Qwen3.8 6-bit: test50 (extern) `test50:test50/q38q6_general` (ausstehend)
-- Alles markieren (Alarm): test50 (extern) `test50:test50/champion` (ausstehend)
 
 ## Offene Team-Entscheidungen
 
@@ -135,11 +140,11 @@ v3 ergänzt v1 um aus den Kriterien abgeleitete Regeln „entscheidender Fakt of
 - v3 erhöht auf Kev oder Qwen3.8 die Fehlalarme deutlich (Zeilen Kev v3 / Q3.8 v3, sobald gerechnet).
 - Die Organisatoren werten „Prüfen“ als Fehler (dann zählt exakte 3-Klassen-Genauigkeit, nicht Verpasste).
 - Ein Smoke-Test von recommended-v3 auf neuen Dateien schlägt fehl.
-- Der externe Testsatz test50 (eigener Datensatz, nie gepoolt) zeigt v3 belegt schlechter: Champion v1 AUC ausstehend, v3 ausstehend, gepaart ausstehend; verpasst ausstehend gegen ausstehend.
+- Der externe Testsatz test50 (eigener Datensatz, nie gepoolt) zeigt v3 belegt schlechter: Champion v1 AUC 0.80 [0.68, 0.90], v3 0.83 [0.72, 0.92], gepaart +0.031 [+0.002, +0.072] belegt; verpasst 22% [6, 39] gegen 13% [0, 29].
 
 Quellen: `research/DECISIONS.md`, `research/findings/RQ10.md`, `config/recommended-v3.yaml`
 
-**Entscheid des Teams:** offen
+**Entscheid des Teams:** v3 übernehmen (Benjamin, 2026-10-10T14:10+02:00): Gilt für den 7B-Leser (dort weniger Verpasste bei gleichen Fehlalarmen). Kev / Qwen3.8 antworten fast nie «unklar»; dort bringt v3 nichts (gemessen).
 
 ### 2. Standard-Entscheider für das versteckte Set und die Demo
 
@@ -178,11 +183,11 @@ Antwort der Organisatoren (Sa ~13:00, docs/CASE.md): exakte Werte zählen wenige
 **Was die Empfehlung ändern würde:**
 - Qwen3.8 6-bit schlägt den Champion auf umformulierten Fragen oder neu aufgenommenem Audio belegt (Zellen oben, sobald gerechnet) UND der A5000 ist Sonntag sicher verfügbar.
 - Die Organisatoren bewerten nur Alarm ja/nein (dann zählen Fehlalarme/Verpasste mehr als Prüfen).
-- test50 (extern, 8 Dialekt-Stimmen, eigener Datensatz): ein Kandidat schlägt den Champion dort belegt (gepaart über A/B-Paare): Kev ausstehend, Qwen3.8 6-bit ausstehend; Champion ausstehend, Dev → test50 ausstehend.
+- test50 (extern, 8 Dialekt-Stimmen, eigener Datensatz): ein Kandidat schlägt den Champion dort belegt (gepaart über A/B-Paare): Kev +0.05 [-0.06, +0.17] ≈, Qwen3.8 6-bit +0.07 [-0.05, +0.18] ≈; Champion 0.80 [0.68, 0.90], Dev → test50 -0.06 [-0.24, +0.11] ≈ (ungepaart).
 
 Quellen: `docs/CASE.md`, `research/findings/two_readers.md`, `experiments/kev_vs_facts.yaml`, `experiments/qwen38_q6.yaml`
 
-**Entscheid des Teams:** offen
+**Entscheid des Teams:** Champion 7B als vorläufiger Standard; Modellwahl bleibt offen (Benjamin, 2026-10-10T14:10+02:00): Team arbeitet an Kev-Feintuning. Leser ist per Profil austauschbar (recommended / kev / qwen38-q6); Entscheid nach test50 und Kev-Feintuning, spätestens beim Code-Freeze.
 
 ### 3. Demo-Hardware: A5000 (24 GB) oder deben 4070 (12 GB)?
 
@@ -211,7 +216,7 @@ Quellen: `docs/CASE.md`, `research/findings/two_readers.md`, `experiments/kev_vs
 
 Quellen: `docs/KEV.md`, `config/two-readers.yaml`, `config/qwen38-q6.yaml`, `docs/SUNDAY_RUNBOOK.md`
 
-**Entscheid des Teams:** offen
+**Entscheid des Teams:** Gespeicherte Ergebnisse + ein Live-Anruf auf der 4070 (Champion); A5000 als Bonus (Benjamin, 2026-10-10T14:10+02:00): A5000 (24 GB) für Zweitmeinung / Qwen3.8 live, wenn Sonntag früh verfügbar.
 
 ### 4. GitHub: Integrations-Branch wohin pushen?
 
@@ -238,7 +243,7 @@ Quellen: `docs/KEV.md`, `config/two-readers.yaml`, `config/qwen38-q6.yaml`, `doc
 
 Quellen: `CLAUDE.md`
 
-**Entscheid des Teams:** offen
+**Entscheid des Teams:** Eigener Branch + PR auf main (Benjamin, 2026-10-10T14:10+02:00): Merge nach kurzem Team-Review, spätestens Samstagabend (main = Abgabe).
 
 ### 5. Abstimmung mit dem Teamkollegen (Kev / allgemeine Fragen)
 
@@ -265,12 +270,12 @@ Messungen auf unseren Transkripten: Kev ist formulierungsrobust (umformuliert 0.
 
 **Was die Empfehlung ändern würde:**
 - Kev mit einer „unklar“-Antwort, die Prüfen-Fälle erzeugt, oder Kev-Passagen mit gutem hit@1.
-- Auf test50 (ihr Testsatz, extern): allgemeine Fragen auf Kev ausstehend, Fehlalarme ausstehend, gegen Champion ausstehend.
+- Auf test50 (ihr Testsatz, extern): allgemeine Fragen auf Kev 0.75 [0.65, 0.84], Fehlalarme 26% [11, 43], gegen Champion -9 Pkt. [-31, +12] ≈.
 - Qwen3.8 6-bit allgemein bleibt auf umformulierten Fragen und neuem Audio gleich gut (ausstehend, ausstehend).
 
 Quellen: `experiments/kev_vs_facts.yaml`, `research/findings/two_readers.md`, `experiments/contrib/comparison_zurich.yaml`
 
-**Entscheid des Teams:** offen
+**Entscheid des Teams:** Kombinieren (Benjamin, 2026-10-10T14:10+02:00): Unsere Pipeline als Standard; Kev als formulierungsrobuster Leser (Feintuning läuft im Team); Rechtsgrundlage, Feedback-Export, Fragen-Versionierung aus sprintd_zurich übernommen.
 
 ### 6. Fragen an die Organisatoren am Sonntag
 
@@ -292,12 +297,11 @@ Quellen: `experiments/kev_vs_facts.yaml`, `research/findings/two_readers.md`, `e
 
 Quellen: `docs/CASE.md`, `docs/SUNDAY_RUNBOOK.md`
 
-**Entscheid des Teams:** offen
+**Entscheid des Teams:** Fragen 1-3 Sonntag früh klären (Benjamin, 2026-10-10T14:10+02:00): Antworten in docs/CASE.md festhalten.
 
 ## Unser Ansatz vs. sprintd_zurich (Teamkollege)
 
-Geschrieben gegen Commit `47c4ffd` von `github.com/markandrewc/sprintd_zurich`.
-**Achtung:** das Repo steht jetzt auf `954446c`; der Vergleich muss aktualisiert werden.
+Geschrieben gegen Commit `954446c` von `github.com/markandrewc/sprintd_zurich`.
 
 Gemessen wurde auf unseren Dev-Daten (48 Anrufe, large-v3-Transkripte, unsere Rollen), nicht in ihrer Umgebung. Ihre README nennt keine Kennzahlen. Wo keine Messung steht, ist die Zeile eine Beschreibung.
 
