@@ -1,0 +1,2284 @@
+{
+ "meta": {
+  "config": "oracle",
+  "threshold": 0.55,
+  "calls": 5,
+  "filters": {
+   "level": null,
+   "clean_only": false,
+   "limit": null,
+   "calls": "Stufe1_D02-K1,Stufe1_D03-K1,Stufe2_C06-K3,Stufe2_C05-K3,Stufe3_C17-K3",
+   "folds": null
+  },
+  "overrides": [],
+  "created": "2026-10-09 23:39:17",
+  "rerendered": "from stored result.json (fusion only) to show the failed LLM checks"
+ },
+ "metrics": {
+  "n": 5,
+  "unlabeled": 0,
+  "errors": 0,
+  "check_failures": {
+   "calls": 5,
+   "by_check": {
+    "geval": 5,
+    "llm_judge": 5
+   }
+  },
+  "accuracy": 0.4,
+  "confusion": {
+   "alarm": {
+    "alarm": 1,
+    "review": 0,
+    "no_alert": 1
+   },
+   "review": {
+    "alarm": 0,
+    "review": 0,
+    "no_alert": 1
+   },
+   "no_alert": {
+    "alarm": 1,
+    "review": 0,
+    "no_alert": 1
+   }
+  },
+  "flag": {
+   "tp": 1,
+   "fp": 1,
+   "fn": 2,
+   "tn": 1,
+   "precision": 0.5,
+   "recall": 0.3333,
+   "f1": 0.4,
+   "false_alarm_rate": 0.5,
+   "miss_rate": 0.6667
+  },
+  "alarm": {
+   "tp": 1,
+   "fp": 1,
+   "fn": 1,
+   "tn": 2,
+   "precision": 0.5,
+   "recall": 0.5,
+   "f1": 0.5,
+   "false_alarm_rate": 0.3333,
+   "miss_rate": 0.5
+  },
+  "review_handling": {
+   "n": 1,
+   "escalated": 0,
+   "as_review": 0,
+   "escalation_rate": 0.0
+  },
+  "workload": {
+   "alarms": 2,
+   "reviews": 0,
+   "flag_rate": 0.4
+  },
+  "by_level": {
+   "1": {
+    "n": 2,
+    "accuracy": 0.5,
+    "flag_precision": 0.5,
+    "flag_recall": 1.0,
+    "flag_f1": 0.6667,
+    "false_alarm_rate": 1.0,
+    "miss_rate": 0.0,
+    "alarm_f1": 0.6667
+   },
+   "2": {
+    "n": 2,
+    "accuracy": 0.5,
+    "flag_precision": null,
+    "flag_recall": 0.0,
+    "flag_f1": 0.0,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 1.0,
+    "alarm_f1": 0.0
+   },
+   "3": {
+    "n": 1,
+    "accuracy": 0.0,
+    "flag_precision": null,
+    "flag_recall": 0.0,
+    "flag_f1": 0.0,
+    "false_alarm_rate": null,
+    "miss_rate": 1.0,
+    "alarm_f1": null
+   }
+  },
+  "by_noise": {
+   "clean": {
+    "n": 5,
+    "accuracy": 0.4,
+    "flag_precision": 0.5,
+    "flag_recall": 0.3333,
+    "flag_f1": 0.4,
+    "false_alarm_rate": 0.5,
+    "miss_rate": 0.6667,
+    "alarm_f1": 0.5
+   }
+  },
+  "family_hit": {
+   "n": 2,
+   "hits": 1,
+   "rate": 0.5
+  },
+  "mean_score": {
+   "alarm": 0.442,
+   "review": 0.0,
+   "no_alert": 0.4197
+  }
+ },
+ "sweep": [
+  {
+   "threshold": 0.2,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.25,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.3,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.35,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.4,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.45,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.5,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.55,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.6,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.65,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.7,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.75,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.8,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 1,
+     "tn": 2,
+     "precision": 0.5,
+     "recall": 0.5,
+     "f1": 0.5,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 2,
+     "reviews": 0,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.5
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.85,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.4,
+    "confusion": {
+     "alarm": {
+      "alarm": 1,
+      "review": 0,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 0,
+      "review": 1,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 1,
+     "tn": 3,
+     "precision": 1.0,
+     "recall": 0.5,
+     "f1": 0.6667,
+     "false_alarm_rate": 0.0,
+     "miss_rate": 0.5
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 1,
+     "reviews": 1,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 1.0
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.4,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.6667
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  },
+  {
+   "threshold": 0.9,
+   "metrics": {
+    "n": 5,
+    "unlabeled": 0,
+    "errors": 0,
+    "check_failures": {
+     "calls": 5,
+     "by_check": {
+      "geval": 5,
+      "llm_judge": 5
+     }
+    },
+    "accuracy": 0.2,
+    "confusion": {
+     "alarm": {
+      "alarm": 0,
+      "review": 1,
+      "no_alert": 1
+     },
+     "review": {
+      "alarm": 0,
+      "review": 0,
+      "no_alert": 1
+     },
+     "no_alert": {
+      "alarm": 0,
+      "review": 1,
+      "no_alert": 1
+     }
+    },
+    "flag": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 2,
+     "tn": 1,
+     "precision": 0.5,
+     "recall": 0.3333,
+     "f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667
+    },
+    "alarm": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 2,
+     "tn": 3,
+     "precision": null,
+     "recall": 0.0,
+     "f1": 0.0,
+     "false_alarm_rate": 0.0,
+     "miss_rate": 1.0
+    },
+    "review_handling": {
+     "n": 1,
+     "escalated": 0,
+     "as_review": 0,
+     "escalation_rate": 0.0
+    },
+    "workload": {
+     "alarms": 0,
+     "reviews": 2,
+     "flag_rate": 0.4
+    },
+    "by_level": {
+     "1": {
+      "n": 2,
+      "accuracy": 0.0,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.0
+     },
+     "2": {
+      "n": 2,
+      "accuracy": 0.5,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "3": {
+      "n": 1,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 5,
+      "accuracy": 0.2,
+      "flag_precision": 0.5,
+      "flag_recall": 0.3333,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.6667,
+      "alarm_f1": 0.0
+     }
+    },
+    "family_hit": {
+     "n": 2,
+     "hits": 1,
+     "rate": 0.5
+    },
+    "mean_score": {
+     "alarm": 0.442,
+     "review": 0.0,
+     "no_alert": 0.4197
+    }
+   }
+  }
+ ],
+ "suggestion": {
+  "threshold": 0.85,
+  "flag_f1": 0.4,
+  "flag_recall": 0.3333,
+  "flag_precision": 0.5,
+  "false_alarm_rate": 0.5,
+  "miss_rate": 0.6667,
+  "tied": [
+   0.85
+  ],
+  "reason": "Schwelle 0.85 maximiert F1 der Markierungen (40%) bei Recall 33% und Fehlalarmquote 50%."
+ },
+ "cv": {
+  "n_folds": 5,
+  "folds": [
+   {
+    "fold": 0,
+    "threshold": 0.55,
+    "n_test": 1,
+    "dialogues": [
+     "Stufe1_D02"
+    ]
+   },
+   {
+    "fold": 1,
+    "threshold": 0.85,
+    "n_test": 1,
+    "dialogues": [
+     "Stufe2_C06"
+    ]
+   },
+   {
+    "fold": 2,
+    "threshold": 0.55,
+    "n_test": 1,
+    "dialogues": [
+     "Stufe1_D03"
+    ]
+   },
+   {
+    "fold": 3,
+    "threshold": 0.85,
+    "n_test": 1,
+    "dialogues": [
+     "Stufe2_C05"
+    ]
+   },
+   {
+    "fold": 4,
+    "threshold": 0.85,
+    "n_test": 1,
+    "dialogues": [
+     "Stufe3_C17"
+    ]
+   }
+  ],
+  "metrics": {
+   "n": 5,
+   "unlabeled": 0,
+   "errors": 0,
+   "check_failures": {
+    "calls": 5,
+    "by_check": {
+     "geval": 5,
+     "llm_judge": 5
+    }
+   },
+   "accuracy": 0.4,
+   "confusion": {
+    "alarm": {
+     "alarm": 1,
+     "review": 0,
+     "no_alert": 1
+    },
+    "review": {
+     "alarm": 0,
+     "review": 0,
+     "no_alert": 1
+    },
+    "no_alert": {
+     "alarm": 1,
+     "review": 0,
+     "no_alert": 1
+    }
+   },
+   "flag": {
+    "tp": 1,
+    "fp": 1,
+    "fn": 2,
+    "tn": 1,
+    "precision": 0.5,
+    "recall": 0.3333,
+    "f1": 0.4,
+    "false_alarm_rate": 0.5,
+    "miss_rate": 0.6667
+   },
+   "alarm": {
+    "tp": 1,
+    "fp": 1,
+    "fn": 1,
+    "tn": 2,
+    "precision": 0.5,
+    "recall": 0.5,
+    "f1": 0.5,
+    "false_alarm_rate": 0.3333,
+    "miss_rate": 0.5
+   },
+   "review_handling": {
+    "n": 1,
+    "escalated": 0,
+    "as_review": 0,
+    "escalation_rate": 0.0
+   },
+   "workload": {
+    "alarms": 2,
+    "reviews": 0,
+    "flag_rate": 0.4
+   },
+   "by_level": {
+    "1": {
+     "n": 2,
+     "accuracy": 0.5,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "flag_f1": 0.6667,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.6667
+    },
+    "2": {
+     "n": 2,
+     "accuracy": 0.5,
+     "flag_precision": null,
+     "flag_recall": 0.0,
+     "flag_f1": 0.0,
+     "false_alarm_rate": 0.0,
+     "miss_rate": 1.0,
+     "alarm_f1": 0.0
+    },
+    "3": {
+     "n": 1,
+     "accuracy": 0.0,
+     "flag_precision": null,
+     "flag_recall": 0.0,
+     "flag_f1": 0.0,
+     "false_alarm_rate": null,
+     "miss_rate": 1.0,
+     "alarm_f1": null
+    }
+   },
+   "by_noise": {
+    "clean": {
+     "n": 5,
+     "accuracy": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "flag_f1": 0.4,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.5
+    }
+   },
+   "family_hit": {
+    "n": 2,
+    "hits": 1,
+    "rate": 0.5
+   },
+   "mean_score": {
+    "alarm": 0.442,
+    "review": 0.0,
+    "no_alert": 0.4197
+   }
+  },
+  "rows": [
+   {
+    "call_id": "Stufe1_D02-K1",
+    "dialogue_id": "Stufe1_D02",
+    "level": 1,
+    "noisy": false,
+    "expected": "alarm",
+    "expected_family": "trade",
+    "predicted": "alarm",
+    "score": 0.884,
+    "uncertainty": 0.3,
+    "top_family": "trade",
+    "error": null,
+    "failed_checks": [
+     "geval",
+     "llm_judge"
+    ]
+   },
+   {
+    "call_id": "Stufe2_C06-K3",
+    "dialogue_id": "Stufe2_C06",
+    "level": 2,
+    "noisy": false,
+    "expected": "alarm",
+    "expected_family": "trade",
+    "predicted": "no_alert",
+    "score": 0.0,
+    "uncertainty": 0.375,
+    "top_family": null,
+    "error": null,
+    "failed_checks": [
+     "geval",
+     "llm_judge"
+    ]
+   },
+   {
+    "call_id": "Stufe1_D03-K1",
+    "dialogue_id": "Stufe1_D03",
+    "level": 1,
+    "noisy": false,
+    "expected": "no_alert",
+    "expected_family": "trade",
+    "predicted": "alarm",
+    "score": 0.8393,
+    "uncertainty": 0.3,
+    "top_family": "trade",
+    "error": null,
+    "failed_checks": [
+     "geval",
+     "llm_judge"
+    ]
+   },
+   {
+    "call_id": "Stufe2_C05-K3",
+    "dialogue_id": "Stufe2_C05",
+    "level": 2,
+    "noisy": false,
+    "expected": "no_alert",
+    "expected_family": "trade",
+    "predicted": "no_alert",
+    "score": 0.0,
+    "uncertainty": 0.375,
+    "top_family": null,
+    "error": null,
+    "failed_checks": [
+     "geval",
+     "llm_judge"
+    ]
+   },
+   {
+    "call_id": "Stufe3_C17-K3",
+    "dialogue_id": "Stufe3_C17",
+    "level": 3,
+    "noisy": false,
+    "expected": "review",
+    "expected_family": "access",
+    "predicted": "no_alert",
+    "score": 0.0,
+    "uncertainty": 0.375,
+    "top_family": null,
+    "error": null,
+    "failed_checks": [
+     "geval",
+     "llm_judge"
+    ]
+   }
+  ]
+ },
+ "rows": [
+  {
+   "call_id": "Stufe1_D02-K1",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.884,
+   "uncertainty": 0.3,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [
+    "geval",
+    "llm_judge"
+   ]
+  },
+  {
+   "call_id": "Stufe1_D03-K1",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.8393,
+   "uncertainty": 0.3,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [
+    "geval",
+    "llm_judge"
+   ]
+  },
+  {
+   "call_id": "Stufe2_C05-K3",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.375,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [
+    "geval",
+    "llm_judge"
+   ]
+  },
+  {
+   "call_id": "Stufe2_C06-K3",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.375,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [
+    "geval",
+    "llm_judge"
+   ]
+  },
+  {
+   "call_id": "Stufe3_C17-K3",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.375,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [
+    "geval",
+    "llm_judge"
+   ]
+  }
+ ]
+}

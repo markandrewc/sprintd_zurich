@@ -1,0 +1,115 @@
+{
+ "variant": "q38_general",
+ "description": "Qwen3.8-27B asked the 15 general questions (facts prompt, logprob p(yes)); call = max p(yes); + kw/pat",
+ "experiment": "qwen38",
+ "split": "dev",
+ "profile": "qwen38",
+ "set": [
+  "fusion.threshold=0.7"
+ ],
+ "checks": [
+  "keywords",
+  "patterns",
+  "general"
+ ],
+ "refuse_from": null,
+ "oracle": false,
+ "config_name": "qwen38",
+ "use_tuning": false,
+ "tuning": null,
+ "config_hash": "edbb17cdad6c3bd9",
+ "threshold": 0.7,
+ "fusion": "weighted",
+ "asr": "faster_whisper",
+ "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+ "llm": {
+  "default": {
+   "type": "pinned"
+  },
+  "q38": {
+   "type": "openai_compat",
+   "base_url": "http://127.0.0.1:8004/v1",
+   "model": "callguard-llm",
+   "cache_tag": "qwen3.8-27b-ud-iq3_xxs"
+  }
+ },
+ "git": {
+  "sha": "96ec3da9c3",
+  "dirty": true,
+  "branch": "main"
+ },
+ "created": "2026-10-10T12:20:48+0200",
+ "wall_seconds": 491.93,
+ "n_calls": 48,
+ "calls": [
+  "Stufe1_D01-K1",
+  "Stufe1_D01-K2",
+  "Stufe1_D02-K1",
+  "Stufe1_D02-K2",
+  "Stufe1_D03-K1",
+  "Stufe1_D03-K2",
+  "Stufe1_D04-K1",
+  "Stufe1_D04-K2",
+  "Stufe1_D05-K1",
+  "Stufe1_D05-K2",
+  "Stufe1_D06-K1",
+  "Stufe1_D06-K2",
+  "Stufe1_D08-K1",
+  "Stufe1_D08-K2",
+  "Stufe1_D09-K1",
+  "Stufe1_D09-K2",
+  "Stufe1_D10-K1",
+  "Stufe1_D10-K2",
+  "Stufe2_C01-K3",
+  "Stufe2_C01-K4",
+  "Stufe2_C02-K3",
+  "Stufe2_C02-K4",
+  "Stufe2_C05-K3",
+  "Stufe2_C05-K4",
+  "Stufe2_C06-K3",
+  "Stufe2_C06-K4",
+  "Stufe2_C07-K3",
+  "Stufe2_C07-K4",
+  "Stufe2_C08-K3",
+  "Stufe2_C08-K4",
+  "Stufe2_C09-K3",
+  "Stufe2_C09-K4",
+  "Stufe2_C10-K3",
+  "Stufe2_C10-K4",
+  "Stufe2_C11-K3",
+  "Stufe2_C11-K4",
+  "Stufe2_C12-K3",
+  "Stufe2_C12-K4",
+  "Stufe2_C13-K3",
+  "Stufe2_C13-K4",
+  "Stufe2_C14-K3",
+  "Stufe2_C14-K4",
+  "Stufe3_C17-K3",
+  "Stufe3_C17-K4",
+  "Stufe3_C18-K3",
+  "Stufe3_C18-K4",
+  "Stufe3_C20-K3",
+  "Stufe3_C20-K4"
+ ],
+ "check_weights": {
+  "keywords": 0.15,
+  "patterns": 0.1,
+  "general": 1.0
+ },
+ "llm_resolved": {
+  "default": {
+   "type": "pinned",
+   "model": null,
+   "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+   "base_url": null,
+   "cache_tag": null
+  },
+  "q38": {
+   "type": "openai_compat",
+   "model": "callguard-llm",
+   "model_id": "qwen3.8-27b-ud-iq3_xxs",
+   "base_url": "http://127.0.0.1:8004/v1",
+   "cache_tag": "qwen3.8-27b-ud-iq3_xxs"
+  }
+ }
+}

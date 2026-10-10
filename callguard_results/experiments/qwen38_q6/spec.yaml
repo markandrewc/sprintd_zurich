@@ -1,0 +1,38 @@
+# Q6_K twin of experiments/qwen38.yaml (same cells, variant prefix q38q6_), llama.cpp on the 24 GB A5000 box.
+# Does the newest Qwen (Qwen3.8-27B, ~3-bit GGUF on llama.cpp) read the facts better than Qwen2.5-7B-AWQ, and is
+# it more robust to question wording? Same cells as experiments/kev_vs_facts.yaml so the rows line up:
+#   q38_facts        tuned facts + policy table (champion design), + kw/pat         vs  champion / kev_facts
+#   q38_general      the teammate's 15 general questions, max p(yes), + kw/pat        vs  qwen_general / kev_general
+#   q38_facts_para   tuned table reworded blind (R3)                                  vs  qwen_facts_para / kev_facts_para
+#   q38_facts_blind  blind table written from criteria only (R4)                      vs  qwen_facts_blind / kev_facts_blind
+#   q38_general_para general questions reworded blind                                 vs  qwen_general_para
+#   *_alone          re-fusions with only the deciding check (no keyword/pattern cues)
+# Earlier: 7B ≈ 8B ≈ 14B on the tuned table (RQ6), but the 14B was flat across wordings (0.85-0.88). The question
+# here is whether a newer, larger model closes the ~0.15 AUC wording gap of the 7B.
+# Runs: llama-server up alone on the GPU (scripts/remote/serve_llamacpp.sh models/llm/qwen38-27b-gguf/<file>.gguf).
+# Dev split only. n = 48 calls: differences of 1-2 calls are noise; quote the CIs.
+name: qwen38_q6
+description: Qwen3.8-27B Q6_K (llama.cpp, A5000 24 GB) as the facts / general-questions backend, wording probes
+rq: [RQ6, RQ10]
+base: recommended
+split: dev
+compare_to: q38q6_facts
+variants:
+  - {name: q38q6_facts, profile: qwen38-q6, set: [fusion.threshold=0.55], description: "Qwen3.8-27B reads the tuned facts (champion design); + kw/pat"}
+  - name: q38q6_general
+    profile: qwen38-q6
+    description: "Qwen3.8-27B asked the 15 general questions (facts prompt, logprob p(yes)); call = max p(yes); + kw/pat"
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions.yaml, parallel: 4, weight: 1.0}]
+    set: [fusion.threshold=0.7]
+  - {name: q38q6_facts_alone, refuse_from: q38q6_facts, checks: [facts]}
+  - {name: q38q6_general_alone, refuse_from: q38q6_general, checks: [general]}
+  - {name: q38q6_facts_para, profile: qwen38-q6, set: [checks.facts.policy_table=config/policy_table_para.yaml, fusion.threshold=0.55], description: "R3 on Qwen3.8: tuned table reworded blind"}
+  - {name: q38q6_facts_blind, profile: qwen38-q6, set: [checks.facts.policy_table=config/policy_table_blind.yaml, fusion.threshold=0.55], description: "R4 on Qwen3.8: blind table"}
+  - name: q38q6_general_para
+    profile: qwen38-q6
+    description: "q38_general with the general questions reworded blind"
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions_para.yaml, parallel: 4, weight: 1.0}]
+    set: [fusion.threshold=0.7]
+  - {name: q38q6_general_para_alone, refuse_from: q38q6_general_para, checks: [general]}

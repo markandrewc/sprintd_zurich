@@ -1,0 +1,106 @@
+{
+ "variant": "qwen_facts_blind",
+ "description": "R4 on large-v3: blind policy table",
+ "experiment": "kev_vs_facts",
+ "split": "dev",
+ "profile": "recommended",
+ "set": [
+  "checks.facts.policy_table=config/policy_table_blind.yaml",
+  "checks.facts.parallel=1"
+ ],
+ "checks": [
+  "keywords",
+  "patterns",
+  "facts"
+ ],
+ "refuse_from": null,
+ "oracle": false,
+ "config_name": "recommended",
+ "use_tuning": false,
+ "tuning": null,
+ "config_hash": "9fa067da9e2a1c83",
+ "threshold": 0.55,
+ "fusion": "weighted",
+ "asr": "faster_whisper",
+ "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+ "llm": {
+  "default": {
+   "type": "openai_compat",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "model": "callguard-llm",
+   "cache_tag": null
+  }
+ },
+ "git": {
+  "sha": "96ec3da9c3",
+  "dirty": true,
+  "branch": "main"
+ },
+ "created": "2026-10-10T11:11:13+0200",
+ "wall_seconds": 30.52,
+ "n_calls": 48,
+ "calls": [
+  "Stufe1_D01-K1",
+  "Stufe1_D01-K2",
+  "Stufe1_D02-K1",
+  "Stufe1_D02-K2",
+  "Stufe1_D03-K1",
+  "Stufe1_D03-K2",
+  "Stufe1_D04-K1",
+  "Stufe1_D04-K2",
+  "Stufe1_D05-K1",
+  "Stufe1_D05-K2",
+  "Stufe1_D06-K1",
+  "Stufe1_D06-K2",
+  "Stufe1_D08-K1",
+  "Stufe1_D08-K2",
+  "Stufe1_D09-K1",
+  "Stufe1_D09-K2",
+  "Stufe1_D10-K1",
+  "Stufe1_D10-K2",
+  "Stufe2_C01-K3",
+  "Stufe2_C01-K4",
+  "Stufe2_C02-K3",
+  "Stufe2_C02-K4",
+  "Stufe2_C05-K3",
+  "Stufe2_C05-K4",
+  "Stufe2_C06-K3",
+  "Stufe2_C06-K4",
+  "Stufe2_C07-K3",
+  "Stufe2_C07-K4",
+  "Stufe2_C08-K3",
+  "Stufe2_C08-K4",
+  "Stufe2_C09-K3",
+  "Stufe2_C09-K4",
+  "Stufe2_C10-K3",
+  "Stufe2_C10-K4",
+  "Stufe2_C11-K3",
+  "Stufe2_C11-K4",
+  "Stufe2_C12-K3",
+  "Stufe2_C12-K4",
+  "Stufe2_C13-K3",
+  "Stufe2_C13-K4",
+  "Stufe2_C14-K3",
+  "Stufe2_C14-K4",
+  "Stufe3_C17-K3",
+  "Stufe3_C17-K4",
+  "Stufe3_C18-K3",
+  "Stufe3_C18-K4",
+  "Stufe3_C20-K3",
+  "Stufe3_C20-K4"
+ ],
+ "check_weights": {
+  "keywords": 0.15,
+  "patterns": 0.1,
+  "facts": 1.0
+ },
+ "llm_resolved": {
+  "default": {
+   "type": "openai_compat",
+   "model": "callguard-llm",
+   "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "cache_tag": null
+  }
+ }
+}

@@ -1,0 +1,53 @@
+# RQ7 (+RQ4): do the passage-level checks help? keyword_context should fix harmless keyword-heavy calls
+# (D03 and the level-2 harmless twins) without losing level-1 alarms; the anchored full-call variant (N4)
+# tests whether +-3 windows cut off decisive context; semantic_windows targets level-2 alarms without any
+# keyword; quote_judge (N3) tests whether grounding the judge in verified quotes cuts ungrounded alarms.
+# Varies: the check set only (base = the gpu-12gb champion set: keywords, patterns, llm_judge, geval).
+# Read: per-call flips on keyword-heavy calls (D03, Stufe2 twins) and FAR; quote_judge: FAR on no_alert
+#       calls + meta.quotes (verified-quote rate) + how often "present" was downgraded. n = 48 dev calls:
+#       differences of 1-3 calls are noise, say so.
+# Runtime (48 dev calls, 4070 + vLLM Qwen2.5-7B-AWQ, ASR + base checks cached):
+#   kwctx_window   ~2-4 single-token probes per family with hits + <=1 evidence call -> ~5-10 s/call, ~5-10 min
+#   kwctx_full     same probe count, ~4-6k-token prompts but the transcript prefix is shared -> ~10 min
+#   semantic       <=3 probes x 5 families + evidence calls -> ~10-20 s/call, ~10-15 min; NEEDS A SECOND
+#                  SERVER: bge-m3 embeddings at :8001 (sentence-transformers is not in the app env because
+#                  it pulls CUDA torch). E.g. on the GPU host, next to callguard-llm (leave VRAM headroom):
+#                    vllm serve BAAI/bge-m3 --task embed --port 8001 --gpu-memory-utilization 0.08
+#                  Without it the variant fails visibly (DEGRADED, "embedding server ... unreachable").
+#   quote_judge    like llm_judge (3 samples x 5 families, ~+40 output tokens) -> ~15-25 min
+# Dry run first: uv run callguard experiment experiments/new_checks.yaml --dry-run
+name: new_checks
+description: keyword_context (window / anchored full), semantic_windows, quote_judge vs the v1 champion set
+rq: [RQ7, RQ4]
+base: gpu-12gb
+split: dev
+compare_to: base
+variants:
+  - name: base
+    description: keywords + patterns + llm_judge + geval (gpu-12gb as is)
+  - name: kwctx_window
+    description: base + keyword_context (G-Eval on +-3 segments around every keyword/pattern hit)
+    add_checks:
+      - {name: keyword_context, type: keyword_context, window: 3, context: window, parallel: 5, weight: 1.0}
+  - name: kwctx_full
+    description: base + keyword_context with context full (N4 anchored full-call probes, +-1 segment)
+    add_checks:
+      - {name: keyword_context_full, type: keyword_context, window: 1, context: full, parallel: 5, weight: 1.0}
+  - name: semantic
+    description: base + semantic_windows (bge-m3 embeddings at :8001, G-Eval verified)
+    add_checks:
+      - name: semantic_windows
+        type: semantic_windows
+        embedder: {type: openai, base_url: http://127.0.0.1:8001/v1, model: BAAI/bge-m3}
+        size: 4
+        stride: 2
+        top_k: 3
+        min_similarity: 0.35
+        verify: true
+        parallel: 5
+        weight: 1.0
+  - name: quote_judge
+    description: llm_judge replaced by quote_judge (N3, verified quotes or no "present")
+    drop_checks: [llm_judge]
+    add_checks:
+      - {name: quote_judge, type: quote_judge, samples: 3, temperature: 0.7, parallel: 5, weight: 1.0}

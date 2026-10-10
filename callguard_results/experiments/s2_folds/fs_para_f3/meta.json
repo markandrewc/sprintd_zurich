@@ -1,0 +1,71 @@
+{
+ "variant": "fs_para_f3",
+ "description": "S2: paraphrased table + per-fold contrast few-shot (same examples)",
+ "experiment": "champion",
+ "split": "dev",
+ "profile": "recommended",
+ "set": [
+  "checks.facts.policy_table=config/policy_table_para.yaml",
+  "checks.facts.parallel=1",
+  "checks.facts.fewshot=/home/bl/repos/sprintd/runs/research/s2/fewshot_fold3.json"
+ ],
+ "checks": [
+  "keywords",
+  "patterns",
+  "facts"
+ ],
+ "refuse_from": null,
+ "oracle": false,
+ "config_name": "recommended",
+ "use_tuning": false,
+ "tuning": null,
+ "config_hash": "4dc4d43f7665f3a1",
+ "threshold": 0.55,
+ "fusion": "weighted",
+ "asr": "faster_whisper",
+ "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+ "llm": {
+  "default": {
+   "type": "openai_compat",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "model": "callguard-llm",
+   "cache_tag": null
+  }
+ },
+ "git": {
+  "sha": "fcffca5bee",
+  "dirty": true,
+  "branch": "main"
+ },
+ "created": "2026-10-10T05:20:32+0200",
+ "wall_seconds": 25.23,
+ "n_calls": 12,
+ "calls": [
+  "Stufe1_D08-K1",
+  "Stufe1_D08-K2",
+  "Stufe1_D10-K1",
+  "Stufe1_D10-K2",
+  "Stufe2_C05-K3",
+  "Stufe2_C05-K4",
+  "Stufe2_C06-K3",
+  "Stufe2_C06-K4",
+  "Stufe2_C11-K3",
+  "Stufe2_C11-K4",
+  "Stufe2_C12-K3",
+  "Stufe2_C12-K4"
+ ],
+ "check_weights": {
+  "keywords": 0.15,
+  "patterns": 0.1,
+  "facts": 1.0
+ },
+ "llm_resolved": {
+  "default": {
+   "type": "openai_compat",
+   "model": "callguard-llm",
+   "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "cache_tag": null
+  }
+ }
+}

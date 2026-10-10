@@ -1,0 +1,12 @@
+# Robustness proxy for the hidden set: the frozen champion on the same 48 dev calls re-recorded (speed 0.96 = slower
+# and lower pitch, gain -3 dB) -> different ASR outputs, same labels. Compare with experiments/champion.yaml `champion`.
+# Note: the experiment runner loads calls from the BASE profile's data_dir (a per-variant paths.data_dir is ignored).
+name: perturbed
+description: champion on re-recorded dev audio (speed 0.96, -3 dB)
+rq: [RQ8]
+base: recommended-perturbed
+split: dev
+variants:
+  - {name: perturbed}
+  - {name: table_v3, set: [checks.facts.policy_table=config/policy_table_v3.yaml], description: "table v3 (review facts) on re-recorded audio"}
+  - {name: s3, refuse_from: perturbed, set: [fusion.type=no_silent], description: "S3 no-silent-clearance re-fusion on re-recorded audio"}

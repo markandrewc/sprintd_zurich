@@ -1,0 +1,9 @@
+# Reference-only holdout look at the v1 baseline (gpu-12gb: turbo ASR + keywords/patterns/free judge/G-Eval, 7B).
+# Not a candidate, nothing is tuned on it; it puts the champion's holdout number in context. Logged.
+name: holdout_v1
+description: v1 baseline on the holdout (reference point for the champion's holdout run)
+rq: [RQ4, RQ5]
+base: gpu-12gb
+split: holdout
+variants:
+  - {name: v1, description: "keywords + patterns + llm_judge + geval (v1 champion set), Qwen2.5-7B"}

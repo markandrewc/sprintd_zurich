@@ -1,0 +1,3645 @@
+{
+ "experiment": "smoke",
+ "description": "Plumbing check on demo-offline (reference scripts + fake LLM); numbers are meaningless.",
+ "rq": [],
+ "base": "demo-offline",
+ "split": "dev",
+ "compare_to": "all",
+ "n_boot": 2000,
+ "seed": 13,
+ "created": "2026-10-10T01:49:15+0200",
+ "git": {
+  "sha": "a72e6a6f84",
+  "dirty": true,
+  "branch": "main"
+ },
+ "spec": "experiments/smoke.yaml",
+ "baselines": {
+  "flag_all": {
+   "flag_f1": 0.7027,
+   "flag_precision": 0.5417,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5882,
+   "review_recall": 0.0,
+   "accuracy": 0.4167,
+   "flag_balanced_accuracy": 0.5
+  },
+  "flag_none": {
+   "flag_f1": 0.0,
+   "flag_precision": null,
+   "flag_recall": 0.0,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 1.0,
+   "alarm_f1": 0.0,
+   "review_recall": 0.0,
+   "accuracy": 0.4583,
+   "flag_balanced_accuracy": 0.5
+  },
+  "_n": {
+   "calls": 48,
+   "prevalence_flag": 0.5417
+  }
+ },
+ "far_cap": 0.2,
+ "variants": {
+  "all": {
+   "variant": "all",
+   "oracle": true,
+   "meta": {
+    "variant": "all",
+    "description": "every check of demo-offline",
+    "experiment": "smoke",
+    "split": "dev",
+    "profile": "demo-offline",
+    "set": [],
+    "checks": [
+     "keywords",
+     "patterns",
+     "llm_judge",
+     "geval"
+    ],
+    "refuse_from": null,
+    "oracle": true,
+    "config_name": "demo-offline",
+    "config_hash": "54d03b906f9d2224",
+    "threshold": 0.55,
+    "fusion": "weighted",
+    "asr": "reference",
+    "asr_model": null,
+    "llm": {
+     "default": {
+      "type": "fake"
+     }
+    },
+    "git": {
+     "sha": "8e00d1ef66",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T01:25:44+0200",
+    "wall_seconds": 1.39,
+    "n_calls": 48,
+    "calls": [
+     "Stufe1_D01-K1",
+     "Stufe1_D01-K2",
+     "Stufe1_D02-K1",
+     "Stufe1_D02-K2",
+     "Stufe1_D03-K1",
+     "Stufe1_D03-K2",
+     "Stufe1_D04-K1",
+     "Stufe1_D04-K2",
+     "Stufe1_D05-K1",
+     "Stufe1_D05-K2",
+     "Stufe1_D06-K1",
+     "Stufe1_D06-K2",
+     "Stufe1_D08-K1",
+     "Stufe1_D08-K2",
+     "Stufe1_D09-K1",
+     "Stufe1_D09-K2",
+     "Stufe1_D10-K1",
+     "Stufe1_D10-K2",
+     "Stufe2_C01-K3",
+     "Stufe2_C01-K4",
+     "Stufe2_C02-K3",
+     "Stufe2_C02-K4",
+     "Stufe2_C05-K3",
+     "Stufe2_C05-K4",
+     "Stufe2_C06-K3",
+     "Stufe2_C06-K4",
+     "Stufe2_C07-K3",
+     "Stufe2_C07-K4",
+     "Stufe2_C08-K3",
+     "Stufe2_C08-K4",
+     "Stufe2_C09-K3",
+     "Stufe2_C09-K4",
+     "Stufe2_C10-K3",
+     "Stufe2_C10-K4",
+     "Stufe2_C11-K3",
+     "Stufe2_C11-K4",
+     "Stufe2_C12-K3",
+     "Stufe2_C12-K4",
+     "Stufe2_C13-K3",
+     "Stufe2_C13-K4",
+     "Stufe2_C14-K3",
+     "Stufe2_C14-K4",
+     "Stufe3_C17-K3",
+     "Stufe3_C17-K4",
+     "Stufe3_C18-K3",
+     "Stufe3_C18-K4",
+     "Stufe3_C20-K3",
+     "Stufe3_C20-K4"
+    ]
+   },
+   "n_calls": 48,
+   "n_dialogues": 24,
+   "fixed": {
+    "n": 48,
+    "flag_precision": 0.625,
+    "flag_recall": 0.3846,
+    "flag_f1": 0.4762,
+    "false_alarm_rate": 0.2727,
+    "miss_rate": 0.6154,
+    "alarm_f1": 0.3077,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.4167,
+    "tp": 10,
+    "fp": 6,
+    "fn": 16,
+    "tn": 16,
+    "flag_balanced_accuracy": 0.556,
+    "ci": {
+     "flag_f1": {
+      "value": 0.4762,
+      "lo": 0.2,
+      "hi": 0.72,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.625,
+      "lo": 0.25,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.3846,
+      "lo": 0.1333,
+      "hi": 0.6667,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.2727,
+      "lo": 0.0,
+      "hi": 0.6,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.6154,
+      "lo": 0.3333,
+      "hi": 0.8667,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.3077,
+      "lo": 0.0,
+      "hi": 0.6154,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.4167,
+      "lo": 0.2381,
+      "hi": 0.5769,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5559,
+      "lo": 0.3819,
+      "hi": 0.7358,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.3333,
+      "flag_precision": 0.625,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7692,
+      "false_alarm_rate": 0.75,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.5
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.625,
+      "flag_recall": 0.3846,
+      "flag_f1": 0.4762,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.6154,
+      "alarm_f1": 0.3077
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.625,
+      "flag_recall": 0.3846,
+      "flag_f1": 0.4762,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.6154,
+      "alarm_f1": 0.3077
+     }
+    }
+   },
+   "cv": {
+    "n": 48,
+    "flag_precision": 0.625,
+    "flag_recall": 0.3846,
+    "flag_f1": 0.4762,
+    "false_alarm_rate": 0.2727,
+    "miss_rate": 0.6154,
+    "alarm_f1": 0.3077,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.4167,
+    "tp": 10,
+    "fp": 6,
+    "fn": 16,
+    "tn": 16,
+    "flag_balanced_accuracy": 0.556,
+    "ci": {
+     "flag_f1": {
+      "value": 0.4762,
+      "lo": 0.2,
+      "hi": 0.72,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.625,
+      "lo": 0.25,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.3846,
+      "lo": 0.1333,
+      "hi": 0.6667,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.2727,
+      "lo": 0.0,
+      "hi": 0.6,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.6154,
+      "lo": 0.3333,
+      "hi": 0.8667,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.3077,
+      "lo": 0.0,
+      "hi": 0.6154,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.4167,
+      "lo": 0.2381,
+      "hi": 0.5769,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5559,
+      "lo": 0.3819,
+      "hi": 0.7358,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.3333,
+      "flag_precision": 0.625,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7692,
+      "false_alarm_rate": 0.75,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.5
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.625,
+      "flag_recall": 0.3846,
+      "flag_f1": 0.4762,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.6154,
+      "alarm_f1": 0.3077
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.625,
+      "flag_recall": 0.3846,
+      "flag_f1": 0.4762,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.6154,
+      "alarm_f1": 0.3077
+     }
+    }
+   },
+   "cv_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.55,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.55,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.6,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 0.55,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "suggestion": {
+    "threshold": 0.55,
+    "flag_f1": 0.4762,
+    "flag_recall": 0.3846,
+    "flag_precision": 0.625,
+    "false_alarm_rate": 0.2727,
+    "miss_rate": 0.6154,
+    "tied": [
+     0.3,
+     0.35,
+     0.4,
+     0.45,
+     0.5,
+     0.55,
+     0.6,
+     0.65,
+     0.7,
+     0.75,
+     0.8
+    ],
+    "reason": "Schwelle 0.55 maximiert F1 der Markierungen (48%) bei Recall 38% und Fehlalarmquote 27%. Schwellen, die alle oder keinen Anruf markieren wurden nicht berücksichtigt."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.2083
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.2083
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 0.166,
+    "stage_s_per_call": {
+     "asr": 0.134,
+     "diarize": 0.02,
+     "checks": 0.009
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.024,
+     "patterns": 0.01,
+     "llm_judge": 0.008,
+     "geval": 0.01
+    },
+    "check_compute_s_total_per_call": 0.052,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 10.0
+   },
+   "commit": "8e00d1ef66",
+   "dirty": true,
+   "cv_far": {
+    "n": 48,
+    "flag_precision": 0.6,
+    "flag_recall": 0.2308,
+    "flag_f1": 0.3333,
+    "false_alarm_rate": 0.1818,
+    "miss_rate": 0.7692,
+    "alarm_f1": 0.0,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.375,
+    "tp": 6,
+    "fp": 4,
+    "fn": 20,
+    "tn": 18,
+    "flag_balanced_accuracy": 0.5245,
+    "ci": {
+     "flag_f1": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 0.6,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.6,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1995
+     },
+     "flag_recall": {
+      "value": 0.2308,
+      "lo": 0.0,
+      "hi": 0.5,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.1818,
+      "lo": 0.0,
+      "hi": 0.4545,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.7692,
+      "lo": 0.5,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.375,
+      "lo": 0.1905,
+      "hi": 0.5385,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5245,
+      "lo": 0.3636,
+      "hi": 0.6786,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.2222,
+      "flag_precision": 0.6,
+      "flag_recall": 0.6,
+      "flag_f1": 0.6,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.4,
+      "alarm_f1": 0.0
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.375,
+      "flag_precision": 0.6,
+      "flag_recall": 0.2308,
+      "flag_f1": 0.3333,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.7692,
+      "alarm_f1": 0.0
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.375,
+      "flag_precision": 0.6,
+      "flag_recall": 0.2308,
+      "flag_f1": 0.3333,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.7692,
+      "alarm_f1": 0.0
+     }
+    }
+   },
+   "cv_far_folds": [
+    {
+     "fold": 0,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "auc": {
+    "flag": {
+     "value": 0.5769,
+     "lo": 0.3843,
+     "hi": 0.7577,
+     "n_valid": 2000,
+     "n_pos": 26,
+     "n_neg": 22
+    },
+    "alarm": {
+     "value": 0.6857,
+     "lo": 0.5,
+     "hi": 0.8731,
+     "n_valid": 2000,
+     "n_pos": 20,
+     "n_neg": 28
+    }
+   },
+   "degraded": false
+  },
+  "rules_only": {
+   "variant": "rules_only",
+   "oracle": true,
+   "meta": {
+    "variant": "rules_only",
+    "description": "keywords + patterns only",
+    "experiment": "smoke",
+    "split": "dev",
+    "profile": "demo-offline",
+    "set": [],
+    "checks": [
+     "keywords",
+     "patterns"
+    ],
+    "refuse_from": null,
+    "oracle": true,
+    "config_name": "demo-offline",
+    "config_hash": "1dd2e4b317b05782",
+    "threshold": 0.55,
+    "fusion": "weighted",
+    "asr": "reference",
+    "asr_model": null,
+    "llm": {
+     "default": {
+      "type": "fake"
+     }
+    },
+    "git": {
+     "sha": "8e00d1ef66",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T01:25:45+0200",
+    "wall_seconds": 1.2,
+    "n_calls": 48,
+    "calls": [
+     "Stufe1_D01-K1",
+     "Stufe1_D01-K2",
+     "Stufe1_D02-K1",
+     "Stufe1_D02-K2",
+     "Stufe1_D03-K1",
+     "Stufe1_D03-K2",
+     "Stufe1_D04-K1",
+     "Stufe1_D04-K2",
+     "Stufe1_D05-K1",
+     "Stufe1_D05-K2",
+     "Stufe1_D06-K1",
+     "Stufe1_D06-K2",
+     "Stufe1_D08-K1",
+     "Stufe1_D08-K2",
+     "Stufe1_D09-K1",
+     "Stufe1_D09-K2",
+     "Stufe1_D10-K1",
+     "Stufe1_D10-K2",
+     "Stufe2_C01-K3",
+     "Stufe2_C01-K4",
+     "Stufe2_C02-K3",
+     "Stufe2_C02-K4",
+     "Stufe2_C05-K3",
+     "Stufe2_C05-K4",
+     "Stufe2_C06-K3",
+     "Stufe2_C06-K4",
+     "Stufe2_C07-K3",
+     "Stufe2_C07-K4",
+     "Stufe2_C08-K3",
+     "Stufe2_C08-K4",
+     "Stufe2_C09-K3",
+     "Stufe2_C09-K4",
+     "Stufe2_C10-K3",
+     "Stufe2_C10-K4",
+     "Stufe2_C11-K3",
+     "Stufe2_C11-K4",
+     "Stufe2_C12-K3",
+     "Stufe2_C12-K4",
+     "Stufe2_C13-K3",
+     "Stufe2_C13-K4",
+     "Stufe2_C14-K3",
+     "Stufe2_C14-K4",
+     "Stufe3_C17-K3",
+     "Stufe3_C17-K4",
+     "Stufe3_C18-K3",
+     "Stufe3_C18-K4",
+     "Stufe3_C20-K3",
+     "Stufe3_C20-K4"
+    ]
+   },
+   "n_calls": 48,
+   "n_dialogues": 24,
+   "fixed": {
+    "n": 48,
+    "flag_precision": 0.8,
+    "flag_recall": 0.3077,
+    "flag_f1": 0.4444,
+    "false_alarm_rate": 0.0909,
+    "miss_rate": 0.6923,
+    "alarm_f1": 0.4286,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.5417,
+    "tp": 8,
+    "fp": 2,
+    "fn": 18,
+    "tn": 20,
+    "flag_balanced_accuracy": 0.6084,
+    "ci": {
+     "flag_f1": {
+      "value": 0.4444,
+      "lo": 0.125,
+      "hi": 0.6958,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.8,
+      "lo": 0.3333,
+      "hi": 1.0,
+      "n_valid": 1992
+     },
+     "flag_recall": {
+      "value": 0.3077,
+      "lo": 0.0769,
+      "hi": 0.5714,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.0909,
+      "lo": 0.0,
+      "hi": 0.3,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.6923,
+      "lo": 0.4286,
+      "hi": 0.9231,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.4286,
+      "lo": 0.0,
+      "hi": 0.7143,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.5417,
+      "lo": 0.375,
+      "hi": 0.7037,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.6084,
+      "lo": 0.4615,
+      "hi": 0.7501,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.6667,
+      "flag_precision": 0.8,
+      "flag_recall": 0.8,
+      "flag_f1": 0.8,
+      "false_alarm_rate": 0.25,
+      "miss_rate": 0.2,
+      "alarm_f1": 0.6667
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.5417,
+      "flag_precision": 0.8,
+      "flag_recall": 0.3077,
+      "flag_f1": 0.4444,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.6923,
+      "alarm_f1": 0.4286
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.5417,
+      "flag_precision": 0.8,
+      "flag_recall": 0.3077,
+      "flag_f1": 0.4444,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.6923,
+      "alarm_f1": 0.4286
+     }
+    }
+   },
+   "cv": {
+    "n": 48,
+    "flag_precision": 0.6,
+    "flag_recall": 0.4615,
+    "flag_f1": 0.5217,
+    "false_alarm_rate": 0.3636,
+    "miss_rate": 0.5385,
+    "alarm_f1": 0.5263,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.5,
+    "tp": 12,
+    "fp": 8,
+    "fn": 14,
+    "tn": 14,
+    "flag_balanced_accuracy": 0.549,
+    "ci": {
+     "flag_f1": {
+      "value": 0.5217,
+      "lo": 0.2353,
+      "hi": 0.7333,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.6,
+      "lo": 0.3327,
+      "hi": 0.8889,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.4615,
+      "lo": 0.1874,
+      "hi": 0.75,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.3636,
+      "lo": 0.0909,
+      "hi": 0.7143,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.5385,
+      "lo": 0.25,
+      "hi": 0.8126,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.5263,
+      "lo": 0.2353,
+      "hi": 0.75,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.5,
+      "lo": 0.3333,
+      "hi": 0.6667,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.549,
+      "lo": 0.3763,
+      "hi": 0.7251,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.5556,
+      "flag_precision": 0.625,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7692,
+      "false_alarm_rate": 0.75,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.6667
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": 0.5,
+      "flag_recall": 0.2,
+      "flag_f1": 0.2857,
+      "false_alarm_rate": 0.1429,
+      "miss_rate": 0.8,
+      "alarm_f1": 0.2857
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.5,
+      "flag_precision": 0.6,
+      "flag_recall": 0.4615,
+      "flag_f1": 0.5217,
+      "false_alarm_rate": 0.3636,
+      "miss_rate": 0.5385,
+      "alarm_f1": 0.5263
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.5,
+      "flag_precision": 0.6,
+      "flag_recall": 0.4615,
+      "flag_f1": 0.5217,
+      "false_alarm_rate": 0.3636,
+      "miss_rate": 0.5385,
+      "alarm_f1": 0.5263
+     }
+    }
+   },
+   "cv_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 0.3,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "suggestion": {
+    "threshold": 0.25,
+    "flag_f1": 0.5217,
+    "flag_recall": 0.4615,
+    "flag_precision": 0.6,
+    "false_alarm_rate": 0.3636,
+    "miss_rate": 0.5385,
+    "tied": [
+     0.2,
+     0.25,
+     0.3
+    ],
+    "reason": "Schwelle 0.25 maximiert F1 der Markierungen (52%) bei Recall 46% und Fehlalarmquote 36%."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.5217,
+     "flag_precision": 0.6,
+     "flag_recall": 0.4615,
+     "false_alarm_rate": 0.3636,
+     "miss_rate": 0.5385,
+     "alarm_f1": 0.5263,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.5217,
+     "flag_precision": 0.6,
+     "flag_recall": 0.4615,
+     "false_alarm_rate": 0.3636,
+     "miss_rate": 0.5385,
+     "alarm_f1": 0.5263,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.5217,
+     "flag_precision": 0.6,
+     "flag_recall": 0.4615,
+     "false_alarm_rate": 0.3636,
+     "miss_rate": 0.5385,
+     "alarm_f1": 0.5263,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.5217,
+     "flag_precision": 0.6,
+     "flag_recall": 0.4615,
+     "false_alarm_rate": 0.3636,
+     "miss_rate": 0.5385,
+     "alarm_f1": 0.4706,
+     "accuracy": 0.4583
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.5217,
+     "flag_precision": 0.6,
+     "flag_recall": 0.4615,
+     "false_alarm_rate": 0.3636,
+     "miss_rate": 0.5385,
+     "alarm_f1": 0.4286,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.5217,
+     "flag_precision": 0.6,
+     "flag_recall": 0.4615,
+     "false_alarm_rate": 0.3636,
+     "miss_rate": 0.5385,
+     "alarm_f1": 0.4286,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.4286,
+     "accuracy": 0.4583
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.4444,
+     "flag_precision": 0.8,
+     "flag_recall": 0.3077,
+     "false_alarm_rate": 0.0909,
+     "miss_rate": 0.6923,
+     "alarm_f1": 0.4286,
+     "accuracy": 0.5417
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.4444,
+     "flag_precision": 0.8,
+     "flag_recall": 0.3077,
+     "false_alarm_rate": 0.0909,
+     "miss_rate": 0.6923,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.4444,
+     "flag_precision": 0.8,
+     "flag_recall": 0.3077,
+     "false_alarm_rate": 0.0909,
+     "miss_rate": 0.6923,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.4444,
+     "flag_precision": 0.8,
+     "flag_recall": 0.3077,
+     "false_alarm_rate": 0.0909,
+     "miss_rate": 0.6923,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.3529,
+     "flag_precision": 0.75,
+     "flag_recall": 0.2308,
+     "false_alarm_rate": 0.0909,
+     "miss_rate": 0.7692,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.3529,
+     "flag_precision": 0.75,
+     "flag_recall": 0.2308,
+     "false_alarm_rate": 0.0909,
+     "miss_rate": 0.7692,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.3529,
+     "flag_precision": 0.75,
+     "flag_recall": 0.2308,
+     "false_alarm_rate": 0.0909,
+     "miss_rate": 0.7692,
+     "alarm_f1": 0.3333,
+     "accuracy": 0.5
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.3529,
+     "flag_precision": 0.75,
+     "flag_recall": 0.2308,
+     "false_alarm_rate": 0.0909,
+     "miss_rate": 0.7692,
+     "alarm_f1": 0.0,
+     "accuracy": 0.4167
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 0.143,
+    "stage_s_per_call": {
+     "asr": 0.125,
+     "diarize": 0.011,
+     "checks": 0.002
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.024,
+     "patterns": 0.01
+    },
+    "check_compute_s_total_per_call": 0.034,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 0.0
+   },
+   "commit": "8e00d1ef66",
+   "dirty": true,
+   "cv_far": {
+    "n": 48,
+    "flag_precision": 0.75,
+    "flag_recall": 0.2308,
+    "flag_f1": 0.3529,
+    "false_alarm_rate": 0.0909,
+    "miss_rate": 0.7692,
+    "alarm_f1": 0.3077,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.5,
+    "tp": 6,
+    "fp": 2,
+    "fn": 20,
+    "tn": 20,
+    "flag_balanced_accuracy": 0.5699,
+    "ci": {
+     "flag_f1": {
+      "value": 0.3529,
+      "lo": 0.0,
+      "hi": 0.6154,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.75,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1977
+     },
+     "flag_recall": {
+      "value": 0.2308,
+      "lo": 0.0,
+      "hi": 0.4667,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.0909,
+      "lo": 0.0,
+      "hi": 0.3,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.7692,
+      "lo": 0.5333,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.3077,
+      "lo": 0.0,
+      "hi": 0.6154,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.5,
+      "lo": 0.3333,
+      "hi": 0.6538,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5699,
+      "lo": 0.4286,
+      "hi": 0.7143,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.5556,
+      "flag_precision": 0.75,
+      "flag_recall": 0.6,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 0.25,
+      "miss_rate": 0.4,
+      "alarm_f1": 0.5
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.5,
+      "flag_precision": 0.75,
+      "flag_recall": 0.2308,
+      "flag_f1": 0.3529,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.7692,
+      "alarm_f1": 0.3077
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.5,
+      "flag_precision": 0.75,
+      "flag_recall": 0.2308,
+      "flag_f1": 0.3529,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.7692,
+      "alarm_f1": 0.3077
+     }
+    }
+   },
+   "cv_far_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.7,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.7,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.7,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "auc": {
+    "flag": {
+     "value": 0.5804,
+     "lo": 0.3889,
+     "hi": 0.7644,
+     "n_valid": 2000,
+     "n_pos": 26,
+     "n_neg": 22
+    },
+    "alarm": {
+     "value": 0.6893,
+     "lo": 0.5058,
+     "hi": 0.875,
+     "n_valid": 2000,
+     "n_pos": 20,
+     "n_neg": 28
+    }
+   },
+   "degraded": false
+  },
+  "all_t040": {
+   "variant": "all_t040",
+   "oracle": true,
+   "meta": {
+    "variant": "all_t040",
+    "description": "re-fusion of `all` at threshold 0.40 (no check reruns)",
+    "experiment": "smoke",
+    "split": "dev",
+    "profile": "demo-offline",
+    "set": [
+     "fusion.threshold=0.40"
+    ],
+    "checks": [
+     "keywords",
+     "patterns",
+     "llm_judge",
+     "geval"
+    ],
+    "refuse_from": "all",
+    "oracle": true,
+    "config_name": "demo-offline",
+    "config_hash": "51359ea3d824b74e",
+    "threshold": 0.4,
+    "fusion": "weighted",
+    "asr": "reference",
+    "asr_model": null,
+    "llm": {
+     "default": {
+      "type": "fake"
+     }
+    },
+    "git": {
+     "sha": "8e00d1ef66",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T01:25:45+0200",
+    "wall_seconds": 0.02,
+    "n_calls": 48,
+    "calls": [
+     "Stufe1_D01-K1",
+     "Stufe1_D01-K2",
+     "Stufe1_D02-K1",
+     "Stufe1_D02-K2",
+     "Stufe1_D03-K1",
+     "Stufe1_D03-K2",
+     "Stufe1_D04-K1",
+     "Stufe1_D04-K2",
+     "Stufe1_D05-K1",
+     "Stufe1_D05-K2",
+     "Stufe1_D06-K1",
+     "Stufe1_D06-K2",
+     "Stufe1_D08-K1",
+     "Stufe1_D08-K2",
+     "Stufe1_D09-K1",
+     "Stufe1_D09-K2",
+     "Stufe1_D10-K1",
+     "Stufe1_D10-K2",
+     "Stufe2_C01-K3",
+     "Stufe2_C01-K4",
+     "Stufe2_C02-K3",
+     "Stufe2_C02-K4",
+     "Stufe2_C05-K3",
+     "Stufe2_C05-K4",
+     "Stufe2_C06-K3",
+     "Stufe2_C06-K4",
+     "Stufe2_C07-K3",
+     "Stufe2_C07-K4",
+     "Stufe2_C08-K3",
+     "Stufe2_C08-K4",
+     "Stufe2_C09-K3",
+     "Stufe2_C09-K4",
+     "Stufe2_C10-K3",
+     "Stufe2_C10-K4",
+     "Stufe2_C11-K3",
+     "Stufe2_C11-K4",
+     "Stufe2_C12-K3",
+     "Stufe2_C12-K4",
+     "Stufe2_C13-K3",
+     "Stufe2_C13-K4",
+     "Stufe2_C14-K3",
+     "Stufe2_C14-K4",
+     "Stufe3_C17-K3",
+     "Stufe3_C17-K4",
+     "Stufe3_C18-K3",
+     "Stufe3_C18-K4",
+     "Stufe3_C20-K3",
+     "Stufe3_C20-K4"
+    ]
+   },
+   "n_calls": 48,
+   "n_dialogues": 24,
+   "fixed": {
+    "n": 48,
+    "flag_precision": 0.625,
+    "flag_recall": 0.3846,
+    "flag_f1": 0.4762,
+    "false_alarm_rate": 0.2727,
+    "miss_rate": 0.6154,
+    "alarm_f1": 0.3077,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.4167,
+    "tp": 10,
+    "fp": 6,
+    "fn": 16,
+    "tn": 16,
+    "flag_balanced_accuracy": 0.556,
+    "ci": {
+     "flag_f1": {
+      "value": 0.4762,
+      "lo": 0.2,
+      "hi": 0.72,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.625,
+      "lo": 0.25,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.3846,
+      "lo": 0.1333,
+      "hi": 0.6667,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.2727,
+      "lo": 0.0,
+      "hi": 0.6,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.6154,
+      "lo": 0.3333,
+      "hi": 0.8667,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.3077,
+      "lo": 0.0,
+      "hi": 0.6154,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.4167,
+      "lo": 0.2381,
+      "hi": 0.5769,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5559,
+      "lo": 0.3819,
+      "hi": 0.7358,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.3333,
+      "flag_precision": 0.625,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7692,
+      "false_alarm_rate": 0.75,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.5
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.625,
+      "flag_recall": 0.3846,
+      "flag_f1": 0.4762,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.6154,
+      "alarm_f1": 0.3077
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.625,
+      "flag_recall": 0.3846,
+      "flag_f1": 0.4762,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.6154,
+      "alarm_f1": 0.3077
+     }
+    }
+   },
+   "cv": {
+    "n": 48,
+    "flag_precision": 0.625,
+    "flag_recall": 0.3846,
+    "flag_f1": 0.4762,
+    "false_alarm_rate": 0.2727,
+    "miss_rate": 0.6154,
+    "alarm_f1": 0.3077,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.4167,
+    "tp": 10,
+    "fp": 6,
+    "fn": 16,
+    "tn": 16,
+    "flag_balanced_accuracy": 0.556,
+    "ci": {
+     "flag_f1": {
+      "value": 0.4762,
+      "lo": 0.2,
+      "hi": 0.72,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.625,
+      "lo": 0.25,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.3846,
+      "lo": 0.1333,
+      "hi": 0.6667,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.2727,
+      "lo": 0.0,
+      "hi": 0.6,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.6154,
+      "lo": 0.3333,
+      "hi": 0.8667,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.3077,
+      "lo": 0.0,
+      "hi": 0.6154,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.4167,
+      "lo": 0.2381,
+      "hi": 0.5769,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5559,
+      "lo": 0.3819,
+      "hi": 0.7358,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.3333,
+      "flag_precision": 0.625,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7692,
+      "false_alarm_rate": 0.75,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.5
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.625,
+      "flag_recall": 0.3846,
+      "flag_f1": 0.4762,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.6154,
+      "alarm_f1": 0.3077
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.625,
+      "flag_recall": 0.3846,
+      "flag_f1": 0.4762,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.6154,
+      "alarm_f1": 0.3077
+     }
+    }
+   },
+   "cv_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.55,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.55,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.6,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 0.55,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "suggestion": {
+    "threshold": 0.55,
+    "flag_f1": 0.4762,
+    "flag_recall": 0.3846,
+    "flag_precision": 0.625,
+    "false_alarm_rate": 0.2727,
+    "miss_rate": 0.6154,
+    "tied": [
+     0.3,
+     0.35,
+     0.4,
+     0.45,
+     0.5,
+     0.55,
+     0.6,
+     0.65,
+     0.7,
+     0.75,
+     0.8
+    ],
+    "reason": "Schwelle 0.55 maximiert F1 der Markierungen (48%) bei Recall 38% und Fehlalarmquote 27%. Schwellen, die alle oder keinen Anruf markieren wurden nicht berücksichtigt."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.2083
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.2083
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.3077,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.4762,
+     "flag_precision": 0.625,
+     "flag_recall": 0.3846,
+     "false_alarm_rate": 0.2727,
+     "miss_rate": 0.6154,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 0.0,
+    "stage_s_per_call": {
+     "asr": 0.134,
+     "diarize": 0.02,
+     "checks": 0.009
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.024,
+     "patterns": 0.01,
+     "llm_judge": 0.008,
+     "geval": 0.01
+    },
+    "check_compute_s_total_per_call": 0.052,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 10.0
+   },
+   "commit": "8e00d1ef66",
+   "dirty": true,
+   "cost_note": "re-fusion of all: check cost is that variant's",
+   "cv_far": {
+    "n": 48,
+    "flag_precision": 0.6,
+    "flag_recall": 0.2308,
+    "flag_f1": 0.3333,
+    "false_alarm_rate": 0.1818,
+    "miss_rate": 0.7692,
+    "alarm_f1": 0.0,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.375,
+    "tp": 6,
+    "fp": 4,
+    "fn": 20,
+    "tn": 18,
+    "flag_balanced_accuracy": 0.5245,
+    "ci": {
+     "flag_f1": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 0.6,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.6,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1995
+     },
+     "flag_recall": {
+      "value": 0.2308,
+      "lo": 0.0,
+      "hi": 0.5,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.1818,
+      "lo": 0.0,
+      "hi": 0.4545,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.7692,
+      "lo": 0.5,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.375,
+      "lo": 0.1905,
+      "hi": 0.5385,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5245,
+      "lo": 0.3636,
+      "hi": 0.6786,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.2222,
+      "flag_precision": 0.6,
+      "flag_recall": 0.6,
+      "flag_f1": 0.6,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.4,
+      "alarm_f1": 0.0
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.375,
+      "flag_precision": 0.6,
+      "flag_recall": 0.2308,
+      "flag_f1": 0.3333,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.7692,
+      "alarm_f1": 0.0
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.375,
+      "flag_precision": 0.6,
+      "flag_recall": 0.2308,
+      "flag_f1": 0.3333,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.7692,
+      "alarm_f1": 0.0
+     }
+    }
+   },
+   "cv_far_folds": [
+    {
+     "fold": 0,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "auc": {
+    "flag": {
+     "value": 0.5769,
+     "lo": 0.3843,
+     "hi": 0.7577,
+     "n_valid": 2000,
+     "n_pos": 26,
+     "n_neg": 22
+    },
+    "alarm": {
+     "value": 0.6857,
+     "lo": 0.5,
+     "hi": 0.8731,
+     "n_valid": 2000,
+     "n_pos": 20,
+     "n_neg": 28
+    }
+   },
+   "degraded": false
+  }
+ },
+ "comparisons": [
+  {
+   "a": "all",
+   "b": "rules_only",
+   "fixed": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.4762,
+      "b": 0.4444,
+      "diff": -0.0318,
+      "lo": -0.2143,
+      "hi": 0.101,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm_f1": {
+      "a": 0.3077,
+      "b": 0.4286,
+      "diff": 0.1209,
+      "lo": 0.0,
+      "hi": 0.3931,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "false_alarm_rate": {
+      "a": 0.2727,
+      "b": 0.0909,
+      "diff": -0.1818,
+      "lo": -0.4545,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "miss_rate": {
+      "a": 0.6154,
+      "b": 0.6923,
+      "diff": 0.0769,
+      "lo": 0.0,
+      "hi": 0.25,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "accuracy": {
+      "a": 0.4167,
+      "b": 0.5417,
+      "diff": 0.125,
+      "lo": 0.0,
+      "hi": 0.2919,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "review_recall": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.5559,
+      "b": 0.6084,
+      "diff": 0.0525,
+      "lo": -0.0714,
+      "hi": 0.2,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.5769,
+      "b": 0.5804,
+      "diff": 0.0035,
+      "lo": -0.0192,
+      "hi": 0.0429,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm": {
+      "a": 0.6857,
+      "b": 0.6893,
+      "diff": 0.0036,
+      "lo": -0.02,
+      "hi": 0.0444,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 2,
+     "b_only": 4,
+     "both": 24,
+     "neither": 18,
+     "p": 0.6875
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 6,
+     "both": 20,
+     "neither": 22,
+     "p": 0.0312
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D06-K1",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7489,
+      "b_score": 0.35,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «Passwort» in [T003]: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bli",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "00:25-00:52 access: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bliibt bi Ihnen. Ja, a mis Passwort erinner ich mich. Ich säg es Ihnen nöd. Au mini PIN bliibt bi mir. Ich weiss nume nöd, ",
+      "b_passage": "01:57-01:58 splitting: Und im Mail het öpper gschribe, ich söll zum Gerätewechsel e Prüefig umgah. Das han ich nöd gmacht. D Absenderadresse gseht anders us als bi Ihren normale Nachricht, drum lüte ich direkt uf de bekannte Servicenummer aa."
+     },
+     {
+      "call_id": "Stufe1_D06-K2",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7489,
+      "b_score": 0.35,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «Passwort» in [T003]: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bli",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "00:25-00:53 access: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bliibt bi Ihnen. Ja, a mis Passwort erinner ich mich. Ich säg es Ihnen nöd. Au mini PIN bliibt bi mir. Ich weiss nume nöd, ",
+      "b_passage": "01:58-01:59 splitting: Und im Mail het öpper gschribe, ich söll zum Gerätewechsel e Prüefig umgah. Das han ich nöd gmacht. D Absenderadresse gseht anders us als bi Ihren normale Nachricht, drum lüte ich direkt uf de bekannte Servicenummer aa."
+     },
+     {
+      "call_id": "Stufe1_D08-K1",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T015]: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sött",
+      "b_reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+      "a_passage": "03:13-03:26 documentation: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sötted vollständig bliibe; nume min falsche Periodenverwiis muess korrigiert werde.",
+      "b_passage": "00:54-00:54 disclosure: Richtig. Ich will au gar nüt über ihn persönlich wüsse. Ich ha s Protokoll vo de Wahl und s Formular zur Vollmacht vor mir. De Vorstand het das letzte Wuche iigreicht."
+     },
+     {
+      "call_id": "Stufe1_D08-K2",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T015]: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sött",
+      "b_reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+      "a_passage": "03:14-03:28 documentation: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sötted vollständig bliibe; nume min falsche Periodenverwiis muess korrigiert werde.",
+      "b_passage": "00:54-00:55 disclosure: Richtig. Ich will au gar nüt über ihn persönlich wüsse. Ich ha s Protokoll vo de Wahl und s Formular zur Vollmacht vor mir. De Vorstand het das letzte Wuche iigreicht."
+     },
+     {
+      "call_id": "Stufe1_D09-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T012]: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditst",
+      "b_reason": "keywords: Stichwort K06 «nöd protokolliere» (Dokumentation auslassen)",
+      "a_passage": "02:37-02:53 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt.",
+      "b_passage": "02:37-02:38 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt."
+     },
+     {
+      "call_id": "Stufe1_D09-K2",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T012]: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditst",
+      "b_reason": "keywords: Stichwort K06 «nöd protokolliere» (Dokumentation auslassen)",
+      "a_passage": "02:38-02:55 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt.",
+      "b_passage": "02:39-02:40 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt."
+     },
+     {
+      "call_id": "Stufe1_D10-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7975,
+      "b_score": 0.5775,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «ufteile» in [T009]: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "01:31-01:49 splitting: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass d Freigabstell d ganzi Rechnig überhaupt gseht. Chönd Sie mir zeige, wie ich mehreri Zahlige separat erfasse?",
+      "b_passage": "01:02-01:03 splitting: D Prüefig umgah würd ich nöd unterstütze. Mir erfassed de tatsächliche Gesamtvorgang und de Termin; de Ziitdruck isch kei Freigab, de Zusammenhang z verberge."
+     },
+     {
+      "call_id": "Stufe1_D10-K2",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7975,
+      "b_score": 0.5775,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «ufteile» in [T009]: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "01:33-01:50 splitting: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass d Freigabstell d ganzi Rechnig überhaupt gseht. Chönd Sie mir zeige, wie ich mehreri Zahlige separat erfasse?",
+      "b_passage": "01:03-01:04 splitting: D Prüefig umgah würd ich nöd unterstütze. Mir erfassed de tatsächliche Gesamtvorgang und de Termin; de Ziitdruck isch kei Freigab, de Zusammenhang z verberge."
+     }
+    ]
+   },
+   "cv": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.4762,
+      "b": 0.5217,
+      "diff": 0.0455,
+      "lo": 0.0,
+      "hi": 0.1616,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm_f1": {
+      "a": 0.3077,
+      "b": 0.5263,
+      "diff": 0.2186,
+      "lo": -0.05,
+      "hi": 0.5241,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "false_alarm_rate": {
+      "a": 0.2727,
+      "b": 0.3636,
+      "diff": 0.0909,
+      "lo": 0.0,
+      "hi": 0.3,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "miss_rate": {
+      "a": 0.6154,
+      "b": 0.5385,
+      "diff": -0.0769,
+      "lo": -0.25,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.4167,
+      "b": 0.5,
+      "diff": 0.0833,
+      "lo": 0.0,
+      "hi": 0.2273,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "review_recall": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.5559,
+      "b": 0.549,
+      "diff": -0.0069,
+      "lo": -0.0583,
+      "hi": 0.0242,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.5769,
+      "b": 0.5804,
+      "diff": 0.0035,
+      "lo": -0.0192,
+      "hi": 0.0429,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm": {
+      "a": 0.6857,
+      "b": 0.6893,
+      "diff": 0.0036,
+      "lo": -0.02,
+      "hi": 0.0444,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 2,
+     "b_only": 2,
+     "both": 24,
+     "neither": 20,
+     "p": 1.0
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 2,
+     "b_only": 6,
+     "both": 18,
+     "neither": 22,
+     "p": 0.2891
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D06-K1",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7489,
+      "b_score": 0.35,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «Passwort» in [T003]: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bli",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "00:25-00:52 access: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bliibt bi Ihnen. Ja, a mis Passwort erinner ich mich. Ich säg es Ihnen nöd. Au mini PIN bliibt bi mir. Ich weiss nume nöd, ",
+      "b_passage": "01:57-01:58 splitting: Und im Mail het öpper gschribe, ich söll zum Gerätewechsel e Prüefig umgah. Das han ich nöd gmacht. D Absenderadresse gseht anders us als bi Ihren normale Nachricht, drum lüte ich direkt uf de bekannte Servicenummer aa."
+     },
+     {
+      "call_id": "Stufe1_D06-K2",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7489,
+      "b_score": 0.35,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «Passwort» in [T003]: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bli",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "00:25-00:53 access: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bliibt bi Ihnen. Ja, a mis Passwort erinner ich mich. Ich säg es Ihnen nöd. Au mini PIN bliibt bi mir. Ich weiss nume nöd, ",
+      "b_passage": "01:58-01:59 splitting: Und im Mail het öpper gschribe, ich söll zum Gerätewechsel e Prüefig umgah. Das han ich nöd gmacht. D Absenderadresse gseht anders us als bi Ihren normale Nachricht, drum lüte ich direkt uf de bekannte Servicenummer aa."
+     },
+     {
+      "call_id": "Stufe1_D08-K1",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T015]: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sött",
+      "b_reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+      "a_passage": "03:13-03:26 documentation: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sötted vollständig bliibe; nume min falsche Periodenverwiis muess korrigiert werde.",
+      "b_passage": "00:54-00:54 disclosure: Richtig. Ich will au gar nüt über ihn persönlich wüsse. Ich ha s Protokoll vo de Wahl und s Formular zur Vollmacht vor mir. De Vorstand het das letzte Wuche iigreicht."
+     },
+     {
+      "call_id": "Stufe1_D08-K2",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T015]: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sött",
+      "b_reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+      "a_passage": "03:14-03:28 documentation: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sötted vollständig bliibe; nume min falsche Periodenverwiis muess korrigiert werde.",
+      "b_passage": "00:54-00:55 disclosure: Richtig. Ich will au gar nüt über ihn persönlich wüsse. Ich ha s Protokoll vo de Wahl und s Formular zur Vollmacht vor mir. De Vorstand het das letzte Wuche iigreicht."
+     },
+     {
+      "call_id": "Stufe1_D09-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T012]: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditst",
+      "b_reason": "keywords: Stichwort K06 «nöd protokolliere» (Dokumentation auslassen)",
+      "a_passage": "02:37-02:53 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt.",
+      "b_passage": "02:37-02:38 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt."
+     },
+     {
+      "call_id": "Stufe1_D09-K2",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T012]: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditst",
+      "b_reason": "keywords: Stichwort K06 «nöd protokolliere» (Dokumentation auslassen)",
+      "a_passage": "02:38-02:55 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt.",
+      "b_passage": "02:39-02:40 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt."
+     },
+     {
+      "call_id": "Stufe1_D10-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7975,
+      "b_score": 0.5775,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «ufteile» in [T009]: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "01:31-01:49 splitting: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass d Freigabstell d ganzi Rechnig überhaupt gseht. Chönd Sie mir zeige, wie ich mehreri Zahlige separat erfasse?",
+      "b_passage": "01:02-01:03 splitting: D Prüefig umgah würd ich nöd unterstütze. Mir erfassed de tatsächliche Gesamtvorgang und de Termin; de Ziitdruck isch kei Freigab, de Zusammenhang z verberge."
+     },
+     {
+      "call_id": "Stufe1_D10-K2",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7975,
+      "b_score": 0.5775,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «ufteile» in [T009]: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "01:33-01:50 splitting: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass d Freigabstell d ganzi Rechnig überhaupt gseht. Chönd Sie mir zeige, wie ich mehreri Zahlige separat erfasse?",
+      "b_passage": "01:03-01:04 splitting: D Prüefig umgah würd ich nöd unterstütze. Mir erfassed de tatsächliche Gesamtvorgang und de Termin; de Ziitdruck isch kei Freigab, de Zusammenhang z verberge."
+     },
+     {
+      "call_id": "Stufe2_C11-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.1487,
+      "b_score": 0.3265,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.15 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "keywords: Stichwort K03 «Übernahm» (Marktrelevanter Inhalt) – ähnlich: «übernäh» (93 %)",
+      "a_passage": null,
+      "b_passage": "03:00-03:00 trade: Genau. Ich will nume d Heimrechnig richtig behandle und nöd grad jede Uusgab us em alte Ordner übernäh. Für mini eigene Erstattig vom Taxifahrt-Beleg muess ich separat mit ihr rede."
+     },
+     {
+      "call_id": "Stufe2_C11-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.1487,
+      "b_score": 0.3265,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.15 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "keywords: Stichwort K03 «Übernahm» (Marktrelevanter Inhalt) – ähnlich: «übernäh» (93 %)",
+      "a_passage": null,
+      "b_passage": "03:02-03:02 trade: Genau. Ich will nume d Heimrechnig richtig behandle und nöd grad jede Uusgab us em alte Ordner übernäh. Für mini eigene Erstattig vom Taxifahrt-Beleg muess ich separat mit ihr rede."
+     },
+     {
+      "call_id": "Stufe2_C12-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.1487,
+      "b_score": 0.3265,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "Kein Alarm: höchster Score 0.15 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "keywords: Stichwort K03 «Übernahm» (Marktrelevanter Inhalt) – ähnlich: «übernäh» (93 %)",
+      "a_passage": null,
+      "b_passage": "02:58-02:59 trade: Genau. Ich will nume d Heimrechnig richtig behandle und nöd grad jede Uusgab us em alte Ordner übernäh. Für mini eigene Erstattig vom Taxifahrt-Beleg muess ich separat mit ihr rede."
+     },
+     {
+      "call_id": "Stufe2_C12-K4",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.1487,
+      "b_score": 0.3265,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "Kein Alarm: höchster Score 0.15 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "keywords: Stichwort K03 «Übernahm» (Marktrelevanter Inhalt) – ähnlich: «übernäh» (93 %)",
+      "a_passage": null,
+      "b_passage": "03:00-03:00 trade: Genau. Ich will nume d Heimrechnig richtig behandle und nöd grad jede Uusgab us em alte Ordner übernäh. Für mini eigene Erstattig vom Taxifahrt-Beleg muess ich separat mit ihr rede."
+     }
+    ]
+   },
+   "cv_far": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.3333,
+      "b": 0.3529,
+      "diff": 0.0196,
+      "lo": -0.3529,
+      "hi": 0.4,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm_f1": {
+      "a": 0.0,
+      "b": 0.3077,
+      "diff": 0.3077,
+      "lo": 0.0,
+      "hi": 0.6154,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "false_alarm_rate": {
+      "a": 0.1818,
+      "b": 0.0909,
+      "diff": -0.0909,
+      "lo": -0.4167,
+      "hi": 0.2222,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "miss_rate": {
+      "a": 0.7692,
+      "b": 0.7692,
+      "diff": 0.0,
+      "lo": -0.3077,
+      "hi": 0.3077,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "accuracy": {
+      "a": 0.375,
+      "b": 0.5,
+      "diff": 0.125,
+      "lo": -0.0417,
+      "hi": 0.3333,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "review_recall": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.5245,
+      "b": 0.5699,
+      "diff": 0.0454,
+      "lo": -0.1616,
+      "hi": 0.2727,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.5769,
+      "b": 0.5804,
+      "diff": 0.0035,
+      "lo": -0.0192,
+      "hi": 0.0429,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm": {
+      "a": 0.6857,
+      "b": 0.6893,
+      "diff": 0.0036,
+      "lo": -0.02,
+      "hi": 0.0444,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 6,
+     "b_only": 8,
+     "both": 18,
+     "neither": 16,
+     "p": 0.7905
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 2,
+     "b_only": 8,
+     "both": 16,
+     "neither": 22,
+     "p": 0.1094
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D02-K1",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.8305,
+      "b_score": 0.884,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «no nöd publiziert» in [T004]: Öppe achttuusig Franke. Mini Schwöschter schaffet det i de Finanzabteilig. Sie het mir gester gseit, d Quartalszahle sin",
+      "b_reason": "keywords: Stichwort K02 «Finanzabteilig» (Interne Quelle)",
+      "a_passage": "00:38-00:53 trade: Öppe achttuusig Franke. Mini Schwöschter schaffet det i de Finanzabteilig. Sie het mir gester gseit, d Quartalszahle sind viel besser als erwartet. Die sind no nöd publiziert; die Mediemeldig chunnt erst am Friitig.",
+      "b_passage": "00:42-00:46 trade: Öppe achttuusig Franke. Mini Schwöschter schaffet det i de Finanzabteilig. Sie het mir gester gseit, d Quartalszahle sind viel besser als erwartet. Die sind no nöd publiziert; die Mediemeldig chunnt erst am Friitig."
+     },
+     {
+      "call_id": "Stufe1_D02-K2",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.8305,
+      "b_score": 0.884,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «no nöd publiziert» in [T004]: Öppe achttuusig Franke. Mini Schwöschter schaffet det i de Finanzabteilig. Sie het mir gester gseit, d Quartalszahle sin",
+      "b_reason": "keywords: Stichwort K02 «Finanzabteilig» (Interne Quelle)",
+      "a_passage": "00:38-00:53 trade: Öppe achttuusig Franke. Mini Schwöschter schaffet det i de Finanzabteilig. Sie het mir gester gseit, d Quartalszahle sind viel besser als erwartet. Die sind no nöd publiziert; die Mediemeldig chunnt erst am Friitig.",
+      "b_passage": "00:42-00:46 trade: Öppe achttuusig Franke. Mini Schwöschter schaffet det i de Finanzabteilig. Sie het mir gester gseit, d Quartalszahle sind viel besser als erwartet. Die sind no nöd publiziert; die Mediemeldig chunnt erst am Friitig."
+     },
+     {
+      "call_id": "Stufe1_D03-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.8257,
+      "b_score": 0.8393,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Verdächtige Formulierung «vor de Meldig» in [T014]: Ah, denn gaht s Beispiel im Podcast nöd um en Zusatzinfo, wo ich ha. Ich will nöd vor de Meldig handle und ha au kei Inf",
+      "b_reason": "keywords: Stichwort K02 «interne Zahlen» (Interne Quelle)",
+      "a_passage": "02:59-03:18 trade: Ah, denn gaht s Beispiel im Podcast nöd um en Zusatzinfo, wo ich ha. Ich will nöd vor de Meldig handle und ha au kei Information, wo no nöd publiziert wär. Mir gahts um de öffentlichi Bericht, nöd um en Auftrag.",
+      "b_passage": "01:10-01:12 trade: D Steigerig vom Umsatz. Im Artikel sind es zwölf Prozent, uf em Blatt füüf. Im Podcast händ si vo interne Zahlen us de Finanzabteilung gredt. Und eine het als Beispiel gseit: «Vor der Bekanntgabe handle wär Insider Trading.» Ich ha drum nöd"
+     },
+     {
+      "call_id": "Stufe1_D03-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.8257,
+      "b_score": 0.8393,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Verdächtige Formulierung «vor de Meldig» in [T014]: Ah, denn gaht s Beispiel im Podcast nöd um en Zusatzinfo, wo ich ha. Ich will nöd vor de Meldig handle und ha au kei Inf",
+      "b_reason": "keywords: Stichwort K02 «interne Zahlen» (Interne Quelle)",
+      "a_passage": "03:01-03:20 trade: Ah, denn gaht s Beispiel im Podcast nöd um en Zusatzinfo, wo ich ha. Ich will nöd vor de Meldig handle und ha au kei Information, wo no nöd publiziert wär. Mir gahts um de öffentlichi Bericht, nöd um en Auftrag.",
+      "b_passage": "01:11-01:13 trade: D Steigerig vom Umsatz. Im Artikel sind es zwölf Prozent, uf em Blatt füüf. Im Podcast händ si vo interne Zahlen us de Finanzabteilung gredt. Und eine het als Beispiel gseit: «Vor der Bekanntgabe handle wär Insider Trading.» Ich ha drum nöd"
+     },
+     {
+      "call_id": "Stufe1_D04-K1",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.8305,
+      "b_score": 0.884,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «under eus» in [T016]: Si het gseit, das bliib under eus. Ich ha das au nöd wiiterverzellt. Aber ich möcht ja nöd im ganze Dorf drüber rede, ic",
+      "b_reason": "keywords: Stichwort K03 «Übernahme» (Marktrelevanter Inhalt)",
+      "a_passage": "03:18-03:32 trade: Si het gseit, das bliib under eus. Ich ha das au nöd wiiterverzellt. Aber ich möcht ja nöd im ganze Dorf drüber rede, ich möcht nume selber es paar Aktie ha.",
+      "b_passage": "02:28-02:29 trade: Si het am Mäntig vo ere Übernahme verzellt. En grössere Konzern wett d Firma chaufe. Si schaffet i de Finanzabteilig und het mir interne Zahlen und de vorgsehni Priis zeigt. Die Sache isch nöd öffentlich. D Bekanntgab isch erst nächste Wuch"
+     },
+     {
+      "call_id": "Stufe1_D04-K2",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.8305,
+      "b_score": 0.884,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «under eus» in [T016]: Si het gseit, das bliib under eus. Ich ha das au nöd wiiterverzellt. Aber ich möcht ja nöd im ganze Dorf drüber rede, ic",
+      "b_reason": "keywords: Stichwort K03 «Übernahme» (Marktrelevanter Inhalt)",
+      "a_passage": "03:20-03:34 trade: Si het gseit, das bliib under eus. Ich ha das au nöd wiiterverzellt. Aber ich möcht ja nöd im ganze Dorf drüber rede, ich möcht nume selber es paar Aktie ha.",
+      "b_passage": "02:29-02:30 trade: Si het am Mäntig vo ere Übernahme verzellt. En grössere Konzern wett d Firma chaufe. Si schaffet i de Finanzabteilig und het mir interne Zahlen und de vorgsehni Priis zeigt. Die Sache isch nöd öffentlich. D Bekanntgab isch erst nächste Wuch"
+     },
+     {
+      "call_id": "Stufe1_D06-K1",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7489,
+      "b_score": 0.35,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «Passwort» in [T003]: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bli",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "00:25-00:52 access: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bliibt bi Ihnen. Ja, a mis Passwort erinner ich mich. Ich säg es Ihnen nöd. Au mini PIN bliibt bi mir. Ich weiss nume nöd, ",
+      "b_passage": "01:57-01:58 splitting: Und im Mail het öpper gschribe, ich söll zum Gerätewechsel e Prüefig umgah. Das han ich nöd gmacht. D Absenderadresse gseht anders us als bi Ihren normale Nachricht, drum lüte ich direkt uf de bekannte Servicenummer aa."
+     },
+     {
+      "call_id": "Stufe1_D06-K2",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7489,
+      "b_score": 0.35,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «Passwort» in [T003]: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bli",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "00:25-00:53 access: Guet, mir trenned die zwei Sache. Für s Passwort säged Sie mir bitte nume, öb Sie sich dra erinnered. De Wert selber bliibt bi Ihnen. Ja, a mis Passwort erinner ich mich. Ich säg es Ihnen nöd. Au mini PIN bliibt bi mir. Ich weiss nume nöd, ",
+      "b_passage": "01:58-01:59 splitting: Und im Mail het öpper gschribe, ich söll zum Gerätewechsel e Prüefig umgah. Das han ich nöd gmacht. D Absenderadresse gseht anders us als bi Ihren normale Nachricht, drum lüte ich direkt uf de bekannte Servicenummer aa."
+     },
+     {
+      "call_id": "Stufe1_D08-K1",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T015]: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sött",
+      "b_reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+      "a_passage": "03:13-03:26 documentation: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sötted vollständig bliibe; nume min falsche Periodenverwiis muess korrigiert werde.",
+      "b_passage": "00:54-00:54 disclosure: Richtig. Ich will au gar nüt über ihn persönlich wüsse. Ich ha s Protokoll vo de Wahl und s Formular zur Vollmacht vor mir. De Vorstand het das letzte Wuche iigreicht."
+     },
+     {
+      "call_id": "Stufe1_D08-K2",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T015]: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sött",
+      "b_reason": "keywords: Stichwort K11 «Vollmacht» (Drittperson und Berechtigung)",
+      "a_passage": "03:14-03:28 documentation: Bitte nöd protokolliere, dass die Apriluusgab im März passiert sei. Die Buechig selber und de richtige Aprilbericht sötted vollständig bliibe; nume min falsche Periodenverwiis muess korrigiert werde.",
+      "b_passage": "00:54-00:55 disclosure: Richtig. Ich will au gar nüt über ihn persönlich wüsse. Ich ha s Protokoll vo de Wahl und s Formular zur Vollmacht vor mir. De Vorstand het das letzte Wuche iigreicht."
+     },
+     {
+      "call_id": "Stufe1_D09-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T012]: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditst",
+      "b_reason": "keywords: Stichwort K06 «nöd protokolliere» (Dokumentation auslassen)",
+      "a_passage": "02:37-02:53 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt.",
+      "b_passage": "02:37-02:38 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt."
+     },
+     {
+      "call_id": "Stufe1_D09-K2",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7731,
+      "b_score": 0.35,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «nöd protokolliere» in [T012]: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditst",
+      "b_reason": "keywords: Stichwort K06 «nöd protokolliere» (Dokumentation auslassen)",
+      "a_passage": "02:38-02:55 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt.",
+      "b_passage": "02:39-02:40 documentation: Denn bitte nöd protokolliere, dass ich die zwanzigtuusig zruggzahle muess. Nähmed s Darlehe nöd i d Notiz für d Kreditstell. Ich will, dass sie nume Eigenmittel gseht und die Vereinbarig vo minere Tante gar nöd erfahrt."
+     },
+     {
+      "call_id": "Stufe1_D10-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7975,
+      "b_score": 0.5775,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «ufteile» in [T009]: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "01:31-01:49 splitting: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass d Freigabstell d ganzi Rechnig überhaupt gseht. Chönd Sie mir zeige, wie ich mehreri Zahlige separat erfasse?",
+      "b_passage": "01:02-01:03 splitting: D Prüefig umgah würd ich nöd unterstütze. Mir erfassed de tatsächliche Gesamtvorgang und de Termin; de Ziitdruck isch kei Freigab, de Zusammenhang z verberge."
+     },
+     {
+      "call_id": "Stufe1_D10-K2",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7975,
+      "b_score": 0.5775,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "llm_judge: Verdächtige Formulierung «ufteile» in [T009]: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass",
+      "b_reason": "keywords: Stichwort K08 «Prüefig umgah» (Kontrollumgehung)",
+      "a_passage": "01:33-01:50 splitting: Ich will d zwölftuusig ufteile, hüt sechstuusig und morn sechstuusig. So wett ich d Kontrolle umgah und verhindre, dass d Freigabstell d ganzi Rechnig überhaupt gseht. Chönd Sie mir zeige, wie ich mehreri Zahlige separat erfasse?",
+      "b_passage": "01:03-01:04 splitting: D Prüefig umgah würd ich nöd unterstütze. Mir erfassed de tatsächliche Gesamtvorgang und de Termin; de Ziitdruck isch kei Freigab, de Zusammenhang z verberge."
+     }
+    ]
+   }
+  },
+  {
+   "a": "all",
+   "b": "all_t040",
+   "fixed": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.4762,
+      "b": 0.4762,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "alarm_f1": {
+      "a": 0.3077,
+      "b": 0.3077,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "false_alarm_rate": {
+      "a": 0.2727,
+      "b": 0.2727,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "miss_rate": {
+      "a": 0.6154,
+      "b": 0.6154,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "accuracy": {
+      "a": 0.4167,
+      "b": 0.4167,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "review_recall": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.5559,
+      "b": 0.5559,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.5769,
+      "b": 0.5769,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "alarm": {
+      "a": 0.6857,
+      "b": 0.6857,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 0,
+     "both": 26,
+     "neither": 22,
+     "p": 1.0
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 0,
+     "both": 20,
+     "neither": 28,
+     "p": 1.0
+    },
+    "flips": []
+   },
+   "cv": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.4762,
+      "b": 0.4762,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "alarm_f1": {
+      "a": 0.3077,
+      "b": 0.3077,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "false_alarm_rate": {
+      "a": 0.2727,
+      "b": 0.2727,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "miss_rate": {
+      "a": 0.6154,
+      "b": 0.6154,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "accuracy": {
+      "a": 0.4167,
+      "b": 0.4167,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "review_recall": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.5559,
+      "b": 0.5559,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.5769,
+      "b": 0.5769,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "alarm": {
+      "a": 0.6857,
+      "b": 0.6857,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 0,
+     "both": 26,
+     "neither": 22,
+     "p": 1.0
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 0,
+     "both": 20,
+     "neither": 28,
+     "p": 1.0
+    },
+    "flips": []
+   },
+   "cv_far": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.3333,
+      "b": 0.3333,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "alarm_f1": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "false_alarm_rate": {
+      "a": 0.1818,
+      "b": 0.1818,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "miss_rate": {
+      "a": 0.7692,
+      "b": 0.7692,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "accuracy": {
+      "a": 0.375,
+      "b": 0.375,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "review_recall": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.5245,
+      "b": 0.5245,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.5769,
+      "b": 0.5769,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "alarm": {
+      "a": 0.6857,
+      "b": 0.6857,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 0,
+     "both": 24,
+     "neither": 24,
+     "p": 1.0
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 0,
+     "both": 18,
+     "neither": 30,
+     "p": 1.0
+    },
+    "flips": []
+   }
+  }
+ ]
+}

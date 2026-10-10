@@ -1,0 +1,67 @@
+{
+ "variant": "champion14",
+ "description": "",
+ "experiment": "champion14_holdout",
+ "split": "holdout",
+ "profile": "recommended-14b",
+ "set": [],
+ "checks": [
+  "keywords",
+  "patterns",
+  "facts"
+ ],
+ "refuse_from": null,
+ "oracle": false,
+ "config_name": "recommended-14b",
+ "use_tuning": false,
+ "tuning": null,
+ "config_hash": "26589cf7c280b32c",
+ "threshold": 0.55,
+ "fusion": "weighted",
+ "asr": "faster_whisper",
+ "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+ "llm": {
+  "default": {
+   "type": "openai_compat",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "model": "callguard-llm",
+   "cache_tag": null
+  }
+ },
+ "git": {
+  "sha": "f0b67b02fc",
+  "dirty": true,
+  "branch": "main"
+ },
+ "created": "2026-10-10T05:00:56+0200",
+ "wall_seconds": 81.24,
+ "n_calls": 12,
+ "calls": [
+  "Stufe1_D07-K1",
+  "Stufe1_D07-K2",
+  "Stufe2_C03-K3",
+  "Stufe2_C03-K4",
+  "Stufe2_C04-K3",
+  "Stufe2_C04-K4",
+  "Stufe2_C15-K3",
+  "Stufe2_C15-K4",
+  "Stufe2_C16-K3",
+  "Stufe2_C16-K4",
+  "Stufe3_C19-K3",
+  "Stufe3_C19-K4"
+ ],
+ "check_weights": {
+  "keywords": 0.15,
+  "patterns": 0.1,
+  "facts": 1.0
+ },
+ "llm_resolved": {
+  "default": {
+   "type": "openai_compat",
+   "model": "callguard-llm",
+   "model_id": "Qwen/Qwen2.5-14B-Instruct-AWQ",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "cache_tag": null
+  }
+ }
+}

@@ -1,0 +1,490 @@
+{
+ "experiment": "holdout_v1",
+ "description": "v1 baseline on the holdout (reference point for the champion's holdout run)",
+ "rq": [
+  "RQ4",
+  "RQ5"
+ ],
+ "base": "gpu-12gb",
+ "split": "holdout",
+ "compare_to": "v1",
+ "n_boot": 2000,
+ "seed": 13,
+ "created": "2026-10-10T04:10:50+0200",
+ "git": {
+  "sha": "795bb55852",
+  "dirty": true,
+  "branch": "main"
+ },
+ "spec": "experiments/holdout_v1.yaml",
+ "baselines": {
+  "flag_all": {
+   "flag_f1": 0.6667,
+   "flag_precision": 0.5,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5,
+   "review_recall": 0.0,
+   "accuracy": 0.3333,
+   "flag_balanced_accuracy": 0.5
+  },
+  "flag_none": {
+   "flag_f1": 0.0,
+   "flag_precision": null,
+   "flag_recall": 0.0,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 1.0,
+   "alarm_f1": 0.0,
+   "review_recall": 0.0,
+   "accuracy": 0.5,
+   "flag_balanced_accuracy": 0.5
+  },
+  "_n": {
+   "calls": 12,
+   "prevalence_flag": 0.5
+  }
+ },
+ "far_cap": 0.2,
+ "variants": {
+  "v1": {
+   "variant": "v1",
+   "oracle": false,
+   "meta": {
+    "variant": "v1",
+    "description": "keywords + patterns + llm_judge + geval (v1 champion set), Qwen2.5-7B",
+    "experiment": "holdout_v1",
+    "split": "holdout",
+    "profile": "gpu-12gb",
+    "set": [],
+    "checks": [
+     "keywords",
+     "patterns",
+     "llm_judge",
+     "geval"
+    ],
+    "refuse_from": null,
+    "oracle": false,
+    "config_name": "gpu-12gb",
+    "use_tuning": false,
+    "tuning": null,
+    "config_hash": "c8c60e398c2fe3c8",
+    "threshold": 0.55,
+    "fusion": "weighted",
+    "asr": "faster_whisper",
+    "asr_model": "models/asr/whisper-turbo-gsw-ct2-int8",
+    "llm": {
+     "default": {
+      "type": "openai_compat",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "model": "callguard-llm",
+      "cache_tag": null
+     }
+    },
+    "git": {
+     "sha": "795bb55852",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T04:10:50+0200",
+    "wall_seconds": 105.45,
+    "n_calls": 12,
+    "calls": [
+     "Stufe1_D07-K1",
+     "Stufe1_D07-K2",
+     "Stufe2_C03-K3",
+     "Stufe2_C03-K4",
+     "Stufe2_C04-K3",
+     "Stufe2_C04-K4",
+     "Stufe2_C15-K3",
+     "Stufe2_C15-K4",
+     "Stufe2_C16-K3",
+     "Stufe2_C16-K4",
+     "Stufe3_C19-K3",
+     "Stufe3_C19-K4"
+    ],
+    "check_weights": {
+     "keywords": 0.35,
+     "patterns": 0.2,
+     "llm_judge": 1.0,
+     "geval": 1.0
+    },
+    "llm_resolved": {
+     "default": {
+      "type": "openai_compat",
+      "model": "callguard-llm",
+      "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "cache_tag": null
+     }
+    }
+   },
+   "n_calls": 12,
+   "n_dialogues": 6,
+   "fixed": {
+    "n": 12,
+    "flag_precision": 0.5,
+    "flag_recall": 1.0,
+    "flag_f1": 0.6667,
+    "false_alarm_rate": 1.0,
+    "miss_rate": 0.0,
+    "alarm_f1": 0.0,
+    "review_recall": 1.0,
+    "review_escalation": 1.0,
+    "accuracy": 0.1667,
+    "tp": 6,
+    "fp": 6,
+    "fn": 0,
+    "tn": 0,
+    "flag_balanced_accuracy": 0.5,
+    "ci": {
+     "flag_f1": {
+      "value": 0.6667,
+      "lo": 0.25,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.5,
+      "lo": 0.1429,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n_valid": 1986
+     },
+     "false_alarm_rate": {
+      "value": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n_valid": 1869
+     },
+     "miss_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1986
+     },
+     "alarm_f1": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1870
+     },
+     "review_recall": {
+      "value": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n_valid": 1363
+     },
+     "accuracy": {
+      "value": 0.1667,
+      "lo": 0.0,
+      "hi": 0.6,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5,
+      "lo": 0.5,
+      "hi": 0.5,
+      "n_valid": 1855
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 2,
+      "accuracy": 0.0,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": null,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe2": {
+      "n": 8,
+      "accuracy": 0.0,
+      "flag_precision": 0.25,
+      "flag_recall": 1.0,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 2,
+      "accuracy": 1.0,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": null,
+      "miss_rate": 0.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 6,
+      "accuracy": 0.1667,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.0
+     },
+     "noisy": {
+      "n": 6,
+      "accuracy": 0.1667,
+      "flag_precision": 0.5,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.0
+     }
+    }
+   },
+   "cv": null,
+   "cv_folds": [],
+   "suggestion": {
+    "threshold": 0.8,
+    "flag_f1": 0.625,
+    "flag_recall": 0.8333,
+    "flag_precision": 0.5,
+    "false_alarm_rate": 0.8333,
+    "miss_rate": 0.1667,
+    "tied": [
+     0.7,
+     0.75,
+     0.8,
+     0.85,
+     0.9
+    ],
+    "reason": "Schwelle 0.80 maximiert F1 der Markierungen (62%) bei Recall 83% und Fehlalarmquote 83%. Schwellen, die alle oder keinen Anruf markieren wurden nicht berücksichtigt."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.2222,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.2222,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.2222,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.2222,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.2222,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.0,
+     "accuracy": 0.0833
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.0,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.0,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.6667,
+     "flag_precision": 0.5,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.0,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.5882,
+     "flag_precision": 0.4545,
+     "flag_recall": 0.8333,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.1667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.0833
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.625,
+     "flag_precision": 0.5,
+     "flag_recall": 0.8333,
+     "false_alarm_rate": 0.8333,
+     "miss_rate": 0.1667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.625,
+     "flag_precision": 0.5,
+     "flag_recall": 0.8333,
+     "false_alarm_rate": 0.8333,
+     "miss_rate": 0.1667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.625,
+     "flag_precision": 0.5,
+     "flag_recall": 0.8333,
+     "false_alarm_rate": 0.8333,
+     "miss_rate": 0.1667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.625,
+     "flag_precision": 0.5,
+     "flag_recall": 0.8333,
+     "false_alarm_rate": 0.8333,
+     "miss_rate": 0.1667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.1667
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.625,
+     "flag_precision": 0.5,
+     "flag_recall": 0.8333,
+     "false_alarm_rate": 0.8333,
+     "miss_rate": 0.1667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.1667
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 1,
+    "by_check": {
+     "llm_judge": 1
+    }
+   },
+   "cost": {
+    "wall_s_per_call": 43.08,
+    "stage_s_per_call": {
+     "asr": 13.054,
+     "diarize": 12.462,
+     "checks": 17.558
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.019,
+     "patterns": 0.009,
+     "llm_judge": 10.61,
+     "geval": 5.795
+    },
+    "check_compute_s_total_per_call": 16.433,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 9.583
+   },
+   "commit": "795bb55852",
+   "dirty": true,
+   "cv_far": null,
+   "cv_far_folds": [],
+   "cap": {
+    "far_cap": 0.2,
+    "compliant": null,
+    "floor": {
+     "threshold": 1.0,
+     "false_alarm_rate": 0.8333,
+     "flag_recall": 0.8333,
+     "fp": 5,
+     "tn": 1,
+     "flagged": 10,
+     "n": 12,
+     "cap_reachable": false
+    },
+    "folds_reachable": null,
+    "folds": 0,
+    "fallback_folds": []
+   },
+   "auc": {
+    "flag": {
+     "value": 0.6111,
+     "lo": 0.5,
+     "hi": 0.9,
+     "n_valid": 1855,
+     "n_pos": 6,
+     "n_neg": 6
+    },
+    "alarm": {
+     "value": 0.6875,
+     "lo": 0.5,
+     "hi": 1.0,
+     "n_valid": 1865,
+     "n_pos": 4,
+     "n_neg": 8
+    }
+   },
+   "degraded": true,
+   "warnings": []
+  }
+ },
+ "comparisons": [],
+ "warnings": {}
+}

@@ -1,0 +1,4886 @@
+{
+ "fixed": [
+  {
+   "call_id": "Stufe1_D01-K1",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 7.35
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.02,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D01-K2",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 23.03
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D02-K1",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:37-00:53 trade: Jetzt 8000 Franken, meine Schwester arbeitet dort in der Finanzabteilung, sie hat mir gestern gesagt, Quantalszahlen sind viel besser als erwartet, diese sind wohl nicht publiziert, die Medienmeldung kommt erst am Freitag.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung arbeitet und ihr geheim Informationen über die Quartalszahlen gegeben hat. (Regel: trade.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 5.55
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.03,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D02-K2",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9701,
+   "uncertainty": 0.0373,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:05-01:09 trade: Und auch alles, sie hat mir sogar ein Foto von der Iguessicht gezeigt.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.93) - Die Kunde erwähnt ein Foto der Iguessicht und dass sie die Sensorkunde für sich selbst kaufen will. (Regel: trade.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 7.52
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D03-K1",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 14.46
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.15,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D03-K2",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 3.65
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D04-K1",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:46-03:30 trade: Ich helle kurz an, diese Unterlagen haben Sie von Ihrer Kollegin persönlich erhalten, es geht nicht um einen Artikel, den ich selber abrufen kann. Nein, es gibt noch keine Artikel, sie hat mir es auf ihrem Laptop gesagt, ich habe keinen App",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie die Informationen von ihrer Kollegin persönlich erhalten hat, die unter ihnen bleiben soll. (Regel: trade.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 6.89
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D04-K2",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:27-02:45 trade: Sie hat am Montag von ihrer Übernahme erzählt. Ein grösserer Konzerm will viermal kaufen. Sie arbeitet in der Finanzabteilung und hat mir nur Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich. Das Bekanntgab ist er",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin in der Finanzabteilung erhalten hat, die noch nicht öffentlich gemacht wurden. (Regel: trade.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 10.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D05-K1",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "alarm",
+   "score": 0.9184,
+   "uncertainty": 0.102,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:17-01:28 access: Warte, ich sage Ihnen die Tarnkarte, 7, 3, 1, 9, 4, 2, es steht immer noch gültig. Können Sie mir sagen, ob das die richtige Reihenfolge ist?",
+   "reason": "facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde gibt die Tarnkarte mit den Ziffern 7, 3, 1, 9, 4, 2 laut aus, während der Berater ihn daran hindert, diesen Wert zu prüfen. (Regel: access.alarm_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 33.69
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D05-K2",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0794,
+   "uncertainty": 0.0992,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.08 ('Zugangsinformation preisgegeben') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 12.12
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D06-K1",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 13.14
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe1_D06-K2",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 10.96
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe1_D08-K1",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 6.37
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe1_D08-K2",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 6.79
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0008
+  },
+  {
+   "call_id": "Stufe1_D09-K1",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.8719,
+   "uncertainty": 0.1602,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:37-02:52 documentation: Dann bitte nicht protokollieren, dass ich die 20 000 zurückzahlen muss. Nehmen die Zarlehe nicht in die Notiz für die Kreditstelle. Ich will, dass ich nur Eigenmittel sehe und die Vereinbarung meiner Tante gar nicht erfahre.",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.68) - Der Kunde möchte, dass die Zinsleistung seiner Tante nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 12.27
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D09-K2",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.9907,
+   "uncertainty": 0.0116,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:43-01:00 documentation: Es sind 20 000 Franken meiner Tante. Ich muss jetzt zurückzahlen, und wir haben jetzt einen Unterschritt nicht vereinbart. Verwescht sind meine eigenen Ersparnisse. Ich kenne den Unterschied, aber ich habe Angst, dass es darum länger dauert",
+   "reason": "facts: Fakt: Verborgene Tatsache ist relevant = ja (0.98) - Der Kunde möchte die Existenz eines Darlehens seiner Tante verschweigen, um eine vollständigere Eigenmittelangabe zu erhalten. (Regel: documentation.alarm_1)",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 19.41
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D10-K1",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.8218,
+   "uncertainty": 0.2228,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:32-01:58 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe stellt die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separat erfasse? Für diese Abs",
+   "reason": "facts: Fakt: Zweck ist, Kontrolle oder Freigabe zu umgehen = ja (1.00) - Der Kunde möchte die Zahlung aufteilen, um die Freigabe zu umgehen und die gesamte Rechnung nicht durchzuführen. (Regel: splitting.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 4.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe1_D10-K2",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.8996,
+   "uncertainty": 0.1256,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:33-01:50 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe-Stell die ganze Rechnung überhaupt sieht. Können Sie mir ja zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "facts: Fakt: Aufteilung in Teilbeträge verlangt = ja (1.00) - Der Kunde möchte die 12.000 Franken aufteilen in 6.000 und 6.000. (Regel: splitting.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 15.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C01-K3",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 8.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C01-K4",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 31.02
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C02-K3",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 7.36
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C02-K4",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 28.84
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C05-K3",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0003,
+   "uncertainty": 0.0004,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 8.15
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.38,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C05-K4",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0013,
+   "uncertainty": 0.0016,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 18.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.29,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C06-K3",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9386,
+   "uncertainty": 0.0767,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:44-00:57 trade: Es geht um die CRM-Systeme, ich habe die Janet Produz aus meiner Arbeit, aber die Aktien habe ich bis jetzt nie gehabt, ich habe letzte Woche einen Bericht über den neuen GoSauftrag gesehen.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.85) - Die Kunde erwähnt, dass sie Informationen über den neuen GoSauftrag von Claudia, die das Projekt leitet, erhalten hat. (Regel: trade.alarm_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 9.56
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.13,
+    "checks": 0.04
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C06-K4",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0437,
+   "uncertainty": 0.1848,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.04 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 17.69
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C07-K3",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:28-03:50 trade: Ja, ich habe mich jetzt entschieden, wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albis Optik kaufen, können Sie den einmaligen Auftrag für mich entgegnen. Ich bestätige jetzt keine Ausführung, ich nehme den Kaufw",
+   "reason": "facts: Fakt: Eigener Handelswunsch geäussert = ja (1.00) - Die Kunde gibt ihren konkreten Kaufwunsch für 5000 Franken Aktien von der Albis Optik ausdrücklich. (Regel: trade.review_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 7.75
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C07-K4",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9674,
+   "uncertainty": 0.0407,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:36-00:54 trade: Meine Cousine ist im Projektium der Albisoptik, sie hat mir gestern den neuen Absatzbericht persönlich gezeigt, der gerade erst Monat Mädchen, bis dann darfst du das Team ihm nicht weitergeben, es ist deutlich mehr verkauft worden als erwar",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.93) - Die Kunde erwähnt, dass ihre Cousine ihr den neuen Absatzbericht persönlich gezeigt hat, der noch nicht veröffentlicht ist. (Regel: trade.alarm_1)",
+   "llm_calls": 24,
+   "check_seconds": {
+    "facts": 15.09
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.21,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C08-K3",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 8.41
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.31,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C08-K4",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 24,
+   "check_seconds": {
+    "facts": 22.4
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.32,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C09-K3",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 0,
+   "check_seconds": {
+    "facts": 0.01
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C09-K4",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 25.86
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C10-K3",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 12.3
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C10-K4",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 18.33
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe2_C11-K3",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:52-04:01 disclosure: Für den Vorgang halte ich fest, was am Telefon besprochen wurde. Ich bestätige damit keine Zahlung und ändere keine Berechtigung.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 4.56
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C11-K4",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:34-03:44 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute am Morgen.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin weiter, die nicht die Eigentümerin des Kontos ist. (Regel: disclosure.review_1)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 16.02
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C12-K3",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.8944,
+   "uncertainty": 0.132,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:51-01:03 disclosure: Sie haben aber kein Auskundsrecht hinterlegt und die Abfährung ergeben, dass sie im dem Vorgang keine Berechtigung zum Kontostand haben. Die familiäre Beziehung allein lehnt da nicht.",
+   "reason": "facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (0.74) - Der Kunde wird informiert, dass er keine Berechtigung zum Kontostand seiner Mutter hat. (Regel: disclosure.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 10.22
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.2,
+    "diarize": 0.15,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C12-K4",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:32-03:41 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand ihrer Mutter heute am Morgen.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin preis. (Regel: disclosure.review_1)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 16.19
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.1,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C13-K3",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "08:21-08:46 documentation: Gut, dann lade ich zuerst den neuen Kaufentwurf und den richtig angeschriebenen Beleg auf. Die alte Version lasse ich separat, damit ich sie nicht wieder verwechsel. Dann beim Aufladen bitte ich die aktuelle Dossier-Lieferenz an. In der Rüc",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass eine bestimmte Information im Satz aus dem Dossier herausgenommen wird. (Regel: documentation.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 10.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.09,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C13-K4",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.9735,
+   "uncertainty": 0.0331,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:57-08:17 documentation: Dann lernt man ja den violetten Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt. Ich nehme Ihren Wunsch auf, zusammen mit denen, was Sie am Anfang über den Satz ges",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.94) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 17.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.05,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C14-K3",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:55-08:05 documentation: Dann lehnt ja der Violett, mache ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt genau dieses Satzes nicht zu sehen bekommt. Ich",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 12.8
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.12,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe2_C14-K4",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.8496,
+   "uncertainty": 0.188,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:58-08:08 documentation: Dann lernt mir ja der Violett, mache ich ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt. Ich",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.84) - Der Kunde möchte, dass der Inhalt eines bestimmten Satzes vom Finanzierungsabschnitt nicht an die Finanzierungsstelle weitergegeben wird. (Regel: documentation.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 12.06
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.17,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe3_C17-K3",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:23-01:31 access: Ich weiss nicht, ob der Wert oben oder und dazu gehört. Der Text ist so klein, dass ich das Bild gerade vergrossern muss.",
+   "reason": "facts: Fakt: Code/Wert am Telefon vorgelesen = ja (0.99) - Der Kunde gibt die Ziffern des Werts vor, obwohl seine Gültigkeit unsicher ist. (Regel: access.review_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 10.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe3_C17-K4",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:49 access: Im Moment schaue ich nur ein Bild an, der oberen Rand ist abgeschnitten und ich kann nicht lesen, ob es noch gültig war, ich habe mich schon etwas neu gestartet, aber ich weiss nicht, ob ich Ihnen zeigen kann, dass Sie benötigen.",
+   "reason": "facts: Fakt: Im Gespräch offen, ob der Wert gültig ist = ja (1.00) - Der Kunde sagt, dass er nicht sagen kann, ob der Wert oben oder unten dazugehört oder ob der Text jetzt oder damals gültig ist. (Regel: access.review_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 11.22
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe3_C18-K3",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 2.55
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe3_C18-K4",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:38-03:58 disclosure: Wenn ich nicht, können sie mir ja bis dahin wenigstens sagen, ob auf ihrem Konto genug für die Wohnungskächtung liegt, nein, das kann ich ihnen erst sagen, wenn die Berechtigung für diese Auskunft gut ist, einen Betrag oder eine Bestätigung",
+   "reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (1.00) - Die Kunde fragt nach dem Kontostand ihrer Schwester, was eine Auskunft an Dritte ist. (Regel: disclosure.review_2)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 3.8
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0001
+  },
+  {
+   "call_id": "Stufe3_C20-K3",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 0.97
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  },
+  {
+   "call_id": "Stufe3_C20-K4",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 0.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.0
+  }
+ ],
+ "cv": [
+  {
+   "call_id": "Stufe1_D01-K1",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 7.35
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.02,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D01-K2",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 23.03
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D02-K1",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:37-00:53 trade: Jetzt 8000 Franken, meine Schwester arbeitet dort in der Finanzabteilung, sie hat mir gestern gesagt, Quantalszahlen sind viel besser als erwartet, diese sind wohl nicht publiziert, die Medienmeldung kommt erst am Freitag.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung arbeitet und ihr geheim Informationen über die Quartalszahlen gegeben hat. (Regel: trade.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 5.55
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.03,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D02-K2",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9701,
+   "uncertainty": 0.0373,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:05-01:09 trade: Und auch alles, sie hat mir sogar ein Foto von der Iguessicht gezeigt.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.93) - Die Kunde erwähnt ein Foto der Iguessicht und dass sie die Sensorkunde für sich selbst kaufen will. (Regel: trade.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 7.52
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D03-K1",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 14.46
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.15,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D03-K2",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 3.65
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D04-K1",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:46-03:30 trade: Ich helle kurz an, diese Unterlagen haben Sie von Ihrer Kollegin persönlich erhalten, es geht nicht um einen Artikel, den ich selber abrufen kann. Nein, es gibt noch keine Artikel, sie hat mir es auf ihrem Laptop gesagt, ich habe keinen App",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie die Informationen von ihrer Kollegin persönlich erhalten hat, die unter ihnen bleiben soll. (Regel: trade.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 6.89
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D04-K2",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:27-02:45 trade: Sie hat am Montag von ihrer Übernahme erzählt. Ein grösserer Konzerm will viermal kaufen. Sie arbeitet in der Finanzabteilung und hat mir nur Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich. Das Bekanntgab ist er",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin in der Finanzabteilung erhalten hat, die noch nicht öffentlich gemacht wurden. (Regel: trade.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 10.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D05-K1",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "alarm",
+   "score": 0.9184,
+   "uncertainty": 0.102,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:17-01:28 access: Warte, ich sage Ihnen die Tarnkarte, 7, 3, 1, 9, 4, 2, es steht immer noch gültig. Können Sie mir sagen, ob das die richtige Reihenfolge ist?",
+   "reason": "facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde gibt die Tarnkarte mit den Ziffern 7, 3, 1, 9, 4, 2 laut aus, während der Berater ihn daran hindert, diesen Wert zu prüfen. (Regel: access.alarm_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 33.69
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe1_D05-K2",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0794,
+   "uncertainty": 0.0992,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.08 ('Zugangsinformation preisgegeben') liegt unter 0.55 (Schwelle 0.70 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 12.12
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe1_D06-K1",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 13.14
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D06-K2",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 10.96
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D08-K1",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 6.37
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D08-K2",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 6.79
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D09-K1",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.8719,
+   "uncertainty": 0.1602,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:37-02:52 documentation: Dann bitte nicht protokollieren, dass ich die 20 000 zurückzahlen muss. Nehmen die Zarlehe nicht in die Notiz für die Kreditstelle. Ich will, dass ich nur Eigenmittel sehe und die Vereinbarung meiner Tante gar nicht erfahre.",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.68) - Der Kunde möchte, dass die Zinsleistung seiner Tante nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 12.27
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D09-K2",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.9907,
+   "uncertainty": 0.0116,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:43-01:00 documentation: Es sind 20 000 Franken meiner Tante. Ich muss jetzt zurückzahlen, und wir haben jetzt einen Unterschritt nicht vereinbart. Verwescht sind meine eigenen Ersparnisse. Ich kenne den Unterschied, aber ich habe Angst, dass es darum länger dauert",
+   "reason": "facts: Fakt: Verborgene Tatsache ist relevant = ja (0.98) - Der Kunde möchte die Existenz eines Darlehens seiner Tante verschweigen, um eine vollständigere Eigenmittelangabe zu erhalten. (Regel: documentation.alarm_1)",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 19.41
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D10-K1",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.8218,
+   "uncertainty": 0.2228,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:32-01:58 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe stellt die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separat erfasse? Für diese Abs",
+   "reason": "facts: Fakt: Zweck ist, Kontrolle oder Freigabe zu umgehen = ja (1.00) - Der Kunde möchte die Zahlung aufteilen, um die Freigabe zu umgehen und die gesamte Rechnung nicht durchzuführen. (Regel: splitting.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 4.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D10-K2",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.8996,
+   "uncertainty": 0.1256,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:33-01:50 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe-Stell die ganze Rechnung überhaupt sieht. Können Sie mir ja zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "facts: Fakt: Aufteilung in Teilbeträge verlangt = ja (1.00) - Der Kunde möchte die 12.000 Franken aufteilen in 6.000 und 6.000. (Regel: splitting.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 15.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C01-K3",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.55 (Schwelle 0.70 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 8.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C01-K4",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.55 (Schwelle 0.70 minus Band 0.15).",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 31.02
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C02-K3",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.55 (Schwelle 0.70 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 7.36
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C02-K4",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.55 (Schwelle 0.70 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 28.84
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C05-K3",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0003,
+   "uncertainty": 0.0004,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 8.15
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.38,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C05-K4",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0013,
+   "uncertainty": 0.0016,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 18.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.29,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C06-K3",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9386,
+   "uncertainty": 0.0767,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:44-00:57 trade: Es geht um die CRM-Systeme, ich habe die Janet Produz aus meiner Arbeit, aber die Aktien habe ich bis jetzt nie gehabt, ich habe letzte Woche einen Bericht über den neuen GoSauftrag gesehen.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.85) - Die Kunde erwähnt, dass sie Informationen über den neuen GoSauftrag von Claudia, die das Projekt leitet, erhalten hat. (Regel: trade.alarm_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 9.56
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.13,
+    "checks": 0.04
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C06-K4",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0437,
+   "uncertainty": 0.1848,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.04 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 17.69
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C07-K3",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:28-03:50 trade: Ja, ich habe mich jetzt entschieden, wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albis Optik kaufen, können Sie den einmaligen Auftrag für mich entgegnen. Ich bestätige jetzt keine Ausführung, ich nehme den Kaufw",
+   "reason": "facts: Fakt: Eigener Handelswunsch geäussert = ja (1.00) - Die Kunde gibt ihren konkreten Kaufwunsch für 5000 Franken Aktien von der Albis Optik ausdrücklich. (Regel: trade.review_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 7.75
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C07-K4",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9674,
+   "uncertainty": 0.0407,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:36-00:54 trade: Meine Cousine ist im Projektium der Albisoptik, sie hat mir gestern den neuen Absatzbericht persönlich gezeigt, der gerade erst Monat Mädchen, bis dann darfst du das Team ihm nicht weitergeben, es ist deutlich mehr verkauft worden als erwar",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.93) - Die Kunde erwähnt, dass ihre Cousine ihr den neuen Absatzbericht persönlich gezeigt hat, der noch nicht veröffentlicht ist. (Regel: trade.alarm_1)",
+   "llm_calls": 24,
+   "check_seconds": {
+    "facts": 15.09
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.21,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C08-K3",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.55 (Schwelle 0.70 minus Band 0.15).",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 8.41
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.31,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C08-K4",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.55 (Schwelle 0.70 minus Band 0.15).",
+   "llm_calls": 24,
+   "check_seconds": {
+    "facts": 22.4
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.32,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C09-K3",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 0,
+   "check_seconds": {
+    "facts": 0.01
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C09-K4",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 25.86
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C10-K3",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 12.3
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C10-K4",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 18.33
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C11-K3",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:52-04:01 disclosure: Für den Vorgang halte ich fest, was am Telefon besprochen wurde. Ich bestätige damit keine Zahlung und ändere keine Berechtigung.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 4.56
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C11-K4",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:34-03:44 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute am Morgen.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin weiter, die nicht die Eigentümerin des Kontos ist. (Regel: disclosure.review_1)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 16.02
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C12-K3",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.8944,
+   "uncertainty": 0.132,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:51-01:03 disclosure: Sie haben aber kein Auskundsrecht hinterlegt und die Abfährung ergeben, dass sie im dem Vorgang keine Berechtigung zum Kontostand haben. Die familiäre Beziehung allein lehnt da nicht.",
+   "reason": "facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (0.74) - Der Kunde wird informiert, dass er keine Berechtigung zum Kontostand seiner Mutter hat. (Regel: disclosure.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 10.22
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.2,
+    "diarize": 0.15,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C12-K4",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:32-03:41 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand ihrer Mutter heute am Morgen.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin preis. (Regel: disclosure.review_1)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 16.19
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.1,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C13-K3",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "08:21-08:46 documentation: Gut, dann lade ich zuerst den neuen Kaufentwurf und den richtig angeschriebenen Beleg auf. Die alte Version lasse ich separat, damit ich sie nicht wieder verwechsel. Dann beim Aufladen bitte ich die aktuelle Dossier-Lieferenz an. In der Rüc",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass eine bestimmte Information im Satz aus dem Dossier herausgenommen wird. (Regel: documentation.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 10.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.09,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C13-K4",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.9735,
+   "uncertainty": 0.0331,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:57-08:17 documentation: Dann lernt man ja den violetten Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt. Ich nehme Ihren Wunsch auf, zusammen mit denen, was Sie am Anfang über den Satz ges",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.94) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 17.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.05,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C14-K3",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:55-08:05 documentation: Dann lehnt ja der Violett, mache ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt genau dieses Satzes nicht zu sehen bekommt. Ich",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 12.8
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.12,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C14-K4",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.8496,
+   "uncertainty": 0.188,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:58-08:08 documentation: Dann lernt mir ja der Violett, mache ich ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt. Ich",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.84) - Der Kunde möchte, dass der Inhalt eines bestimmten Satzes vom Finanzierungsabschnitt nicht an die Finanzierungsstelle weitergegeben wird. (Regel: documentation.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 12.06
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.17,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe3_C17-K3",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:23-01:31 access: Ich weiss nicht, ob der Wert oben oder und dazu gehört. Der Text ist so klein, dass ich das Bild gerade vergrossern muss.",
+   "reason": "facts: Fakt: Code/Wert am Telefon vorgelesen = ja (0.99) - Der Kunde gibt die Ziffern des Werts vor, obwohl seine Gültigkeit unsicher ist. (Regel: access.review_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 10.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe3_C17-K4",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:49 access: Im Moment schaue ich nur ein Bild an, der oberen Rand ist abgeschnitten und ich kann nicht lesen, ob es noch gültig war, ich habe mich schon etwas neu gestartet, aber ich weiss nicht, ob ich Ihnen zeigen kann, dass Sie benötigen.",
+   "reason": "facts: Fakt: Im Gespräch offen, ob der Wert gültig ist = ja (1.00) - Der Kunde sagt, dass er nicht sagen kann, ob der Wert oben oder unten dazugehört oder ob der Text jetzt oder damals gültig ist. (Regel: access.review_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 11.22
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe3_C18-K3",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 2.55
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe3_C18-K4",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:38-03:58 disclosure: Wenn ich nicht, können sie mir ja bis dahin wenigstens sagen, ob auf ihrem Konto genug für die Wohnungskächtung liegt, nein, das kann ich ihnen erst sagen, wenn die Berechtigung für diese Auskunft gut ist, einen Betrag oder eine Bestätigung",
+   "reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (1.00) - Die Kunde fragt nach dem Kontostand ihrer Schwester, was eine Auskunft an Dritte ist. (Regel: disclosure.review_2)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 3.8
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe3_C20-K3",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 0.97
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe3_C20-K4",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 0.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  }
+ ],
+ "cv_folds": [
+  {
+   "fold": 0,
+   "threshold": 0.2,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D01",
+    "Stufe1_D06",
+    "Stufe1_D09",
+    "Stufe2_C13",
+    "Stufe2_C14",
+    "Stufe3_C20"
+   ]
+  },
+  {
+   "fold": 1,
+   "threshold": 0.7,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D05",
+    "Stufe2_C01",
+    "Stufe2_C02",
+    "Stufe2_C07",
+    "Stufe2_C08",
+    "Stufe3_C17"
+   ]
+  },
+  {
+   "fold": 2,
+   "threshold": 0.2,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D02",
+    "Stufe1_D03",
+    "Stufe1_D04",
+    "Stufe2_C09",
+    "Stufe2_C10",
+    "Stufe3_C18"
+   ]
+  },
+  {
+   "fold": 3,
+   "threshold": 0.2,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D08",
+    "Stufe1_D10",
+    "Stufe2_C05",
+    "Stufe2_C06",
+    "Stufe2_C11",
+    "Stufe2_C12"
+   ]
+  }
+ ],
+ "cv_far": [
+  {
+   "call_id": "Stufe1_D01-K1",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 7.35
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.02,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D01-K2",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 23.03
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D02-K1",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:37-00:53 trade: Jetzt 8000 Franken, meine Schwester arbeitet dort in der Finanzabteilung, sie hat mir gestern gesagt, Quantalszahlen sind viel besser als erwartet, diese sind wohl nicht publiziert, die Medienmeldung kommt erst am Freitag.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung arbeitet und ihr geheim Informationen über die Quartalszahlen gegeben hat. (Regel: trade.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 5.55
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.03,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D02-K2",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.9701,
+   "uncertainty": 0.0373,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:05-01:09 trade: Und auch alles, sie hat mir sogar ein Foto von der Iguessicht gezeigt.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.93) - Die Kunde erwähnt ein Foto der Iguessicht und dass sie die Sensorkunde für sich selbst kaufen will. (Regel: trade.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 7.52
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D03-K1",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 14.46
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.15,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D03-K2",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 3.65
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D04-K1",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:46-03:30 trade: Ich helle kurz an, diese Unterlagen haben Sie von Ihrer Kollegin persönlich erhalten, es geht nicht um einen Artikel, den ich selber abrufen kann. Nein, es gibt noch keine Artikel, sie hat mir es auf ihrem Laptop gesagt, ich habe keinen App",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie die Informationen von ihrer Kollegin persönlich erhalten hat, die unter ihnen bleiben soll. (Regel: trade.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 6.89
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D04-K2",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 1.0,
+   "uncertainty": 0.0,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:27-02:45 trade: Sie hat am Montag von ihrer Übernahme erzählt. Ein grösserer Konzerm will viermal kaufen. Sie arbeitet in der Finanzabteilung und hat mir nur Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich. Das Bekanntgab ist er",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin in der Finanzabteilung erhalten hat, die noch nicht öffentlich gemacht wurden. (Regel: trade.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 10.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D05-K1",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.9184,
+   "uncertainty": 0.102,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:17-01:28 access: Warte, ich sage Ihnen die Tarnkarte, 7, 3, 1, 9, 4, 2, es steht immer noch gültig. Können Sie mir sagen, ob das die richtige Reihenfolge ist?",
+   "reason": "facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde gibt die Tarnkarte mit den Ziffern 7, 3, 1, 9, 4, 2 laut aus, während der Berater ihn daran hindert, diesen Wert zu prüfen. (Regel: access.alarm_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 33.69
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D05-K2",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0794,
+   "uncertainty": 0.0992,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.08 ('Zugangsinformation preisgegeben') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 12.12
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D06-K1",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 13.14
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D06-K2",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 10.96
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D08-K1",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 6.37
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D08-K2",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 6.79
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D09-K1",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.8719,
+   "uncertainty": 0.1602,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:37-02:52 documentation: Dann bitte nicht protokollieren, dass ich die 20 000 zurückzahlen muss. Nehmen die Zarlehe nicht in die Notiz für die Kreditstelle. Ich will, dass ich nur Eigenmittel sehe und die Vereinbarung meiner Tante gar nicht erfahre.",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.68) - Der Kunde möchte, dass die Zinsleistung seiner Tante nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 12.27
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D09-K2",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.9907,
+   "uncertainty": 0.0116,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:43-01:00 documentation: Es sind 20 000 Franken meiner Tante. Ich muss jetzt zurückzahlen, und wir haben jetzt einen Unterschritt nicht vereinbart. Verwescht sind meine eigenen Ersparnisse. Ich kenne den Unterschied, aber ich habe Angst, dass es darum länger dauert",
+   "reason": "facts: Fakt: Verborgene Tatsache ist relevant = ja (0.98) - Der Kunde möchte die Existenz eines Darlehens seiner Tante verschweigen, um eine vollständigere Eigenmittelangabe zu erhalten. (Regel: documentation.alarm_1)",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 19.41
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D10-K1",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.8218,
+   "uncertainty": 0.2228,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:32-01:58 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe stellt die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separat erfasse? Für diese Abs",
+   "reason": "facts: Fakt: Zweck ist, Kontrolle oder Freigabe zu umgehen = ja (1.00) - Der Kunde möchte die Zahlung aufteilen, um die Freigabe zu umgehen und die gesamte Rechnung nicht durchzuführen. (Regel: splitting.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 4.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe1_D10-K2",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.8996,
+   "uncertainty": 0.1256,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:33-01:50 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe-Stell die ganze Rechnung überhaupt sieht. Können Sie mir ja zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "facts: Fakt: Aufteilung in Teilbeträge verlangt = ja (1.00) - Der Kunde möchte die 12.000 Franken aufteilen in 6.000 und 6.000. (Regel: splitting.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 15.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C01-K3",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 8.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C01-K4",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Auskunft an Dritte') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 31.02
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C02-K3",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 7.36
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C02-K4",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 28.84
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C05-K3",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0003,
+   "uncertainty": 0.0004,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 8.15
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.38,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C05-K4",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0013,
+   "uncertainty": 0.0016,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 23,
+   "check_seconds": {
+    "facts": 18.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.29,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C06-K3",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9386,
+   "uncertainty": 0.0767,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:44-00:57 trade: Es geht um die CRM-Systeme, ich habe die Janet Produz aus meiner Arbeit, aber die Aktien habe ich bis jetzt nie gehabt, ich habe letzte Woche einen Bericht über den neuen GoSauftrag gesehen.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.85) - Die Kunde erwähnt, dass sie Informationen über den neuen GoSauftrag von Claudia, die das Projekt leitet, erhalten hat. (Regel: trade.alarm_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 9.56
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.13,
+    "checks": 0.04
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C06-K4",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0437,
+   "uncertainty": 0.1848,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.04 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 17.69
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.02,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C07-K3",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:28-03:50 trade: Ja, ich habe mich jetzt entschieden, wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albis Optik kaufen, können Sie den einmaligen Auftrag für mich entgegnen. Ich bestätige jetzt keine Ausführung, ich nehme den Kaufw",
+   "reason": "facts: Fakt: Eigener Handelswunsch geäussert = ja (1.00) - Die Kunde gibt ihren konkreten Kaufwunsch für 5000 Franken Aktien von der Albis Optik ausdrücklich. (Regel: trade.review_1)",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 7.75
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C07-K4",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.9674,
+   "uncertainty": 0.0407,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:36-00:54 trade: Meine Cousine ist im Projektium der Albisoptik, sie hat mir gestern den neuen Absatzbericht persönlich gezeigt, der gerade erst Monat Mädchen, bis dann darfst du das Team ihm nicht weitergeben, es ist deutlich mehr verkauft worden als erwar",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.93) - Die Kunde erwähnt, dass ihre Cousine ihr den neuen Absatzbericht persönlich gezeigt hat, der noch nicht veröffentlicht ist. (Regel: trade.alarm_1)",
+   "llm_calls": 24,
+   "check_seconds": {
+    "facts": 15.09
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.21,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C08-K3",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 3,
+   "check_seconds": {
+    "facts": 8.41
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.31,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C08-K4",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 24,
+   "check_seconds": {
+    "facts": 22.4
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.32,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C09-K3",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 0,
+   "check_seconds": {
+    "facts": 0.01
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C09-K4",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 25.86
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C10-K3",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 12.3
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C10-K4",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 18.33
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C11-K3",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:52-04:01 disclosure: Für den Vorgang halte ich fest, was am Telefon besprochen wurde. Ich bestätige damit keine Zahlung und ändere keine Berechtigung.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Mitarbeiterin gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 4.56
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C11-K4",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:34-03:44 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute am Morgen.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin weiter, die nicht die Eigentümerin des Kontos ist. (Regel: disclosure.review_1)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 16.02
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C12-K3",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.8944,
+   "uncertainty": 0.132,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:51-01:03 disclosure: Sie haben aber kein Auskundsrecht hinterlegt und die Abfährung ergeben, dass sie im dem Vorgang keine Berechtigung zum Kontostand haben. Die familiäre Beziehung allein lehnt da nicht.",
+   "reason": "facts: Fakt: Keine Vollmacht/Berechtigung festgestellt = ja (0.74) - Der Kunde wird informiert, dass er keine Berechtigung zum Kontostand seiner Mutter hat. (Regel: disclosure.alarm_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 10.22
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.2,
+    "diarize": 0.15,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C12-K4",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:32-03:41 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand ihrer Mutter heute am Morgen.",
+   "reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin preis. (Regel: disclosure.review_1)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 16.19
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.1,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C13-K3",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "08:21-08:46 documentation: Gut, dann lade ich zuerst den neuen Kaufentwurf und den richtig angeschriebenen Beleg auf. Die alte Version lasse ich separat, damit ich sie nicht wieder verwechsel. Dann beim Aufladen bitte ich die aktuelle Dossier-Lieferenz an. In der Rüc",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass eine bestimmte Information im Satz aus dem Dossier herausgenommen wird. (Regel: documentation.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 10.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.09,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C13-K4",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.9735,
+   "uncertainty": 0.0331,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:57-08:17 documentation: Dann lernt man ja den violetten Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt. Ich nehme Ihren Wunsch auf, zusammen mit denen, was Sie am Anfang über den Satz ges",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.94) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 17.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.05,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C14-K3",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:55-08:05 documentation: Dann lehnt ja der Violett, mache ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt genau dieses Satzes nicht zu sehen bekommt. Ich",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 12.8
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.12,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe2_C14-K4",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.8496,
+   "uncertainty": 0.188,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:58-08:08 documentation: Dann lernt mir ja der Violett, mache ich ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt. Ich",
+   "reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.84) - Der Kunde möchte, dass der Inhalt eines bestimmten Satzes vom Finanzierungsabschnitt nicht an die Finanzierungsstelle weitergegeben wird. (Regel: documentation.alarm_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 12.06
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.17,
+    "checks": 0.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe3_C17-K3",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:23-01:31 access: Ich weiss nicht, ob der Wert oben oder und dazu gehört. Der Text ist so klein, dass ich das Bild gerade vergrossern muss.",
+   "reason": "facts: Fakt: Code/Wert am Telefon vorgelesen = ja (0.99) - Der Kunde gibt die Ziffern des Werts vor, obwohl seine Gültigkeit unsicher ist. (Regel: access.review_1)",
+   "llm_calls": 2,
+   "check_seconds": {
+    "facts": 10.9
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe3_C17-K4",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:49 access: Im Moment schaue ich nur ein Bild an, der oberen Rand ist abgeschnitten und ich kann nicht lesen, ob es noch gültig war, ich habe mich schon etwas neu gestartet, aber ich weiss nicht, ob ich Ihnen zeigen kann, dass Sie benötigen.",
+   "reason": "facts: Fakt: Im Gespräch offen, ob der Wert gültig ist = ja (1.00) - Der Kunde sagt, dass er nicht sagen kann, ob der Wert oben oder unten dazugehört oder ob der Text jetzt oder damals gültig ist. (Regel: access.review_1)",
+   "llm_calls": 22,
+   "check_seconds": {
+    "facts": 11.22
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.23,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe3_C18-K3",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 2.55
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe3_C18-K4",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.5,
+   "uncertainty": 0.35,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:38-03:58 disclosure: Wenn ich nicht, können sie mir ja bis dahin wenigstens sagen, ob auf ihrem Konto genug für die Wohnungskächtung liegt, nein, das kann ich ihnen erst sagen, wenn die Berechtigung für diese Auskunft gut ist, einen Betrag oder eine Bestätigung",
+   "reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (1.00) - Die Kunde fragt nach dem Kontostand ihrer Schwester, was eine Auskunft an Dritte ist. (Regel: disclosure.review_2)",
+   "llm_calls": 21,
+   "check_seconds": {
+    "facts": 3.8
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe3_C20-K3",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 1,
+   "check_seconds": {
+    "facts": 0.97
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  },
+  {
+   "call_id": "Stufe3_C20-K4",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.05 (Schwelle 0.20 minus Band 0.15).",
+   "llm_calls": 20,
+   "check_seconds": {
+    "facts": 0.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.2
+  }
+ ],
+ "cv_far_folds": [
+  {
+   "fold": 0,
+   "threshold": 0.2,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D01",
+    "Stufe1_D06",
+    "Stufe1_D09",
+    "Stufe2_C13",
+    "Stufe2_C14",
+    "Stufe3_C20"
+   ],
+   "cap_reachable": true,
+   "fallback": false,
+   "train_far": 0.125
+  },
+  {
+   "fold": 1,
+   "threshold": 1.0,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D05",
+    "Stufe2_C01",
+    "Stufe2_C02",
+    "Stufe2_C07",
+    "Stufe2_C08",
+    "Stufe3_C17"
+   ],
+   "cap_reachable": true,
+   "fallback": false,
+   "train_far": 0.1875
+  },
+  {
+   "fold": 2,
+   "threshold": 1.0,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D02",
+    "Stufe1_D03",
+    "Stufe1_D04",
+    "Stufe2_C09",
+    "Stufe2_C10",
+    "Stufe3_C18"
+   ],
+   "cap_reachable": true,
+   "fallback": false,
+   "train_far": 0.1667
+  },
+  {
+   "fold": 3,
+   "threshold": 0.2,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D08",
+    "Stufe1_D10",
+    "Stufe2_C05",
+    "Stufe2_C06",
+    "Stufe2_C11",
+    "Stufe2_C12"
+   ],
+   "cap_reachable": true,
+   "fallback": false,
+   "train_far": 0.125
+  }
+ ],
+ "sweep": [
+  {
+   "threshold": 0.2,
+   "flag_f1": 0.8,
+   "flag_precision": 0.8333,
+   "flag_recall": 0.7692,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2308,
+   "alarm_f1": 0.7442,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.25,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7442,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.3,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7442,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.35,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7442,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.4,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7442,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.45,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7442,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.5,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7442,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.55,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7647,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.6,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7647,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.65,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7647,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.7,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7647,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.75,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7647,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.8,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.7647,
+   "accuracy": 0.7083
+  },
+  {
+   "threshold": 0.85,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.75,
+   "accuracy": 0.6875
+  },
+  {
+   "threshold": 0.9,
+   "flag_f1": 0.7755,
+   "flag_precision": 0.8261,
+   "flag_recall": 0.7308,
+   "false_alarm_rate": 0.1818,
+   "miss_rate": 0.2692,
+   "alarm_f1": 0.6207,
+   "accuracy": 0.625
+  }
+ ],
+ "suggestion": {
+  "threshold": 0.2,
+  "flag_f1": 0.8,
+  "flag_recall": 0.7692,
+  "flag_precision": 0.8333,
+  "false_alarm_rate": 0.1818,
+  "miss_rate": 0.2308,
+  "tied": [
+   0.2
+  ],
+  "reason": "Schwelle 0.20 maximiert F1 der Markierungen (80%) bei Recall 77% und Fehlalarmquote 18%."
+ },
+ "far_floor": {
+  "threshold": 1.0,
+  "false_alarm_rate": 0.1364,
+  "flag_recall": 0.6923,
+  "fp": 3,
+  "tn": 19,
+  "flagged": 21,
+  "n": 48,
+  "cap_reachable": true
+ },
+ "backfill": {
+  "cv_far": {
+   "git": {
+    "sha": "5d9264d90c",
+    "dirty": true,
+    "branch": "main"
+   },
+   "config_hash": "afa2f27c704b490a",
+   "run_config_hash": "afa2f27c704b490a",
+   "config_matches_run": true,
+   "created": "2026-10-10T02:42:01+0200"
+  },
+  "far_floor": {
+   "git": {
+    "sha": "5d9264d90c",
+    "dirty": true,
+    "branch": "main"
+   },
+   "config_hash": "afa2f27c704b490a",
+   "run_config_hash": "afa2f27c704b490a",
+   "config_matches_run": true,
+   "created": "2026-10-10T02:42:01+0200"
+  }
+ }
+}

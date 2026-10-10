@@ -1,0 +1,124 @@
+# Does Kev-4B and/or a set of GENERAL questions (written without test data) generalise better than our tuned
+# facts? Runbook with exact GPU-host commands and stages: docs/KEV.md. Dev split only (holdout untouched).
+#
+# Background: our fact questions (config/policy_table.yaml) were tuned while reading dev transcripts; blind
+# paraphrases drop dev AUC 0.87 -> 0.72 (research/findings/RQ10.md, R3/R4 in research/DECISIONS.md). The teammate's
+# prototype (sprintd_zurich @ 47c4ffd) asks Kev-4B 15 general law-based questions (config/general_questions.yaml)
+# and alerts on max p(yes) >= 0.7. Kev-4B (Apache-2.0, LoRA on Qwen3.5-4B-Base) was trained on ENGLISH data only;
+# our transcripts are Standard German, hence the English-view variants. All variants read OUR large-v3 transcripts
+# + cached roles (except the ORACLE one).
+#
+# Grid: backend {Qwen2.5-7B-AWQ logprobs, Kev-4B} x questions {tuned facts, general} x text {de, en_from_de}
+#   kev_general         Kev   general  de    the teammate's rule, one Kev request per call (+ passages by window)
+#   kev_general_en      Kev   general  en    same on the English translation of the de view (Kev is English-only)
+#   kev_facts           Kev   facts    de    Kev as the facts probability backend: p(yes) / 1 - p(yes), no evidence
+#   qwen_general        Qwen  general  de    blind-style control: the facts single-token prompt, max p(yes)
+#   champion            Qwen  facts    de    config/recommended.yaml as is (reference, compare_to)
+#   qwen_general_en     Qwen  general  en    English control; ALSO computes the en_from_de translations kev_general_en reads
+#   kev_general_oracle  Kev   general  ORACLE dialect reference scripts (like the teammate's own eval; ceiling only)
+#   *_alone             re-fusions with only the decisive check (pure rule, no keyword/pattern cues): compare these
+#                       for "which question set / backend", the full ones for "what would we ship"
+#   wording probes      same meaning, other words (R3/R4): *_facts_blind (config/policy_table_blind.yaml, written
+#                       from criteria.yaml only), *_facts_para / *_para2 (blind paraphrases of the tuned table),
+#                       *_general_para (blind paraphrase of the general questions). The tuned -> blind/para gap per
+#                       backend is the generalisation proxy this experiment is about.
+#
+# Stages (12 GB: Kev ~8 GB and vLLM never run together; docs/KEV.md has the commands):
+#   1 vLLM up:  qwen_general_en  (translations for the en view; ~15 s/call for 48 calls)
+#   2 Kev up:   kev_general,kev_general_en,kev_facts,kev_general_oracle, then the other kev_* variants
+#   3 vLLM up:  qwen_general,champion,facts_only, then the other qwen_* variants
+# Cost (estimates, 4070): Kev ~0.1-0.5 s per request: kev_general 1 + ~8 window requests per call, kev_facts ~18
+#   (one per fact). Qwen: 15 single-token probes per call (prefix-cached) ~3-5 min per general variant;
+#   champion / qwen_facts_para* are cache hits if experiments/champion.yaml ran.
+# Read: CV table + AUC with CIs. n = 48 dev calls (24 dialogues, twin groups): differences of 1-2 calls are noise.
+#   Thresholds (fixed-threshold row only; CV fits its own per fold and is primary): general-question variants use
+#   the teammate's 0.7, facts variants the champion's 0.55 (the policy-table score scale).
+name: kev_vs_facts
+description: Kev-4B and general (untuned) questions vs our tuned facts, de/en views, wording-robustness probes
+rq: [RQ10]
+base: recommended
+split: dev
+compare_to: champion
+variants:
+  # ---- the four first-look variants ------------------------------------------------------------------------------
+  - {name: kev_general, profile: kev, description: "Kev-4B, 15 general questions in one request on the de view, max p(yes), passages by window; + kw/pat"}
+  - {name: kev_general_en, profile: kev-views, set: [checks.general.view=en_from_de], description: "kev_general on the English translation (Kev is English-only); translations from qwen_general_en's cache"}
+  - name: kev_facts
+    profile: kev
+    description: "our facts check (tuned questions + policy table) with Kev as the probability backend (noul); + kw/pat"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0}]
+    set: [fusion.threshold=0.55]
+  - name: qwen_general
+    description: "Qwen2.5-7B asked the 15 general questions (facts prompt, logprob p(yes)); call = max p(yes); + kw/pat"
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: default, questions: config/general_questions.yaml, parallel: 5, weight: 1.0}]
+    set: [fusion.threshold=0.7]
+  # ---- references ------------------------------------------------------------------------------------------------
+  - {name: champion, description: "config/recommended.yaml as is (Qwen2.5-7B facts, tuned questions + kw/pat)"}
+  - {name: facts_only, refuse_from: champion, checks: [facts], description: "champion without keyword/pattern cues"}
+  - name: qwen_general_en
+    profile: recommended-views
+    description: "qwen_general on the English view (control for kev_general_en; computes the en_from_de translations)"
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: default, questions: config/general_questions.yaml, parallel: 5, weight: 1.0, view: en_from_de}]
+    set: [fusion.threshold=0.7]
+  - {name: kev_general_oracle, profile: kev-oracle, oracle: true, description: "ORACLE: Kev general questions on the dialect reference scripts (the teammate's eval setting)"}
+  # ---- pure rules (re-fusions, free) -----------------------------------------------------------------------------
+  - {name: kev_general_alone, refuse_from: kev_general, checks: [general], description: "the teammate's rule exactly: max p(yes) of Kev"}
+  - {name: kev_general_en_alone, refuse_from: kev_general_en, checks: [general]}
+  - {name: kev_facts_alone, refuse_from: kev_facts, checks: [facts]}
+  - {name: qwen_general_alone, refuse_from: qwen_general, checks: [general], description: "max p(yes) alone (their rule on Qwen)"}
+  - {name: qwen_general_en_alone, refuse_from: qwen_general_en, checks: [general]}
+  - {name: kev_general_oracle_alone, refuse_from: kev_general_oracle, oracle: true, checks: [general]}
+  # ---- Kev facts backend variants --------------------------------------------------------------------------------
+  - name: kev_facts_choice
+    profile: kev
+    description: "kev_facts with a Kev choice question over yes / no / unknown (unclear facts -> review rules stay live)"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev_choice, evidence: false, weight: 1.0}]
+    set: [fusion.threshold=0.55]
+  - name: kev_facts_band
+    profile: kev
+    description: "kev_facts, fact value from p(yes) alone: yes >= 0.6, no < 0.2, else unclear (band from champion ens3_band, not tuned on Kev); Kev probes cached"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0, unclear_band: [0.2, 0.6]}]
+    set: [fusion.threshold=0.55]
+  # ---- wording robustness: Kev ------------------------------------------------------------------------------------
+  - name: kev_facts_blind
+    profile: kev
+    description: "R4 on Kev: blind policy table (written from criteria.yaml + README only, no transcripts)"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0, policy_table: config/policy_table_blind.yaml}]
+    set: [fusion.threshold=0.55]
+  - name: kev_facts_para
+    profile: kev
+    description: "R3 on Kev: tuned table reworded blind (Kev's wording gap vs Qwen's champion -> qwen_facts_para)"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0, policy_table: config/policy_table_para.yaml}]
+    set: [fusion.threshold=0.55]
+  - name: kev_facts_para2
+    profile: kev
+    description: "R6 on Kev: second independent blind paraphrase of the tuned table"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0, policy_table: config/policy_table_para2.yaml}]
+    set: [fusion.threshold=0.55]
+  - {name: kev_general_para, profile: kev, set: [checks.general.questions=config/general_questions_para.yaml], description: "kev_general with the general questions reworded blind"}
+  - {name: kev_general_para_alone, refuse_from: kev_general_para, checks: [general]}
+  # ---- wording robustness: Qwen (the same probes on the champion's backend) ---------------------------------------
+  - {name: qwen_facts_blind, set: [checks.facts.policy_table=config/policy_table_blind.yaml, checks.facts.parallel=1], description: "R4 on large-v3: blind policy table"}
+  - {name: qwen_facts_para, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.parallel=1], description: "= champion.yaml para (R3); cache hit if champion.yaml ran"}
+  - {name: qwen_facts_para2, set: [checks.facts.policy_table=config/policy_table_para2.yaml, checks.facts.parallel=1], description: "= champion.yaml para2"}
+  - name: qwen_general_para
+    description: "qwen_general with the general questions reworded blind (config/general_questions_para.yaml)"
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: default, questions: config/general_questions_para.yaml, parallel: 5, weight: 1.0}]
+    set: [fusion.threshold=0.7]
+  - {name: qwen_general_para_alone, refuse_from: qwen_general_para, checks: [general]}
+  # ---- team-decision matrix: policy table v3 on Kev (champion's table_v3 lives in experiments/champion.yaml) ----
+  - name: kev_facts_v3
+    profile: kev
+    description: "Kev facts with policy table v3 (criteria-derived open-fact review rules)"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0, policy_table: config/policy_table_v3.yaml}]
+    set: [fusion.threshold=0.55]

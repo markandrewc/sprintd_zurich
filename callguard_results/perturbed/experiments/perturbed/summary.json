@@ -1,0 +1,4231 @@
+{
+ "experiment": "perturbed",
+ "description": "champion on re-recorded dev audio (speed 0.96, -3 dB)",
+ "rq": [
+  "RQ8"
+ ],
+ "base": "recommended-perturbed",
+ "split": "dev",
+ "compare_to": "perturbed",
+ "n_boot": 2000,
+ "seed": 13,
+ "created": "2026-10-10T05:59:03+0200",
+ "git": {
+  "sha": "480479c79d",
+  "dirty": true,
+  "branch": "main"
+ },
+ "spec": "experiments/perturbed.yaml",
+ "baselines": {
+  "flag_all": {
+   "flag_f1": 0.7027,
+   "flag_precision": 0.5417,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5882,
+   "review_recall": 0.0,
+   "accuracy": 0.4167,
+   "flag_balanced_accuracy": 0.5
+  },
+  "flag_none": {
+   "flag_f1": 0.0,
+   "flag_precision": null,
+   "flag_recall": 0.0,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 1.0,
+   "alarm_f1": 0.0,
+   "review_recall": 0.0,
+   "accuracy": 0.4583,
+   "flag_balanced_accuracy": 0.5
+  },
+  "_n": {
+   "calls": 48,
+   "prevalence_flag": 0.5417
+  }
+ },
+ "far_cap": 0.2,
+ "variants": {
+  "perturbed": {
+   "variant": "perturbed",
+   "oracle": false,
+   "meta": {
+    "variant": "perturbed",
+    "description": "",
+    "experiment": "perturbed",
+    "split": "dev",
+    "profile": "recommended-perturbed",
+    "set": [],
+    "checks": [
+     "keywords",
+     "patterns",
+     "facts"
+    ],
+    "refuse_from": null,
+    "oracle": false,
+    "config_name": "recommended-perturbed",
+    "use_tuning": false,
+    "tuning": null,
+    "config_hash": "22cb20ed2150451b",
+    "threshold": 0.55,
+    "fusion": "weighted",
+    "asr": "faster_whisper",
+    "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+    "llm": {
+     "default": {
+      "type": "openai_compat",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "model": "callguard-llm",
+      "cache_tag": null
+     }
+    },
+    "git": {
+     "sha": "0320090fc5",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T05:49:25+0200",
+    "wall_seconds": 275.12,
+    "n_calls": 48,
+    "calls": [
+     "Stufe1_D01-K1",
+     "Stufe1_D01-K2",
+     "Stufe1_D02-K1",
+     "Stufe1_D02-K2",
+     "Stufe1_D03-K1",
+     "Stufe1_D03-K2",
+     "Stufe1_D04-K1",
+     "Stufe1_D04-K2",
+     "Stufe1_D05-K1",
+     "Stufe1_D05-K2",
+     "Stufe1_D06-K1",
+     "Stufe1_D06-K2",
+     "Stufe1_D08-K1",
+     "Stufe1_D08-K2",
+     "Stufe1_D09-K1",
+     "Stufe1_D09-K2",
+     "Stufe1_D10-K1",
+     "Stufe1_D10-K2",
+     "Stufe2_C01-K3",
+     "Stufe2_C01-K4",
+     "Stufe2_C02-K3",
+     "Stufe2_C02-K4",
+     "Stufe2_C05-K3",
+     "Stufe2_C05-K4",
+     "Stufe2_C06-K3",
+     "Stufe2_C06-K4",
+     "Stufe2_C07-K3",
+     "Stufe2_C07-K4",
+     "Stufe2_C08-K3",
+     "Stufe2_C08-K4",
+     "Stufe2_C09-K3",
+     "Stufe2_C09-K4",
+     "Stufe2_C10-K3",
+     "Stufe2_C10-K4",
+     "Stufe2_C11-K3",
+     "Stufe2_C11-K4",
+     "Stufe2_C12-K3",
+     "Stufe2_C12-K4",
+     "Stufe2_C13-K3",
+     "Stufe2_C13-K4",
+     "Stufe2_C14-K3",
+     "Stufe2_C14-K4",
+     "Stufe3_C17-K3",
+     "Stufe3_C17-K4",
+     "Stufe3_C18-K3",
+     "Stufe3_C18-K4",
+     "Stufe3_C20-K3",
+     "Stufe3_C20-K4"
+    ],
+    "check_weights": {
+     "keywords": 0.15,
+     "patterns": 0.1,
+     "facts": 1.0
+    },
+    "llm_resolved": {
+     "default": {
+      "type": "openai_compat",
+      "model": "callguard-llm",
+      "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "cache_tag": null
+     }
+    }
+   },
+   "n_calls": 48,
+   "n_dialogues": 24,
+   "fixed": {
+    "n": 48,
+    "flag_precision": 0.8696,
+    "flag_recall": 0.7692,
+    "flag_f1": 0.8163,
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.2308,
+    "alarm_f1": 0.75,
+    "review_recall": 0.5,
+    "review_escalation": 0.5,
+    "accuracy": 0.7083,
+    "tp": 20,
+    "fp": 3,
+    "fn": 6,
+    "tn": 19,
+    "flag_balanced_accuracy": 0.8164,
+    "ci": {
+     "flag_f1": {
+      "value": 0.8163,
+      "lo": 0.68,
+      "hi": 0.9311,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.8696,
+      "lo": 0.7308,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.7692,
+      "lo": 0.5714,
+      "hi": 0.9615,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.2308,
+      "lo": 0.0385,
+      "hi": 0.4286,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.75,
+      "lo": 0.4762,
+      "hi": 0.9268,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.5,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.7083,
+      "lo": 0.5227,
+      "hi": 0.8864,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.8164,
+      "lo": 0.6988,
+      "hi": 0.9303,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.9444,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.9474
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": 0.7,
+      "flag_recall": 0.7,
+      "flag_f1": 0.7,
+      "false_alarm_rate": 0.2143,
+      "miss_rate": 0.3,
+      "alarm_f1": 0.4615
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.5,
+      "flag_precision": 1.0,
+      "flag_recall": 0.5,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": null,
+      "miss_rate": 0.5,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.625,
+      "flag_precision": 0.8182,
+      "flag_recall": 0.6923,
+      "flag_f1": 0.75,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.3077,
+      "alarm_f1": 0.6667
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.7917,
+      "flag_precision": 0.9167,
+      "flag_recall": 0.8462,
+      "flag_f1": 0.88,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.1538,
+      "alarm_f1": 0.8235
+     }
+    }
+   },
+   "cv": {
+    "n": 48,
+    "flag_precision": 0.8696,
+    "flag_recall": 0.7692,
+    "flag_f1": 0.8163,
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.2308,
+    "alarm_f1": 0.7619,
+    "review_recall": 0.0,
+    "review_escalation": 0.5,
+    "accuracy": 0.7292,
+    "tp": 20,
+    "fp": 3,
+    "fn": 6,
+    "tn": 19,
+    "flag_balanced_accuracy": 0.8164,
+    "ci": {
+     "flag_f1": {
+      "value": 0.8163,
+      "lo": 0.68,
+      "hi": 0.9311,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.8696,
+      "lo": 0.7308,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.7692,
+      "lo": 0.5714,
+      "hi": 0.9615,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.2308,
+      "lo": 0.0385,
+      "hi": 0.4286,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.7619,
+      "lo": 0.5788,
+      "hi": 0.8966,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.7292,
+      "lo": 0.575,
+      "hi": 0.8696,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.8164,
+      "lo": 0.6988,
+      "hi": 0.9303,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.9444,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.9474
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.75,
+      "flag_precision": 0.7,
+      "flag_recall": 0.7,
+      "flag_f1": 0.7,
+      "false_alarm_rate": 0.2143,
+      "miss_rate": 0.3,
+      "alarm_f1": 0.7
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": 1.0,
+      "flag_recall": 0.5,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": null,
+      "miss_rate": 0.5,
+      "alarm_f1": 0.0
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.6667,
+      "flag_precision": 0.8182,
+      "flag_recall": 0.6923,
+      "flag_f1": 0.75,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.3077,
+      "alarm_f1": 0.7
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.7917,
+      "flag_precision": 0.9167,
+      "flag_recall": 0.8462,
+      "flag_f1": 0.88,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.1538,
+      "alarm_f1": 0.8182
+     }
+    }
+   },
+   "cv_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.35,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "suggestion": {
+    "threshold": 0.25,
+    "flag_f1": 0.84,
+    "flag_recall": 0.8077,
+    "flag_precision": 0.875,
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1923,
+    "tied": [
+     0.2,
+     0.25,
+     0.3
+    ],
+    "reason": "Schwelle 0.25 maximiert F1 der Markierungen (84%) bei Recall 81% und Fehlalarmquote 14%."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.84,
+     "flag_precision": 0.875,
+     "flag_recall": 0.8077,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1923,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.84,
+     "flag_precision": 0.875,
+     "flag_recall": 0.8077,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1923,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.84,
+     "flag_precision": 0.875,
+     "flag_recall": 0.8077,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1923,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.75,
+     "accuracy": 0.7083
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.75,
+     "accuracy": 0.7083
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.75,
+     "accuracy": 0.7083
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.75,
+     "accuracy": 0.7083
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.75,
+     "accuracy": 0.7083
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.75,
+     "accuracy": 0.7083
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.75,
+     "accuracy": 0.7083
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.8163,
+     "flag_precision": 0.8696,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.6207,
+     "accuracy": 0.6458
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 33.364,
+    "stage_s_per_call": {
+     "asr": 14.001,
+     "diarize": 14.292,
+     "checks": 5.068
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.019,
+     "patterns": 0.009,
+     "facts": 5.036
+    },
+    "check_compute_s_total_per_call": 5.064,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 21.542
+   },
+   "commit": "0320090fc5",
+   "dirty": true,
+   "cv_far": {
+    "n": 48,
+    "flag_precision": 0.8696,
+    "flag_recall": 0.7692,
+    "flag_f1": 0.8163,
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.2308,
+    "alarm_f1": 0.7368,
+    "review_recall": 0.3333,
+    "review_escalation": 0.5,
+    "accuracy": 0.7292,
+    "tp": 20,
+    "fp": 3,
+    "fn": 6,
+    "tn": 19,
+    "flag_balanced_accuracy": 0.8164,
+    "ci": {
+     "flag_f1": {
+      "value": 0.8163,
+      "lo": 0.68,
+      "hi": 0.9311,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.8696,
+      "lo": 0.7308,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.7692,
+      "lo": 0.5714,
+      "hi": 0.9615,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.2308,
+      "lo": 0.0385,
+      "hi": 0.4286,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.7368,
+      "lo": 0.5,
+      "hi": 0.898,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.7292,
+      "lo": 0.5769,
+      "hi": 0.88,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.8164,
+      "lo": 0.6988,
+      "hi": 0.9303,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.8889,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.8889
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.7083,
+      "flag_precision": 0.7,
+      "flag_recall": 0.7,
+      "flag_f1": 0.7,
+      "false_alarm_rate": 0.2143,
+      "miss_rate": 0.3,
+      "alarm_f1": 0.6316
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.3333,
+      "flag_precision": 1.0,
+      "flag_recall": 0.5,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": null,
+      "miss_rate": 0.5,
+      "alarm_f1": 0.0
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.7083,
+      "flag_precision": 0.8182,
+      "flag_recall": 0.6923,
+      "flag_f1": 0.75,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.3077,
+      "alarm_f1": 0.7368
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.75,
+      "flag_precision": 0.9167,
+      "flag_recall": 0.8462,
+      "flag_f1": 0.88,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.1538,
+      "alarm_f1": 0.7368
+     }
+    }
+   },
+   "cv_far_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.3,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.125
+    },
+    {
+     "fold": 1,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.1875
+    },
+    {
+     "fold": 2,
+     "threshold": 0.3,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.1667
+    },
+    {
+     "fold": 3,
+     "threshold": 0.3,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.0625
+    }
+   ],
+   "cap": {
+    "far_cap": 0.2,
+    "compliant": true,
+    "floor": {
+     "threshold": 1.0,
+     "false_alarm_rate": 0.1364,
+     "flag_recall": 0.7692,
+     "fp": 3,
+     "tn": 19,
+     "flagged": 23,
+     "n": 48,
+     "cap_reachable": true
+    },
+    "folds_reachable": 4,
+    "folds": 4,
+    "fallback_folds": []
+   },
+   "auc": {
+    "flag": {
+     "value": 0.8278,
+     "lo": 0.6732,
+     "hi": 0.9593,
+     "n_valid": 2000,
+     "n_pos": 26,
+     "n_neg": 22
+    },
+    "alarm": {
+     "value": 0.8911,
+     "lo": 0.7353,
+     "hi": 0.9926,
+     "n_valid": 2000,
+     "n_pos": 20,
+     "n_neg": 28
+    }
+   },
+   "degraded": false,
+   "warnings": []
+  },
+  "table_v3": {
+   "variant": "table_v3",
+   "oracle": false,
+   "meta": {
+    "variant": "table_v3",
+    "description": "table v3 (review facts) on re-recorded audio",
+    "experiment": "perturbed",
+    "split": "dev",
+    "profile": "recommended-perturbed",
+    "set": [
+     "checks.facts.policy_table=config/policy_table_v3.yaml"
+    ],
+    "checks": [
+     "keywords",
+     "patterns",
+     "facts"
+    ],
+    "refuse_from": null,
+    "oracle": false,
+    "config_name": "recommended-perturbed",
+    "use_tuning": false,
+    "tuning": null,
+    "config_hash": "2c198c9566bfc88f",
+    "threshold": 0.55,
+    "fusion": "weighted",
+    "asr": "faster_whisper",
+    "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+    "llm": {
+     "default": {
+      "type": "openai_compat",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "model": "callguard-llm",
+      "cache_tag": null
+     }
+    },
+    "git": {
+     "sha": "60e402c62e",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T05:51:25+0200",
+    "wall_seconds": 52.94,
+    "n_calls": 48,
+    "calls": [
+     "Stufe1_D01-K1",
+     "Stufe1_D01-K2",
+     "Stufe1_D02-K1",
+     "Stufe1_D02-K2",
+     "Stufe1_D03-K1",
+     "Stufe1_D03-K2",
+     "Stufe1_D04-K1",
+     "Stufe1_D04-K2",
+     "Stufe1_D05-K1",
+     "Stufe1_D05-K2",
+     "Stufe1_D06-K1",
+     "Stufe1_D06-K2",
+     "Stufe1_D08-K1",
+     "Stufe1_D08-K2",
+     "Stufe1_D09-K1",
+     "Stufe1_D09-K2",
+     "Stufe1_D10-K1",
+     "Stufe1_D10-K2",
+     "Stufe2_C01-K3",
+     "Stufe2_C01-K4",
+     "Stufe2_C02-K3",
+     "Stufe2_C02-K4",
+     "Stufe2_C05-K3",
+     "Stufe2_C05-K4",
+     "Stufe2_C06-K3",
+     "Stufe2_C06-K4",
+     "Stufe2_C07-K3",
+     "Stufe2_C07-K4",
+     "Stufe2_C08-K3",
+     "Stufe2_C08-K4",
+     "Stufe2_C09-K3",
+     "Stufe2_C09-K4",
+     "Stufe2_C10-K3",
+     "Stufe2_C10-K4",
+     "Stufe2_C11-K3",
+     "Stufe2_C11-K4",
+     "Stufe2_C12-K3",
+     "Stufe2_C12-K4",
+     "Stufe2_C13-K3",
+     "Stufe2_C13-K4",
+     "Stufe2_C14-K3",
+     "Stufe2_C14-K4",
+     "Stufe3_C17-K3",
+     "Stufe3_C17-K4",
+     "Stufe3_C18-K3",
+     "Stufe3_C18-K4",
+     "Stufe3_C20-K3",
+     "Stufe3_C20-K4"
+    ],
+    "check_weights": {
+     "keywords": 0.15,
+     "patterns": 0.1,
+     "facts": 1.0
+    },
+    "llm_resolved": {
+     "default": {
+      "type": "openai_compat",
+      "model": "callguard-llm",
+      "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "cache_tag": null
+     }
+    }
+   },
+   "n_calls": 48,
+   "n_dialogues": 24,
+   "fixed": {
+    "n": 48,
+    "flag_precision": 0.88,
+    "flag_recall": 0.8462,
+    "flag_f1": 0.8627,
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1538,
+    "alarm_f1": 0.75,
+    "review_recall": 0.8333,
+    "review_escalation": 0.8333,
+    "accuracy": 0.75,
+    "tp": 22,
+    "fp": 3,
+    "fn": 4,
+    "tn": 19,
+    "flag_balanced_accuracy": 0.8549,
+    "ci": {
+     "flag_f1": {
+      "value": 0.8627,
+      "lo": 0.75,
+      "hi": 0.9584,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.88,
+      "lo": 0.75,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.8462,
+      "lo": 0.6667,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.1538,
+      "lo": 0.0,
+      "hi": 0.3333,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.75,
+      "lo": 0.4762,
+      "hi": 0.9268,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.8333,
+      "lo": 0.5,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.75,
+      "lo": 0.58,
+      "hi": 0.9167,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.8549,
+      "lo": 0.7486,
+      "hi": 0.9545,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.9444,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.9474
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.5833,
+      "flag_precision": 0.7,
+      "flag_recall": 0.7,
+      "flag_f1": 0.7,
+      "false_alarm_rate": 0.2143,
+      "miss_rate": 0.3,
+      "alarm_f1": 0.4615
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.8333,
+      "flag_precision": 1.0,
+      "flag_recall": 0.8333,
+      "flag_f1": 0.9091,
+      "false_alarm_rate": null,
+      "miss_rate": 0.1667,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.6667,
+      "flag_precision": 0.8333,
+      "flag_recall": 0.7692,
+      "flag_f1": 0.8,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.2308,
+      "alarm_f1": 0.6667
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.8333,
+      "flag_precision": 0.9231,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.9231,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.8235
+     }
+    }
+   },
+   "cv": {
+    "n": 48,
+    "flag_precision": 0.88,
+    "flag_recall": 0.8462,
+    "flag_f1": 0.8627,
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1538,
+    "alarm_f1": 0.7273,
+    "review_recall": 0.0,
+    "review_escalation": 0.8333,
+    "accuracy": 0.7292,
+    "tp": 22,
+    "fp": 3,
+    "fn": 4,
+    "tn": 19,
+    "flag_balanced_accuracy": 0.8549,
+    "ci": {
+     "flag_f1": {
+      "value": 0.8627,
+      "lo": 0.75,
+      "hi": 0.9584,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.88,
+      "lo": 0.75,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.8462,
+      "lo": 0.6667,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.1538,
+      "lo": 0.0,
+      "hi": 0.3333,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.7273,
+      "lo": 0.5333,
+      "hi": 0.8696,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.7292,
+      "lo": 0.575,
+      "hi": 0.8696,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.8549,
+      "lo": 0.7486,
+      "hi": 0.9545,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.9444,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.9474
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.75,
+      "flag_precision": 0.7,
+      "flag_recall": 0.7,
+      "flag_f1": 0.7,
+      "false_alarm_rate": 0.2143,
+      "miss_rate": 0.3,
+      "alarm_f1": 0.7
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": 1.0,
+      "flag_recall": 0.8333,
+      "flag_f1": 0.9091,
+      "false_alarm_rate": null,
+      "miss_rate": 0.1667,
+      "alarm_f1": 0.0
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.6667,
+      "flag_precision": 0.8333,
+      "flag_recall": 0.7692,
+      "flag_f1": 0.8,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.2308,
+      "alarm_f1": 0.6667
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.7917,
+      "flag_precision": 0.9231,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.9231,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.7826
+     }
+    }
+   },
+   "cv_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.35,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 0.25,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "suggestion": {
+    "threshold": 0.25,
+    "flag_f1": 0.8846,
+    "flag_recall": 0.8846,
+    "flag_precision": 0.8846,
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1154,
+    "tied": [
+     0.2,
+     0.25,
+     0.3
+    ],
+    "reason": "Schwelle 0.25 maximiert F1 der Markierungen (88%) bei Recall 88% und Fehlalarmquote 14%."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.8846,
+     "flag_precision": 0.8846,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7273,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.8846,
+     "flag_precision": 0.8846,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7273,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.8846,
+     "flag_precision": 0.8846,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7273,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.7273,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.7273,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.7273,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.7273,
+     "accuracy": 0.7292
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.75,
+     "accuracy": 0.75
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.75,
+     "accuracy": 0.75
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.75,
+     "accuracy": 0.75
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.75,
+     "accuracy": 0.75
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.75,
+     "accuracy": 0.75
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.75,
+     "accuracy": 0.75
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.75,
+     "accuracy": 0.75
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.8627,
+     "flag_precision": 0.88,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.6207,
+     "accuracy": 0.6875
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 6.512,
+    "stage_s_per_call": {
+     "asr": 0.014,
+     "diarize": 0.015,
+     "checks": 6.481
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.019,
+     "patterns": 0.009,
+     "facts": 6.475
+    },
+    "check_compute_s_total_per_call": 6.503,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 9.917
+   },
+   "commit": "60e402c62e",
+   "dirty": true,
+   "cv_far": {
+    "n": 48,
+    "flag_precision": 0.88,
+    "flag_recall": 0.8462,
+    "flag_f1": 0.8627,
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1538,
+    "alarm_f1": 0.7,
+    "review_recall": 0.3333,
+    "review_escalation": 0.8333,
+    "accuracy": 0.7292,
+    "tp": 22,
+    "fp": 3,
+    "fn": 4,
+    "tn": 19,
+    "flag_balanced_accuracy": 0.8549,
+    "ci": {
+     "flag_f1": {
+      "value": 0.8627,
+      "lo": 0.75,
+      "hi": 0.9584,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.88,
+      "lo": 0.75,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.8462,
+      "lo": 0.6667,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.1538,
+      "lo": 0.0,
+      "hi": 0.3333,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.7,
+      "lo": 0.4615,
+      "hi": 0.8696,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.7292,
+      "lo": 0.5769,
+      "hi": 0.88,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.8549,
+      "lo": 0.7486,
+      "hi": 0.9545,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.8889,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": 0.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.8889
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.7083,
+      "flag_precision": 0.7,
+      "flag_recall": 0.7,
+      "flag_f1": 0.7,
+      "false_alarm_rate": 0.2143,
+      "miss_rate": 0.3,
+      "alarm_f1": 0.6316
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.3333,
+      "flag_precision": 1.0,
+      "flag_recall": 0.8333,
+      "flag_f1": 0.9091,
+      "false_alarm_rate": null,
+      "miss_rate": 0.1667,
+      "alarm_f1": 0.0
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.7083,
+      "flag_precision": 0.8333,
+      "flag_recall": 0.7692,
+      "flag_f1": 0.8,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.2308,
+      "alarm_f1": 0.7
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.75,
+      "flag_precision": 0.9231,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.9231,
+      "false_alarm_rate": 0.0909,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.7
+     }
+    }
+   },
+   "cv_far_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.3,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.125
+    },
+    {
+     "fold": 1,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.1875
+    },
+    {
+     "fold": 2,
+     "threshold": 0.3,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.1667
+    },
+    {
+     "fold": 3,
+     "threshold": 0.3,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.0625
+    }
+   ],
+   "cap": {
+    "far_cap": 0.2,
+    "compliant": true,
+    "floor": {
+     "threshold": 1.0,
+     "false_alarm_rate": 0.1364,
+     "flag_recall": 0.8462,
+     "fp": 3,
+     "tn": 19,
+     "flagged": 25,
+     "n": 48,
+     "cap_reachable": true
+    },
+    "folds_reachable": 4,
+    "folds": 4,
+    "fallback_folds": []
+   },
+   "auc": {
+    "flag": {
+     "value": 0.882,
+     "lo": 0.7583,
+     "hi": 0.9838,
+     "n_valid": 2000,
+     "n_pos": 26,
+     "n_neg": 22
+    },
+    "alarm": {
+     "value": 0.8768,
+     "lo": 0.7151,
+     "hi": 0.9875,
+     "n_valid": 2000,
+     "n_pos": 20,
+     "n_neg": 28
+    }
+   },
+   "degraded": false,
+   "warnings": []
+  },
+  "s3": {
+   "variant": "s3",
+   "oracle": false,
+   "meta": {
+    "variant": "s3",
+    "description": "S3 no-silent-clearance re-fusion on re-recorded audio",
+    "experiment": "perturbed",
+    "split": "dev",
+    "profile": "recommended-perturbed",
+    "set": [
+     "fusion.type=no_silent"
+    ],
+    "checks": [
+     "keywords",
+     "patterns",
+     "facts"
+    ],
+    "refuse_from": "perturbed",
+    "oracle": false,
+    "config_name": "recommended-perturbed",
+    "use_tuning": false,
+    "tuning": null,
+    "config_hash": "06850543f6fadb9a",
+    "threshold": 0.55,
+    "fusion": "no_silent",
+    "asr": "faster_whisper",
+    "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+    "llm": {
+     "default": {
+      "type": "openai_compat",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "model": "callguard-llm",
+      "cache_tag": null
+     }
+    },
+    "git": {
+     "sha": "480479c79d",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T05:59:02+0200",
+    "wall_seconds": 0.03,
+    "n_calls": 48,
+    "calls": [
+     "Stufe1_D01-K1",
+     "Stufe1_D01-K2",
+     "Stufe1_D02-K1",
+     "Stufe1_D02-K2",
+     "Stufe1_D03-K1",
+     "Stufe1_D03-K2",
+     "Stufe1_D04-K1",
+     "Stufe1_D04-K2",
+     "Stufe1_D05-K1",
+     "Stufe1_D05-K2",
+     "Stufe1_D06-K1",
+     "Stufe1_D06-K2",
+     "Stufe1_D08-K1",
+     "Stufe1_D08-K2",
+     "Stufe1_D09-K1",
+     "Stufe1_D09-K2",
+     "Stufe1_D10-K1",
+     "Stufe1_D10-K2",
+     "Stufe2_C01-K3",
+     "Stufe2_C01-K4",
+     "Stufe2_C02-K3",
+     "Stufe2_C02-K4",
+     "Stufe2_C05-K3",
+     "Stufe2_C05-K4",
+     "Stufe2_C06-K3",
+     "Stufe2_C06-K4",
+     "Stufe2_C07-K3",
+     "Stufe2_C07-K4",
+     "Stufe2_C08-K3",
+     "Stufe2_C08-K4",
+     "Stufe2_C09-K3",
+     "Stufe2_C09-K4",
+     "Stufe2_C10-K3",
+     "Stufe2_C10-K4",
+     "Stufe2_C11-K3",
+     "Stufe2_C11-K4",
+     "Stufe2_C12-K3",
+     "Stufe2_C12-K4",
+     "Stufe2_C13-K3",
+     "Stufe2_C13-K4",
+     "Stufe2_C14-K3",
+     "Stufe2_C14-K4",
+     "Stufe3_C17-K3",
+     "Stufe3_C17-K4",
+     "Stufe3_C18-K3",
+     "Stufe3_C18-K4",
+     "Stufe3_C20-K3",
+     "Stufe3_C20-K4"
+    ],
+    "check_weights": {
+     "keywords": 0.15,
+     "patterns": 0.1,
+     "facts": 1.0
+    },
+    "source": {
+     "variant": "perturbed",
+     "results_hash": "861a2b4822aa9903",
+     "git": {
+      "sha": "0320090fc5",
+      "dirty": true,
+      "branch": "main"
+     },
+     "config_hash": "22cb20ed2150451b",
+     "created": "2026-10-10T05:49:25+0200",
+     "llm_resolved": {
+      "default": {
+       "type": "openai_compat",
+       "model": "callguard-llm",
+       "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+       "base_url": "http://127.0.0.1:8000/v1",
+       "cache_tag": null
+      }
+     }
+    },
+    "llm_resolved": {
+     "default": {
+      "type": "openai_compat",
+      "model": "callguard-llm",
+      "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "cache_tag": null
+     }
+    }
+   },
+   "n_calls": 48,
+   "n_dialogues": 24,
+   "fixed": {
+    "n": 48,
+    "flag_precision": 0.6765,
+    "flag_recall": 0.8846,
+    "flag_f1": 0.7667,
+    "false_alarm_rate": 0.5,
+    "miss_rate": 0.1154,
+    "alarm_f1": 0.75,
+    "review_recall": 0.5,
+    "review_escalation": 0.5,
+    "accuracy": 0.5417,
+    "tp": 23,
+    "fp": 11,
+    "fn": 3,
+    "tn": 11,
+    "flag_balanced_accuracy": 0.6923,
+    "ci": {
+     "flag_f1": {
+      "value": 0.7667,
+      "lo": 0.5818,
+      "hi": 0.9118,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.6765,
+      "lo": 0.4545,
+      "hi": 0.8966,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.8846,
+      "lo": 0.7,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.5,
+      "lo": 0.1818,
+      "hi": 0.7917,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.1154,
+      "lo": 0.0,
+      "hi": 0.3,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.75,
+      "lo": 0.4762,
+      "hi": 0.9268,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.5,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.5417,
+      "lo": 0.3333,
+      "hi": 0.75,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.6923,
+      "lo": 0.503,
+      "hi": 0.875,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.7222,
+      "flag_precision": 0.7143,
+      "flag_recall": 1.0,
+      "flag_f1": 0.8333,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.9474
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.5882,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7407,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.4615
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.5,
+      "flag_precision": 1.0,
+      "flag_recall": 0.5,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": null,
+      "miss_rate": 0.5,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4583,
+      "flag_precision": 0.6471,
+      "flag_recall": 0.8462,
+      "flag_f1": 0.7333,
+      "false_alarm_rate": 0.5455,
+      "miss_rate": 0.1538,
+      "alarm_f1": 0.6667
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.625,
+      "flag_precision": 0.7059,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.8,
+      "false_alarm_rate": 0.4545,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.8235
+     }
+    }
+   },
+   "cv": {
+    "n": 48,
+    "flag_precision": 0.6765,
+    "flag_recall": 0.8846,
+    "flag_f1": 0.7667,
+    "false_alarm_rate": 0.5,
+    "miss_rate": 0.1154,
+    "alarm_f1": 0.6857,
+    "review_recall": 0.0,
+    "review_escalation": 0.5,
+    "accuracy": 0.4792,
+    "tp": 23,
+    "fp": 11,
+    "fn": 3,
+    "tn": 11,
+    "flag_balanced_accuracy": 0.6923,
+    "ci": {
+     "flag_f1": {
+      "value": 0.7667,
+      "lo": 0.5818,
+      "hi": 0.9118,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.6765,
+      "lo": 0.4545,
+      "hi": 0.8966,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.8846,
+      "lo": 0.7,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.5,
+      "lo": 0.1818,
+      "hi": 0.7917,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.1154,
+      "lo": 0.0,
+      "hi": 0.3,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.6857,
+      "lo": 0.3888,
+      "hi": 0.8718,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.4792,
+      "lo": 0.2776,
+      "hi": 0.6957,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.6923,
+      "lo": 0.503,
+      "hi": 0.875,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.7222,
+      "flag_precision": 0.7143,
+      "flag_recall": 1.0,
+      "flag_f1": 0.8333,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.9474
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.5882,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7407,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.4615
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.0,
+      "flag_precision": 1.0,
+      "flag_recall": 0.5,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": null,
+      "miss_rate": 0.5,
+      "alarm_f1": 0.0
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.6471,
+      "flag_recall": 0.8462,
+      "flag_f1": 0.7333,
+      "false_alarm_rate": 0.5455,
+      "miss_rate": 0.1538,
+      "alarm_f1": 0.625
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.5417,
+      "flag_precision": 0.7059,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.8,
+      "false_alarm_rate": 0.4545,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.7368
+     }
+    }
+   },
+   "cv_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.7,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.35,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.35,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 0.7,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "suggestion": {
+    "threshold": 0.35,
+    "flag_f1": 0.7667,
+    "flag_recall": 0.8846,
+    "flag_precision": 0.6765,
+    "false_alarm_rate": 0.5,
+    "miss_rate": 0.1154,
+    "tied": [
+     0.2,
+     0.25,
+     0.3,
+     0.35,
+     0.4,
+     0.45,
+     0.5
+    ],
+    "reason": "Schwelle 0.35 maximiert F1 der Markierungen (77%) bei Recall 88% und Fehlalarmquote 50%."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.5625
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.5625
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.5625
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.5625
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.5625
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.5625
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.7619,
+     "accuracy": 0.5625
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.75,
+     "accuracy": 0.5417
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.75,
+     "accuracy": 0.5417
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.75,
+     "accuracy": 0.5417
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.75,
+     "accuracy": 0.5417
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.75,
+     "accuracy": 0.5417
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.75,
+     "accuracy": 0.5417
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.75,
+     "accuracy": 0.5417
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.7667,
+     "flag_precision": 0.6765,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.5,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.6207,
+     "accuracy": 0.4792
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 0.0,
+    "stage_s_per_call": {
+     "asr": 14.001,
+     "diarize": 14.292,
+     "checks": 5.068
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.019,
+     "patterns": 0.009,
+     "facts": 5.036
+    },
+    "check_compute_s_total_per_call": 5.064,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 21.542
+   },
+   "commit": "480479c79d",
+   "dirty": true,
+   "cost_note": "re-fusion of perturbed: check cost is that variant's",
+   "cv_far": {
+    "n": 48,
+    "flag_precision": 0.6765,
+    "flag_recall": 0.8846,
+    "flag_f1": 0.7667,
+    "false_alarm_rate": 0.5,
+    "miss_rate": 0.1154,
+    "alarm_f1": 0.0,
+    "review_recall": 0.5,
+    "review_escalation": 0.5,
+    "accuracy": 0.2917,
+    "tp": 23,
+    "fp": 11,
+    "fn": 3,
+    "tn": 11,
+    "flag_balanced_accuracy": 0.6923,
+    "ci": {
+     "flag_f1": {
+      "value": 0.7667,
+      "lo": 0.5818,
+      "hi": 0.9118,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.6765,
+      "lo": 0.4545,
+      "hi": 0.8966,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.8846,
+      "lo": 0.7,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.5,
+      "lo": 0.1818,
+      "hi": 0.7917,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.1154,
+      "lo": 0.0,
+      "hi": 0.3,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.5,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.2917,
+      "lo": 0.1429,
+      "hi": 0.45,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.6923,
+      "lo": 0.503,
+      "hi": 0.875,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.2222,
+      "flag_precision": 0.7143,
+      "flag_recall": 1.0,
+      "flag_f1": 0.8333,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.2917,
+      "flag_precision": 0.5882,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7407,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.5,
+      "flag_precision": 1.0,
+      "flag_recall": 0.5,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": null,
+      "miss_rate": 0.5,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.25,
+      "flag_precision": 0.6471,
+      "flag_recall": 0.8462,
+      "flag_f1": 0.7333,
+      "false_alarm_rate": 0.5455,
+      "miss_rate": 0.1538,
+      "alarm_f1": 0.0
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.3333,
+      "flag_precision": 0.7059,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.8,
+      "false_alarm_rate": 0.4545,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.0
+     }
+    }
+   },
+   "cv_far_folds": [
+    {
+     "fold": 0,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.5
+    },
+    {
+     "fold": 1,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.4375
+    },
+    {
+     "fold": 2,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.6111
+    },
+    {
+     "fold": 3,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.4375
+    }
+   ],
+   "cap": {
+    "far_cap": 0.2,
+    "compliant": false,
+    "floor": {
+     "threshold": 1.0,
+     "false_alarm_rate": 0.5,
+     "flag_recall": 0.8846,
+     "fp": 11,
+     "tn": 11,
+     "flagged": 34,
+     "n": 48,
+     "cap_reachable": false
+    },
+    "folds_reachable": 0,
+    "folds": 4,
+    "fallback_folds": [
+     0,
+     1,
+     2,
+     3
+    ]
+   },
+   "auc": {
+    "flag": {
+     "value": 0.84,
+     "lo": 0.6747,
+     "hi": 0.9667,
+     "n_valid": 2000,
+     "n_pos": 26,
+     "n_neg": 22
+    },
+    "alarm": {
+     "value": 0.925,
+     "lo": 0.8333,
+     "hi": 0.9886,
+     "n_valid": 2000,
+     "n_pos": 20,
+     "n_neg": 28
+    }
+   },
+   "degraded": false,
+   "warnings": []
+  }
+ },
+ "comparisons": [
+  {
+   "a": "perturbed",
+   "b": "table_v3",
+   "fixed": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.8163,
+      "b": 0.8627,
+      "diff": 0.0464,
+      "lo": 0.0,
+      "hi": 0.1598,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm_f1": {
+      "a": 0.75,
+      "b": 0.75,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "false_alarm_rate": {
+      "a": 0.1364,
+      "b": 0.1364,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "miss_rate": {
+      "a": 0.2308,
+      "b": 0.1538,
+      "diff": -0.077,
+      "lo": -0.25,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.7083,
+      "b": 0.75,
+      "diff": 0.0417,
+      "lo": 0.0,
+      "hi": 0.1364,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "review_recall": {
+      "a": 0.5,
+      "b": 0.8333,
+      "diff": 0.3333,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": "b"
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.8164,
+      "b": 0.8549,
+      "diff": 0.0385,
+      "lo": 0.0,
+      "hi": 0.125,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.8278,
+      "b": 0.882,
+      "diff": 0.0542,
+      "lo": 0.0,
+      "hi": 0.1771,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm": {
+      "a": 0.8911,
+      "b": 0.8768,
+      "diff": -0.0143,
+      "lo": -0.0485,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 2,
+     "both": 39,
+     "neither": 7,
+     "p": 0.5
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 2,
+     "both": 34,
+     "neither": 12,
+     "p": 0.5
+    },
+    "flips": [
+     {
+      "call_id": "Stufe3_C20-K3",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.5,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "facts: Fakt: Im Gespräch offen, ob die Teilbeträge zusammengehören = ja (1.00) - Die Kunde sagt, dass sie die Daten so notiert hat, wie ihre Kollegin es getan hat, und dass sie nicht weiß, warum die Daten getrennt geplant sind oder welche Belege zusammengehören. (Regel: splitting.review_open)",
+      "a_passage": null,
+      "b_passage": "01:07-01:16 splitting: Meine Kollegin hat die Daten so notiert. Ich kann nicht sagen, ob sie nach der Rechnung gegangen ist oder nur einen eigenen Plan gemacht hat."
+     },
+     {
+      "call_id": "Stufe3_C20-K4",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.5,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "facts: Fakt: Im Gespräch offen, ob die Teilbeträge zusammengehören = ja (0.99) - Die Kunde sagt, dass sie nicht weiß, ob die Daten nach der Rechnung gegangen sind oder nur einen eigenen Plan gemacht hat. (Regel: splitting.review_open)",
+      "a_passage": null,
+      "b_passage": "01:11-01:17 splitting: Ich kann nicht sagen, ob sie nach der Rechnung gegangen ist oder nur einen eigenen Plan gemacht hat."
+     }
+    ]
+   },
+   "cv": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.8163,
+      "b": 0.8627,
+      "diff": 0.0464,
+      "lo": 0.0,
+      "hi": 0.1598,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm_f1": {
+      "a": 0.7619,
+      "b": 0.7273,
+      "diff": -0.0346,
+      "lo": -0.119,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "false_alarm_rate": {
+      "a": 0.1364,
+      "b": 0.1364,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "miss_rate": {
+      "a": 0.2308,
+      "b": 0.1538,
+      "diff": -0.077,
+      "lo": -0.25,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.7292,
+      "b": 0.7292,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "review_recall": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.8164,
+      "b": 0.8549,
+      "diff": 0.0385,
+      "lo": 0.0,
+      "hi": 0.125,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.8278,
+      "b": 0.882,
+      "diff": 0.0542,
+      "lo": 0.0,
+      "hi": 0.1771,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm": {
+      "a": 0.8911,
+      "b": 0.8768,
+      "diff": -0.0143,
+      "lo": -0.0485,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 2,
+     "both": 39,
+     "neither": 7,
+     "p": 0.5
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 0,
+     "both": 35,
+     "neither": 13,
+     "p": 1.0
+    },
+    "flips": [
+     {
+      "call_id": "Stufe3_C20-K3",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.0,
+      "b_score": 0.5,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15).",
+      "b_reason": "facts: Fakt: Im Gespräch offen, ob die Teilbeträge zusammengehören = ja (1.00) - Die Kunde sagt, dass sie die Daten so notiert hat, wie ihre Kollegin es getan hat, und dass sie nicht weiß, warum die Daten getrennt geplant sind oder welche Belege zusammengehören. (Regel: splitting.review_open)",
+      "a_passage": null,
+      "b_passage": "01:07-01:16 splitting: Meine Kollegin hat die Daten so notiert. Ich kann nicht sagen, ob sie nach der Rechnung gegangen ist oder nur einen eigenen Plan gemacht hat."
+     },
+     {
+      "call_id": "Stufe3_C20-K4",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.0,
+      "b_score": 0.5,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15).",
+      "b_reason": "facts: Fakt: Im Gespräch offen, ob die Teilbeträge zusammengehören = ja (0.99) - Die Kunde sagt, dass sie nicht weiß, ob die Daten nach der Rechnung gegangen sind oder nur einen eigenen Plan gemacht hat. (Regel: splitting.review_open)",
+      "a_passage": null,
+      "b_passage": "01:11-01:17 splitting: Ich kann nicht sagen, ob sie nach der Rechnung gegangen ist oder nur einen eigenen Plan gemacht hat."
+     }
+    ]
+   },
+   "cv_far": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.8163,
+      "b": 0.8627,
+      "diff": 0.0464,
+      "lo": 0.0,
+      "hi": 0.1598,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm_f1": {
+      "a": 0.7368,
+      "b": 0.7,
+      "diff": -0.0368,
+      "lo": -0.1255,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "false_alarm_rate": {
+      "a": 0.1364,
+      "b": 0.1364,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "miss_rate": {
+      "a": 0.2308,
+      "b": 0.1538,
+      "diff": -0.077,
+      "lo": -0.25,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.7292,
+      "b": 0.7292,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "review_recall": {
+      "a": 0.3333,
+      "b": 0.3333,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.8164,
+      "b": 0.8549,
+      "diff": 0.0385,
+      "lo": 0.0,
+      "hi": 0.125,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.8278,
+      "b": 0.882,
+      "diff": 0.0542,
+      "lo": 0.0,
+      "hi": 0.1771,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm": {
+      "a": 0.8911,
+      "b": 0.8768,
+      "diff": -0.0143,
+      "lo": -0.0485,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 2,
+     "both": 39,
+     "neither": 7,
+     "p": 0.5
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 0,
+     "b_only": 0,
+     "both": 35,
+     "neither": 13,
+     "p": 1.0
+    },
+    "flips": [
+     {
+      "call_id": "Stufe3_C20-K3",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.0,
+      "b_score": 0.5,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.15 (Schwelle 0.30 minus Band 0.15).",
+      "b_reason": "facts: Fakt: Im Gespräch offen, ob die Teilbeträge zusammengehören = ja (1.00) - Die Kunde sagt, dass sie die Daten so notiert hat, wie ihre Kollegin es getan hat, und dass sie nicht weiß, warum die Daten getrennt geplant sind oder welche Belege zusammengehören. (Regel: splitting.review_open)",
+      "a_passage": null,
+      "b_passage": "01:07-01:16 splitting: Meine Kollegin hat die Daten so notiert. Ich kann nicht sagen, ob sie nach der Rechnung gegangen ist oder nur einen eigenen Plan gemacht hat."
+     },
+     {
+      "call_id": "Stufe3_C20-K4",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.0,
+      "b_score": 0.5,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.15 (Schwelle 0.30 minus Band 0.15).",
+      "b_reason": "facts: Fakt: Im Gespräch offen, ob die Teilbeträge zusammengehören = ja (0.99) - Die Kunde sagt, dass sie nicht weiß, ob die Daten nach der Rechnung gegangen sind oder nur einen eigenen Plan gemacht hat. (Regel: splitting.review_open)",
+      "a_passage": null,
+      "b_passage": "01:11-01:17 splitting: Ich kann nicht sagen, ob sie nach der Rechnung gegangen ist oder nur einen eigenen Plan gemacht hat."
+     }
+    ]
+   }
+  },
+  {
+   "a": "perturbed",
+   "b": "s3",
+   "fixed": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.8163,
+      "b": 0.7667,
+      "diff": -0.0496,
+      "lo": -0.2262,
+      "hi": 0.1032,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm_f1": {
+      "a": 0.75,
+      "b": 0.75,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "false_alarm_rate": {
+      "a": 0.1364,
+      "b": 0.5,
+      "diff": 0.3636,
+      "lo": 0.0,
+      "hi": 0.6923,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "miss_rate": {
+      "a": 0.2308,
+      "b": 0.1154,
+      "diff": -0.1154,
+      "lo": -0.2917,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.7083,
+      "b": 0.5417,
+      "diff": -0.1666,
+      "lo": -0.375,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "review_recall": {
+      "a": 0.5,
+      "b": 0.5,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.8164,
+      "b": 0.6923,
+      "diff": -0.1241,
+      "lo": -0.3182,
+      "hi": 0.0667,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.8278,
+      "b": 0.84,
+      "diff": 0.0122,
+      "lo": -0.0639,
+      "hi": 0.1176,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm": {
+      "a": 0.8911,
+      "b": 0.925,
+      "diff": 0.0339,
+      "lo": -0.0208,
+      "hi": 0.1384,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 8,
+     "b_only": 3,
+     "both": 31,
+     "neither": 6,
+     "p": 0.2266
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 8,
+     "b_only": 0,
+     "both": 26,
+     "neither": 14,
+     "p": 0.0078
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D01-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.475,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.39; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D01-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.475,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.74; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D08-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0202,
+      "b_score": 0.475,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Auskunft an Dritte»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Stichwort K11; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D08-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0216,
+      "b_score": 0.475,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Auskunft an Dritte»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Stichwort K11; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C01-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.475,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C01-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.475,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C02-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.475,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C02-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.475,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C07-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.1586,
+      "b_score": 0.475,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.16 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Insiderhandel (Information und Kaufwunsch)»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Eigener Handelswunsch geäussert» p(ja) = 0.40; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C09-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.475,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.94; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C09-K4",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.475,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.98; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     }
+    ]
+   },
+   "cv": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.8163,
+      "b": 0.7667,
+      "diff": -0.0496,
+      "lo": -0.2262,
+      "hi": 0.1032,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm_f1": {
+      "a": 0.7619,
+      "b": 0.6857,
+      "diff": -0.0762,
+      "lo": -0.2451,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "false_alarm_rate": {
+      "a": 0.1364,
+      "b": 0.5,
+      "diff": 0.3636,
+      "lo": 0.0,
+      "hi": 0.6923,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "miss_rate": {
+      "a": 0.2308,
+      "b": 0.1154,
+      "diff": -0.1154,
+      "lo": -0.2917,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.7292,
+      "b": 0.4792,
+      "diff": -0.25,
+      "lo": -0.4445,
+      "hi": -0.0833,
+      "n_valid": 2000,
+      "real": true,
+      "better": "a"
+     },
+     "review_recall": {
+      "a": 0.0,
+      "b": 0.0,
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.8164,
+      "b": 0.6923,
+      "diff": -0.1241,
+      "lo": -0.3182,
+      "hi": 0.0667,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.8278,
+      "b": 0.7806,
+      "diff": -0.0472,
+      "lo": -0.1836,
+      "hi": 0.0834,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm": {
+      "a": 0.8911,
+      "b": 0.8857,
+      "diff": -0.0054,
+      "lo": -0.1072,
+      "hi": 0.1124,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 8,
+     "b_only": 3,
+     "both": 31,
+     "neither": 6,
+     "p": 0.2266
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 12,
+     "b_only": 0,
+     "both": 23,
+     "neither": 13,
+     "p": 0.0005
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D01-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.625,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.39; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D01-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.625,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.74; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D08-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0202,
+      "b_score": 0.625,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15).",
+      "b_reason": "«Auskunft an Dritte»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Stichwort K11; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D08-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0216,
+      "b_score": 0.625,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15).",
+      "b_reason": "«Auskunft an Dritte»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Stichwort K11; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C01-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.275,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.20 (Schwelle 0.35 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C01-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.275,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.20 (Schwelle 0.35 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C02-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.275,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.20 (Schwelle 0.35 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C02-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.275,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.20 (Schwelle 0.35 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C07-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.1586,
+      "b_score": 0.275,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.16 ('Insiderhandel') liegt unter 0.20 (Schwelle 0.35 minus Band 0.15).",
+      "b_reason": "«Insiderhandel (Information und Kaufwunsch)»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Eigener Handelswunsch geäussert» p(ja) = 0.40; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C09-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.275,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.94; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C09-K4",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.275,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.10 (Schwelle 0.25 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.98; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C11-K3",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (0.97) - Die Kunde fragt nach den monatlichen Ausgaben und den Belegen des Heims. (Regel: disclosure.review_1)",
+      "b_reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (0.97) - Die Kunde fragt nach den monatlichen Ausgaben und den Belegen des Heims. (Regel: disclosure.review_1)",
+      "a_passage": "00:36-00:42 disclosure: Richtig. Wir haben den Beleg des Heimes und die Liste der monatlichen Ausgaben.",
+      "b_passage": "00:36-00:42 disclosure: Richtig. Wir haben den Beleg des Heimes und die Liste der monatlichen Ausgaben."
+     },
+     {
+      "call_id": "Stufe2_C11-K4",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Beraterin gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+      "b_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Beraterin gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+      "a_passage": "03:43-03:52 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen.",
+      "b_passage": "03:43-03:52 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C12-K3",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin weiter. (Regel: disclosure.review_1)",
+      "b_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin weiter. (Regel: disclosure.review_1)",
+      "a_passage": "03:38-03:48 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen.",
+      "b_passage": "03:38-03:48 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C12-K4",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+      "b_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+      "a_passage": "03:40-03:50 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen.",
+      "b_passage": "03:40-03:50 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C13-K3",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.98) - Regula Bachmann möchte, dass der Satz mit der Rückzahlungsverpflichtung nicht in den Entwurf aufgenommen wird. (Regel: documentation.review_1)",
+      "b_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.98) - Regula Bachmann möchte, dass der Satz mit der Rückzahlungsverpflichtung nicht in den Entwurf aufgenommen wird. (Regel: documentation.review_1)",
+      "a_passage": "01:12-01:33 documentation: Der violette Satz sagt, dass dreissigtausend von meinem Bruder ein Rückzahlpass darlegen sind. Das ist richtig. Es ist ein Teil der Finanzierung, kein privater Kontaktanrat. Der Satz ist der einzige Ort im Entwurf. Wo die tatsächlich besteh",
+      "b_passage": "01:12-01:33 documentation: Der violette Satz sagt, dass dreissigtausend von meinem Bruder ein Rückzahlpass darlegen sind. Das ist richtig. Es ist ein Teil der Finanzierung, kein privater Kontaktanrat. Der Satz ist der einzige Ort im Entwurf. Wo die tatsächlich besteh"
+     },
+     {
+      "call_id": "Stufe2_C13-K4",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+      "b_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+      "a_passage": "08:07-08:34 documentation: Ja, Sie meinen die violetten Zeilen im aktuellen Entwurf. Sagen Sie mir bitte, was ich mit diesem Satz machen soll. Dann lässt mich der Violett Machia den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von ge",
+      "b_passage": "08:07-08:34 documentation: Ja, Sie meinen die violetten Zeilen im aktuellen Entwurf. Sagen Sie mir bitte, was ich mit diesem Satz machen soll. Dann lässt mich der Violett Machia den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von ge"
+     },
+     {
+      "call_id": "Stufe2_C14-K3",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Regula Bachmann möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+      "b_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Regula Bachmann möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+      "a_passage": "00:59-01:59 documentation: Bedienen wir mit den violetten Zeilen. Um welche Anlage geht es dort? Wir müssen zuerst wissen, ob diese Sache wichtig und für den vorgesehenen Empfänger nötig ist. Der violette Satz nennt meine alte Kontaktadresse. Diese ist falsch und für",
+      "b_passage": "00:59-01:59 documentation: Bedienen wir mit den violetten Zeilen. Um welche Anlage geht es dort? Wir müssen zuerst wissen, ob diese Sache wichtig und für den vorgesehenen Empfänger nötig ist. Der violette Satz nennt meine alte Kontaktadresse. Diese ist falsch und für"
+     }
+    ]
+   },
+   "cv_far": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.8163,
+      "b": 0.7667,
+      "diff": -0.0496,
+      "lo": -0.2262,
+      "hi": 0.1032,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm_f1": {
+      "a": 0.7368,
+      "b": 0.0,
+      "diff": -0.7368,
+      "lo": -0.898,
+      "hi": -0.5,
+      "n_valid": 2000,
+      "real": true,
+      "better": "a"
+     },
+     "false_alarm_rate": {
+      "a": 0.1364,
+      "b": 0.5,
+      "diff": 0.3636,
+      "lo": 0.0,
+      "hi": 0.6923,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "miss_rate": {
+      "a": 0.2308,
+      "b": 0.1154,
+      "diff": -0.1154,
+      "lo": -0.2917,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.7292,
+      "b": 0.2917,
+      "diff": -0.4375,
+      "lo": -0.6501,
+      "hi": -0.2333,
+      "n_valid": 2000,
+      "real": true,
+      "better": "a"
+     },
+     "review_recall": {
+      "a": 0.3333,
+      "b": 0.5,
+      "diff": 0.1667,
+      "lo": 0.0,
+      "hi": 0.5,
+      "n_valid": 1930,
+      "real": false,
+      "better": "b"
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.8164,
+      "b": 0.6923,
+      "diff": -0.1241,
+      "lo": -0.3182,
+      "hi": 0.0667,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.8278,
+      "b": 0.7019,
+      "diff": -0.1259,
+      "lo": -0.3904,
+      "hi": 0.0938,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm": {
+      "a": 0.8911,
+      "b": 0.8429,
+      "diff": -0.0482,
+      "lo": -0.2692,
+      "hi": 0.1591,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 8,
+     "b_only": 3,
+     "both": 31,
+     "neither": 6,
+     "p": 0.2266
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 22,
+     "b_only": 1,
+     "both": 13,
+     "neither": 12,
+     "p": 0.0
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D01-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.925,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.15 (Schwelle 0.30 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.39; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D01-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.925,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.15 (Schwelle 0.30 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.74; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D02-K1",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9934,
+      "b_score": 0.9934,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung arbeitet und ihr vorgeschlagen hat, die Aktie zu kaufen, bevor die Quartalszahlen veröffentlicht werden. (Regel: trade.alarm_1)",
+      "b_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung arbeitet und ihr vorgeschlagen hat, die Aktie zu kaufen, bevor die Quartalszahlen veröffentlicht werden. (Regel: trade.alarm_1)",
+      "a_passage": "00:38-01:14 trade: Etwa 8000 Franken. Meine Schwester arbeitet dort in der Finanzabteilung. Sie hat mir gestern gesagt, Quartalszahlen seien viel besser als erwartet. Die sind noch nicht publiziert. Die Medienmeldung kommt erst am Freitag. Sie haben das Direk",
+      "b_passage": "00:38-01:14 trade: Etwa 8000 Franken. Meine Schwester arbeitet dort in der Finanzabteilung. Sie hat mir gestern gesagt, Quartalszahlen seien viel besser als erwartet. Die sind noch nicht publiziert. Die Medienmeldung kommt erst am Freitag. Sie haben das Direk"
+     },
+     {
+      "call_id": "Stufe1_D02-K2",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9899,
+      "b_score": 0.9899,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung arbeitet und ihr vorgeschownes Foto von den Quartalszahlen gezeigt hat. (Regel: trade.alarm_1)",
+      "b_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass ihre Schwester in der Finanzabteilung arbeitet und ihr vorgeschownes Foto von den Quartalszahlen gezeigt hat. (Regel: trade.alarm_1)",
+      "a_passage": "01:04-01:16 trade: Ja, sie hat gesagt, ich solle es vertraulich behandeln. Und alles, sie hat mir sogar ein Foto von der Rigo-Sicht gezeigt. Ich habe ihr versprochen, ich schicke es niemandem weiter.",
+      "b_passage": "01:04-01:16 trade: Ja, sie hat gesagt, ich solle es vertraulich behandeln. Und alles, sie hat mir sogar ein Foto von der Rigo-Sicht gezeigt. Ich habe ihr versprochen, ich schicke es niemandem weiter."
+     },
+     {
+      "call_id": "Stufe1_D04-K1",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9934,
+      "b_score": 0.9934,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin erhalten hat, die noch nicht öffentlich bekannt gegeben wurden. (Regel: trade.alarm_1)",
+      "b_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin erhalten hat, die noch nicht öffentlich bekannt gegeben wurden. (Regel: trade.alarm_1)",
+      "a_passage": "03:04-03:39 trade: Nein, es gibt noch keinen Artikel. Sie hat mir auf ihrem Laptop gesagt, ich habe keine Datei. Es ist auch nicht bloss das Gericht. Sie bereitet die Unterlagen für die Besprechung mit den anderen Firmen vor. Hat sie Ihnen gesagt, dass sie di",
+      "b_passage": "03:04-03:39 trade: Nein, es gibt noch keinen Artikel. Sie hat mir auf ihrem Laptop gesagt, ich habe keine Datei. Es ist auch nicht bloss das Gericht. Sie bereitet die Unterlagen für die Besprechung mit den anderen Firmen vor. Hat sie Ihnen gesagt, dass sie di"
+     },
+     {
+      "call_id": "Stufe1_D04-K2",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9899,
+      "b_score": 0.9899,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin persönlich erhalten hat, die noch nicht öffentlich sind. (Regel: trade.alarm_1)",
+      "b_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin persönlich erhalten hat, die noch nicht öffentlich sind. (Regel: trade.alarm_1)",
+      "a_passage": "02:56-03:00 trade: Diese Unterlagen haben Sie von Ihrer Kollegin persönlich bekommen.",
+      "b_passage": "02:56-03:00 trade: Diese Unterlagen haben Sie von Ihrer Kollegin persönlich bekommen."
+     },
+     {
+      "call_id": "Stufe1_D08-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0202,
+      "b_score": 0.925,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.15 (Schwelle 0.30 minus Band 0.15).",
+      "b_reason": "«Auskunft an Dritte»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Stichwort K11; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D08-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0216,
+      "b_score": 0.925,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.02 ('Auskunft an Dritte') liegt unter 0.15 (Schwelle 0.30 minus Band 0.15).",
+      "b_reason": "«Auskunft an Dritte»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Stichwort K11; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe1_D09-K1",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9551,
+      "b_score": 0.9551,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Verborgene Tatsache ist relevant = ja (0.98) - Die Kunde möchte, dass die Verpflichtung ihrer Tante nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.alarm_1)",
+      "b_reason": "facts: Fakt: Verborgene Tatsache ist relevant = ja (0.98) - Die Kunde möchte, dass die Verpflichtung ihrer Tante nicht in die Notiz für die Kreditstelle aufgenommen wird. (Regel: documentation.alarm_1)",
+      "a_passage": "02:49-02:59 documentation: Nehmen Sie das Darlehen nicht in die Notiz für die Kreditstelle. Ich will, dass ich nur Eigenmittel sehe und die Vereinbarung meiner Tante gar nicht erfahre.",
+      "b_passage": "02:49-02:59 documentation: Nehmen Sie das Darlehen nicht in die Notiz für die Kreditstelle. Ich will, dass ich nur Eigenmittel sehe und die Vereinbarung meiner Tante gar nicht erfahre."
+     },
+     {
+      "call_id": "Stufe1_D09-K2",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.8947,
+      "b_score": 0.8947,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.94) - Der Kunde möchte, dass die Tante nicht auf die Kreditstelle geht und die Herkunft und Pflichtenrichtung nicht erfährt. (Regel: documentation.alarm_1)",
+      "b_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.94) - Der Kunde möchte, dass die Tante nicht auf die Kreditstelle geht und die Herkunft und Pflichtenrichtung nicht erfährt. (Regel: documentation.alarm_1)",
+      "a_passage": "02:55-03:01 documentation: Ich will, dass sie nur Eigenmittel sieht und die Vereinbarung meiner Tante gar nicht erfährt.",
+      "b_passage": "02:55-03:01 documentation: Ich will, dass sie nur Eigenmittel sieht und die Vereinbarung meiner Tante gar nicht erfährt."
+     },
+     {
+      "call_id": "Stufe1_D10-K1",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.8766,
+      "b_score": 0.8766,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Zweck ist, Kontrolle oder Freigabe zu umgehen = ja (1.00) - Der Kunde erklärt, dass er die Zahlung aufteilen will, um die Freigabestellung der ganzen Rechnung zu umgehen. (Regel: splitting.alarm_1)",
+      "b_reason": "facts: Fakt: Zweck ist, Kontrolle oder Freigabe zu umgehen = ja (1.00) - Der Kunde erklärt, dass er die Zahlung aufteilen will, um die Freigabestellung der ganzen Rechnung zu umgehen. (Regel: splitting.alarm_1)",
+      "a_passage": "01:36-01:52 splitting: Ich will zwölftausend aufteilen mit sechstausend und neunsechstausend. So möchte ich die Kontrolle umgehen und verhindern, dass die Freigabestellung die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separa",
+      "b_passage": "01:36-01:52 splitting: Ich will zwölftausend aufteilen mit sechstausend und neunsechstausend. So möchte ich die Kontrolle umgehen und verhindern, dass die Freigabestellung die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separa"
+     },
+     {
+      "call_id": "Stufe1_D10-K2",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9739,
+      "b_score": 0.9739,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Teilbeträge gehören zu einer einzigen Rechnung = ja (0.73) - Die Kundenin erklärt, dass es eine einzige Rechnung für die Maschine ist. (Regel: splitting.alarm_1)",
+      "b_reason": "facts: Fakt: Teilbeträge gehören zu einer einzigen Rechnung = ja (0.73) - Die Kundenin erklärt, dass es eine einzige Rechnung für die Maschine ist. (Regel: splitting.alarm_1)",
+      "a_passage": "00:36-00:40 splitting: Es ist eine einzige Rechnung für die eine Maschine.",
+      "b_passage": "00:36-00:40 splitting: Es ist eine einzige Rechnung für die eine Maschine."
+     },
+     {
+      "call_id": "Stufe2_C01-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.925,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C01-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.925,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C02-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.925,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C02-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.925,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 1.00; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C06-K3",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9816,
+      "b_score": 0.9816,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.95) - Die Kunde erwähnt, dass sie den Bericht von Claudia, die das Projekt leitet, persönlich erhalten hat. (Regel: trade.alarm_1)",
+      "b_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.95) - Die Kunde erwähnt, dass sie den Bericht von Claudia, die das Projekt leitet, persönlich erhalten hat. (Regel: trade.alarm_1)",
+      "a_passage": "01:12-01:26 trade: Claudia leitet das Projekt bei der Firma. Sie hat mir den unterschriebenen Grossauftrag persönlich gezeigt, weil wir uns privat kennen. Der Inhalt bleibt bis zur Präsentation am Freitag im Projekt drin.",
+      "b_passage": "01:12-01:26 trade: Claudia leitet das Projekt bei der Firma. Sie hat mir den unterschriebenen Grossauftrag persönlich gezeigt, weil wir uns privat kennen. Der Inhalt bleibt bis zur Präsentation am Freitag im Projekt drin."
+     },
+     {
+      "call_id": "Stufe2_C06-K4",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9997,
+      "b_score": 0.9997,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kundin erwähnt einen unterzeichneten Großauftrag, den sie privat von der Firma gekannt hat. (Regel: trade.alarm_1)",
+      "b_reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kundin erwähnt einen unterzeichneten Großauftrag, den sie privat von der Firma gekannt hat. (Regel: trade.alarm_1)",
+      "a_passage": "00:46-00:55 trade: Es geht um CRM -Systeme. Ich kenne die Produkte aus meiner Arbeit, aber die Aktien habe ich bis jetzt nie gehabt.",
+      "b_passage": "00:46-00:55 trade: Es geht um CRM -Systeme. Ich kenne die Produkte aus meiner Arbeit, aber die Aktien habe ich bis jetzt nie gehabt."
+     },
+     {
+      "call_id": "Stufe2_C07-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.1586,
+      "b_score": 0.925,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.16 ('Insiderhandel') liegt unter 0.85 (Schwelle 1.00 minus Band 0.15).",
+      "b_reason": "«Insiderhandel (Information und Kaufwunsch)»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Eigener Handelswunsch geäussert» p(ja) = 0.40; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C09-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.925,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.15 (Schwelle 0.30 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.94; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C09-K4",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.0,
+      "b_score": 0.925,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.15 (Schwelle 0.30 minus Band 0.15).",
+      "b_reason": "«Zugangsinformation preisgegeben»: Handlung möglich, aber nicht entkräftet – bitte prüfen (Fakt «Code/Wert am Telefon vorgelesen» p(ja) = 0.98; keine entlastende Tatsache).",
+      "a_passage": null,
+      "b_passage": null
+     },
+     {
+      "call_id": "Stufe2_C11-K3",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (0.97) - Die Kunde fragt nach den monatlichen Ausgaben und den Belegen des Heims. (Regel: disclosure.review_1)",
+      "b_reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (0.97) - Die Kunde fragt nach den monatlichen Ausgaben und den Belegen des Heims. (Regel: disclosure.review_1)",
+      "a_passage": "00:36-00:42 disclosure: Richtig. Wir haben den Beleg des Heimes und die Liste der monatlichen Ausgaben.",
+      "b_passage": "00:36-00:42 disclosure: Richtig. Wir haben den Beleg des Heimes und die Liste der monatlichen Ausgaben."
+     },
+     {
+      "call_id": "Stufe2_C11-K4",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Beraterin gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+      "b_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Die Beraterin gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+      "a_passage": "03:43-03:52 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen.",
+      "b_passage": "03:43-03:52 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C12-K3",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin weiter. (Regel: disclosure.review_1)",
+      "b_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Anruferin weiter. (Regel: disclosure.review_1)",
+      "a_passage": "03:38-03:48 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen.",
+      "b_passage": "03:38-03:48 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C12-K4",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+      "b_reason": "facts: Fakt: Konkrete Daten einer Drittperson herausgegeben = ja (1.00) - Der Berater gibt die aktuelle Kontostandsumme von 6400 Franken an die Klientin weiter. (Regel: disclosure.review_1)",
+      "a_passage": "03:40-03:50 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen.",
+      "b_passage": "03:40-03:50 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C13-K3",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.98) - Regula Bachmann möchte, dass der Satz mit der Rückzahlungsverpflichtung nicht in den Entwurf aufgenommen wird. (Regel: documentation.review_1)",
+      "b_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (0.98) - Regula Bachmann möchte, dass der Satz mit der Rückzahlungsverpflichtung nicht in den Entwurf aufgenommen wird. (Regel: documentation.review_1)",
+      "a_passage": "01:12-01:33 documentation: Der violette Satz sagt, dass dreissigtausend von meinem Bruder ein Rückzahlpass darlegen sind. Das ist richtig. Es ist ein Teil der Finanzierung, kein privater Kontaktanrat. Der Satz ist der einzige Ort im Entwurf. Wo die tatsächlich besteh",
+      "b_passage": "01:12-01:33 documentation: Der violette Satz sagt, dass dreissigtausend von meinem Bruder ein Rückzahlpass darlegen sind. Das ist richtig. Es ist ein Teil der Finanzierung, kein privater Kontaktanrat. Der Satz ist der einzige Ort im Entwurf. Wo die tatsächlich besteh"
+     },
+     {
+      "call_id": "Stufe2_C13-K4",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+      "b_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+      "a_passage": "08:07-08:34 documentation: Ja, Sie meinen die violetten Zeilen im aktuellen Entwurf. Sagen Sie mir bitte, was ich mit diesem Satz machen soll. Dann lässt mich der Violett Machia den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von ge",
+      "b_passage": "08:07-08:34 documentation: Ja, Sie meinen die violetten Zeilen im aktuellen Entwurf. Sagen Sie mir bitte, was ich mit diesem Satz machen soll. Dann lässt mich der Violett Machia den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt von ge"
+     },
+     {
+      "call_id": "Stufe2_C14-K3",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Regula Bachmann möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+      "b_reason": "facts: Fakt: Verlangt, etwas nicht zu protokollieren = ja (1.00) - Regula Bachmann möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt. (Regel: documentation.review_1)",
+      "a_passage": "00:59-01:59 documentation: Bedienen wir mit den violetten Zeilen. Um welche Anlage geht es dort? Wir müssen zuerst wissen, ob diese Sache wichtig und für den vorgesehenen Empfänger nötig ist. Der violette Satz nennt meine alte Kontaktadresse. Diese ist falsch und für",
+      "b_passage": "00:59-01:59 documentation: Bedienen wir mit den violetten Zeilen. Um welche Anlage geht es dort? Wir müssen zuerst wissen, ob diese Sache wichtig und für den vorgesehenen Empfänger nötig ist. Der violette Satz nennt meine alte Kontaktadresse. Diese ist falsch und für"
+     },
+     {
+      "call_id": "Stufe3_C18-K4",
+      "expected": "review",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.5,
+      "b_score": 0.5,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (1.00) - Die Kunde fragt nach der Berechtigung für Auskunft zum Konto ihrer Schwester. (Regel: disclosure.review_2)",
+      "b_reason": "facts: Fakt: Auskunft über Drittperson verlangt = ja (1.00) - Die Kunde fragt nach der Berechtigung für Auskunft zum Konto ihrer Schwester. (Regel: disclosure.review_2)",
+      "a_passage": "00:10-00:31 disclosure: Ja, sie ist für zwei Monate im Ausland. Ich habe ihr angeboten, auf die offenen Rechnungen zu schauen. Ich habe aber noch nie mit ihrer Bank über ihr Konto telefoniert. Dann müssen wir vorher die konkrete Auskunft schauen, wer sie sind und ",
+      "b_passage": "00:10-00:31 disclosure: Ja, sie ist für zwei Monate im Ausland. Ich habe ihr angeboten, auf die offenen Rechnungen zu schauen. Ich habe aber noch nie mit ihrer Bank über ihr Konto telefoniert. Dann müssen wir vorher die konkrete Auskunft schauen, wer sie sind und "
+     }
+    ]
+   }
+  }
+ ],
+ "warnings": {}
+}

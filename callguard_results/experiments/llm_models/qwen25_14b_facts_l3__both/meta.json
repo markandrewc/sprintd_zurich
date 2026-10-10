@@ -1,0 +1,143 @@
+{
+ "variant": "qwen25_14b_facts_l3__both",
+ "description": "",
+ "experiment": "llm_models",
+ "split": "dev",
+ "profile": "llm-sweep",
+ "set": [
+  "checks.facts.weight=1.0",
+  "checks.facts_blind.weight=1.0"
+ ],
+ "checks": [
+  "facts",
+  "facts_blind"
+ ],
+ "refuse_from": "qwen25_14b_facts_l3",
+ "oracle": false,
+ "config_name": "llm-sweep",
+ "use_tuning": false,
+ "tuning": null,
+ "config_hash": "6520dea48f8ba790",
+ "threshold": 0.55,
+ "fusion": "weighted",
+ "asr": "faster_whisper",
+ "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+ "llm": {
+  "default": {
+   "type": "openai_compat",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "model": "callguard-llm",
+   "cache_tag": "Qwen/Qwen2.5-7B-Instruct-AWQ"
+  },
+  "judge": {
+   "type": "openai_compat",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "model": "callguard-llm"
+  }
+ },
+ "git": {
+  "sha": "1fd19e75c0",
+  "dirty": true,
+  "branch": "main"
+ },
+ "created": "2026-10-10T03:37:00+0200",
+ "wall_seconds": 0.03,
+ "n_calls": 48,
+ "calls": [
+  "Stufe1_D01-K1",
+  "Stufe1_D01-K2",
+  "Stufe1_D02-K1",
+  "Stufe1_D02-K2",
+  "Stufe1_D03-K1",
+  "Stufe1_D03-K2",
+  "Stufe1_D04-K1",
+  "Stufe1_D04-K2",
+  "Stufe1_D05-K1",
+  "Stufe1_D05-K2",
+  "Stufe1_D06-K1",
+  "Stufe1_D06-K2",
+  "Stufe1_D08-K1",
+  "Stufe1_D08-K2",
+  "Stufe1_D09-K1",
+  "Stufe1_D09-K2",
+  "Stufe1_D10-K1",
+  "Stufe1_D10-K2",
+  "Stufe2_C01-K3",
+  "Stufe2_C01-K4",
+  "Stufe2_C02-K3",
+  "Stufe2_C02-K4",
+  "Stufe2_C05-K3",
+  "Stufe2_C05-K4",
+  "Stufe2_C06-K3",
+  "Stufe2_C06-K4",
+  "Stufe2_C07-K3",
+  "Stufe2_C07-K4",
+  "Stufe2_C08-K3",
+  "Stufe2_C08-K4",
+  "Stufe2_C09-K3",
+  "Stufe2_C09-K4",
+  "Stufe2_C10-K3",
+  "Stufe2_C10-K4",
+  "Stufe2_C11-K3",
+  "Stufe2_C11-K4",
+  "Stufe2_C12-K3",
+  "Stufe2_C12-K4",
+  "Stufe2_C13-K3",
+  "Stufe2_C13-K4",
+  "Stufe2_C14-K3",
+  "Stufe2_C14-K4",
+  "Stufe3_C17-K3",
+  "Stufe3_C17-K4",
+  "Stufe3_C18-K3",
+  "Stufe3_C18-K4",
+  "Stufe3_C20-K3",
+  "Stufe3_C20-K4"
+ ],
+ "check_weights": {
+  "facts": 1.0,
+  "facts_blind": 1.0
+ },
+ "source": {
+  "variant": "qwen25_14b_facts_l3",
+  "results_hash": "e64c212064d2290b",
+  "git": {
+   "sha": "1fd19e75c0",
+   "dirty": true,
+   "branch": "main"
+  },
+  "config_hash": "1d0821a2b7f0dc9d",
+  "created": "2026-10-10T03:36:19+0200",
+  "llm_resolved": {
+   "default": {
+    "type": "openai_compat",
+    "model": "callguard-llm",
+    "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "cache_tag": "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   },
+   "judge": {
+    "type": "openai_compat",
+    "model": "callguard-llm",
+    "model_id": "Qwen/Qwen2.5-14B-Instruct-AWQ",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "cache_tag": null
+   }
+  }
+ },
+ "llm_resolved": {
+  "default": {
+   "type": "openai_compat",
+   "model": "callguard-llm",
+   "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "cache_tag": "Qwen/Qwen2.5-7B-Instruct-AWQ"
+  },
+  "judge": {
+   "type": "openai_compat",
+   "model": "callguard-llm",
+   "model_id": "Qwen/Qwen2.5-14B-Instruct-AWQ",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "cache_tag": null
+  }
+ }
+}

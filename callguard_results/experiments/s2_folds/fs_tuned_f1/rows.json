@@ -1,0 +1,590 @@
+{
+ "fixed": [
+  {
+   "call_id": "Stufe1_D05-K1",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "alarm",
+   "score": 0.9034,
+   "uncertainty": 0.2649,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:17-01:22 access: Wartet, ich sage Ihnen die TAN-Card. sieben, drei, eins, neun, vier, zwei.",
+   "reason": "facts: Fakt: Code/Wert am Telefon vorgelesen = ja (1.00) - Der Kunde las die Ziffern der TAN-Card vor, obwohl die Richtigkeit unklar war. (Regel: access.alarm_1)",
+   "llm_calls": 15,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "facts": 10.71
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.0,
+    "diarize": 0.0,
+    "checks": 10.72
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 10.726
+  },
+  {
+   "call_id": "Stufe1_D05-K2",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.7907,
+   "uncertainty": 0.3615,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:18-01:29 access: Warte, ich sage Ihnen den TAN-Card. Sieben, drei, eins, neun, vier, zwei. Es steht immer noch gültig. Können Sie mir sagen, ob das die richtige Reihenfolge ist?",
+   "reason": "facts: Fakt: Wert gehört zum laufenden, gültigen Vorgang = ja (0.88) - Der Kunde gibt den TAN-Code aus, der für die aktuelle Anmeldung gültig ist. (Regel: access.alarm_1)",
+   "llm_calls": 15,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "facts": 12.87
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.03,
+    "diarize": 0.0,
+    "checks": 12.88
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 12.911
+  },
+  {
+   "call_id": "Stufe2_C01-K3",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 12,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "facts": 4.08
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.0,
+    "checks": 4.08
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 4.102
+  },
+  {
+   "call_id": "Stufe2_C01-K4",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 12,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "facts": 4.12
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.04,
+    "diarize": 0.0,
+    "checks": 4.12
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 4.165
+  },
+  {
+   "call_id": "Stufe2_C02-K3",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 12,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "facts": 2.22
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.01,
+    "checks": 2.22
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 2.238
+  },
+  {
+   "call_id": "Stufe2_C02-K4",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 13,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "facts": 4.03
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.01,
+    "checks": 4.03
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 4.049
+  },
+  {
+   "call_id": "Stufe2_C07-K3",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9965,
+   "uncertainty": 0.0044,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:48 trade: Meine Cousine ist im Projektteam der Alpesoptik. Sie hat mir gestern den neuen Absatzbericht persönlich gezeigt. Er geht erst morgen an die Mädchen, bis dann das Team ihn nicht weitergeben.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (1.00) - Die Kunde erwähnt, dass ihre Cousine ihr den neuen Absatzbericht persönlich gezeigt hat, der erst morgen an das Team weitergegeben wird. (Regel: trade.alarm_1)",
+   "llm_calls": 14,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "facts": 7.11
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.01,
+    "checks": 7.11
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 7.131
+  },
+  {
+   "call_id": "Stufe2_C07-K4",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.8228,
+   "uncertainty": 0.2216,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:40-00:48 trade: Sie hat mir gestern den neuen Absatzbericht persönlich gezeigt. Der geht erst einmal an die Mädchen, bis dann darf das Team ihn nicht weitergeben.",
+   "reason": "facts: Fakt: Begründet mit nicht öffentlicher Insider-Information = ja (0.58) - Die Kunde erwähnt, dass ihre Cousine ihr den neuen Absatzbericht persönlich gezeigt hat. (Regel: trade.alarm_1)",
+   "llm_calls": 16,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "facts": 10.05
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.01,
+    "checks": 10.06
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 10.079
+  },
+  {
+   "call_id": "Stufe2_C08-K3",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 14,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "facts": 8.47
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.01,
+    "checks": 8.48
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 8.499
+  },
+  {
+   "call_id": "Stufe2_C08-K4",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 15,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "facts": 8.12
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.01,
+    "checks": 8.13
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 8.155
+  },
+  {
+   "call_id": "Stufe3_C17-K3",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 13,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "facts": 3.26
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.0,
+    "diarize": 0.01,
+    "checks": 3.27
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 3.281
+  },
+  {
+   "call_id": "Stufe3_C17-K4",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.0,
+   "uncertainty": 0.0,
+   "top_family": null,
+   "error": null,
+   "failed_checks": [],
+   "passage": null,
+   "reason": "Kein Alarm: höchster Score 0.00 ('Insiderhandel') liegt unter 0.40 (Schwelle 0.55 minus Band 0.15).",
+   "llm_calls": 13,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "facts": 4.09
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.0,
+    "diarize": 0.01,
+    "checks": 4.09
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-large-v3-gsw-ct2",
+   "seconds": 4.109
+  }
+ ],
+ "cv": [],
+ "cv_folds": [],
+ "cv_far": [],
+ "cv_far_folds": [],
+ "sweep": [
+  {
+   "threshold": 0.2,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.25,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.3,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.35,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.4,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.45,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.5,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.55,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.6,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.65,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.7,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.75,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.8,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.8571,
+   "accuracy": 0.75
+  },
+  {
+   "threshold": 0.85,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.6667,
+   "accuracy": 0.6667
+  },
+  {
+   "threshold": 0.9,
+   "flag_f1": 0.8,
+   "flag_precision": 1.0,
+   "flag_recall": 0.6667,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 0.3333,
+   "alarm_f1": 0.6667,
+   "accuracy": 0.6667
+  }
+ ],
+ "suggestion": {
+  "threshold": 0.5,
+  "flag_f1": 0.8,
+  "flag_recall": 0.6667,
+  "flag_precision": 1.0,
+  "false_alarm_rate": 0.0,
+  "miss_rate": 0.3333,
+  "tied": [
+   0.2,
+   0.25,
+   0.3,
+   0.35,
+   0.4,
+   0.45,
+   0.5,
+   0.55,
+   0.6,
+   0.65,
+   0.7,
+   0.75,
+   0.8
+  ],
+  "reason": "Schwelle 0.50 maximiert F1 der Markierungen (80%) bei Recall 67% und Fehlalarmquote 0%."
+ },
+ "far_floor": {
+  "threshold": 1.0,
+  "false_alarm_rate": 0.0,
+  "flag_recall": 0.5,
+  "fp": 0,
+  "tn": 6,
+  "flagged": 3,
+  "n": 12,
+  "cap_reachable": true
+ }
+}

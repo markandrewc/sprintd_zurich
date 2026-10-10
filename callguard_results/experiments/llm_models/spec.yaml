@@ -1,0 +1,82 @@
+# RQ6: does a bigger / newer LLM fix the judge? Same transcripts (default ASR), same roles (pinned), same
+# prompts; only the model served as `callguard-llm` varies (scripts/remote/swap_llm.sh <hf-id>).
+# Run ONE variant per served model:  callguard experiment experiments/llm_models.yaml --variants <name>
+# geval_cot has weight 0 here (computed, not fused); experiments/geval_cot.yaml re-fuses it.
+# Cache keys use the real served model id, so variants never mix. ~10-20 min per model on dev.
+name: llm_models
+description: Check LLM sweep (Qwen2.5-7B-AWQ vs Qwen3-8B-AWQ vs Qwen2.5-14B-AWQ vs Qwen3-14B-AWQ)
+rq: [RQ6]
+base: llm-sweep
+split: dev
+compare_to: qwen25_7b
+variants:
+  - {name: qwen25_7b, description: "Qwen/Qwen2.5-7B-Instruct-AWQ (v1 default)"}
+  - name: qwen3_8b
+    description: "Qwen/Qwen3-8B-AWQ, thinking off"
+    set: ["llms.judge.extra_body={chat_template_kwargs: {enable_thinking: false}}"]
+  - {name: qwen25_14b, description: "Qwen/Qwen2.5-14B-Instruct-AWQ (alone on the GPU, 8k ctx, fp8 KV)"}
+  - name: qwen3_14b
+    description: "Qwen/Qwen3-14B-AWQ, thinking off (alone on the GPU, 8k ctx, fp8 KV)"
+    set: ["llms.judge.extra_body={chat_template_kwargs: {enable_thinking: false}}"]
+
+  # ---- re-fusion variants per model (no LLM calls; need the model's base variant first)
+  - {name: qwen25_7b__kwpat_facts, refuse_from: qwen25_7b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_7b__facts_only, refuse_from: qwen25_7b, checks: [facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_7b__judge_facts, refuse_from: qwen25_7b, checks: [keywords, patterns, llm_judge, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_7b__gcot, refuse_from: qwen25_7b, checks: [keywords, patterns, llm_judge, geval_cot], set: [checks.geval_cot.weight=1.0]}
+  - {name: qwen25_7b__all_plus, refuse_from: qwen25_7b, checks: [keywords, patterns, llm_judge, geval_cot, facts, anchored], set: [checks.geval_cot.weight=1.0, checks.facts.weight=1.0, checks.anchored.weight=1.0]}
+  - {name: qwen3_8b__kwpat_facts, refuse_from: qwen3_8b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_8b__facts_only, refuse_from: qwen3_8b, checks: [facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_8b__judge_facts, refuse_from: qwen3_8b, checks: [keywords, patterns, llm_judge, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_8b__gcot, refuse_from: qwen3_8b, checks: [keywords, patterns, llm_judge, geval_cot], set: [checks.geval_cot.weight=1.0]}
+  - {name: qwen3_8b__all_plus, refuse_from: qwen3_8b, checks: [keywords, patterns, llm_judge, geval_cot, facts, anchored], set: [checks.geval_cot.weight=1.0, checks.facts.weight=1.0, checks.anchored.weight=1.0]}
+  - {name: qwen25_14b__kwpat_facts, refuse_from: qwen25_14b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_14b__facts_only, refuse_from: qwen25_14b, checks: [facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_14b__judge_facts, refuse_from: qwen25_14b, checks: [keywords, patterns, llm_judge, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen25_14b__gcot, refuse_from: qwen25_14b, checks: [keywords, patterns, llm_judge, geval_cot], set: [checks.geval_cot.weight=1.0]}
+  - {name: qwen25_14b__all_plus, refuse_from: qwen25_14b, checks: [keywords, patterns, llm_judge, geval_cot, facts, anchored], set: [checks.geval_cot.weight=1.0, checks.facts.weight=1.0, checks.anchored.weight=1.0]}
+  - {name: qwen3_14b__kwpat_facts, refuse_from: qwen3_14b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_14b__facts_only, refuse_from: qwen3_14b, checks: [facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_14b__judge_facts, refuse_from: qwen3_14b, checks: [keywords, patterns, llm_judge, facts], set: [checks.facts.weight=1.0]}
+  - {name: qwen3_14b__gcot, refuse_from: qwen3_14b, checks: [keywords, patterns, llm_judge, geval_cot], set: [checks.geval_cot.weight=1.0]}
+  - {name: qwen3_14b__all_plus, refuse_from: qwen3_14b, checks: [keywords, patterns, llm_judge, geval_cot, facts, anchored], set: [checks.geval_cot.weight=1.0, checks.facts.weight=1.0, checks.anchored.weight=1.0]}
+  # ---- hybrid fusion: facts decides, llm_judge may only escalate to review (fusion/hybrid.py)
+  - {name: qwen25_7b__hybrid, refuse_from: qwen25_7b, checks: [facts, llm_judge], set: [fusion.type=hybrid, checks.facts.weight=1.0]}
+  - {name: qwen25_7b__hybrid_kw, refuse_from: qwen25_7b, checks: [keywords, patterns, facts, llm_judge], set: [fusion.type=hybrid, "fusion.core=[keywords, patterns, facts]", checks.facts.weight=1.0]}
+  - {name: qwen3_8b__hybrid, refuse_from: qwen3_8b, checks: [facts, llm_judge], set: [fusion.type=hybrid, checks.facts.weight=1.0]}
+  - {name: qwen3_8b__hybrid_kw, refuse_from: qwen3_8b, checks: [keywords, patterns, facts, llm_judge], set: [fusion.type=hybrid, "fusion.core=[keywords, patterns, facts]", checks.facts.weight=1.0]}
+  - {name: qwen25_14b__hybrid, refuse_from: qwen25_14b, checks: [facts, llm_judge], set: [fusion.type=hybrid, checks.facts.weight=1.0]}
+  - {name: qwen25_14b__hybrid_kw, refuse_from: qwen25_14b, checks: [keywords, patterns, facts, llm_judge], set: [fusion.type=hybrid, "fusion.core=[keywords, patterns, facts]", checks.facts.weight=1.0]}
+  - {name: qwen3_14b__hybrid, refuse_from: qwen3_14b, checks: [facts, llm_judge], set: [fusion.type=hybrid, checks.facts.weight=1.0]}
+  - {name: qwen3_14b__hybrid_kw, refuse_from: qwen3_14b, checks: [keywords, patterns, facts, llm_judge], set: [fusion.type=hybrid, "fusion.core=[keywords, patterns, facts]", checks.facts.weight=1.0]}
+  # ---- R4 blind policy table
+  - {name: qwen25_7b__facts_blind_only, refuse_from: qwen25_7b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen3_8b__facts_blind_only, refuse_from: qwen3_8b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen25_14b__facts_blind_only, refuse_from: qwen25_14b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen3_14b__facts_blind_only, refuse_from: qwen3_14b, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  # ---- 14B on 12 GB: full check set OOMs at runtime; facts-only pass (single-token answers, prefix cached) at
+  #      low concurrency (util 0.90, 6k ctx, max-num-seqs 2). Compare with <model>__facts_only / __facts_blind_only.
+  - {name: qwen25_14b_facts, checks: [facts, facts_blind], set: [checks.facts.weight=1.0], description: "Qwen2.5-14B-AWQ, facts + facts_blind only"}
+  - {name: qwen25_14b_facts__blind_only, refuse_from: qwen25_14b_facts, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  # ---- product variants: facts decides, keywords/patterns stay visible + editable with a light weight (abstain when empty)
+  - {name: qwen25_7b__facts_kwlight, refuse_from: qwen25_7b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0, checks.keywords.weight=0.15, checks.patterns.weight=0.1, fusion.abstain_on_empty=true]}
+  - {name: qwen25_7b__facts_kwlight_noesc, refuse_from: qwen25_7b, checks: [keywords, patterns, facts], set: [checks.facts.weight=1.0, checks.keywords.weight=0.15, checks.patterns.weight=0.1, fusion.abstain_on_empty=true, fusion.max_uncertainty=1.0]}
+  - {name: qwen25_7b__facts_noesc, refuse_from: qwen25_7b, checks: [facts], set: [checks.facts.weight=1.0, fusion.max_uncertainty=1.0]}
+  # ---- with the facts check: ASR model and ORACLE ceiling (run while the matching model is served)
+  - {name: qwen25_14b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, asr.model=models/asr/whisper-large-v3-gsw-ct2, asr.compute_type=float16], description: "14B facts on gcoli large-v3 ASR"}
+  - {name: qwen25_14b_facts_oracle, profile: llm-sweep-oracle, oracle: true, checks: [facts, facts_blind], set: [checks.facts.weight=1.0], description: "ORACLE: 14B facts on the dialect reference scripts"}
+  - {name: qwen25_7b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, asr.model=models/asr/whisper-large-v3-gsw-ct2, asr.compute_type=float16], description: "7B facts on gcoli large-v3 ASR"}
+  - {name: qwen25_7b_facts_oracle, profile: llm-sweep-oracle, oracle: true, checks: [facts, facts_blind], set: [checks.facts.weight=1.0], description: "ORACLE: 7B facts on the dialect reference scripts"}
+  # ---- review side: tuned facts decide, the blind table (written from review_when etc.) may escalate to review only
+  - {name: qwen25_14b_facts__blind_review, refuse_from: qwen25_14b_facts, checks: [facts, facts_blind], set: [fusion.type=hybrid, "fusion.second_opinion=[facts_blind]", checks.facts.weight=1.0]}
+  # ---- RQ1 view comparison with facts (7B): Standard German ASR view vs its English LLM translation
+  - {name: qwen25_7b_facts_en, profile: llm-sweep-views, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, check_view=en_from_de], description: "7B facts on the English translation of the de view"}
+  - {name: qwen25_14b_facts_l3__blind_only, refuse_from: qwen25_14b_facts_l3, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen25_14b_facts_l3__both, refuse_from: qwen25_14b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
+  - {name: qwen25_14b_facts__both, refuse_from: qwen25_14b_facts, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
+  - {name: qwen25_14b_facts_oracle__blind_only, refuse_from: qwen25_14b_facts_oracle, oracle: true, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen25_7b__both, refuse_from: qwen25_7b, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
+  - {name: qwen25_7b_facts_l3__blind_only, refuse_from: qwen25_7b_facts_l3, checks: [facts_blind], set: [checks.facts_blind.weight=1.0]}
+  - {name: qwen25_7b_facts_l3__both, refuse_from: qwen25_7b_facts_l3, checks: [facts, facts_blind], set: [checks.facts.weight=1.0, checks.facts_blind.weight=1.0]}
+  # ---- R3 on 14B: is the wording fragility a 7B problem? (large-v3 transcripts, paraphrased table)
+  - {name: qwen25_14b_para_l3, checks: [facts], set: [checks.facts.weight=1.0, checks.facts.policy_table=config/policy_table_para.yaml, asr.model=models/asr/whisper-large-v3-gsw-ct2, asr.compute_type=float16], description: "14B facts with the paraphrased table on large-v3 ASR"}

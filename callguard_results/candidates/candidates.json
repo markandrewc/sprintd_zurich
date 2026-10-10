@@ -1,0 +1,3844 @@
+{
+ "created": "2026-10-10T13:36:17+0200",
+ "spec": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a9c21ffda9a23d374/experiments/contrib/candidates.yaml",
+ "roots": {
+  "default": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a9c21ffda9a23d374/runs/experiments",
+  "perturbed": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a9c21ffda9a23d374/runs/perturbed/experiments",
+  "test50": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a9c21ffda9a23d374/runs/test50/experiments"
+ },
+ "n_boot": 2000,
+ "seed": 13,
+ "basis": "cv",
+ "reference": "champion",
+ "candidates": [
+  {
+   "id": "champion",
+   "label": "Champion: Qwen2.5-7B Fakten, Tabelle v1",
+   "short": "Champion v1",
+   "group": "Fakten",
+   "kind": "candidate",
+   "passages": "ja",
+   "hardware": "12 GB 4070 gestaffelt (ASR, dann vLLM); 24 GB: alles zusammen",
+   "licence": "LLM Apache-2.0, ASR MIT",
+   "e2e": "ja (gestaffelt, neue Dateien, Journal 04:50)",
+   "profile": "recommended",
+   "note": "Eingefroren, einziger Kandidat mit Holdout-Lauf (3 Blicke, nur Plausibilität).",
+   "table": "v1",
+   "model": "Qwen2.5-7B-AWQ",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "champion/champion",
+     "status": "ok",
+     "refs": [
+      "champion/champion"
+     ]
+    },
+    "reworded": {
+     "ref": "kev_vs_facts/qwen_facts_para",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/qwen_facts_para",
+      "kev_vs_facts/qwen_facts_para2"
+     ]
+    },
+    "blind": {
+     "ref": "kev_vs_facts/qwen_facts_blind",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/qwen_facts_blind"
+     ]
+    },
+    "rerecorded": {
+     "ref": "perturbed:perturbed/perturbed",
+     "status": "ok",
+     "refs": [
+      "perturbed:perturbed/perturbed",
+      "perturbed/perturbed"
+     ]
+    },
+    "test50": {
+     "ref": "test50:test50/champion",
+     "status": "pending",
+     "refs": [
+      "test50:test50/champion"
+     ]
+    }
+   },
+   "tuned": {
+    "ref": "champion/champion",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.8663,
+     "lo": 0.722,
+     "hi": 0.9889
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502
+     },
+     "miss_rate": {
+      "value": 0.1538,
+      "lo": 0.0,
+      "hi": 0.3636
+     },
+     "accuracy": {
+      "value": 0.7917,
+      "lo": 0.6296,
+      "hi": 0.9545
+     },
+     "review_recall": {
+      "value": 0.6667,
+      "lo": 0.0,
+      "hi": 1.0
+     },
+     "flag_f1": {
+      "value": 0.8627,
+      "lo": 0.7347,
+      "hi": 0.963
+     }
+    },
+    "cost": {
+     "s_per_call": 4.13,
+     "llm_calls_per_call": 1.65,
+     "wall_s_per_call": 0.208
+    },
+    "tags": [],
+    "description": "config/recommended.yaml as is",
+    "far20": {
+     "flag_recall": 0.8077,
+     "false_alarm_rate": 0.1364,
+     "flag_f1": 0.84
+    }
+   },
+   "reviews": {
+    "predicted": 10,
+    "expected": 6,
+    "hit": 4,
+    "n": 48
+   },
+   "gen": {
+    "reworded": {
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/qwen_facts_para",
+      "kev_vs_facts/qwen_facts_para2"
+     ],
+     "auc": {
+      "value": 0.7277,
+      "lo": 0.5312,
+      "hi": 0.8899
+     },
+     "parts": [
+      {
+       "ref": "kev_vs_facts/qwen_facts_para",
+       "status": "ok"
+      },
+      {
+       "ref": "kev_vs_facts/qwen_facts_para2",
+       "status": "ok"
+      }
+     ],
+     "aucs": [
+      {
+       "value": 0.7194,
+       "lo": 0.5248,
+       "hi": 0.8821
+      },
+      {
+       "value": 0.736,
+       "lo": 0.5402,
+       "hi": 0.9037
+      }
+     ],
+     "n_sets": 2,
+     "drop": {
+      "a": 0.8663,
+      "b": 0.7277,
+      "diff": -0.1386,
+      "lo": -0.2963,
+      "hi": -0.0207,
+      "real": true,
+      "n": 48
+     }
+    },
+    "blind": {
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/qwen_facts_blind"
+     ],
+     "auc": {
+      "value": 0.7255,
+      "lo": 0.528,
+      "hi": 0.9039
+     },
+     "aucs": [
+      {
+       "value": 0.7255,
+       "lo": 0.528,
+       "hi": 0.9039
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8663,
+      "b": 0.7255,
+      "diff": -0.1408,
+      "lo": -0.3229,
+      "hi": -0.0083,
+      "real": true,
+      "n": 48
+     }
+    },
+    "rerecorded": {
+     "status": "ok",
+     "refs": [
+      "perturbed:perturbed/perturbed",
+      "perturbed/perturbed"
+     ],
+     "auc": {
+      "value": 0.8278,
+      "lo": 0.6732,
+      "hi": 0.9593
+     },
+     "aucs": [
+      {
+       "value": 0.8278,
+       "lo": 0.6732,
+       "hi": 0.9593
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8663,
+      "b": 0.8278,
+      "diff": -0.0385,
+      "lo": -0.1067,
+      "hi": 0.0051,
+      "real": false,
+      "n": 48
+     }
+    }
+   },
+   "evidence": {
+    "ref": "kev_vs_facts/champion",
+    "n": 22,
+    "no_passage": 0,
+    "chance1": 0.244,
+    "median_len1": 12.4,
+    "hit1": {
+     "k": 16,
+     "n": 22,
+     "value": 0.7273,
+     "lo": 0.4545,
+     "hi": 0.9102,
+     "units": 11
+    },
+    "hit3": {
+     "k": 21,
+     "n": 22,
+     "value": 0.9545,
+     "lo": 0.8636,
+     "hi": 1.0,
+     "units": 11
+    }
+   }
+  },
+  {
+   "id": "champion_v3",
+   "label": "Champion mit Tabelle v3",
+   "short": "Champion v3",
+   "group": "Fakten",
+   "kind": "candidate",
+   "passages": "ja",
+   "hardware": "wie Champion",
+   "licence": "LLM Apache-2.0, ASR MIT",
+   "e2e": "teilweise (gleiche Kette, Profil recommended-v3; auf neuen Dateien nicht separat gelaufen)",
+   "profile": "recommended-v3",
+   "note": "v3 wurde in Kenntnis eines Holdout-Fehlers (Aufteilen) entworfen; kein Holdout-Lauf.",
+   "table": "v3",
+   "model": "Qwen2.5-7B-AWQ",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "champion/table_v3",
+     "status": "ok",
+     "refs": [
+      "champion/table_v3"
+     ]
+    },
+    "reworded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": "perturbed:perturbed/table_v3",
+     "status": "ok",
+     "refs": [
+      "perturbed:perturbed/table_v3",
+      "perturbed/table_v3"
+     ]
+    },
+    "test50": {
+     "ref": "test50:test50/champion_v3",
+     "status": "pending",
+     "refs": [
+      "test50:test50/champion_v3"
+     ]
+    }
+   },
+   "tuned": {
+    "ref": "champion/table_v3",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.9187,
+     "lo": 0.8045,
+     "hi": 1.0
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502
+     },
+     "miss_rate": {
+      "value": 0.0769,
+      "lo": 0.0,
+      "hi": 0.25
+     },
+     "accuracy": {
+      "value": 0.8333,
+      "lo": 0.6786,
+      "hi": 1.0
+     },
+     "review_recall": {
+      "value": 1.0,
+      "lo": 1.0,
+      "hi": 1.0
+     },
+     "flag_f1": {
+      "value": 0.9057,
+      "lo": 0.8,
+      "hi": 1.0
+     }
+    },
+    "cost": {
+     "s_per_call": 4.94,
+     "llm_calls_per_call": 9.96,
+     "wall_s_per_call": 4.883
+    },
+    "tags": [],
+    "description": "R2: + per-family explicit open-fact review rules (from criteria review_when) + splitting re-check facts; v1 fact answers cached, new facts computed",
+    "far20": {
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.1364,
+     "flag_f1": 0.8846
+    }
+   },
+   "reviews": {
+    "predicted": 12,
+    "expected": 6,
+    "hit": 6,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "noise",
+    "flips": 2,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.9187,
+     "diff": 0.0524,
+     "lo": 0.0,
+     "hi": 0.1715,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.1364,
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.0769,
+     "diff": -0.0769,
+     "lo": -0.25,
+     "hi": 0.0,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 1.0,
+     "diff": 0.3333,
+     "lo": 0.0,
+     "hi": 1.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.8333,
+     "diff": 0.0416,
+     "lo": 0.0,
+     "hi": 0.1364,
+     "real": false
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "ok",
+     "refs": [
+      "perturbed:perturbed/table_v3",
+      "perturbed/table_v3"
+     ],
+     "auc": {
+      "value": 0.882,
+      "lo": 0.7583,
+      "hi": 0.9838
+     },
+     "aucs": [
+      {
+       "value": 0.882,
+       "lo": 0.7583,
+       "hi": 0.9838
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.9187,
+      "b": 0.882,
+      "diff": -0.0367,
+      "lo": -0.1021,
+      "hi": 0.0019,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.8278,
+      "b": 0.882,
+      "diff": 0.0542,
+      "lo": 0.0,
+      "hi": 0.1771,
+      "real": false,
+      "n": 48
+     }
+    }
+   }
+  },
+  {
+   "id": "kev",
+   "label": "Kev-4B Fakten, Tabelle v1",
+   "short": "Kev v1",
+   "group": "Fakten",
+   "kind": "candidate",
+   "passages": "nein (nur Stichwort-/Muster-Treffer)",
+   "hardware": "12 GB gestaffelt: ASR, vLLM 7B für Rollen, dann Kev (~8 GB); 24 GB zusammen",
+   "licence": "Kev Apache-2.0 (LoRA auf Qwen3.5-4B), ASR MIT",
+   "e2e": "nein (nur Experimente auf gecachten Transkripten + Rollen)",
+   "profile": "kev (Variante kev_facts)",
+   "note": "Kev kennt kein „unklar“: offene Fakten werden ja/nein, die Prüfen-Regeln der Tabelle feuern kaum.",
+   "table": "v1",
+   "model": "Kev-4B",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "kev_vs_facts/kev_facts",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_facts"
+     ]
+    },
+    "reworded": {
+     "ref": "kev_vs_facts/kev_facts_para",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_facts_para",
+      "kev_vs_facts/kev_facts_para2"
+     ]
+    },
+    "blind": {
+     "ref": "kev_vs_facts/kev_facts_blind",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_facts_blind"
+     ]
+    },
+    "rerecorded": {
+     "ref": "perturbed:kev_perturbed/kev_facts",
+     "status": "ok",
+     "refs": [
+      "perturbed:kev_perturbed/kev_facts"
+     ]
+    },
+    "test50": {
+     "ref": "test50:test50/kev_facts",
+     "status": "pending",
+     "refs": [
+      "test50:test50/kev_facts"
+     ]
+    }
+   },
+   "tuned": {
+    "ref": "kev_vs_facts/kev_facts",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.8566,
+     "lo": 0.6667,
+     "hi": 0.9818
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "miss_rate": {
+      "value": 0.3077,
+      "lo": 0.0909,
+      "hi": 0.5556
+     },
+     "accuracy": {
+      "value": 0.6875,
+      "lo": 0.4773,
+      "hi": 0.86
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.8182,
+      "lo": 0.6154,
+      "hi": 0.9524
+     }
+    },
+    "cost": {
+     "s_per_call": 15.67,
+     "llm_calls_per_call": 20.0,
+     "wall_s_per_call": 15.608
+    },
+    "tags": [],
+    "description": "our facts check (tuned questions + policy table) with Kev as the probability backend (noul); + kw/pat",
+    "far20": {
+     "flag_recall": 0.6923,
+     "false_alarm_rate": 0.0,
+     "flag_f1": 0.8182
+    }
+   },
+   "reviews": {
+    "predicted": 6,
+    "expected": 6,
+    "hit": 0,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "noise",
+    "flips": 15,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.8566,
+     "diff": -0.0097,
+     "lo": -0.2058,
+     "hi": 0.1439,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.0,
+     "diff": -0.1364,
+     "lo": -0.3502,
+     "hi": 0.0,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.3077,
+     "diff": 0.1539,
+     "lo": -0.0556,
+     "hi": 0.4091,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.0,
+     "diff": -0.6667,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.6875,
+     "diff": -0.1042,
+     "lo": -0.3636,
+     "hi": 0.0926,
+     "real": false
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_facts_para",
+      "kev_vs_facts/kev_facts_para2"
+     ],
+     "auc": {
+      "value": 0.8995,
+      "lo": 0.7273,
+      "hi": 1.0
+     },
+     "parts": [
+      {
+       "ref": "kev_vs_facts/kev_facts_para",
+       "status": "ok"
+      },
+      {
+       "ref": "kev_vs_facts/kev_facts_para2",
+       "status": "ok"
+      }
+     ],
+     "aucs": [
+      {
+       "value": 0.9021,
+       "lo": 0.7341,
+       "hi": 1.0
+      },
+      {
+       "value": 0.8969,
+       "lo": 0.7087,
+       "hi": 1.0
+      }
+     ],
+     "n_sets": 2,
+     "drop": {
+      "a": 0.8566,
+      "b": 0.8995,
+      "diff": 0.0429,
+      "lo": -0.007,
+      "hi": 0.1052,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7277,
+      "b": 0.8995,
+      "diff": 0.1718,
+      "lo": 0.0432,
+      "hi": 0.3103,
+      "real": true,
+      "n": 48
+     }
+    },
+    "blind": {
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_facts_blind"
+     ],
+     "auc": {
+      "value": 0.854,
+      "lo": 0.6826,
+      "hi": 0.9978
+     },
+     "aucs": [
+      {
+       "value": 0.854,
+       "lo": 0.6826,
+       "hi": 0.9978
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8566,
+      "b": 0.854,
+      "diff": -0.0026,
+      "lo": -0.0923,
+      "hi": 0.1131,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7255,
+      "b": 0.854,
+      "diff": 0.1285,
+      "lo": -0.0834,
+      "hi": 0.3491,
+      "real": false,
+      "n": 48
+     }
+    },
+    "rerecorded": {
+     "status": "ok",
+     "refs": [
+      "perturbed:kev_perturbed/kev_facts"
+     ],
+     "auc": {
+      "value": 0.8059,
+      "lo": 0.6044,
+      "hi": 0.9571
+     },
+     "aucs": [
+      {
+       "value": 0.8059,
+       "lo": 0.6044,
+       "hi": 0.9571
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8566,
+      "b": 0.8059,
+      "diff": -0.0507,
+      "lo": -0.1531,
+      "hi": 0.0136,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.8278,
+      "b": 0.8059,
+      "diff": -0.0219,
+      "lo": -0.1764,
+      "hi": 0.0938,
+      "real": false,
+      "n": 48
+     }
+    }
+   },
+   "evidence": {
+    "ref": "kev_vs_facts/kev_facts",
+    "n": 14,
+    "no_passage": 8,
+    "chance1": 0.167,
+    "median_len1": 1.5,
+    "hit1": {
+     "k": 6,
+     "n": 14,
+     "value": 0.4286,
+     "lo": 0.125,
+     "hi": 0.75,
+     "units": 8
+    },
+    "hit3": {
+     "k": 6,
+     "n": 14,
+     "value": 0.4286,
+     "lo": 0.125,
+     "hi": 0.75,
+     "units": 8
+    }
+   }
+  },
+  {
+   "id": "kev_v3",
+   "label": "Kev-4B Fakten, Tabelle v3",
+   "short": "Kev v3",
+   "group": "Fakten",
+   "kind": "candidate",
+   "passages": "nein (nur Stichwort-/Muster-Treffer)",
+   "hardware": "wie Kev v1",
+   "licence": "Kev Apache-2.0, ASR MIT",
+   "e2e": "nein",
+   "profile": null,
+   "note": null,
+   "table": "v3",
+   "model": "Kev-4B",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "kev_vs_facts/kev_facts_v3",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_facts_v3"
+     ]
+    },
+    "reworded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": "perturbed:kev_perturbed/kev_facts_v3",
+     "status": "ok",
+     "refs": [
+      "perturbed:kev_perturbed/kev_facts_v3"
+     ]
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": {
+    "ref": "kev_vs_facts/kev_facts_v3",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.8287,
+     "lo": 0.6473,
+     "hi": 0.9646
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.0455,
+      "lo": 0.0,
+      "hi": 0.1538
+     },
+     "miss_rate": {
+      "value": 0.3077,
+      "lo": 0.0909,
+      "hi": 0.5556
+     },
+     "accuracy": {
+      "value": 0.6667,
+      "lo": 0.4733,
+      "hi": 0.8333
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.8,
+      "lo": 0.6,
+      "hi": 0.9302
+     }
+    },
+    "cost": {
+     "s_per_call": 6.35,
+     "llm_calls_per_call": 8.0,
+     "wall_s_per_call": 6.287
+    },
+    "tags": [],
+    "description": "Kev facts with policy table v3 (criteria-derived open-fact review rules)",
+    "far20": {
+     "flag_recall": 0.6923,
+     "false_alarm_rate": 0.0455,
+     "flag_f1": 0.8
+    }
+   },
+   "reviews": {
+    "predicted": 6,
+    "expected": 6,
+    "hit": 0,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "noise",
+    "flips": 16,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.8287,
+     "diff": -0.0376,
+     "lo": -0.2305,
+     "hi": 0.1195,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.0455,
+     "diff": -0.0909,
+     "lo": -0.3333,
+     "hi": 0.1111,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.3077,
+     "diff": 0.1539,
+     "lo": -0.0556,
+     "hi": 0.4091,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.0,
+     "diff": -0.6667,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.6667,
+     "diff": -0.125,
+     "lo": -0.381,
+     "hi": 0.08,
+     "real": false
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "ok",
+     "refs": [
+      "perturbed:kev_perturbed/kev_facts_v3"
+     ],
+     "auc": {
+      "value": 0.7858,
+      "lo": 0.5798,
+      "hi": 0.9494
+     },
+     "aucs": [
+      {
+       "value": 0.7858,
+       "lo": 0.5798,
+       "hi": 0.9494
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8287,
+      "b": 0.7858,
+      "diff": -0.0429,
+      "lo": -0.1507,
+      "hi": 0.0303,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.8278,
+      "b": 0.7858,
+      "diff": -0.042,
+      "lo": -0.2031,
+      "hi": 0.0826,
+      "real": false,
+      "n": 48
+     }
+    }
+   },
+   "evidence": {
+    "ref": "kev_vs_facts/kev_facts_v3",
+    "n": 15,
+    "no_passage": 8,
+    "chance1": 0.175,
+    "median_len1": 1.5,
+    "hit1": {
+     "k": 7,
+     "n": 15,
+     "value": 0.4667,
+     "lo": 0.1333,
+     "hi": 0.8,
+     "units": 9
+    },
+    "hit3": {
+     "k": 7,
+     "n": 15,
+     "value": 0.4667,
+     "lo": 0.1333,
+     "hi": 0.8,
+     "units": 9
+    }
+   }
+  },
+  {
+   "id": "q38",
+   "label": "Qwen3.8-27B 3-bit Fakten, Tabelle v1",
+   "short": "Q3.8 3-bit v1",
+   "group": "Fakten",
+   "kind": "candidate",
+   "passages": "nein (evidence aus; nur Stichwort-/Muster-Treffer)",
+   "hardware": "12 GB 4070 allein (10.9 GB GGUF); ASR + Rollen (vLLM 7B) vorher in eigenen Stufen",
+   "licence": "Qwen3.8: Lizenz nicht geprüft (Modellkarte), ASR MIT",
+   "e2e": "nein (Experimente; Rollen aus dem Cache)",
+   "profile": "qwen38",
+   "note": "Nur eine Paraphrase gerechnet (para2 nicht geplant).",
+   "table": "v1",
+   "model": "Qwen3.8-27B IQ3_XXS (llama.cpp)",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "qwen38/q38_facts",
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_facts"
+     ]
+    },
+    "reworded": {
+     "ref": "qwen38/q38_facts_para",
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_facts_para"
+     ]
+    },
+    "blind": {
+     "ref": "qwen38/q38_facts_blind",
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_facts_blind"
+     ]
+    },
+    "rerecorded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": {
+    "ref": "qwen38/q38_facts",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.8497,
+     "lo": 0.6429,
+     "hi": 1.0
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "miss_rate": {
+      "value": 0.3077,
+      "lo": 0.0769,
+      "hi": 0.5833
+     },
+     "accuracy": {
+      "value": 0.7708,
+      "lo": 0.6,
+      "hi": 0.9167
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.8182,
+      "lo": 0.5882,
+      "hi": 0.96
+     }
+    },
+    "cost": {
+     "s_per_call": 26.33,
+     "llm_calls_per_call": 20.0,
+     "wall_s_per_call": 25.212
+    },
+    "tags": [],
+    "description": "Qwen3.8-27B reads the tuned facts (champion design); + kw/pat",
+    "far20": {
+     "flag_recall": 0.6923,
+     "false_alarm_rate": 0.0,
+     "flag_f1": 0.8182
+    }
+   },
+   "reviews": {
+    "predicted": 1,
+    "expected": 6,
+    "hit": 0,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "noise",
+    "flips": 11,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.8497,
+     "diff": -0.0166,
+     "lo": -0.1969,
+     "hi": 0.1189,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.0,
+     "diff": -0.1364,
+     "lo": -0.3502,
+     "hi": 0.0,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.3077,
+     "diff": 0.1539,
+     "lo": 0.0,
+     "hi": 0.3752,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.0,
+     "diff": -0.6667,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.7708,
+     "diff": -0.0209,
+     "lo": -0.2143,
+     "hi": 0.1458,
+     "real": false
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_facts_para"
+     ],
+     "auc": {
+      "value": 0.8671,
+      "lo": 0.6627,
+      "hi": 1.0
+     },
+     "parts": [
+      {
+       "ref": "qwen38/q38_facts_para",
+       "status": "ok"
+      }
+     ],
+     "aucs": [
+      {
+       "value": 0.8671,
+       "lo": 0.6627,
+       "hi": 1.0
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8497,
+      "b": 0.8671,
+      "diff": 0.0174,
+      "lo": 0.0,
+      "hi": 0.0694,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7194,
+      "b": 0.8671,
+      "diff": 0.1477,
+      "lo": 0.0,
+      "hi": 0.3093,
+      "real": false,
+      "n": 48
+     }
+    },
+    "blind": {
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_facts_blind"
+     ],
+     "auc": {
+      "value": 0.8252,
+      "lo": 0.6321,
+      "hi": 0.9703
+     },
+     "aucs": [
+      {
+       "value": 0.8252,
+       "lo": 0.6321,
+       "hi": 0.9703
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8497,
+      "b": 0.8252,
+      "diff": -0.0245,
+      "lo": -0.1389,
+      "hi": 0.0606,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7255,
+      "b": 0.8252,
+      "diff": 0.0997,
+      "lo": -0.0965,
+      "hi": 0.2802,
+      "real": false,
+      "n": 48
+     }
+    },
+    "rerecorded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    }
+   },
+   "evidence": {
+    "ref": "qwen38/q38_facts",
+    "n": 18,
+    "no_passage": 8,
+    "chance1": 0.184,
+    "median_len1": 1.5,
+    "hit1": {
+     "k": 9,
+     "n": 18,
+     "value": 0.5,
+     "lo": 0.2222,
+     "hi": 0.7778,
+     "units": 9
+    },
+    "hit3": {
+     "k": 10,
+     "n": 18,
+     "value": 0.5556,
+     "lo": 0.2222,
+     "hi": 0.8889,
+     "units": 9
+    }
+   }
+  },
+  {
+   "id": "q38_v3",
+   "label": "Qwen3.8-27B 3-bit Fakten, Tabelle v3",
+   "short": "Q3.8 3-bit v3",
+   "group": "Fakten",
+   "kind": "candidate",
+   "passages": "nein (nur Stichwort-/Muster-Treffer)",
+   "hardware": "wie Q3.8 3-bit",
+   "licence": "Qwen3.8: nicht geprüft, ASR MIT",
+   "e2e": "nein",
+   "profile": null,
+   "note": null,
+   "table": "v3",
+   "model": "Qwen3.8-27B IQ3_XXS (llama.cpp)",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "qwen38/q38_facts_v3",
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_facts_v3"
+     ]
+    },
+    "reworded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": {
+    "ref": "qwen38/q38_facts_v3",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.8497,
+     "lo": 0.6429,
+     "hi": 1.0
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "miss_rate": {
+      "value": 0.3077,
+      "lo": 0.0769,
+      "hi": 0.5833
+     },
+     "accuracy": {
+      "value": 0.7708,
+      "lo": 0.6,
+      "hi": 0.9167
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.8182,
+      "lo": 0.5882,
+      "hi": 0.96
+     }
+    },
+    "cost": {
+     "s_per_call": 11.88,
+     "llm_calls_per_call": 8.0,
+     "wall_s_per_call": 11.819
+    },
+    "tags": [],
+    "description": "Qwen3.8 facts with policy table v3",
+    "far20": {
+     "flag_recall": 0.6923,
+     "false_alarm_rate": 0.0,
+     "flag_f1": 0.8182
+    }
+   },
+   "reviews": {
+    "predicted": 1,
+    "expected": 6,
+    "hit": 0,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "noise",
+    "flips": 11,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.8497,
+     "diff": -0.0166,
+     "lo": -0.1969,
+     "hi": 0.1189,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.0,
+     "diff": -0.1364,
+     "lo": -0.3502,
+     "hi": 0.0,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.3077,
+     "diff": 0.1539,
+     "lo": 0.0,
+     "hi": 0.3752,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.0,
+     "diff": -0.6667,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.7708,
+     "diff": -0.0209,
+     "lo": -0.2143,
+     "hi": 0.1458,
+     "real": false
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    }
+   },
+   "evidence": {
+    "ref": "qwen38/q38_facts_v3",
+    "n": 18,
+    "no_passage": 8,
+    "chance1": 0.184,
+    "median_len1": 1.5,
+    "hit1": {
+     "k": 9,
+     "n": 18,
+     "value": 0.5,
+     "lo": 0.2222,
+     "hi": 0.7778,
+     "units": 9
+    },
+    "hit3": {
+     "k": 10,
+     "n": 18,
+     "value": 0.5556,
+     "lo": 0.2222,
+     "hi": 0.8889,
+     "units": 9
+    }
+   }
+  },
+  {
+   "id": "q38q6",
+   "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v1",
+   "short": "Q3.8 6-bit v1",
+   "group": "Fakten",
+   "kind": "candidate",
+   "passages": "nein (evidence aus; nur Stichwort-/Muster-Treffer)",
+   "hardware": "24 GB A5000 (22 GB GGUF füllt die Karte); ASR + Rollen in eigenen Stufen",
+   "licence": "Qwen3.8: nicht geprüft, ASR MIT",
+   "e2e": "nein (Experimente auf dem A5000; Rollen aus dem Cache)",
+   "profile": "qwen38-q6",
+   "note": "Kosten auf dem A5000 gemessen (llama.cpp, 4 Slots): ~135 s Prüfzeit pro Anruf.",
+   "table": "v1",
+   "model": "Qwen3.8-27B Q6_K (llama.cpp)",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "qwen38_q6/q38q6_facts",
+     "status": "ok",
+     "refs": [
+      "qwen38_q6/q38q6_facts"
+     ]
+    },
+    "reworded": {
+     "ref": "qwen38_q6/q38q6_facts_para",
+     "status": "ok",
+     "refs": [
+      "qwen38_q6/q38q6_facts_para"
+     ]
+    },
+    "blind": {
+     "ref": "qwen38_q6/q38q6_facts_blind",
+     "status": "running",
+     "refs": [
+      "qwen38_q6/q38q6_facts_blind"
+     ]
+    },
+    "rerecorded": {
+     "ref": "perturbed:qwen38_q6_perturbed/q38q6_facts",
+     "status": "pending",
+     "refs": [
+      "perturbed:qwen38_q6_perturbed/q38q6_facts"
+     ]
+    },
+    "test50": {
+     "ref": "test50:test50/q38q6_facts",
+     "status": "pending",
+     "refs": [
+      "test50:test50/q38q6_facts"
+     ]
+    }
+   },
+   "tuned": {
+    "ref": "qwen38_q6/q38q6_facts",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.8514,
+     "lo": 0.6474,
+     "hi": 1.0
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "miss_rate": {
+      "value": 0.2692,
+      "lo": 0.0667,
+      "hi": 0.5
+     },
+     "accuracy": {
+      "value": 0.7917,
+      "lo": 0.625,
+      "hi": 0.929
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.8444,
+      "lo": 0.6667,
+      "hi": 0.9655
+     }
+    },
+    "cost": {
+     "s_per_call": 135.63,
+     "llm_calls_per_call": 20.0,
+     "wall_s_per_call": 133.299
+    },
+    "tags": [],
+    "description": "Qwen3.8-27B reads the tuned facts (champion design); + kw/pat",
+    "far20": {
+     "flag_recall": 0.7308,
+     "false_alarm_rate": 0.0,
+     "flag_f1": 0.8444
+    }
+   },
+   "reviews": {
+    "predicted": 1,
+    "expected": 6,
+    "hit": 0,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "noise",
+    "flips": 9,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.8514,
+     "diff": -0.0149,
+     "lo": -0.1964,
+     "hi": 0.1228,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.0,
+     "diff": -0.1364,
+     "lo": -0.3502,
+     "hi": 0.0,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.2692,
+     "diff": 0.1154,
+     "lo": 0.0,
+     "hi": 0.3,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.0,
+     "diff": -0.6667,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.7917,
+     "diff": 0.0,
+     "lo": -0.182,
+     "hi": 0.16,
+     "real": false
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "ok",
+     "refs": [
+      "qwen38_q6/q38q6_facts_para"
+     ],
+     "auc": {
+      "value": 0.8636,
+      "lo": 0.6606,
+      "hi": 1.0
+     },
+     "parts": [
+      {
+       "ref": "qwen38_q6/q38q6_facts_para",
+       "status": "ok"
+      }
+     ],
+     "aucs": [
+      {
+       "value": 0.8636,
+       "lo": 0.6606,
+       "hi": 1.0
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8514,
+      "b": 0.8636,
+      "diff": 0.0122,
+      "lo": 0.0,
+      "hi": 0.0437,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7194,
+      "b": 0.8636,
+      "diff": 0.1442,
+      "lo": 0.0,
+      "hi": 0.3042,
+      "real": false,
+      "n": 48
+     }
+    },
+    "blind": {
+     "status": "running",
+     "refs": [
+      "qwen38_q6/q38q6_facts_blind"
+     ],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "pending",
+     "refs": [
+      "perturbed:qwen38_q6_perturbed/q38q6_facts"
+     ],
+     "auc": null
+    }
+   },
+   "evidence": {
+    "ref": "qwen38_q6/q38q6_facts",
+    "n": 19,
+    "no_passage": 9,
+    "chance1": 0.184,
+    "median_len1": 1.5,
+    "hit1": {
+     "k": 9,
+     "n": 19,
+     "value": 0.4737,
+     "lo": 0.1875,
+     "hi": 0.75,
+     "units": 10
+    },
+    "hit3": {
+     "k": 10,
+     "n": 19,
+     "value": 0.5263,
+     "lo": 0.2105,
+     "hi": 0.8421,
+     "units": 10
+    }
+   }
+  },
+  {
+   "id": "q38q6_v3",
+   "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v3",
+   "short": "Q3.8 6-bit v3",
+   "group": "Fakten",
+   "kind": "candidate",
+   "passages": "nein (nur Stichwort-/Muster-Treffer)",
+   "hardware": "wie Q3.8 6-bit",
+   "licence": "Qwen3.8: nicht geprüft, ASR MIT",
+   "e2e": "nein",
+   "profile": null,
+   "note": null,
+   "table": "v3",
+   "model": "Qwen3.8-27B Q6_K (llama.cpp)",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "qwen38_q6/q38q6_facts_v3",
+     "status": "pending",
+     "refs": [
+      "qwen38_q6/q38q6_facts_v3"
+     ]
+    },
+    "reworded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": "perturbed:qwen38_q6_perturbed/q38q6_facts_v3",
+     "status": "pending",
+     "refs": [
+      "perturbed:qwen38_q6_perturbed/q38q6_facts_v3"
+     ]
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": null
+  },
+  {
+   "id": "gen_qwen",
+   "label": "Allgemeine Fragen auf Qwen2.5-7B",
+   "short": "Allg. Qwen 7B",
+   "group": "Allgemeine Fragen",
+   "kind": "candidate",
+   "passages": "nein (nur Stichwort-/Muster-Treffer)",
+   "hardware": "wie Champion",
+   "licence": "LLM Apache-2.0, ASR MIT",
+   "e2e": "nein",
+   "profile": "recommended (Variante qwen_general)",
+   "note": null,
+   "table": null,
+   "model": "Qwen2.5-7B-AWQ",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "kev_vs_facts/qwen_general",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/qwen_general"
+     ]
+    },
+    "reworded": {
+     "ref": "kev_vs_facts/qwen_general_para",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/qwen_general_para"
+     ]
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": "perturbed:kev_perturbed/qwen_general",
+     "status": "ok",
+     "refs": [
+      "perturbed:kev_perturbed/qwen_general"
+     ]
+    },
+    "test50": {
+     "ref": "test50:test50/qwen_general",
+     "status": "pending",
+     "refs": [
+      "test50:test50/qwen_general"
+     ]
+    }
+   },
+   "tuned": {
+    "ref": "kev_vs_facts/qwen_general",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.722,
+     "lo": 0.5535,
+     "hi": 0.8839
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.6364,
+      "lo": 0.375,
+      "hi": 0.875
+     },
+     "miss_rate": {
+      "value": 0.0769,
+      "lo": 0.0,
+      "hi": 0.25
+     },
+     "accuracy": {
+      "value": 0.5417,
+      "lo": 0.3913,
+      "hi": 0.7083
+     },
+     "review_recall": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 1.0
+     },
+     "flag_f1": {
+      "value": 0.75,
+      "lo": 0.6027,
+      "hi": 0.88
+     }
+    },
+    "cost": {
+     "s_per_call": 3.04,
+     "llm_calls_per_call": 15.0,
+     "wall_s_per_call": 2.987
+    },
+    "tags": [],
+    "description": "Qwen2.5-7B asked the 15 general questions (facts prompt, logprob p(yes)); call = max p(yes); + kw/pat",
+    "far20": {
+     "flag_recall": 0.5769,
+     "false_alarm_rate": 0.3182,
+     "flag_f1": 0.625
+    }
+   },
+   "reviews": {
+    "predicted": 7,
+    "expected": 6,
+    "hit": 2,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "loss",
+    "flips": 22,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.722,
+     "diff": -0.1443,
+     "lo": -0.3012,
+     "hi": 0.0114,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.6364,
+     "diff": 0.5,
+     "lo": 0.1667,
+     "hi": 0.8,
+     "real": true
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.0769,
+     "diff": -0.0769,
+     "lo": -0.25,
+     "hi": 0.0,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.3333,
+     "diff": -0.3334,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.5417,
+     "diff": -0.25,
+     "lo": -0.4524,
+     "hi": -0.074,
+     "real": true
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/qwen_general_para"
+     ],
+     "auc": {
+      "value": 0.7107,
+      "lo": 0.5,
+      "hi": 0.8933
+     },
+     "parts": [
+      {
+       "ref": "kev_vs_facts/qwen_general_para",
+       "status": "ok"
+      }
+     ],
+     "aucs": [
+      {
+       "value": 0.7107,
+       "lo": 0.5,
+       "hi": 0.8933
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.722,
+      "b": 0.7107,
+      "diff": -0.0113,
+      "lo": -0.1462,
+      "hi": 0.0916,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7194,
+      "b": 0.7107,
+      "diff": -0.0087,
+      "lo": -0.1979,
+      "hi": 0.2103,
+      "real": false,
+      "n": 48
+     }
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "ok",
+     "refs": [
+      "perturbed:kev_perturbed/qwen_general"
+     ],
+     "auc": {
+      "value": 0.757,
+      "lo": 0.5816,
+      "hi": 0.9125
+     },
+     "aucs": [
+      {
+       "value": 0.757,
+       "lo": 0.5816,
+       "hi": 0.9125
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.722,
+      "b": 0.757,
+      "diff": 0.035,
+      "lo": -0.0458,
+      "hi": 0.1137,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.8278,
+      "b": 0.757,
+      "diff": -0.0708,
+      "lo": -0.2571,
+      "hi": 0.1178,
+      "real": false,
+      "n": 48
+     }
+    }
+   },
+   "evidence": {
+    "ref": "kev_vs_facts/qwen_general",
+    "n": 14,
+    "no_passage": 5,
+    "chance1": 0.181,
+    "median_len1": 1.4,
+    "hit1": {
+     "k": 8,
+     "n": 14,
+     "value": 0.5714,
+     "lo": 0.2308,
+     "hi": 0.875,
+     "units": 8
+    },
+    "hit3": {
+     "k": 9,
+     "n": 14,
+     "value": 0.6429,
+     "lo": 0.2667,
+     "hi": 1.0,
+     "units": 8
+    }
+   }
+  },
+  {
+   "id": "gen_kev",
+   "label": "Allgemeine Fragen auf Kev-4B (Teamkollege)",
+   "short": "Allg. Kev",
+   "group": "Allgemeine Fragen",
+   "kind": "candidate",
+   "passages": "ja (Fenster ~40 Wörter, lang)",
+   "hardware": "wie Kev v1",
+   "licence": "Kev Apache-2.0, ASR MIT",
+   "e2e": "nein bei uns (im Prototyp des Teamkollegen ja, andere ASR)",
+   "profile": "kev",
+   "note": null,
+   "table": null,
+   "model": "Kev-4B",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "kev_vs_facts/kev_general",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_general"
+     ]
+    },
+    "reworded": {
+     "ref": "kev_vs_facts/kev_general_para",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_general_para"
+     ]
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": "perturbed:kev_perturbed/kev_general",
+     "status": "ok",
+     "refs": [
+      "perturbed:kev_perturbed/kev_general"
+     ]
+    },
+    "test50": {
+     "ref": "test50:test50/kev_general",
+     "status": "pending",
+     "refs": [
+      "test50:test50/kev_general"
+     ]
+    }
+   },
+   "tuned": {
+    "ref": "kev_vs_facts/kev_general",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.7885,
+     "lo": 0.6154,
+     "hi": 0.9261
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.6818,
+      "lo": 0.4375,
+      "hi": 0.889
+     },
+     "miss_rate": {
+      "value": 0.2692,
+      "lo": 0.0667,
+      "hi": 0.5
+     },
+     "accuracy": {
+      "value": 0.5,
+      "lo": 0.35,
+      "hi": 0.6429
+     },
+     "review_recall": {
+      "value": 0.1667,
+      "lo": 0.0,
+      "hi": 0.5
+     },
+     "flag_f1": {
+      "value": 0.6333,
+      "lo": 0.4528,
+      "hi": 0.7761
+     }
+    },
+    "cost": {
+     "s_per_call": 2.36,
+     "llm_calls_per_call": 7.79,
+     "wall_s_per_call": 2.262
+    },
+    "tags": [],
+    "description": "Kev-4B, 15 general questions in one request on the de view, max p(yes), passages by window; + kw/pat",
+    "far20": {
+     "flag_recall": 0.5385,
+     "false_alarm_rate": 0.2273,
+     "flag_f1": 0.6222
+    }
+   },
+   "reviews": {
+    "predicted": 11,
+    "expected": 6,
+    "hit": 1,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "loss",
+    "flips": 22,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.7885,
+     "diff": -0.0778,
+     "lo": -0.2384,
+     "hi": 0.0595,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.6818,
+     "diff": 0.5454,
+     "lo": 0.3,
+     "hi": 0.75,
+     "real": true
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.2692,
+     "diff": 0.1154,
+     "lo": 0.0,
+     "hi": 0.2917,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.1667,
+     "diff": -0.5,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.5,
+     "diff": -0.2917,
+     "lo": -0.5,
+     "hi": -0.1042,
+     "real": true
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_general_para"
+     ],
+     "auc": {
+      "value": 0.8767,
+      "lo": 0.738,
+      "hi": 1.0
+     },
+     "parts": [
+      {
+       "ref": "kev_vs_facts/kev_general_para",
+       "status": "ok"
+      }
+     ],
+     "aucs": [
+      {
+       "value": 0.8767,
+       "lo": 0.738,
+       "hi": 1.0
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.7885,
+      "b": 0.8767,
+      "diff": 0.0882,
+      "lo": -0.03,
+      "hi": 0.2812,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7194,
+      "b": 0.8767,
+      "diff": 0.1573,
+      "lo": 0.0033,
+      "hi": 0.3866,
+      "real": true,
+      "n": 48
+     }
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "ok",
+     "refs": [
+      "perturbed:kev_perturbed/kev_general"
+     ],
+     "auc": {
+      "value": 0.7622,
+      "lo": 0.5647,
+      "hi": 0.9219
+     },
+     "aucs": [
+      {
+       "value": 0.7622,
+       "lo": 0.5647,
+       "hi": 0.9219
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.7885,
+      "b": 0.7622,
+      "diff": -0.0263,
+      "lo": -0.1169,
+      "hi": 0.0538,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.8278,
+      "b": 0.7622,
+      "diff": -0.0656,
+      "lo": -0.2354,
+      "hi": 0.0837,
+      "real": false,
+      "n": 48
+     }
+    }
+   },
+   "evidence": {
+    "ref": "kev_vs_facts/kev_general",
+    "n": 15,
+    "no_passage": 0,
+    "chance1": 0.547,
+    "median_len1": 48.0,
+    "hit1": {
+     "k": 13,
+     "n": 15,
+     "value": 0.8667,
+     "lo": 0.6,
+     "hi": 1.0,
+     "units": 8
+    },
+    "hit3": {
+     "k": 15,
+     "n": 15,
+     "value": 1.0,
+     "lo": 1.0,
+     "hi": 1.0,
+     "units": 8
+    }
+   }
+  },
+  {
+   "id": "gen_q38",
+   "label": "Allgemeine Fragen auf Qwen3.8 3-bit",
+   "short": "Allg. Q3.8 3-bit",
+   "group": "Allgemeine Fragen",
+   "kind": "candidate",
+   "passages": "nein (nur Stichwort-/Muster-Treffer)",
+   "hardware": "wie Q3.8 3-bit",
+   "licence": "Qwen3.8: nicht geprüft, ASR MIT",
+   "e2e": "nein",
+   "profile": null,
+   "note": null,
+   "table": null,
+   "model": "Qwen3.8-27B IQ3_XXS",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "qwen38/q38_general",
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_general"
+     ]
+    },
+    "reworded": {
+     "ref": "qwen38/q38_general_para",
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_general_para"
+     ]
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": {
+    "ref": "qwen38/q38_general",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.8287,
+     "lo": 0.6488,
+     "hi": 0.9636
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.3182,
+      "lo": 0.0554,
+      "hi": 0.6429
+     },
+     "miss_rate": {
+      "value": 0.2692,
+      "lo": 0.0625,
+      "hi": 0.5
+     },
+     "accuracy": {
+      "value": 0.625,
+      "lo": 0.4348,
+      "hi": 0.8043
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.7308,
+      "lo": 0.5384,
+      "hi": 0.8846
+     }
+    },
+    "cost": {
+     "s_per_call": 20.37,
+     "llm_calls_per_call": 15.0,
+     "wall_s_per_call": 20.317
+    },
+    "tags": [],
+    "description": "Qwen3.8-27B asked the 15 general questions (facts prompt, logprob p(yes)); call = max p(yes); + kw/pat",
+    "far20": {
+     "flag_recall": 0.6923,
+     "false_alarm_rate": 0.2727,
+     "flag_f1": 0.72
+    }
+   },
+   "reviews": {
+    "predicted": 4,
+    "expected": 6,
+    "hit": 0,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "loss",
+    "flips": 19,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.8287,
+     "diff": -0.0376,
+     "lo": -0.1421,
+     "hi": 0.0577,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.3182,
+     "diff": 0.1818,
+     "lo": -0.15,
+     "hi": 0.5455,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.2692,
+     "diff": 0.1154,
+     "lo": -0.0769,
+     "hi": 0.3333,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.0,
+     "diff": -0.6667,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.625,
+     "diff": -0.1667,
+     "lo": -0.3696,
+     "hi": -0.0185,
+     "real": true
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "ok",
+     "refs": [
+      "qwen38/q38_general_para"
+     ],
+     "auc": {
+      "value": 0.8322,
+      "lo": 0.6658,
+      "hi": 0.9584
+     },
+     "parts": [
+      {
+       "ref": "qwen38/q38_general_para",
+       "status": "ok"
+      }
+     ],
+     "aucs": [
+      {
+       "value": 0.8322,
+       "lo": 0.6658,
+       "hi": 0.9584
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.8287,
+      "b": 0.8322,
+      "diff": 0.0035,
+      "lo": -0.1154,
+      "hi": 0.1131,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7194,
+      "b": 0.8322,
+      "diff": 0.1128,
+      "lo": -0.0,
+      "hi": 0.2635,
+      "real": false,
+      "n": 48
+     }
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    }
+   },
+   "evidence": {
+    "ref": "qwen38/q38_general",
+    "n": 18,
+    "no_passage": 8,
+    "chance1": 0.184,
+    "median_len1": 1.5,
+    "hit1": {
+     "k": 9,
+     "n": 18,
+     "value": 0.5,
+     "lo": 0.2222,
+     "hi": 0.7778,
+     "units": 9
+    },
+    "hit3": {
+     "k": 10,
+     "n": 18,
+     "value": 0.5556,
+     "lo": 0.2222,
+     "hi": 0.8889,
+     "units": 9
+    }
+   }
+  },
+  {
+   "id": "gen_q38q6",
+   "label": "Allgemeine Fragen auf Qwen3.8 6-bit",
+   "short": "Allg. Q3.8 6-bit",
+   "group": "Allgemeine Fragen",
+   "kind": "candidate",
+   "passages": "nein (nur Stichwort-/Muster-Treffer)",
+   "hardware": "wie Q3.8 6-bit",
+   "licence": "Qwen3.8: nicht geprüft, ASR MIT",
+   "e2e": "nein",
+   "profile": null,
+   "note": null,
+   "table": null,
+   "model": "Qwen3.8-27B Q6_K",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "qwen38_q6/q38q6_general",
+     "status": "ok",
+     "refs": [
+      "qwen38_q6/q38q6_general"
+     ]
+    },
+    "reworded": {
+     "ref": "qwen38_q6/q38q6_general_para",
+     "status": "pending",
+     "refs": [
+      "qwen38_q6/q38q6_general_para"
+     ]
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": "perturbed:qwen38_q6_perturbed/q38q6_general",
+     "status": "pending",
+     "refs": [
+      "perturbed:qwen38_q6_perturbed/q38q6_general"
+     ]
+    },
+    "test50": {
+     "ref": "test50:test50/q38q6_general",
+     "status": "pending",
+     "refs": [
+      "test50:test50/q38q6_general"
+     ]
+    }
+   },
+   "tuned": {
+    "ref": "qwen38_q6/q38q6_general",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.861,
+     "lo": 0.694,
+     "hi": 0.9883
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.3182,
+      "lo": 0.1,
+      "hi": 0.5833
+     },
+     "miss_rate": {
+      "value": 0.1538,
+      "lo": 0.0,
+      "hi": 0.3333
+     },
+     "accuracy": {
+      "value": 0.7083,
+      "lo": 0.5455,
+      "hi": 0.8462
+     },
+     "review_recall": {
+      "value": 0.1667,
+      "lo": 0.0,
+      "hi": 0.5
+     },
+     "flag_f1": {
+      "value": 0.8,
+      "lo": 0.6512,
+      "hi": 0.9206
+     }
+    },
+    "cost": {
+     "s_per_call": 102.63,
+     "llm_calls_per_call": 15.0,
+     "wall_s_per_call": 102.613
+    },
+    "tags": [],
+    "description": "Qwen3.8-27B asked the 15 general questions (facts prompt, logprob p(yes)); call = max p(yes); + kw/pat",
+    "far20": {
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.3182,
+     "flag_f1": 0.7547
+    }
+   },
+   "reviews": {
+    "predicted": 6,
+    "expected": 6,
+    "hit": 1,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "noise",
+    "flips": 17,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.861,
+     "diff": -0.0053,
+     "lo": -0.1177,
+     "hi": 0.1167,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.3182,
+     "diff": 0.1818,
+     "lo": -0.1364,
+     "hi": 0.4652,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.1538,
+     "diff": 0.0,
+     "lo": -0.1071,
+     "hi": 0.1071,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.1667,
+     "diff": -0.5,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.7083,
+     "diff": -0.0834,
+     "lo": -0.275,
+     "hi": 0.0625,
+     "real": false
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "pending",
+     "refs": [
+      "qwen38_q6/q38q6_general_para"
+     ],
+     "auc": null,
+     "parts": [
+      {
+       "ref": "qwen38_q6/q38q6_general_para",
+       "status": "pending"
+      }
+     ]
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "pending",
+     "refs": [
+      "perturbed:qwen38_q6_perturbed/q38q6_general"
+     ],
+     "auc": null
+    }
+   },
+   "evidence": {
+    "ref": "qwen38_q6/q38q6_general",
+    "n": 19,
+    "no_passage": 9,
+    "chance1": 0.184,
+    "median_len1": 1.5,
+    "hit1": {
+     "k": 9,
+     "n": 19,
+     "value": 0.4737,
+     "lo": 0.1765,
+     "hi": 0.7895,
+     "units": 10
+    },
+    "hit3": {
+     "k": 10,
+     "n": 19,
+     "value": 0.5263,
+     "lo": 0.2105,
+     "hi": 0.8421,
+     "units": 10
+    }
+   }
+  },
+  {
+   "id": "gen_kev_oracle",
+   "label": "ORACLE: allgemeine Fragen auf Kev, Dialekt-Referenzskripte (nur Experiment)",
+   "short": "Allg. Kev ORACLE",
+   "group": "Allgemeine Fragen",
+   "kind": "oracle",
+   "passages": null,
+   "hardware": null,
+   "licence": null,
+   "e2e": null,
+   "profile": null,
+   "note": "Die Bewertungs-Einstellung des Teamkollegen (Referenzskripte statt ASR); nie ein Abgabe-Kandidat.",
+   "table": null,
+   "model": null,
+   "hidden": true,
+   "slots": {
+    "tuned": {
+     "ref": "kev_vs_facts/kev_general_oracle",
+     "status": "ok",
+     "refs": [
+      "kev_vs_facts/kev_general_oracle"
+     ]
+    },
+    "reworded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": {
+    "ref": "kev_vs_facts/kev_general_oracle",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.8881,
+     "lo": 0.6883,
+     "hi": 0.9886
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.4545,
+      "lo": 0.1429,
+      "hi": 0.8
+     },
+     "miss_rate": {
+      "value": 0.0769,
+      "lo": 0.0,
+      "hi": 0.25
+     },
+     "accuracy": {
+      "value": 0.625,
+      "lo": 0.3913,
+      "hi": 0.8571
+     },
+     "review_recall": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 1.0
+     },
+     "flag_f1": {
+      "value": 0.8,
+      "lo": 0.6667,
+      "hi": 0.9286
+     }
+    },
+    "cost": {
+     "s_per_call": 1.4,
+     "llm_calls_per_call": 2.96,
+     "wall_s_per_call": 1.392
+    },
+    "tags": [
+     "ORACLE"
+    ],
+    "description": "ORACLE: Kev general questions on the dialect reference scripts (the teammate's eval setting)",
+    "far20": {
+     "flag_recall": 0.6154,
+     "false_alarm_rate": 0.0,
+     "flag_f1": 0.7619
+    }
+   },
+   "reviews": {
+    "predicted": 14,
+    "expected": 6,
+    "hit": 2,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "noise",
+    "flips": 20,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.8881,
+     "diff": 0.0218,
+     "lo": -0.1433,
+     "hi": 0.1539,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.4545,
+     "diff": 0.3181,
+     "lo": -0.0771,
+     "hi": 0.7222,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.0769,
+     "diff": -0.0769,
+     "lo": -0.3333,
+     "hi": 0.1667,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.3333,
+     "diff": -0.3334,
+     "lo": -1.0,
+     "hi": 1.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.625,
+     "diff": -0.1667,
+     "lo": -0.413,
+     "hi": 0.0834,
+     "real": false
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    }
+   },
+   "evidence": {
+    "ref": "kev_vs_facts/kev_general_oracle",
+    "n": 18,
+    "no_passage": 0,
+    "chance1": 0.653,
+    "median_len1": 60.0,
+    "hit1": {
+     "k": 14,
+     "n": 18,
+     "value": 0.7778,
+     "lo": 0.4444,
+     "hi": 1.0,
+     "units": 9
+    },
+    "hit3": {
+     "k": 16,
+     "n": 18,
+     "value": 0.8889,
+     "lo": 0.6667,
+     "hi": 1.0,
+     "units": 9
+    }
+   }
+  },
+  {
+   "id": "r1",
+   "label": "Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit)",
+   "short": "Zwei Leser R1",
+   "group": "Zwei Leser",
+   "kind": "candidate",
+   "passages": "ja (aus Qwen)",
+   "hardware": "24 GB zusammen (nie getestet) oder 12 GB gestaffelt + `agreement merge`",
+   "licence": "Apache-2.0 (beide), ASR MIT",
+   "e2e": "nein (nur Re-Fusion gespeicherter Läufe)",
+   "profile": "two-readers",
+   "note": "Vorregistriert, nicht bestanden: 3-Klassen-Genauigkeit belegt schlechter, Prüf-Recall 3/6.",
+   "table": null,
+   "model": "Qwen2.5-7B + Kev-4B",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "two_readers/r1",
+     "status": "ok",
+     "refs": [
+      "two_readers/r1"
+     ]
+    },
+    "reworded": {
+     "ref": "two_readers/r1_para",
+     "status": "ok",
+     "refs": [
+      "two_readers/r1_para",
+      "two_readers/r1_para2"
+     ]
+    },
+    "blind": {
+     "ref": "two_readers/r1_blind",
+     "status": "ok",
+     "refs": [
+      "two_readers/r1_blind"
+     ]
+    },
+    "rerecorded": {
+     "ref": "perturbed:two_readers_perturbed/r1",
+     "status": "ok",
+     "refs": [
+      "perturbed:two_readers_perturbed/r1"
+     ]
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": {
+    "ref": "two_readers/r1",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.9266,
+     "lo": 0.8208,
+     "hi": 0.9965
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.1364,
+      "lo": 0.0,
+      "hi": 0.3502
+     },
+     "miss_rate": {
+      "value": 0.1154,
+      "lo": 0.0,
+      "hi": 0.2857
+     },
+     "accuracy": {
+      "value": 0.6458,
+      "lo": 0.4524,
+      "hi": 0.8271
+     },
+     "review_recall": {
+      "value": 0.5,
+      "lo": 0.0,
+      "hi": 1.0
+     },
+     "flag_f1": {
+      "value": 0.8846,
+      "lo": 0.7755,
+      "hi": 0.9787
+     }
+    },
+    "cost": {
+     "s_per_call": 19.71,
+     "llm_calls_per_call": 21.65,
+     "wall_s_per_call": 0.001
+    },
+    "tags": [],
+    "description": "R1 label agreement, tuned table",
+    "far20": {
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.1364,
+     "flag_f1": 0.8627
+    }
+   },
+   "reviews": {
+    "predicted": 16,
+    "expected": 6,
+    "hit": 3,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "loss",
+    "flips": 8,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.9266,
+     "diff": 0.0603,
+     "lo": -0.0019,
+     "hi": 0.16,
+     "real": false
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.1364,
+     "diff": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.1154,
+     "diff": -0.0384,
+     "lo": -0.125,
+     "hi": 0.0,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.5,
+     "diff": -0.1667,
+     "lo": -0.5,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.6458,
+     "diff": -0.1459,
+     "lo": -0.3182,
+     "hi": -0.0227,
+     "real": true
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "ok",
+     "refs": [
+      "two_readers/r1_para",
+      "two_readers/r1_para2"
+     ],
+     "auc": {
+      "value": 0.8554,
+      "lo": 0.6875,
+      "hi": 0.9755
+     },
+     "parts": [
+      {
+       "ref": "two_readers/r1_para",
+       "status": "ok"
+      },
+      {
+       "ref": "two_readers/r1_para2",
+       "status": "ok"
+      }
+     ],
+     "aucs": [
+      {
+       "value": 0.8558,
+       "lo": 0.6846,
+       "hi": 0.972
+      },
+      {
+       "value": 0.8549,
+       "lo": 0.6763,
+       "hi": 0.986
+      }
+     ],
+     "n_sets": 2,
+     "drop": {
+      "a": 0.9266,
+      "b": 0.8554,
+      "diff": -0.0712,
+      "lo": -0.1935,
+      "hi": 0.0,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7277,
+      "b": 0.8554,
+      "diff": 0.1277,
+      "lo": 0.0393,
+      "hi": 0.2315,
+      "real": true,
+      "n": 48
+     }
+    },
+    "blind": {
+     "status": "ok",
+     "refs": [
+      "two_readers/r1_blind"
+     ],
+     "auc": {
+      "value": 0.8418,
+      "lo": 0.7115,
+      "hi": 0.9623
+     },
+     "aucs": [
+      {
+       "value": 0.8418,
+       "lo": 0.7115,
+       "hi": 0.9623
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.9266,
+      "b": 0.8418,
+      "diff": -0.0848,
+      "lo": -0.206,
+      "hi": 0.0262,
+      "real": false,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.7255,
+      "b": 0.8418,
+      "diff": 0.1163,
+      "lo": 0.0275,
+      "hi": 0.2472,
+      "real": true,
+      "n": 48
+     }
+    },
+    "rerecorded": {
+     "status": "ok",
+     "refs": [
+      "perturbed:two_readers_perturbed/r1"
+     ],
+     "auc": {
+      "value": 0.8575,
+      "lo": 0.7205,
+      "hi": 0.9786
+     },
+     "aucs": [
+      {
+       "value": 0.8575,
+       "lo": 0.7205,
+       "hi": 0.9786
+      }
+     ],
+     "n_sets": 1,
+     "drop": {
+      "a": 0.9266,
+      "b": 0.8575,
+      "diff": -0.0691,
+      "lo": -0.1648,
+      "hi": -0.0041,
+      "real": true,
+      "n": 48
+     },
+     "vs_ref": {
+      "a": 0.8278,
+      "b": 0.8575,
+      "diff": 0.0297,
+      "lo": -0.0219,
+      "hi": 0.0924,
+      "real": false,
+      "n": 48
+     }
+    }
+   },
+   "evidence": {
+    "ref": "two_readers/r1",
+    "n": 23,
+    "no_passage": 1,
+    "chance1": 0.244,
+    "median_len1": 12.4,
+    "hit1": {
+     "k": 16,
+     "n": 23,
+     "value": 0.6957,
+     "lo": 0.4545,
+     "hi": 0.913,
+     "units": 12
+    },
+    "hit3": {
+     "k": 21,
+     "n": 23,
+     "value": 0.913,
+     "lo": 0.7727,
+     "hi": 1.0,
+     "units": 12
+    }
+   }
+  },
+  {
+   "id": "v1",
+   "label": "v1 (Stichwörter + freier LLM-Richter, Turbo-ASR)",
+   "short": "v1",
+   "group": "Referenz",
+   "kind": "reference",
+   "passages": "ja",
+   "hardware": "12 GB",
+   "licence": "Apache-2.0 / ASR CC-BY-NC-Herkunft (Turbo)",
+   "e2e": "ja (Ausgangssystem)",
+   "profile": null,
+   "note": "Freier Richter mit T=0.7: von Lauf zu Lauf nicht reproduzierbar.",
+   "table": null,
+   "model": "Qwen2.5-7B-AWQ",
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "llm_models/qwen25_7b",
+     "status": "ok",
+     "refs": [
+      "llm_models/qwen25_7b"
+     ]
+    },
+    "reworded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": {
+    "ref": "llm_models/qwen25_7b",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.6774,
+     "lo": 0.5321,
+     "hi": 0.8371
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.8636,
+      "lo": 0.6429,
+      "hi": 1.0
+     },
+     "miss_rate": {
+      "value": 0.1538,
+      "lo": 0.0,
+      "hi": 0.3462
+     },
+     "accuracy": {
+      "value": 0.375,
+      "lo": 0.2308,
+      "hi": 0.5455
+     },
+     "review_recall": {
+      "value": 0.8333,
+      "lo": 0.5,
+      "hi": 1.0
+     },
+     "flag_f1": {
+      "value": 0.6567,
+      "lo": 0.4918,
+      "hi": 0.7945
+     }
+    },
+    "cost": {
+     "s_per_call": 82.63,
+     "llm_calls_per_call": 53.4,
+     "wall_s_per_call": 8.377
+    },
+    "tags": [],
+    "description": "Qwen/Qwen2.5-7B-Instruct-AWQ (v1 default)",
+    "far20": {
+     "flag_recall": 0.6923,
+     "false_alarm_rate": 0.5455,
+     "flag_f1": 0.6429
+    }
+   },
+   "reviews": {
+    "predicted": 20,
+    "expected": 6,
+    "hit": 5,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "loss",
+    "flips": 28,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.6774,
+     "diff": -0.1889,
+     "lo": -0.3318,
+     "hi": -0.0506,
+     "real": true
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.8636,
+     "diff": 0.7272,
+     "lo": 0.4583,
+     "hi": 0.9444,
+     "real": true
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.1538,
+     "diff": 0.0,
+     "lo": -0.1923,
+     "hi": 0.167,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.8333,
+     "diff": 0.1666,
+     "lo": -0.5,
+     "hi": 1.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.375,
+     "diff": -0.4167,
+     "lo": -0.6522,
+     "hi": -0.18,
+     "real": true
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    }
+   }
+  },
+  {
+   "id": "keywords",
+   "label": "Nur Stichwörter",
+   "short": "Stichwörter",
+   "group": "Referenz",
+   "kind": "reference",
+   "passages": "ja",
+   "hardware": "CPU (+ ASR)",
+   "licence": "–",
+   "e2e": "ja",
+   "profile": null,
+   "note": "Turbo-Transkripte (gpu-12gb), gleiche Anrufe.",
+   "table": null,
+   "model": null,
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "checks_ablation/keywords",
+     "status": "ok",
+     "refs": [
+      "checks_ablation/keywords"
+     ]
+    },
+    "reworded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "test50": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    }
+   },
+   "tuned": {
+    "ref": "checks_ablation/keywords",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.5472,
+     "lo": 0.375,
+     "hi": 0.7271
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 0.3182,
+      "lo": 0.0714,
+      "hi": 0.6111
+     },
+     "miss_rate": {
+      "value": 0.6154,
+      "lo": 0.3333,
+      "hi": 0.8667
+     },
+     "accuracy": {
+      "value": 0.5,
+      "lo": 0.3542,
+      "hi": 0.6458
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.4651,
+      "lo": 0.2,
+      "hi": 0.7111
+     }
+    },
+    "cost": {
+     "s_per_call": 0.03,
+     "llm_calls_per_call": 0.0,
+     "wall_s_per_call": 0.0
+    },
+    "tags": [],
+    "description": "",
+    "far20": {
+     "flag_recall": 0.1154,
+     "false_alarm_rate": 0.0455,
+     "flag_f1": 0.2
+    }
+   },
+   "reviews": {
+    "predicted": 1,
+    "expected": 6,
+    "hit": 0,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "loss",
+    "flips": 23,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.5472,
+     "diff": -0.3191,
+     "lo": -0.5112,
+     "hi": -0.1495,
+     "real": true
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 0.3182,
+     "diff": 0.1818,
+     "lo": -0.1875,
+     "hi": 0.5556,
+     "real": false
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.6154,
+     "diff": 0.4616,
+     "lo": 0.1875,
+     "hi": 0.7333,
+     "real": true
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.0,
+     "diff": -0.6667,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.5,
+     "diff": -0.2917,
+     "lo": -0.5,
+     "hi": -0.1087,
+     "real": true
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    }
+   }
+  },
+  {
+   "id": "flag_all",
+   "label": "Alles markieren (Alarm)",
+   "short": "Alles markieren",
+   "group": "Referenz",
+   "kind": "trivial",
+   "passages": "–",
+   "hardware": "–",
+   "licence": "–",
+   "e2e": "–",
+   "profile": null,
+   "note": null,
+   "table": null,
+   "model": null,
+   "hidden": null,
+   "slots": {
+    "tuned": {
+     "ref": "trivial/flag_all",
+     "status": "ok",
+     "refs": []
+    },
+    "reworded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "blind": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "rerecorded": {
+     "ref": null,
+     "status": "na",
+     "refs": []
+    },
+    "test50": {
+     "ref": "test50:test50/champion",
+     "refs": [],
+     "status": "pending"
+    }
+   },
+   "tuned": {
+    "ref": "trivial/flag_all",
+    "basis": "cv",
+    "n_calls": 48,
+    "n_dialogues": 24,
+    "auc": {
+     "value": 0.5,
+     "lo": 0.5,
+     "hi": 0.5
+    },
+    "metrics": {
+     "false_alarm_rate": {
+      "value": 1.0,
+      "lo": 1.0,
+      "hi": 1.0
+     },
+     "miss_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "accuracy": {
+      "value": 0.4167,
+      "lo": 0.25,
+      "hi": 0.5833
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+     },
+     "flag_f1": {
+      "value": 0.7027,
+      "lo": 0.5556,
+      "hi": 0.8293
+     }
+    },
+    "cost": {
+     "s_per_call": 0.0,
+     "llm_calls_per_call": 0.0,
+     "wall_s_per_call": null
+    },
+    "tags": [],
+    "description": "trivial: every call alarm",
+    "far20": {
+     "flag_recall": null,
+     "false_alarm_rate": null,
+     "flag_f1": null
+    }
+   },
+   "reviews": {
+    "predicted": 0,
+    "expected": 6,
+    "hit": 0,
+    "n": 48
+   },
+   "vs_ref": {
+    "n_common": 48,
+    "verdict": "loss",
+    "flips": 33,
+    "auc": {
+     "a": 0.8663,
+     "b": 0.5,
+     "diff": -0.3663,
+     "lo": -0.4889,
+     "hi": -0.222,
+     "real": true
+    },
+    "false_alarm_rate": {
+     "a": 0.1364,
+     "b": 1.0,
+     "diff": 0.8636,
+     "lo": 0.6498,
+     "hi": 1.0,
+     "real": true
+    },
+    "miss_rate": {
+     "a": 0.1538,
+     "b": 0.0,
+     "diff": -0.1538,
+     "lo": -0.3636,
+     "hi": 0.0,
+     "real": false
+    },
+    "review_recall": {
+     "a": 0.6667,
+     "b": 0.0,
+     "diff": -0.6667,
+     "lo": -1.0,
+     "hi": 0.0,
+     "real": false
+    },
+    "accuracy": {
+     "a": 0.7917,
+     "b": 0.4167,
+     "diff": -0.375,
+     "lo": -0.625,
+     "hi": -0.1522,
+     "real": true
+    }
+   },
+   "gen": {
+    "reworded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "blind": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    },
+    "rerecorded": {
+     "status": "na",
+     "refs": [],
+     "auc": null
+    }
+   }
+  }
+ ],
+ "fingerprint": 1791632009.0915391,
+ "evidence_note": "Beleg hit@1 = Anteil der richtig markierten Anrufe, deren erste angezeigte Passage eine annotierte Beleg-Zeile trifft (`callguard evidence-eval`-Methode, Dev). „Zufall“ = was eine gleich lange Passage an zufälliger Stelle träfe: lange Passagen (Kev allgemein, ~48 s) treffen schon zufällig oft. Anrufe ohne Passage zählen als Fehltreffer.",
+ "best": {
+  "auc": {
+   "ids": [
+    "r1"
+   ],
+   "value": 0.9266,
+   "real_vs_ref": {
+    "r1": false
+   }
+  },
+  "false_alarm_rate": {
+   "ids": [
+    "kev",
+    "q38",
+    "q38_v3",
+    "q38q6"
+   ],
+   "value": 0.0,
+   "real_vs_ref": {
+    "kev": false,
+    "q38": false,
+    "q38_v3": false,
+    "q38q6": false
+   }
+  },
+  "miss_rate": {
+   "ids": [
+    "champion_v3",
+    "gen_qwen"
+   ],
+   "value": 0.0769,
+   "real_vs_ref": {
+    "champion_v3": false,
+    "gen_qwen": false
+   }
+  },
+  "review_recall": {
+   "ids": [
+    "champion_v3"
+   ],
+   "value": 1.0,
+   "real_vs_ref": {
+    "champion_v3": false
+   }
+  },
+  "accuracy": {
+   "ids": [
+    "champion_v3"
+   ],
+   "value": 0.8333,
+   "real_vs_ref": {
+    "champion_v3": false
+   }
+  },
+  "reworded": {
+   "ids": [
+    "kev"
+   ],
+   "value": 0.8995,
+   "real_vs_ref": {
+    "kev": true
+   }
+  },
+  "blind": {
+   "ids": [
+    "kev"
+   ],
+   "value": 0.854,
+   "real_vs_ref": {
+    "kev": false
+   }
+  },
+  "rerecorded": {
+   "ids": [
+    "champion_v3"
+   ],
+   "value": 0.882,
+   "real_vs_ref": {
+    "champion_v3": false
+   }
+  },
+  "hit1": {
+   "ids": [
+    "gen_kev"
+   ],
+   "value": 0.8667,
+   "real_vs_ref": {
+    "gen_kev": false
+   }
+  },
+  "cost": {
+   "ids": [
+    "gen_kev"
+   ],
+   "value": 2.36,
+   "real_vs_ref": {
+    "gen_kev": false
+   }
+  }
+ },
+ "pending": [
+  {
+   "candidate": "champion",
+   "label": "Champion: Qwen2.5-7B Fakten, Tabelle v1",
+   "slot": "test50",
+   "ref": "test50:test50/champion",
+   "status": "pending"
+  },
+  {
+   "candidate": "champion_v3",
+   "label": "Champion mit Tabelle v3",
+   "slot": "test50",
+   "ref": "test50:test50/champion_v3",
+   "status": "pending"
+  },
+  {
+   "candidate": "kev",
+   "label": "Kev-4B Fakten, Tabelle v1",
+   "slot": "test50",
+   "ref": "test50:test50/kev_facts",
+   "status": "pending"
+  },
+  {
+   "candidate": "q38q6",
+   "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v1",
+   "slot": "blind",
+   "ref": "qwen38_q6/q38q6_facts_blind",
+   "status": "running"
+  },
+  {
+   "candidate": "q38q6",
+   "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v1",
+   "slot": "rerecorded",
+   "ref": "perturbed:qwen38_q6_perturbed/q38q6_facts",
+   "status": "pending"
+  },
+  {
+   "candidate": "q38q6",
+   "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v1",
+   "slot": "test50",
+   "ref": "test50:test50/q38q6_facts",
+   "status": "pending"
+  },
+  {
+   "candidate": "q38q6_v3",
+   "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v3",
+   "slot": "tuned",
+   "ref": "qwen38_q6/q38q6_facts_v3",
+   "status": "pending"
+  },
+  {
+   "candidate": "q38q6_v3",
+   "label": "Qwen3.8-27B 6-bit Fakten, Tabelle v3",
+   "slot": "rerecorded",
+   "ref": "perturbed:qwen38_q6_perturbed/q38q6_facts_v3",
+   "status": "pending"
+  },
+  {
+   "candidate": "gen_qwen",
+   "label": "Allgemeine Fragen auf Qwen2.5-7B",
+   "slot": "test50",
+   "ref": "test50:test50/qwen_general",
+   "status": "pending"
+  },
+  {
+   "candidate": "gen_kev",
+   "label": "Allgemeine Fragen auf Kev-4B (Teamkollege)",
+   "slot": "test50",
+   "ref": "test50:test50/kev_general",
+   "status": "pending"
+  },
+  {
+   "candidate": "gen_q38q6",
+   "label": "Allgemeine Fragen auf Qwen3.8 6-bit",
+   "slot": "reworded",
+   "ref": "qwen38_q6/q38q6_general_para",
+   "status": "pending"
+  },
+  {
+   "candidate": "gen_q38q6",
+   "label": "Allgemeine Fragen auf Qwen3.8 6-bit",
+   "slot": "rerecorded",
+   "ref": "perturbed:qwen38_q6_perturbed/q38q6_general",
+   "status": "pending"
+  },
+  {
+   "candidate": "gen_q38q6",
+   "label": "Allgemeine Fragen auf Qwen3.8 6-bit",
+   "slot": "test50",
+   "ref": "test50:test50/q38q6_general",
+   "status": "pending"
+  },
+  {
+   "candidate": "flag_all",
+   "label": "Alles markieren (Alarm)",
+   "slot": "test50",
+   "ref": "test50:test50/champion",
+   "status": "pending"
+  }
+ ]
+}

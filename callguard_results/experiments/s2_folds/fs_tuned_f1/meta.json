@@ -1,0 +1,70 @@
+{
+ "variant": "fs_tuned_f1",
+ "description": "S2: tuned table + per-fold contrast few-shot (built by scripts/research/s2_fewshot.py)",
+ "experiment": "champion",
+ "split": "dev",
+ "profile": "recommended",
+ "set": [
+  "checks.facts.parallel=1",
+  "checks.facts.fewshot=/home/bl/repos/sprintd/runs/research/s2/fewshot_fold1.json"
+ ],
+ "checks": [
+  "keywords",
+  "patterns",
+  "facts"
+ ],
+ "refuse_from": null,
+ "oracle": false,
+ "config_name": "recommended",
+ "use_tuning": false,
+ "tuning": null,
+ "config_hash": "4bc104be9dd1e5f2",
+ "threshold": 0.55,
+ "fusion": "weighted",
+ "asr": "faster_whisper",
+ "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+ "llm": {
+  "default": {
+   "type": "openai_compat",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "model": "callguard-llm",
+   "cache_tag": null
+  }
+ },
+ "git": {
+  "sha": "fcffca5bee",
+  "dirty": true,
+  "branch": "main"
+ },
+ "created": "2026-10-10T05:18:06+0200",
+ "wall_seconds": 21.07,
+ "n_calls": 12,
+ "calls": [
+  "Stufe1_D05-K1",
+  "Stufe1_D05-K2",
+  "Stufe2_C01-K3",
+  "Stufe2_C01-K4",
+  "Stufe2_C02-K3",
+  "Stufe2_C02-K4",
+  "Stufe2_C07-K3",
+  "Stufe2_C07-K4",
+  "Stufe2_C08-K3",
+  "Stufe2_C08-K4",
+  "Stufe3_C17-K3",
+  "Stufe3_C17-K4"
+ ],
+ "check_weights": {
+  "keywords": 0.15,
+  "patterns": 0.1,
+  "facts": 1.0
+ },
+ "llm_resolved": {
+  "default": {
+   "type": "openai_compat",
+   "model": "callguard-llm",
+   "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "cache_tag": null
+  }
+ }
+}

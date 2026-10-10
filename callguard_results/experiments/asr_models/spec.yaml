@@ -1,0 +1,21 @@
+# RQ2 (+RQ8): which ASR model gives the best DETECTION (not just WER)? Same checks + LLM, only asr.* varies.
+# Transcripts must be cached first (scripts/research/asr_queue*.sh); large fp16 models cannot transcribe next to vLLM.
+# Each variant re-runs diarization roles + all LLM checks on its own transcripts (~15-30 min each on the 4070).
+# Pair with `callguard asr-eval-compare` (keyword-spot recall) for the mechanism.
+name: asr_models
+description: Detection quality per ASR model (Swiss German fine-tunes vs vanilla Whisper)
+rq: [RQ2, RQ8]
+base: gpu-12gb
+split: dev
+compare_to: turbo_gsw_int8
+variants:
+  - {name: turbo_gsw_int8, description: "default: nebi/Flurin17 turbo int8 (CC BY-NC origin)"}
+  - name: large_v3_gsw
+    description: "gcoli whisper-large-v3 Swiss German (MIT), fp16, beam 1"
+    set: [asr.model=models/asr/whisper-large-v3-gsw-ct2, asr.compute_type=float16]
+  - name: vanilla_turbo
+    description: "vanilla openai large-v3-turbo (no Swiss German fine-tune)"
+    set: [asr.model=models/asr/vanilla-turbo-ct2, asr.compute_type=float16]
+  - name: turbo_gsw_fp16
+    description: "jayr23 turbo fp16 (Flurin17 origin)"
+    set: [asr.model=models/asr/turbo-gsw-ct2-fp16, asr.compute_type=float16]

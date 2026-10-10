@@ -1,0 +1,21 @@
+# RQ: plumbing smoke test (no research question): does `callguard experiment` run end to end?
+# Varies: the fusion threshold and the check set, on demo-offline (reference scripts as ASR = ORACLE,
+#         fake cue-word LLM). The numbers mean nothing about detection quality.
+# Runtime: < 1 min on a laptop CPU, no models, no servers.
+#   uv run callguard experiment experiments/smoke.yaml && uv run callguard report --experiments smoke
+name: smoke
+description: Plumbing check on demo-offline (reference scripts + fake LLM); numbers are meaningless.
+rq: []
+base: demo-offline
+split: dev
+compare_to: all
+variants:
+  - name: all
+    description: every check of demo-offline
+  - name: rules_only
+    description: keywords + patterns only
+    checks: [keywords, patterns]
+  - name: all_t040
+    description: re-fusion of `all` at threshold 0.40 (no check reruns)
+    refuse_from: all
+    set: ["fusion.threshold=0.40"]

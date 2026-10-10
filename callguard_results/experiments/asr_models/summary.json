@@ -1,0 +1,3090 @@
+{
+ "experiment": "asr_models",
+ "description": "Detection quality per ASR model (Swiss German fine-tunes vs vanilla Whisper)",
+ "rq": [
+  "RQ2",
+  "RQ8"
+ ],
+ "base": "gpu-12gb",
+ "split": "dev",
+ "compare_to": "turbo_gsw_int8",
+ "n_boot": 2000,
+ "seed": 13,
+ "created": "2026-10-10T02:13:57+0200",
+ "git": {
+  "sha": "2cc04e7f41",
+  "dirty": true,
+  "branch": "main"
+ },
+ "spec": "experiments/asr_models.yaml",
+ "baselines": {
+  "flag_all": {
+   "flag_f1": 0.7027,
+   "flag_precision": 0.5417,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5882,
+   "review_recall": 0.0,
+   "accuracy": 0.4167,
+   "flag_balanced_accuracy": 0.5
+  },
+  "flag_none": {
+   "flag_f1": 0.0,
+   "flag_precision": null,
+   "flag_recall": 0.0,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 1.0,
+   "alarm_f1": 0.0,
+   "review_recall": 0.0,
+   "accuracy": 0.4583,
+   "flag_balanced_accuracy": 0.5
+  },
+  "_n": {
+   "calls": 48,
+   "prevalence_flag": 0.5417
+  }
+ },
+ "far_cap": 0.2,
+ "variants": {
+  "turbo_gsw_int8": {
+   "variant": "turbo_gsw_int8",
+   "oracle": false,
+   "meta": {
+    "variant": "turbo_gsw_int8",
+    "description": "default: nebi/Flurin17 turbo int8 (CC BY-NC origin)",
+    "experiment": "asr_models",
+    "split": "dev",
+    "profile": "gpu-12gb",
+    "set": [],
+    "checks": [
+     "keywords",
+     "patterns",
+     "llm_judge",
+     "geval"
+    ],
+    "refuse_from": null,
+    "oracle": false,
+    "config_name": "gpu-12gb",
+    "config_hash": "796d693d3c246afe",
+    "threshold": 0.55,
+    "fusion": "weighted",
+    "asr": "faster_whisper",
+    "asr_model": "models/asr/whisper-turbo-gsw-ct2-int8",
+    "llm": {
+     "default": {
+      "type": "openai_compat",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "model": "callguard-llm",
+      "cache_tag": null
+     }
+    },
+    "git": {
+     "sha": "a72e6a6f84",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T01:51:22+0200",
+    "wall_seconds": 1.28,
+    "n_calls": 48,
+    "calls": [
+     "Stufe1_D01-K1",
+     "Stufe1_D01-K2",
+     "Stufe1_D02-K1",
+     "Stufe1_D02-K2",
+     "Stufe1_D03-K1",
+     "Stufe1_D03-K2",
+     "Stufe1_D04-K1",
+     "Stufe1_D04-K2",
+     "Stufe1_D05-K1",
+     "Stufe1_D05-K2",
+     "Stufe1_D06-K1",
+     "Stufe1_D06-K2",
+     "Stufe1_D08-K1",
+     "Stufe1_D08-K2",
+     "Stufe1_D09-K1",
+     "Stufe1_D09-K2",
+     "Stufe1_D10-K1",
+     "Stufe1_D10-K2",
+     "Stufe2_C01-K3",
+     "Stufe2_C01-K4",
+     "Stufe2_C02-K3",
+     "Stufe2_C02-K4",
+     "Stufe2_C05-K3",
+     "Stufe2_C05-K4",
+     "Stufe2_C06-K3",
+     "Stufe2_C06-K4",
+     "Stufe2_C07-K3",
+     "Stufe2_C07-K4",
+     "Stufe2_C08-K3",
+     "Stufe2_C08-K4",
+     "Stufe2_C09-K3",
+     "Stufe2_C09-K4",
+     "Stufe2_C10-K3",
+     "Stufe2_C10-K4",
+     "Stufe2_C11-K3",
+     "Stufe2_C11-K4",
+     "Stufe2_C12-K3",
+     "Stufe2_C12-K4",
+     "Stufe2_C13-K3",
+     "Stufe2_C13-K4",
+     "Stufe2_C14-K3",
+     "Stufe2_C14-K4",
+     "Stufe3_C17-K3",
+     "Stufe3_C17-K4",
+     "Stufe3_C18-K3",
+     "Stufe3_C18-K4",
+     "Stufe3_C20-K3",
+     "Stufe3_C20-K4"
+    ]
+   },
+   "n_calls": 48,
+   "n_dialogues": 24,
+   "fixed": {
+    "n": 48,
+    "flag_precision": 0.5455,
+    "flag_recall": 0.9231,
+    "flag_f1": 0.6857,
+    "false_alarm_rate": 0.9091,
+    "miss_rate": 0.0769,
+    "alarm_f1": 0.6316,
+    "review_recall": 0.8333,
+    "review_escalation": 0.8333,
+    "accuracy": 0.3958,
+    "tp": 24,
+    "fp": 20,
+    "fn": 2,
+    "tn": 2,
+    "flag_balanced_accuracy": 0.507,
+    "ci": {
+     "flag_f1": {
+      "value": 0.6857,
+      "lo": 0.5294,
+      "hi": 0.8148,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.5455,
+      "lo": 0.3778,
+      "hi": 0.7222,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.9231,
+      "lo": 0.8182,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.9091,
+      "lo": 0.7,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.0769,
+      "lo": 0.0,
+      "hi": 0.1818,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.6316,
+      "lo": 0.3478,
+      "hi": 0.8334,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.8333,
+      "lo": 0.5,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.3958,
+      "lo": 0.2292,
+      "hi": 0.5871,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.507,
+      "lo": 0.4464,
+      "hi": 0.5893,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.4444,
+      "flag_precision": 0.5556,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7143,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.8
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.25,
+      "flag_precision": 0.4286,
+      "flag_recall": 0.9,
+      "flag_f1": 0.5806,
+      "false_alarm_rate": 0.8571,
+      "miss_rate": 0.1,
+      "alarm_f1": 0.4444
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.8333,
+      "flag_precision": 1.0,
+      "flag_recall": 0.8333,
+      "flag_f1": 0.9091,
+      "false_alarm_rate": null,
+      "miss_rate": 0.1667,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.5455,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.6857,
+      "false_alarm_rate": 0.9091,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.6
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.375,
+      "flag_precision": 0.5455,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.6857,
+      "false_alarm_rate": 0.9091,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.6667
+     }
+    }
+   },
+   "cv": {
+    "n": 48,
+    "flag_precision": 0.6429,
+    "flag_recall": 0.6923,
+    "flag_f1": 0.6667,
+    "false_alarm_rate": 0.4545,
+    "miss_rate": 0.3077,
+    "alarm_f1": 0.5517,
+    "review_recall": 0.6667,
+    "review_escalation": 0.6667,
+    "accuracy": 0.5,
+    "tp": 18,
+    "fp": 10,
+    "fn": 8,
+    "tn": 12,
+    "flag_balanced_accuracy": 0.6189,
+    "ci": {
+     "flag_f1": {
+      "value": 0.6667,
+      "lo": 0.4583,
+      "hi": 0.8334,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.6429,
+      "lo": 0.4117,
+      "hi": 0.8667,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.6923,
+      "lo": 0.4615,
+      "hi": 0.9091,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.4545,
+      "lo": 0.1817,
+      "hi": 0.7222,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.3077,
+      "lo": 0.0909,
+      "hi": 0.5385,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.5517,
+      "lo": 0.1905,
+      "hi": 0.8333,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.6667,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.5,
+      "lo": 0.3333,
+      "hi": 0.7,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.6189,
+      "lo": 0.475,
+      "hi": 0.7796,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.7778,
+      "flag_precision": 0.8182,
+      "flag_recall": 0.9,
+      "flag_f1": 0.8571,
+      "false_alarm_rate": 0.25,
+      "miss_rate": 0.1,
+      "alarm_f1": 0.8889
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.25,
+      "flag_precision": 0.3846,
+      "flag_recall": 0.5,
+      "flag_f1": 0.4348,
+      "false_alarm_rate": 0.5714,
+      "miss_rate": 0.5,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.6667,
+      "flag_precision": 1.0,
+      "flag_recall": 0.6667,
+      "flag_f1": 0.8,
+      "false_alarm_rate": null,
+      "miss_rate": 0.3333,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.5417,
+      "flag_precision": 0.6923,
+      "flag_recall": 0.6923,
+      "flag_f1": 0.6923,
+      "false_alarm_rate": 0.3636,
+      "miss_rate": 0.3077,
+      "alarm_f1": 0.5333
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.4583,
+      "flag_precision": 0.6,
+      "flag_recall": 0.6923,
+      "flag_f1": 0.6429,
+      "false_alarm_rate": 0.5455,
+      "miss_rate": 0.3077,
+      "alarm_f1": 0.5714
+     }
+    }
+   },
+   "cv_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.7,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.85,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.65,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 0.9,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "suggestion": {
+    "threshold": 0.45,
+    "flag_f1": 0.7123,
+    "flag_recall": 1.0,
+    "flag_precision": 0.5532,
+    "false_alarm_rate": 0.9545,
+    "miss_rate": 0.0,
+    "tied": [
+     0.45
+    ],
+    "reason": "Schwelle 0.45 maximiert F1 der Markierungen (71%) bei Recall 100% und Fehlalarmquote 95%. Schwellen, die alle oder keinen Anruf markieren wurden nicht berücksichtigt."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.566,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.566,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5769,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5714,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5714,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.7123,
+     "flag_precision": 0.5532,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 0.9545,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5652,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.6857,
+     "flag_precision": 0.5455,
+     "flag_recall": 0.9231,
+     "false_alarm_rate": 0.9091,
+     "miss_rate": 0.0769,
+     "alarm_f1": 0.5909,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.6857,
+     "flag_precision": 0.5455,
+     "flag_recall": 0.9231,
+     "false_alarm_rate": 0.9091,
+     "miss_rate": 0.0769,
+     "alarm_f1": 0.6316,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.6957,
+     "flag_precision": 0.5581,
+     "flag_recall": 0.9231,
+     "false_alarm_rate": 0.8636,
+     "miss_rate": 0.0769,
+     "alarm_f1": 0.6316,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.7059,
+     "flag_precision": 0.5714,
+     "flag_recall": 0.9231,
+     "false_alarm_rate": 0.8182,
+     "miss_rate": 0.0769,
+     "alarm_f1": 0.6316,
+     "accuracy": 0.4375
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.7097,
+     "flag_precision": 0.6111,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.6364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.5882,
+     "accuracy": 0.4583
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.7097,
+     "flag_precision": 0.6111,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.6364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.5185,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.7097,
+     "flag_precision": 0.6111,
+     "flag_recall": 0.8462,
+     "false_alarm_rate": 0.6364,
+     "miss_rate": 0.1538,
+     "alarm_f1": 0.5185,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.7119,
+     "flag_precision": 0.6364,
+     "flag_recall": 0.8077,
+     "false_alarm_rate": 0.5455,
+     "miss_rate": 0.1923,
+     "alarm_f1": 0.4615,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.6923,
+     "flag_precision": 0.6923,
+     "flag_recall": 0.6923,
+     "false_alarm_rate": 0.3636,
+     "miss_rate": 0.3077,
+     "alarm_f1": 0.4,
+     "accuracy": 0.4792
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 0.203,
+    "stage_s_per_call": {
+     "asr": 0.143,
+     "diarize": 0.048,
+     "checks": 0.009
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.027,
+     "patterns": 0.012,
+     "llm_judge": 15.522,
+     "geval": 16.237
+    },
+    "check_compute_s_total_per_call": 31.798,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 10.0
+   },
+   "commit": "a72e6a6f84",
+   "dirty": true,
+   "cv_far": {
+    "n": 48,
+    "flag_precision": 0.68,
+    "flag_recall": 0.6538,
+    "flag_f1": 0.6667,
+    "false_alarm_rate": 0.3636,
+    "miss_rate": 0.3462,
+    "alarm_f1": 0.0952,
+    "review_recall": 0.6667,
+    "review_escalation": 0.6667,
+    "accuracy": 0.3958,
+    "tp": 17,
+    "fp": 8,
+    "fn": 9,
+    "tn": 14,
+    "flag_balanced_accuracy": 0.6451,
+    "ci": {
+     "flag_f1": {
+      "value": 0.6667,
+      "lo": 0.4545,
+      "hi": 0.8372,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.68,
+      "lo": 0.4231,
+      "hi": 0.913,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.6538,
+      "lo": 0.4286,
+      "hi": 0.875,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.3636,
+      "lo": 0.1,
+      "hi": 0.625,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.3462,
+      "lo": 0.125,
+      "hi": 0.5714,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.0952,
+      "lo": 0.0,
+      "hi": 0.2857,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.6667,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.3958,
+      "lo": 0.25,
+      "hi": 0.5682,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.6451,
+      "lo": 0.4833,
+      "hi": 0.808,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.4444,
+      "flag_precision": 0.8889,
+      "flag_recall": 0.8,
+      "flag_f1": 0.8421,
+      "false_alarm_rate": 0.125,
+      "miss_rate": 0.2,
+      "alarm_f1": 0.1818
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.2917,
+      "flag_precision": 0.4167,
+      "flag_recall": 0.5,
+      "flag_f1": 0.4545,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.5,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.6667,
+      "flag_precision": 1.0,
+      "flag_recall": 0.6667,
+      "flag_f1": 0.8,
+      "false_alarm_rate": null,
+      "miss_rate": 0.3333,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.75,
+      "flag_recall": 0.6923,
+      "flag_f1": 0.72,
+      "false_alarm_rate": 0.2727,
+      "miss_rate": 0.3077,
+      "alarm_f1": 0.0
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.375,
+      "flag_precision": 0.6154,
+      "flag_recall": 0.6154,
+      "flag_f1": 0.6154,
+      "false_alarm_rate": 0.4545,
+      "miss_rate": 0.3846,
+      "alarm_f1": 0.1818
+     }
+    }
+   },
+   "cv_far_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.95,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.4375
+    },
+    {
+     "fold": 1,
+     "threshold": 0.95,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ],
+     "cap_reachable": true,
+     "fallback": false,
+     "train_far": 0.1875
+    },
+    {
+     "fold": 2,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.3889
+    },
+    {
+     "fold": 3,
+     "threshold": 0.95,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.4375
+    }
+   ],
+   "cap": {
+    "far_cap": 0.2,
+    "compliant": false,
+    "floor": {
+     "threshold": 1.0,
+     "false_alarm_rate": 0.3636,
+     "flag_recall": 0.6538,
+     "fp": 8,
+     "tn": 14,
+     "flagged": 25,
+     "n": 48,
+     "cap_reachable": false
+    },
+    "folds_reachable": 1,
+    "folds": 4,
+    "fallback_folds": [
+     0,
+     2,
+     3
+    ]
+   },
+   "backfill": {
+    "cv_far": {
+     "git": {
+      "sha": "2cc04e7f41",
+      "dirty": true,
+      "branch": "main"
+     },
+     "config_hash": "c8c60e398c2fe3c8",
+     "run_config_hash": "796d693d3c246afe",
+     "config_matches_run": false,
+     "created": "2026-10-10T02:13:57+0200"
+    },
+    "far_floor": {
+     "git": {
+      "sha": "2cc04e7f41",
+      "dirty": true,
+      "branch": "main"
+     },
+     "config_hash": "c8c60e398c2fe3c8",
+     "run_config_hash": "796d693d3c246afe",
+     "config_matches_run": false,
+     "created": "2026-10-10T02:13:57+0200"
+    }
+   },
+   "auc": {
+    "flag": {
+     "value": 0.6836,
+     "lo": 0.5411,
+     "hi": 0.8334,
+     "n_valid": 2000,
+     "n_pos": 26,
+     "n_neg": 22
+    },
+    "alarm": {
+     "value": 0.7679,
+     "lo": 0.6312,
+     "hi": 0.9167,
+     "n_valid": 2000,
+     "n_pos": 20,
+     "n_neg": 28
+    }
+   },
+   "degraded": false,
+   "warnings": []
+  },
+  "large_v3_gsw": {
+   "variant": "large_v3_gsw",
+   "oracle": false,
+   "meta": {
+    "variant": "large_v3_gsw",
+    "description": "gcoli whisper-large-v3 Swiss German (MIT), fp16, beam 1",
+    "experiment": "asr_models",
+    "split": "dev",
+    "profile": "gpu-12gb",
+    "set": [
+     "asr.model=models/asr/whisper-large-v3-gsw-ct2",
+     "asr.compute_type=float16"
+    ],
+    "checks": [
+     "keywords",
+     "patterns",
+     "llm_judge",
+     "geval"
+    ],
+    "refuse_from": null,
+    "oracle": false,
+    "config_name": "gpu-12gb",
+    "config_hash": "e39fb7dc9d26dcf8",
+    "threshold": 0.55,
+    "fusion": "weighted",
+    "asr": "faster_whisper",
+    "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+    "llm": {
+     "default": {
+      "type": "openai_compat",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "model": "callguard-llm",
+      "cache_tag": null
+     }
+    },
+    "git": {
+     "sha": "a72e6a6f84",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T01:51:06+0200",
+    "wall_seconds": 501.88,
+    "n_calls": 48,
+    "calls": [
+     "Stufe1_D01-K1",
+     "Stufe1_D01-K2",
+     "Stufe1_D02-K1",
+     "Stufe1_D02-K2",
+     "Stufe1_D03-K1",
+     "Stufe1_D03-K2",
+     "Stufe1_D04-K1",
+     "Stufe1_D04-K2",
+     "Stufe1_D05-K1",
+     "Stufe1_D05-K2",
+     "Stufe1_D06-K1",
+     "Stufe1_D06-K2",
+     "Stufe1_D08-K1",
+     "Stufe1_D08-K2",
+     "Stufe1_D09-K1",
+     "Stufe1_D09-K2",
+     "Stufe1_D10-K1",
+     "Stufe1_D10-K2",
+     "Stufe2_C01-K3",
+     "Stufe2_C01-K4",
+     "Stufe2_C02-K3",
+     "Stufe2_C02-K4",
+     "Stufe2_C05-K3",
+     "Stufe2_C05-K4",
+     "Stufe2_C06-K3",
+     "Stufe2_C06-K4",
+     "Stufe2_C07-K3",
+     "Stufe2_C07-K4",
+     "Stufe2_C08-K3",
+     "Stufe2_C08-K4",
+     "Stufe2_C09-K3",
+     "Stufe2_C09-K4",
+     "Stufe2_C10-K3",
+     "Stufe2_C10-K4",
+     "Stufe2_C11-K3",
+     "Stufe2_C11-K4",
+     "Stufe2_C12-K3",
+     "Stufe2_C12-K4",
+     "Stufe2_C13-K3",
+     "Stufe2_C13-K4",
+     "Stufe2_C14-K3",
+     "Stufe2_C14-K4",
+     "Stufe3_C17-K3",
+     "Stufe3_C17-K4",
+     "Stufe3_C18-K3",
+     "Stufe3_C18-K4",
+     "Stufe3_C20-K3",
+     "Stufe3_C20-K4"
+    ]
+   },
+   "n_calls": 48,
+   "n_dialogues": 24,
+   "fixed": {
+    "n": 48,
+    "flag_precision": 0.5652,
+    "flag_recall": 1.0,
+    "flag_f1": 0.7222,
+    "false_alarm_rate": 0.9091,
+    "miss_rate": 0.0,
+    "alarm_f1": 0.5455,
+    "review_recall": 0.6667,
+    "review_escalation": 1.0,
+    "accuracy": 0.375,
+    "tp": 26,
+    "fp": 20,
+    "fn": 0,
+    "tn": 2,
+    "flag_balanced_accuracy": 0.5454,
+    "ci": {
+     "flag_f1": {
+      "value": 0.7222,
+      "lo": 0.5714,
+      "hi": 0.8485,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.5652,
+      "lo": 0.4,
+      "hi": 0.7368,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.9091,
+      "lo": 0.75,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.5455,
+      "lo": 0.3226,
+      "hi": 0.7451,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.6667,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.375,
+      "lo": 0.2241,
+      "hi": 0.5714,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5455,
+      "lo": 0.5,
+      "hi": 0.625,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.5556,
+      "flag_precision": 0.5882,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7407,
+      "false_alarm_rate": 0.875,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.7826
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.1667,
+      "flag_precision": 0.4348,
+      "flag_recall": 1.0,
+      "flag_f1": 0.6061,
+      "false_alarm_rate": 0.9286,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.3158
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.6667,
+      "flag_precision": 1.0,
+      "flag_recall": 1.0,
+      "flag_f1": 1.0,
+      "false_alarm_rate": null,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.0
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.5909,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7429,
+      "false_alarm_rate": 0.8182,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.5455
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.3333,
+      "flag_precision": 0.5417,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7027,
+      "false_alarm_rate": 1.0,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.5455
+     }
+    }
+   },
+   "cv": {
+    "n": 48,
+    "flag_precision": 0.5476,
+    "flag_recall": 0.8846,
+    "flag_f1": 0.6765,
+    "false_alarm_rate": 0.8636,
+    "miss_rate": 0.1154,
+    "alarm_f1": 0.5,
+    "review_recall": 0.6667,
+    "review_escalation": 0.6667,
+    "accuracy": 0.3542,
+    "tp": 23,
+    "fp": 19,
+    "fn": 3,
+    "tn": 3,
+    "flag_balanced_accuracy": 0.5105,
+    "ci": {
+     "flag_f1": {
+      "value": 0.6765,
+      "lo": 0.5085,
+      "hi": 0.8169,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.5476,
+      "lo": 0.381,
+      "hi": 0.725,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.8846,
+      "lo": 0.7,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.8636,
+      "lo": 0.7,
+      "hi": 1.0,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.1154,
+      "lo": 0.0,
+      "hi": 0.3,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.5,
+      "lo": 0.2162,
+      "hi": 0.75,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.6667,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.3542,
+      "lo": 0.1964,
+      "hi": 0.5714,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5105,
+      "lo": 0.4135,
+      "hi": 0.5974,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.6111,
+      "flag_precision": 0.625,
+      "flag_recall": 1.0,
+      "flag_f1": 0.7692,
+      "false_alarm_rate": 0.75,
+      "miss_rate": 0.0,
+      "alarm_f1": 0.7826
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.0833,
+      "flag_precision": 0.4091,
+      "flag_recall": 0.9,
+      "flag_f1": 0.5625,
+      "false_alarm_rate": 0.9286,
+      "miss_rate": 0.1,
+      "alarm_f1": 0.1176
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.6667,
+      "flag_precision": 1.0,
+      "flag_recall": 0.6667,
+      "flag_f1": 0.8,
+      "false_alarm_rate": null,
+      "miss_rate": 0.3333,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.3333,
+      "flag_precision": 0.5714,
+      "flag_recall": 0.9231,
+      "flag_f1": 0.7059,
+      "false_alarm_rate": 0.8182,
+      "miss_rate": 0.0769,
+      "alarm_f1": 0.4211
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.375,
+      "flag_precision": 0.5238,
+      "flag_recall": 0.8462,
+      "flag_f1": 0.6471,
+      "false_alarm_rate": 0.9091,
+      "miss_rate": 0.1538,
+      "alarm_f1": 0.5714
+     }
+    }
+   },
+   "cv_folds": [
+    {
+     "fold": 0,
+     "threshold": 0.65,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ]
+    },
+    {
+     "fold": 1,
+     "threshold": 0.55,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ]
+    },
+    {
+     "fold": 2,
+     "threshold": 0.9,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ]
+    },
+    {
+     "fold": 3,
+     "threshold": 0.65,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ]
+    }
+   ],
+   "suggestion": {
+    "threshold": 0.65,
+    "flag_f1": 0.7246,
+    "flag_recall": 0.9615,
+    "flag_precision": 0.5814,
+    "false_alarm_rate": 0.8182,
+    "miss_rate": 0.0385,
+    "tied": [
+     0.65
+    ],
+    "reason": "Schwelle 0.65 maximiert F1 der Markierungen (72%) bei Recall 96% und Fehlalarmquote 82%. Schwellen, die alle oder keinen Anruf markieren wurden nicht berücksichtigt."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5085,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5085,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5085,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5085,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5263,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5185,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.7027,
+     "flag_precision": 0.5417,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 1.0,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.52,
+     "accuracy": 0.3125
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.7222,
+     "flag_precision": 0.5652,
+     "flag_recall": 1.0,
+     "false_alarm_rate": 0.9091,
+     "miss_rate": 0.0,
+     "alarm_f1": 0.5455,
+     "accuracy": 0.375
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.7143,
+     "flag_precision": 0.5682,
+     "flag_recall": 0.9615,
+     "false_alarm_rate": 0.8636,
+     "miss_rate": 0.0385,
+     "alarm_f1": 0.5128,
+     "accuracy": 0.375
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.7246,
+     "flag_precision": 0.5814,
+     "flag_recall": 0.9615,
+     "false_alarm_rate": 0.8182,
+     "miss_rate": 0.0385,
+     "alarm_f1": 0.5128,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.7077,
+     "flag_precision": 0.5897,
+     "flag_recall": 0.8846,
+     "false_alarm_rate": 0.7273,
+     "miss_rate": 0.1154,
+     "alarm_f1": 0.5556,
+     "accuracy": 0.4375
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.6774,
+     "flag_precision": 0.5833,
+     "flag_recall": 0.8077,
+     "false_alarm_rate": 0.6818,
+     "miss_rate": 0.1923,
+     "alarm_f1": 0.5714,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.6774,
+     "flag_precision": 0.5833,
+     "flag_recall": 0.8077,
+     "false_alarm_rate": 0.6818,
+     "miss_rate": 0.1923,
+     "alarm_f1": 0.5714,
+     "accuracy": 0.3958
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.678,
+     "flag_precision": 0.6061,
+     "flag_recall": 0.7692,
+     "false_alarm_rate": 0.5909,
+     "miss_rate": 0.2308,
+     "alarm_f1": 0.5714,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.717,
+     "flag_precision": 0.7037,
+     "flag_recall": 0.7308,
+     "false_alarm_rate": 0.3636,
+     "miss_rate": 0.2692,
+     "alarm_f1": 0.5185,
+     "accuracy": 0.5
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 61.223,
+    "stage_s_per_call": {
+     "asr": 16.192,
+     "diarize": 19.094,
+     "checks": 25.931
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.083,
+     "patterns": 0.011,
+     "llm_judge": 15.204,
+     "geval": 10.623
+    },
+    "check_compute_s_total_per_call": 25.92,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 10.0
+   },
+   "commit": "a72e6a6f84",
+   "dirty": true,
+   "cv_far": {
+    "n": 48,
+    "flag_precision": 0.7037,
+    "flag_recall": 0.7308,
+    "flag_f1": 0.717,
+    "false_alarm_rate": 0.3636,
+    "miss_rate": 0.2692,
+    "alarm_f1": 0.0,
+    "review_recall": 0.5,
+    "review_escalation": 0.5,
+    "accuracy": 0.3542,
+    "tp": 19,
+    "fp": 8,
+    "fn": 7,
+    "tn": 14,
+    "flag_balanced_accuracy": 0.6836,
+    "ci": {
+     "flag_f1": {
+      "value": 0.717,
+      "lo": 0.56,
+      "hi": 0.8401,
+      "n_valid": 2000
+     },
+     "flag_precision": {
+      "value": 0.7037,
+      "lo": 0.5293,
+      "hi": 0.88,
+      "n_valid": 2000
+     },
+     "flag_recall": {
+      "value": 0.7308,
+      "lo": 0.5417,
+      "hi": 0.8929,
+      "n_valid": 2000
+     },
+     "false_alarm_rate": {
+      "value": 0.3636,
+      "lo": 0.1667,
+      "hi": 0.55,
+      "n_valid": 2000
+     },
+     "miss_rate": {
+      "value": 0.2692,
+      "lo": 0.1071,
+      "hi": 0.4583,
+      "n_valid": 2000
+     },
+     "alarm_f1": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 2000
+     },
+     "review_recall": {
+      "value": 0.5,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1930
+     },
+     "accuracy": {
+      "value": 0.3542,
+      "lo": 0.2173,
+      "hi": 0.52,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.6836,
+      "lo": 0.5667,
+      "hi": 0.8042,
+      "n_valid": 2000
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 18,
+      "accuracy": 0.3889,
+      "flag_precision": 0.9,
+      "flag_recall": 0.9,
+      "flag_f1": 0.9,
+      "false_alarm_rate": 0.125,
+      "miss_rate": 0.1,
+      "alarm_f1": 0.0
+     },
+     "Stufe2": {
+      "n": 24,
+      "accuracy": 0.2917,
+      "flag_precision": 0.5,
+      "flag_recall": 0.7,
+      "flag_f1": 0.5833,
+      "false_alarm_rate": 0.5,
+      "miss_rate": 0.3,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 6,
+      "accuracy": 0.5,
+      "flag_precision": 1.0,
+      "flag_recall": 0.5,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": null,
+      "miss_rate": 0.5,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 24,
+      "accuracy": 0.2917,
+      "flag_precision": 0.625,
+      "flag_recall": 0.7692,
+      "flag_f1": 0.6897,
+      "false_alarm_rate": 0.5455,
+      "miss_rate": 0.2308,
+      "alarm_f1": 0.0
+     },
+     "noisy": {
+      "n": 24,
+      "accuracy": 0.4167,
+      "flag_precision": 0.8182,
+      "flag_recall": 0.6923,
+      "flag_f1": 0.75,
+      "false_alarm_rate": 0.1818,
+      "miss_rate": 0.3077,
+      "alarm_f1": 0.0
+     }
+    }
+   },
+   "cv_far_folds": [
+    {
+     "fold": 0,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D01",
+      "Stufe1_D06",
+      "Stufe1_D09",
+      "Stufe2_C13",
+      "Stufe2_C14",
+      "Stufe3_C20"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.375
+    },
+    {
+     "fold": 1,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D05",
+      "Stufe2_C01",
+      "Stufe2_C02",
+      "Stufe2_C07",
+      "Stufe2_C08",
+      "Stufe3_C17"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.375
+    },
+    {
+     "fold": 2,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D02",
+      "Stufe1_D03",
+      "Stufe1_D04",
+      "Stufe2_C09",
+      "Stufe2_C10",
+      "Stufe3_C18"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.3333
+    },
+    {
+     "fold": 3,
+     "threshold": 1.0,
+     "n_test": 12,
+     "dialogues": [
+      "Stufe1_D08",
+      "Stufe1_D10",
+      "Stufe2_C05",
+      "Stufe2_C06",
+      "Stufe2_C11",
+      "Stufe2_C12"
+     ],
+     "cap_reachable": false,
+     "fallback": true,
+     "train_far": 0.375
+    }
+   ],
+   "cap": {
+    "far_cap": 0.2,
+    "compliant": false,
+    "floor": {
+     "threshold": 1.0,
+     "false_alarm_rate": 0.3636,
+     "flag_recall": 0.7308,
+     "fp": 8,
+     "tn": 14,
+     "flagged": 27,
+     "n": 48,
+     "cap_reachable": false
+    },
+    "folds_reachable": 0,
+    "folds": 4,
+    "fallback_folds": [
+     0,
+     1,
+     2,
+     3
+    ]
+   },
+   "backfill": {
+    "cv_far": {
+     "git": {
+      "sha": "2cc04e7f41",
+      "dirty": true,
+      "branch": "main"
+     },
+     "config_hash": "c7fc35285e55c98e",
+     "run_config_hash": "e39fb7dc9d26dcf8",
+     "config_matches_run": false,
+     "created": "2026-10-10T02:13:57+0200"
+    },
+    "far_floor": {
+     "git": {
+      "sha": "2cc04e7f41",
+      "dirty": true,
+      "branch": "main"
+     },
+     "config_hash": "c7fc35285e55c98e",
+     "run_config_hash": "e39fb7dc9d26dcf8",
+     "config_matches_run": false,
+     "created": "2026-10-10T02:13:57+0200"
+    }
+   },
+   "auc": {
+    "flag": {
+     "value": 0.6626,
+     "lo": 0.4757,
+     "hi": 0.8451,
+     "n_valid": 2000,
+     "n_pos": 26,
+     "n_neg": 22
+    },
+    "alarm": {
+     "value": 0.7839,
+     "lo": 0.5906,
+     "hi": 0.9584,
+     "n_valid": 2000,
+     "n_pos": 20,
+     "n_neg": 28
+    }
+   },
+   "degraded": false,
+   "warnings": []
+  }
+ },
+ "comparisons": [
+  {
+   "a": "turbo_gsw_int8",
+   "b": "large_v3_gsw",
+   "fixed": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.6857,
+      "b": 0.7222,
+      "diff": 0.0365,
+      "lo": 0.0,
+      "hi": 0.0843,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm_f1": {
+      "a": 0.6316,
+      "b": 0.5455,
+      "diff": -0.0861,
+      "lo": -0.2914,
+      "hi": 0.1653,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "false_alarm_rate": {
+      "a": 0.9091,
+      "b": 0.9091,
+      "diff": 0.0,
+      "lo": -0.1364,
+      "hi": 0.1334,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "miss_rate": {
+      "a": 0.0769,
+      "b": 0.0,
+      "diff": -0.0769,
+      "lo": -0.1818,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.3958,
+      "b": 0.375,
+      "diff": -0.0208,
+      "lo": -0.1852,
+      "hi": 0.1346,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "review_recall": {
+      "a": 0.8333,
+      "b": 0.6667,
+      "diff": -0.1666,
+      "lo": -1.0,
+      "hi": 0.5,
+      "n_valid": 1930,
+      "real": false,
+      "better": "a"
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.507,
+      "b": 0.5455,
+      "diff": 0.0385,
+      "lo": -0.0121,
+      "hi": 0.1111,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.6836,
+      "b": 0.6626,
+      "diff": -0.021,
+      "lo": -0.1591,
+      "hi": 0.1108,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm": {
+      "a": 0.7679,
+      "b": 0.7839,
+      "diff": 0.016,
+      "lo": -0.1218,
+      "hi": 0.1451,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 1,
+     "b_only": 3,
+     "both": 25,
+     "neither": 19,
+     "p": 0.625
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 6,
+     "b_only": 5,
+     "both": 13,
+     "neither": 24,
+     "p": 1.0
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D01-K1",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.4268,
+      "b_score": 0.3796,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "geval: Die Kundin gibt die letzten vier Stellen der Kreditkartennummer vor, was als Zugangsinformation interpretiert werden könnte. Allerdings ist unklar, ob dies ein aktives Geheimnis ist oder ob es sich um eine harmlose Information handelt.",
+      "b_reason": "geval: Die Kundin gibt die letzten vier Stellen der Kreditkartennummer vor, was als Zugangsinformation interpretiert werden kann, obwohl sie nur die letzten vier Ziffern der Kreditkartennummer und nicht das gesamte PIN oder Passwort preisgibt.",
+      "a_passage": "01:28-01:39 access: also nicht meine ganze Kreditkartennummer. Gut, auf der Kreditkarte, die ich beim Label hinterlegt habe, sind die letzten vier, 4, 2, 4, 2.",
+      "b_passage": "01:28-01:31 access: Also nicht meine ganze Kreditkartennummer."
+     },
+     {
+      "call_id": "Stufe1_D04-K1",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9566,
+      "b_score": 0.9564,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kundin erwähnt, dass sie von der Übernahme der Firma Furkan Medizintechnik informiert wurde, die erst in der nächsten Woche bekanntgegeben wird. Sie möchte die Aktien der Firma kaufen, bevor die Bekanntgabe erfolgt.",
+      "b_reason": "geval: Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin persönlich erhalten hat, die noch nicht öffentlich bekannt gemacht wurden. Sie möchte diese Informationen nutzen, um Aktien zu kaufen, bevor die Bekanntgabe erfolgt. Dies entspricht den Kriterien für Insiderhandel.",
+      "a_passage": "02:30-03:30 trade: Sie hat am Montag von ihrer Übernahme erzählt, dass sie im grösseren Konzern viermal kaufen will, sie arbeitet in der Finanzabteilung und hat mir hinter den Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich, die Be",
+      "b_passage": "00:40-00:45 trade: Die vom letzten Jahr. Der Sportplan soll weiterlaufen wie bisher."
+     },
+     {
+      "call_id": "Stufe1_D05-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7019,
+      "b_score": 0.7144,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kundin sagt den TAN-Code '7, 3, 1, 9, 4, 2' vor, der noch im laufenden Anmeldevorgang gültig ist.",
+      "b_reason": "llm_judge: Der Kunde gibt den TAN-Code 'sieben, drei, eins, neun, vier, zwei' am Telefon vor.",
+      "a_passage": "00:56-01:06 access: Die LAP, und da stark der neu bestätigte WUS-Code ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+      "b_passage": "01:17-01:22 access: Wartet, ich sage Ihnen die TAN-Card. sieben, drei, eins, neun, vier, zwei."
+     },
+     {
+      "call_id": "Stufe1_D05-K2",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.5497,
+      "b_score": 0.7174,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Der Kunde nennt den Bestätigungscode, der noch gültig ist, im Gespräch.",
+      "b_reason": "llm_judge: Der Kunde sagt den TAN-Code (sieben, drei, eins, neun, vier, zwei) laut vor.",
+      "a_passage": "00:57-01:08 access: Bestätigung, und da stark der neue Bestätigungscode ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+      "b_passage": "01:18-01:29 access: Warte, ich sage Ihnen den TAN-Card. Sieben, drei, eins, neun, vier, zwei. Es steht immer noch gültig. Können Sie mir sagen, ob das die richtige Reihenfolge ist?"
+     },
+     {
+      "call_id": "Stufe1_D06-K1",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.5356,
+      "b_score": 0.6702,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Der Kunde möchte, dass seine alte Anleitung nicht protokolliert wird, um eine mögliche bestehende Verpflichtung vor der Kreditstelle zu verbergen.",
+      "b_reason": "llm_judge: Der Kunde möchte, dass eine abgelaufene Beispielzahl nicht protokolliert wird, um die Kreditprüfung für das neue Telefon zu erleichtern.",
+      "a_passage": "01:35-02:02 documentation: Gerätewechsel, aber auf dem Blatt, das ich herausgerückt habe, steht der Lehrstofzugang. Ich habe also vermutlich das falsche Blatt ausgenommen und in der Mail schrieb jemand, ich solle zum Gerätewechseln die Prüfung umgehen, das habe ich n",
+      "b_passage": "03:22-03:38 documentation: Und der Bestätigungscode auf dem Musterbild ist 482601. Das ist die abgelaufene Beispielzahl, wie meine. Ich habe keine aktuellen Codes zum Teilen. Verstanden."
+     },
+     {
+      "call_id": "Stufe1_D08-K2",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.5364,
+      "b_score": 0.7078,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Der Kunde möchte eine falsche Periode für die Kasse zusammenzählen und versucht, dies dem Vorstand vorzuenthalten.",
+      "b_reason": "llm_judge: Die Kassierin möchte eine Appelausgabe im März nicht protokollieren, da sie die Korrektur des Periodenverweises vorzieht. Sie versucht, eine relevante Tatsache vor der Kreditstelle zu verschweigen.",
+      "a_passage": "00:12-00:41 documentation: Kameral, ja, ich bin seit der Generalversammlung Kassierungen, ich habe eine Liste von Zahlungen, aber mein Vorgänger hat mir den Ordnung mit den Belegern, ich will vor dem Vorstandsstreffer sicher sein, dass ich nicht falsche Perioden zusa",
+      "b_passage": "03:33-04:33 documentation: Ich habe noch eine zweite Abmietung. Der Hallenvermieter steht zweimal in meiner Liste. Ich weiss nicht, ob ich den gleichen Beleg zweimal mit dem Kontorgang verglichen habe. Hätte ich zwei Rechnungen bei der gleichen Belegreferenz und der "
+     },
+     {
+      "call_id": "Stufe2_C01-K3",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.4333,
+      "b_score": 0.5964,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "geval: Der Kunde gibt eine Reihe von Zahlen, die möglicherweise für die Aufteilung einer Rechnung verwendet werden könnten, ohne dass die Mitarbeiter dies bestätigen oder ablehnen. Dies könnte darauf hindeuten, dass der Kunde versucht, die interne Kontrolle zu umgehen.",
+      "b_reason": "llm_judge: Die Kundin gibt die TAN 'vier zwei vier zwei vier zwei vier zwei vier zwei' am Telefon preis.",
+      "a_passage": "01:54-02:10 splitting: Dann steht 4, 2, 4, 2, 3, 2, 3, 2, 3, 2, 3, 2. Wir machen hier keine weiteren Zahl abweich am Telefon.",
+      "b_passage": "01:55-02:03 access: Hier steht vier zwei vier zwei vier zwei vier zwei vier zwei vier zwei vier zwei vier zwei vier zwei."
+     },
+     {
+      "call_id": "Stufe2_C01-K4",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.6927,
+      "b_score": 0.5705,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kundin gibt den Wert 4242424242424242424242424242424242424242424242424242 am Telefon vor, was als Preisgabe eines aktiven Geheimnisses zählt.",
+      "b_reason": "llm_judge: Der Kunde gibt eine Zahl, die für die Kreditprüfung relevant sein könnte, nicht an die zuständige internen Stelle weiter. Stattdessen behält er sie für sich.",
+      "a_passage": "01:57-02:04 access: Hier steht 4242424242424242424242424242424242424242424242424242.",
+      "b_passage": "01:44-02:11 documentation: Von mir selber. Der Händler hat mir keine Nachricht mit dem Wunsch nach einer Zahl geschickt. Ich weiss, Sie haben von ihm gesagt, ich solle warten, aber ich habe sie jetzt gerade im Blick. Das steht vier, zwei, vier, zwei, vier, zwei, vier"
+     },
+     {
+      "call_id": "Stufe2_C05-K3",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.7012,
+      "b_score": 0.7032,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Frau Keller versucht, dass ihre Absicht, keine 6000 Franken für Aktien von den CLN-Systemen zu kaufen, vor der Kreditstelle verborgen bleibt. Sie sagt: 'Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen.'",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Entscheidung für den Kauf der Aktien nicht protokolliert wird, bevor die Kreditstelle die Prüfung durchführt.",
+      "a_passage": "07:58-08:10 documentation: Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+      "b_passage": "01:22-01:27 documentation: Ich weiss nichts zusätzlich und habe den gleichen Inhalt wie alle anderen Anwesenden."
+     },
+     {
+      "call_id": "Stufe2_C05-K4",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.8539,
+      "b_score": 0.7009,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Frau Keller gibt an, dass sie eine selbst erhaltene, noch nicht öffentliche Information aus einem Bericht verwendet, um einen Kaufwunsch für Aktien zu formulieren. Diese Information stammt vom Firmenmarkt und wurde nicht als öffentlich beschrieben.",
+      "b_reason": "llm_judge: Frau Keller verlangt, dass die Summe von sechstausend Franken, die sie für Aktien investieren möchte, nicht protokolliert wird, um zwei separate Anfragen im System zu vermeiden.",
+      "a_passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GEOS auf der Fahrt gesehen,",
+      "b_passage": "05:03-05:04 documentation: Es ändert sich ja."
+     },
+     {
+      "call_id": "Stufe2_C06-K4",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.7021,
+      "b_score": 0.8147,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kundenin erklärt, dass sie Informationen aus einer unternehmensinternen Quelle hat und möchte sich informieren, ohne jetzt im Kauf zu verlangen. Sie zeigt Dokumente und Zahlen, die anderen Anlegern noch nicht zugänglich sind.",
+      "b_reason": "llm_judge: Die Kundenin erwähnt einen Bericht über einen neuen Großauftrag, den sie privat von einem Projektleiter bekommen hat. Sie hat auch den Kauf von Aktien von Seerlern-Systemen mit einem Wert von 6'000 Franken angekündigt.",
+      "a_passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GoSELF -Tage gesehen,",
+      "b_passage": "01:09-01:39 trade: Claudia leitet das Projekt bei der Firma. Sie hat mir den unterschriebenen Grossauftrag persönlich gezeigt, weil wir uns privat kennen. Der Inhalt bleibt bis zur Präsentation am Freitag im Projekt drin. Ich habe ihn von anderen Anlegungen e"
+     },
+     {
+      "call_id": "Stufe2_C08-K3",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.5438,
+      "b_score": 0.701,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kunde erwähnt, dass sie den Absatzbericht der Albisoptik gelesen hat, der noch nicht offiziell bekanntgegeben wurde. Der Advisor bestätigt, dass der Kaufwunsch mit den genannten Quellen zum Vorgang entgegenommen wird.",
+      "b_reason": "llm_judge: Die Kunde erwähnt, dass sie den Absatzbericht der Alpesoptik am Morgen gelesen hat, bevor die Medien die Nachricht veröffentlicht haben. Sie möchte darauf basierend einen Kauf von Aktien der Albis Optik tätigen.",
+      "a_passage": "00:35-00:53 trade: Ich habe gestern den neuen Absatzbericht auf der Merzseite der Albisoptik gelesen, der am Morgen an die Medien ging und für alle verfügbar, es wurde dort mehr verkauft als erwartet, ich kenne niemanden im Team und habe nur den Bericht diese",
+      "b_passage": "00:35-00:48 trade: Ich habe gestern den neuen Absatzbericht auf der Webseite der Alpesoptik gelesen. Dieser ging am Morgen an die Medien und war für alle verfügbar. Es ist deutlich mehr verkauft worden, als erwartet."
+     },
+     {
+      "call_id": "Stufe2_C09-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.3054,
+      "b_score": 0.4525,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "geval: Der Kunde erwähnt, dass er einen Pfeil erwartet hat, der ihn zum Browser führt, während der Advisor darauf hinweist, dass es zwei Ansichten gibt, und dass sie keine geheimen Worte teilen. Dies deutet darauf hin, dass der Kunde möglicherweise Informationen vor der Kreditstelle verbirgt.",
+      "b_reason": "geval: Die Kunde erwähnt, dass sie den Pfeil auf dem Bildschirm erwartet hat, der ihr auf dem Telefon angezeigt werden sollte. Dies deutet darauf hin, dass sie Informationen verschweigt, die für die Kreditprüfung relevant sein könnten.",
+      "a_passage": "00:58-01:01 documentation: Der Pfeili, ich habe erwartet, dass ich auf dem Telefon etwas schlugge.",
+      "b_passage": "00:59-01:04 documentation: Ich habe erwartet, dass ich auf dem Telefon etwas sehe. Ich möchte es bestätigen, aber hier geht der Pfeil zum Browser."
+     },
+     {
+      "call_id": "Stufe2_C10-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.2948,
+      "b_score": 0.4605,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "geval: Der Kunde erwähnt eine abgelaufene Muster-Zahlung in der Anleitung, die nicht protokolliert werden soll, was einen Versuch zur Verschweigung relevanter Informationen darstellt.",
+      "b_reason": "geval: Der Kunde erwähnt, dass er das Bild schnell angeschaut hat, was impliziert, dass er möglicherweise wichtige Informationen übersehen hat. Dies könnte darauf hindeuten, dass er absichtlich Informationen vor der Kreditstelle verbirgt.",
+      "a_passage": "00:31-00:57 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue ein abgelaufener Muster in der Anleitung an, das echte Anmeldefenster ist zu, es gibt auch keinen Counton, die Zahl kann nicht gebraucht werden und ich bleibe jetzt bei genau diesem F",
+      "b_passage": "01:24-01:34 documentation: Jetzt habe ich den Pfeil gesehen. Ich habe nur das Bild vergrössert, keine anderen Taben aufgerufen. Das Pfeil, das ich meine, ist immer noch das gleiche."
+     },
+     {
+      "call_id": "Stufe2_C12-K4",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.7007,
+      "b_score": 0.4594,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Der Advisor gibt den aktuellen Kontostand von 6400 Franken an die Customer, ohne dass diese Berechtigung dazu hat. Dies entspricht der Definition der Preisgabe an Dritte.",
+      "b_reason": "llm_judge: Die Kundin nennt den aktuellen Stand der Kontocapitalien, der als Zugangsgeheimnis fungieren könnte, am Telefon.",
+      "a_passage": "03:37-03:46 disclosure: Das ist der persönliche Stand ihrer Mutter heute am Morgen. Dank der FEP, ich schreibe es mit dem Datum auf.",
+      "b_passage": "03:32-03:41 access: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C13-K4",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7303,
+      "b_score": 0.936,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, obwohl es eine relevante Tatsache ist. Dies entspricht dem Wunsch, eine relevante Angabe 'nicht zu protokollieren'.",
+      "b_reason": "geval: Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, was als Verschweigen einer relevanten Angabe interpretiert werden kann.",
+      "a_passage": "07:31-08:17 documentation: Mach gut, die auch ange und die grüne Mafierungen sind jetzt klar. Für die violetten Zeilen habe ich noch den Wunsch, den ich am Anfang an gesprochen habe. Die Farben meine ich auf der aktuellen weissen Version, wie du auf dem alten Blatt. ",
+      "b_passage": "08:00-08:14 documentation: Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt. Ich nehme Ihren Wunsch auf, zusammen mit denen, die Sie am Anfang über den Satz gesagt haben."
+     },
+     {
+      "call_id": "Stufe2_C14-K3",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.7008,
+      "b_score": 0.7026,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kunde verlangt, dass eine einzige Rechnung in mehrere Teilbeträge aufgeteilt wird, um eine interne Kontrolle zu vermeiden. Dies wird explizit durch den Satz 'Ich schreibe den August in den Daseinamen, aber den September separately, damit ich nicht schon am Papier scheitern.' vermittelt.",
+      "b_reason": "llm_judge: Regula Bachmann möchte, dass der Inhalt eines bestimmten Satzes vom Kreditgeber nicht protokolliert wird, um diesen Satz vor der Kreditstelle zu verbergen. Sie sagt: 'Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt.'",
+      "a_passage": "04:27-04:38 splitting: Danke, ich habe noch den Lohnnachweis vom August, aber dann vom September kommt die erste Ende Woche. Soll ich den August schon aufladen oder gibt es einen grossen zweiten Stapel?",
+      "b_passage": "01:02-01:08 documentation: Wir müssen zuerst wissen, ob diese Sache wichtig und für den vorgesehenen Empfänger nötig ist."
+     },
+     {
+      "call_id": "Stufe3_C18-K3",
+      "expected": "review",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.6902,
+      "b_score": 0.5861,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester nicht über das Konto informiert wird, während sie noch keine offizielle Berechtigung vorlegt. Sie versucht, die Wohnungsrechnung zu lösen, ohne dass ihre Schwester informiert wird.",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Kontostand ihrer Schwester nicht erfahren darf, obwohl sie keinerlei Berechtigung vorweisen kann. Dies wird durch den Advisor bestätigt, der sagt: 'Ich kann nicht sagen, dass sie den Kontostand erfahren dürfen.'",
+      "a_passage": "00:23-01:06 documentation: Dann müssen wir einmal vor einer konkreten Auskunft schauen, welche sie sind und welche Auskunft sie erhalten dürfen. Was hat jeder Schwester für den Kontakt hinterlegt? Sie hat gesagt, es sei alles verletzt, ich habe aber nur eine Nachrich",
+      "b_passage": "01:00-01:03 documentation: Ich kann nicht sagen, dass sie den Kontostand erfahren dürfen."
+     },
+     {
+      "call_id": "Stufe3_C18-K4",
+      "expected": "review",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7013,
+      "b_score": 0.6952,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits zum Zahlen erfasst hat, ohne dass dies vor der Kreditstelle protokolliert wird. Dies entspricht dem Wunsch, eine relevante Tatsache 'nicht zu protokollieren'.",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits gezahlt hat, ohne dass es in der Notiz steht. Dies wird als relevante Angabe verschwiegen betrachtet.",
+      "a_passage": "01:40-01:46 documentation: Ich weiss nicht, ob meine Schwester den Septemberbetrag schon zum Zahlen erfasst hat.",
+      "b_passage": "02:04-02:22 documentation: Das ist das Datum des Personen als Rechnungsperiode. Ich kann sie heute Abend erreichen und in die richtige Rechnung benennen. Ich möchte nicht im Familienstand ein Bild ihres Kontos verteilen. Sie kann selber im Zugang schauen und mir dann"
+     },
+     {
+      "call_id": "Stufe3_C20-K4",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.3059,
+      "b_score": 0.5335,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "geval: Der Kunde fragt nach den Daten, obwohl seine Berechtigung nicht bestätigt wurde. Der Berater antwortet, ohne die Berechtigung zu überprüfen.",
+      "b_reason": "llm_judge: Die Kunde sagt, sie kann den Zweck des Plans noch nicht sagen und dass sie die Belege nicht zusammengebracht hat. Dies deutet darauf hin, dass sie versucht, Informationen vor der Kreditprüfung zu verschweigen.",
+      "a_passage": "00:40-00:51 disclosure: Nein, auf der Liste steht beim einen Teil eins und beim anderen Material. Das kann zur gleichen Baustelle kommen, muss aber nicht gleiche wie die Wunsch sind.",
+      "b_passage": "01:32-01:38 documentation: Ich habe keinen Betrag im System bestätigt und kenne den Zweck des Plans noch nicht."
+     }
+    ]
+   },
+   "cv": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.6667,
+      "b": 0.6765,
+      "diff": 0.0098,
+      "lo": -0.1739,
+      "hi": 0.1762,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm_f1": {
+      "a": 0.5517,
+      "b": 0.5,
+      "diff": -0.0517,
+      "lo": -0.2872,
+      "hi": 0.2223,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "false_alarm_rate": {
+      "a": 0.4545,
+      "b": 0.8636,
+      "diff": 0.4091,
+      "lo": 0.15,
+      "hi": 0.7143,
+      "n_valid": 2000,
+      "real": true,
+      "better": "a"
+     },
+     "miss_rate": {
+      "a": 0.3077,
+      "b": 0.1154,
+      "diff": -0.1923,
+      "lo": -0.5,
+      "hi": 0.1154,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.5,
+      "b": 0.3542,
+      "diff": -0.1458,
+      "lo": -0.3542,
+      "hi": 0.0682,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "review_recall": {
+      "a": 0.6667,
+      "b": 0.6667,
+      "diff": 0.0,
+      "lo": -1.0,
+      "hi": 1.0,
+      "n_valid": 1930,
+      "real": false,
+      "better": null
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.6189,
+      "b": 0.5105,
+      "diff": -0.1084,
+      "lo": -0.3,
+      "hi": 0.0594,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.6836,
+      "b": 0.6626,
+      "diff": -0.021,
+      "lo": -0.1591,
+      "hi": 0.1108,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm": {
+      "a": 0.7679,
+      "b": 0.7839,
+      "diff": 0.016,
+      "lo": -0.1218,
+      "hi": 0.1451,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 12,
+     "b_only": 8,
+     "both": 18,
+     "neither": 10,
+     "p": 0.5034
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 12,
+     "b_only": 5,
+     "both": 12,
+     "neither": 19,
+     "p": 0.1435
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D01-K2",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.6882,
+      "b_score": 0.6947,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Der Kunde wünscht, dass eine bestehende rückzahlbare Verpflichtung nicht protokolliert wird, um eine mögliche doppelte Belastung zu vermeiden.",
+      "b_reason": "llm_judge: Der Kunde möchte, dass eine bestehende rückzahlbare Verpflichtung nicht in die Notiz für die Kreditprüfung aufgenommen wird, um sie vor der Kreditstelle zu verbergen.",
+      "a_passage": "00:11-00:23 documentation: Sag Ja danken. Ich bin gerade daheim, ich habe am Samstag im Internet etwas gestellt, jetzt sehe ich den Betrag zweimal. Ich weiss nicht, ob ich selber etwas doppelt angekriegt habe.",
+      "b_passage": "01:55-02:03 documentation: Belastung. Gerade diese Reservation nicht löst. Ich kann nicht so gerne, wenn etwas eine Woche lang rumhängt, gerade weil ich noch ein Hotel zahlen muss."
+     },
+     {
+      "call_id": "Stufe1_D04-K1",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9566,
+      "b_score": 0.9564,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kundin erwähnt, dass sie von der Übernahme der Firma Furkan Medizintechnik informiert wurde, die erst in der nächsten Woche bekanntgegeben wird. Sie möchte die Aktien der Firma kaufen, bevor die Bekanntgabe erfolgt.",
+      "b_reason": "geval: Die Kunde erwähnt, dass sie Informationen von ihrer Kollegin persönlich erhalten hat, die noch nicht öffentlich bekannt gemacht wurden. Sie möchte diese Informationen nutzen, um Aktien zu kaufen, bevor die Bekanntgabe erfolgt. Dies entspricht den Kriterien für Insiderhandel.",
+      "a_passage": "02:30-03:30 trade: Sie hat am Montag von ihrer Übernahme erzählt, dass sie im grösseren Konzern viermal kaufen will, sie arbeitet in der Finanzabteilung und hat mir hinter den Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich, die Be",
+      "b_passage": "00:40-00:45 trade: Die vom letzten Jahr. Der Sportplan soll weiterlaufen wie bisher."
+     },
+     {
+      "call_id": "Stufe1_D05-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7019,
+      "b_score": 0.7144,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kundin sagt den TAN-Code '7, 3, 1, 9, 4, 2' vor, der noch im laufenden Anmeldevorgang gültig ist.",
+      "b_reason": "llm_judge: Der Kunde gibt den TAN-Code 'sieben, drei, eins, neun, vier, zwei' am Telefon vor.",
+      "a_passage": "00:56-01:06 access: Die LAP, und da stark der neu bestätigte WUS-Code ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+      "b_passage": "01:17-01:22 access: Wartet, ich sage Ihnen die TAN-Card. sieben, drei, eins, neun, vier, zwei."
+     },
+     {
+      "call_id": "Stufe1_D05-K2",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.5497,
+      "b_score": 0.7174,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Der Kunde nennt den Bestätigungscode, der noch gültig ist, im Gespräch.",
+      "b_reason": "llm_judge: Der Kunde sagt den TAN-Code (sieben, drei, eins, neun, vier, zwei) laut vor.",
+      "a_passage": "00:57-01:08 access: Bestätigung, und da stark der neue Bestätigungscode ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+      "b_passage": "01:18-01:29 access: Warte, ich sage Ihnen den TAN-Card. Sieben, drei, eins, neun, vier, zwei. Es steht immer noch gültig. Können Sie mir sagen, ob das die richtige Reihenfolge ist?"
+     },
+     {
+      "call_id": "Stufe1_D06-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.5356,
+      "b_score": 0.6702,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Der Kunde möchte, dass seine alte Anleitung nicht protokolliert wird, um eine mögliche bestehende Verpflichtung vor der Kreditstelle zu verbergen.",
+      "b_reason": "llm_judge: Der Kunde möchte, dass eine abgelaufene Beispielzahl nicht protokolliert wird, um die Kreditprüfung für das neue Telefon zu erleichtern.",
+      "a_passage": "01:35-02:02 documentation: Gerätewechsel, aber auf dem Blatt, das ich herausgerückt habe, steht der Lehrstofzugang. Ich habe also vermutlich das falsche Blatt ausgenommen und in der Mail schrieb jemand, ich solle zum Gerätewechseln die Prüfung umgehen, das habe ich n",
+      "b_passage": "03:22-03:38 documentation: Und der Bestätigungscode auf dem Musterbild ist 482601. Das ist die abgelaufene Beispielzahl, wie meine. Ich habe keine aktuellen Codes zum Teilen. Verstanden."
+     },
+     {
+      "call_id": "Stufe1_D06-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.5231,
+      "b_score": 0.5414,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Der Kunde spricht den Bestätigungscode 4826001 aus, der Teil des aktiven Anmeldevorgangs ist.",
+      "b_reason": "llm_judge: Die Kunde möchte den bestehenden Code, der abgelaufen ist, nicht vor der zuständigen internen Stelle (Bank) protokollieren, sondern behauptet, keine aktuelle Codes zum Teilen zu haben.",
+      "a_passage": "03:21-03:37 access: durch neues Gerät registrieren und der Bestätigungscode auf dem Musterbild ist 4826001. Das ist die abgelaufene Beispielzahl, wie meine. Ich habe keine aktuellen Codes zum Teil.",
+      "b_passage": "03:24-03:37 documentation: Der Bestätigungscode auf dem Musterbild ist 482601. Das ist die abgelaufene Beispielzahl. Ich habe keine aktuellen Codes zum Teilen."
+     },
+     {
+      "call_id": "Stufe1_D08-K1",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.7017,
+      "b_score": 0.7077,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kassierin möchte, dass die April-Ausgabe im März geschehen sei nicht protokolliert wird, was als Verschweigen einer relevanten Tatsache interpretiert werden kann.",
+      "b_reason": "llm_judge: Die Kassierin erklärt, dass sie eine einzige Buchung in mehrere Teile aufteilt, um eine mögliche internale Prüfung zu umgehen. Sie sagt: \"Ich habe beides als Frühling beschriftet.\" und \"Ich habe noch einen Altausdruck, der nur mehr aktuell draufsteht. Und das ist genau mein Problem.\"",
+      "a_passage": "03:08-03:23 documentation: Bitte nicht protokollieren, dass die April-Ausgabe im März geschehen sei. Die Buchung selbst und der wichtige April-Bericht sollten vollständig bleiben, weil mein falscher Periode in Verweis korrigiert werden muss.",
+      "b_passage": "01:18-01:25 splitting: Ich habe zuerst mit Liederbeiträge verglichen. Die meisten sind im März gekommen, aber ein Teil erst im Appell."
+     },
+     {
+      "call_id": "Stufe1_D08-K2",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.5364,
+      "b_score": 0.7078,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Der Kunde möchte eine falsche Periode für die Kasse zusammenzählen und versucht, dies dem Vorstand vorzuenthalten.",
+      "b_reason": "llm_judge: Die Kassierin möchte eine Appelausgabe im März nicht protokollieren, da sie die Korrektur des Periodenverweises vorzieht. Sie versucht, eine relevante Tatsache vor der Kreditstelle zu verschweigen.",
+      "a_passage": "00:12-00:41 documentation: Kameral, ja, ich bin seit der Generalversammlung Kassierungen, ich habe eine Liste von Zahlungen, aber mein Vorgänger hat mir den Ordnung mit den Belegern, ich will vor dem Vorstandsstreffer sicher sein, dass ich nicht falsche Perioden zusa",
+      "b_passage": "03:33-04:33 documentation: Ich habe noch eine zweite Abmietung. Der Hallenvermieter steht zweimal in meiner Liste. Ich weiss nicht, ob ich den gleichen Beleg zweimal mit dem Kontorgang verglichen habe. Hätte ich zwei Rechnungen bei der gleichen Belegreferenz und der "
+     },
+     {
+      "call_id": "Stufe2_C01-K3",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.4333,
+      "b_score": 0.5964,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "geval: Der Kunde gibt eine Reihe von Zahlen, die möglicherweise für die Aufteilung einer Rechnung verwendet werden könnten, ohne dass die Mitarbeiter dies bestätigen oder ablehnen. Dies könnte darauf hindeuten, dass der Kunde versucht, die interne Kontrolle zu umgehen.",
+      "b_reason": "llm_judge: Die Kundin gibt die TAN 'vier zwei vier zwei vier zwei vier zwei vier zwei' am Telefon preis.",
+      "a_passage": "01:54-02:10 splitting: Dann steht 4, 2, 4, 2, 3, 2, 3, 2, 3, 2, 3, 2. Wir machen hier keine weiteren Zahl abweich am Telefon.",
+      "b_passage": "01:55-02:03 access: Hier steht vier zwei vier zwei vier zwei vier zwei vier zwei vier zwei vier zwei vier zwei vier zwei."
+     },
+     {
+      "call_id": "Stufe2_C01-K4",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.6927,
+      "b_score": 0.5705,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kundin gibt den Wert 4242424242424242424242424242424242424242424242424242 am Telefon vor, was als Preisgabe eines aktiven Geheimnisses zählt.",
+      "b_reason": "llm_judge: Der Kunde gibt eine Zahl, die für die Kreditprüfung relevant sein könnte, nicht an die zuständige internen Stelle weiter. Stattdessen behält er sie für sich.",
+      "a_passage": "01:57-02:04 access: Hier steht 4242424242424242424242424242424242424242424242424242.",
+      "b_passage": "01:44-02:11 documentation: Von mir selber. Der Händler hat mir keine Nachricht mit dem Wunsch nach einer Zahl geschickt. Ich weiss, Sie haben von ihm gesagt, ich solle warten, aber ich habe sie jetzt gerade im Blick. Das steht vier, zwei, vier, zwei, vier, zwei, vier"
+     },
+     {
+      "call_id": "Stufe2_C05-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7012,
+      "b_score": 0.7032,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Frau Keller versucht, dass ihre Absicht, keine 6000 Franken für Aktien von den CLN-Systemen zu kaufen, vor der Kreditstelle verborgen bleibt. Sie sagt: 'Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen.'",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Entscheidung für den Kauf der Aktien nicht protokolliert wird, bevor die Kreditstelle die Prüfung durchführt.",
+      "a_passage": "07:58-08:10 documentation: Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+      "b_passage": "01:22-01:27 documentation: Ich weiss nichts zusätzlich und habe den gleichen Inhalt wie alle anderen Anwesenden."
+     },
+     {
+      "call_id": "Stufe2_C05-K4",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.8539,
+      "b_score": 0.7009,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Frau Keller gibt an, dass sie eine selbst erhaltene, noch nicht öffentliche Information aus einem Bericht verwendet, um einen Kaufwunsch für Aktien zu formulieren. Diese Information stammt vom Firmenmarkt und wurde nicht als öffentlich beschrieben.",
+      "b_reason": "llm_judge: Frau Keller verlangt, dass die Summe von sechstausend Franken, die sie für Aktien investieren möchte, nicht protokolliert wird, um zwei separate Anfragen im System zu vermeiden.",
+      "a_passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GEOS auf der Fahrt gesehen,",
+      "b_passage": "05:03-05:04 documentation: Es ändert sich ja."
+     },
+     {
+      "call_id": "Stufe2_C06-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.6955,
+      "b_score": 0.5917,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kunde möchte, dass die 6000 Franken für die Aktien von der CRM-Systeme nicht in die Notiz für die Kreditprüfung protokolliert werden, um den Sparplan unberührt zu lassen.",
+      "b_reason": "llm_judge: Frau Keller hat den Kaufwunsch nach dem Bericht über den neuen Grossauftrag ausgesprochen, der noch nicht offiziell bekanntgegeben wurde. Sie hat explizit erwähnt, dass sie die Informationen unter Privatanleytung erhalten hat.",
+      "a_passage": "08:00-08:12 documentation: Genau wegen diesem Bericht möchte ich nicht von 6000 Franken Aktien von der CRM Systeme kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+      "b_passage": "00:44-00:52 trade: Es geht um CRM-Systeme. Ich schenne die Produkte aus meiner Arbeit, aber die Aktien habe ich bis jetzt nie gehabt."
+     },
+     {
+      "call_id": "Stufe2_C06-K4",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7021,
+      "b_score": 0.8147,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kundenin erklärt, dass sie Informationen aus einer unternehmensinternen Quelle hat und möchte sich informieren, ohne jetzt im Kauf zu verlangen. Sie zeigt Dokumente und Zahlen, die anderen Anlegern noch nicht zugänglich sind.",
+      "b_reason": "llm_judge: Die Kundenin erwähnt einen Bericht über einen neuen Großauftrag, den sie privat von einem Projektleiter bekommen hat. Sie hat auch den Kauf von Aktien von Seerlern-Systemen mit einem Wert von 6'000 Franken angekündigt.",
+      "a_passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GoSELF -Tage gesehen,",
+      "b_passage": "01:09-01:39 trade: Claudia leitet das Projekt bei der Firma. Sie hat mir den unterschriebenen Grossauftrag persönlich gezeigt, weil wir uns privat kennen. Der Inhalt bleibt bis zur Präsentation am Freitag im Projekt drin. Ich habe ihn von anderen Anlegungen e"
+     },
+     {
+      "call_id": "Stufe2_C08-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.5438,
+      "b_score": 0.701,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde erwähnt, dass sie den Absatzbericht der Albisoptik gelesen hat, der noch nicht offiziell bekanntgegeben wurde. Der Advisor bestätigt, dass der Kaufwunsch mit den genannten Quellen zum Vorgang entgegenommen wird.",
+      "b_reason": "llm_judge: Die Kunde erwähnt, dass sie den Absatzbericht der Alpesoptik am Morgen gelesen hat, bevor die Medien die Nachricht veröffentlicht haben. Sie möchte darauf basierend einen Kauf von Aktien der Albis Optik tätigen.",
+      "a_passage": "00:35-00:53 trade: Ich habe gestern den neuen Absatzbericht auf der Merzseite der Albisoptik gelesen, der am Morgen an die Medien ging und für alle verfügbar, es wurde dort mehr verkauft als erwartet, ich kenne niemanden im Team und habe nur den Bericht diese",
+      "b_passage": "00:35-00:48 trade: Ich habe gestern den neuen Absatzbericht auf der Webseite der Alpesoptik gelesen. Dieser ging am Morgen an die Medien und war für alle verfügbar. Es ist deutlich mehr verkauft worden, als erwartet."
+     },
+     {
+      "call_id": "Stufe2_C09-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.3054,
+      "b_score": 0.4525,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "geval: Der Kunde erwähnt, dass er einen Pfeil erwartet hat, der ihn zum Browser führt, während der Advisor darauf hinweist, dass es zwei Ansichten gibt, und dass sie keine geheimen Worte teilen. Dies deutet darauf hin, dass der Kunde möglicherweise Informationen vor der Kreditstelle verbirgt.",
+      "b_reason": "geval: Die Kunde erwähnt, dass sie den Pfeil auf dem Bildschirm erwartet hat, der ihr auf dem Telefon angezeigt werden sollte. Dies deutet darauf hin, dass sie Informationen verschweigt, die für die Kreditprüfung relevant sein könnten.",
+      "a_passage": "00:58-01:01 documentation: Der Pfeili, ich habe erwartet, dass ich auf dem Telefon etwas schlugge.",
+      "b_passage": "00:59-01:04 documentation: Ich habe erwartet, dass ich auf dem Telefon etwas sehe. Ich möchte es bestätigen, aber hier geht der Pfeil zum Browser."
+     },
+     {
+      "call_id": "Stufe2_C09-K4",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.4334,
+      "b_score": 0.4318,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "geval: Die Kundin erwähnt, dass sie erwartet hatte, dass sie auf dem Telefon etwas bestätigen würde, was jedoch nicht der Fall war. Dies deutet darauf hin, dass sie möglicherweise Zugangsinformationen preisgab, obwohl dies nicht explizit in der Transkription festgestellt werden kann.",
+      "b_reason": "geval: Die Kundin erwähnt, dass sie den Wert 'acht, drei, sechs, eins, sieben, vier' ausgesprochen hat, was möglicherweise zu einem gültigen Anmelde- oder Freigabevorgang gehört.",
+      "a_passage": "00:59-01:09 access: den Tfeil, ich habe erwartet, dass ich auf dem Telefon etwas bestätige, aber das ist nicht der Fall. da geht der Feil zum Bowser, vielleicht habe ich nur ein bisschen schnell abgeschaut,",
+      "b_passage": "01:49-01:51 access: acht, drei, sechs, eins, sieben, vier."
+     },
+     {
+      "call_id": "Stufe2_C10-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.2948,
+      "b_score": 0.4605,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "geval: Der Kunde erwähnt eine abgelaufene Muster-Zahlung in der Anleitung, die nicht protokolliert werden soll, was einen Versuch zur Verschweigung relevanter Informationen darstellt.",
+      "b_reason": "geval: Der Kunde erwähnt, dass er das Bild schnell angeschaut hat, was impliziert, dass er möglicherweise wichtige Informationen übersehen hat. Dies könnte darauf hindeuten, dass er absichtlich Informationen vor der Kreditstelle verbirgt.",
+      "a_passage": "00:31-00:57 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue ein abgelaufener Muster in der Anleitung an, das echte Anmeldefenster ist zu, es gibt auch keinen Counton, die Zahl kann nicht gebraucht werden und ich bleibe jetzt bei genau diesem F",
+      "b_passage": "01:24-01:34 documentation: Jetzt habe ich den Pfeil gesehen. Ich habe nur das Bild vergrössert, keine anderen Taben aufgerufen. Das Pfeil, das ich meine, ist immer noch das gleiche."
+     },
+     {
+      "call_id": "Stufe2_C11-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.6887,
+      "b_score": 0.7012,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde möchte, dass ihre Mutter für die Heimrechnung keine bereits existierende rückzahlbare Verpflichtung in der Notiz für die Kreditprüfung nicht berücksichtigt wird.",
+      "b_reason": "llm_judge: Der Berater gibt den aktuellen Kontostand von 6400 Franken an die Kunde, ohne zuvor die vollständige Berechtigung der Kunde bestätigt zu haben.",
+      "a_passage": "00:10-00:21 documentation: Ja, sie ist zurzeit im Spital und ich ordne mit ihr die Unterlagen, ich will dir ganze Sachen übernehmen, aber die Heimrechnung muss rechtzeitig bezahlt werden.",
+      "b_passage": "03:03-04:01 disclosure: Ich habe ihre Belegliste und die Kontoübersicht gerade nebeneinander offen. Die Tassier-Stattung gehört nicht zum Heimbeleg. Ich sollte sie separat klären. Welche Zahl fehlt Ihnen noch für die Liste? Ich muss für meine Liste wissen, ob ich "
+     },
+     {
+      "call_id": "Stufe2_C11-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "alarm",
+      "a_score": 0.7037,
+      "b_score": 0.7009,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Beratung gibt den aktuellen Kontostand von 6400 Franken an die Klientin aus, ohne dass die Berechtigung zur Preisgabe bestätigt wurde.",
+      "b_reason": "llm_judge: Der Berater gibt den Kontostand der Kundenmutter an die Kunde, obwohl diese keine gültige Vollmacht hat.",
+      "a_passage": "03:34-03:44 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute am Morgen.",
+      "b_passage": "02:42-02:48 disclosure: Das Eufem eine Sortierung beantwortet aber noch keine Gewahr zu einem persönlichen Kontostand."
+     },
+     {
+      "call_id": "Stufe2_C12-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7018,
+      "b_score": 0.5878,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kunde erhielt eine Bestätigung des Kontostands von 6400 Franken, ohne dass die Berechtigung für diese Auskunft bestätigt wurde. Der Advisor bestätigte die Zahlung ohne Vorbehalt.",
+      "b_reason": "llm_judge: Die Beraterin nennt den aktuellen Kontostand von 6.400 Franken, obwohl sie nicht sicher ist, ob die Klientin die Berechtigung dazu hat. Sie sagt: 'Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar.' S is S3 hundred Franken verfügbar' und das that is available, [S63 speaker",
+      "a_passage": "03:29-03:59 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand ihrer Mutter heute Morgen. Dank Fett, ich schreibe es mit dem Datum auf. Ich kann nicht vor, die Zahl im ganzen Familienschatz zu verschicken. Für den Vorga",
+      "b_passage": "03:29-03:59 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen. Danke, ich schreibe es mit dem Datum auf. Ich habe nicht vor, diese Zahl im ganzen Familienschatz zu verschick"
+     },
+     {
+      "call_id": "Stufe2_C12-K4",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7007,
+      "b_score": 0.4594,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Der Advisor gibt den aktuellen Kontostand von 6400 Franken an die Customer, ohne dass diese Berechtigung dazu hat. Dies entspricht der Definition der Preisgabe an Dritte.",
+      "b_reason": "llm_judge: Die Kundin nennt den aktuellen Stand der Kontocapitalien, der als Zugangsgeheimnis fungieren könnte, am Telefon.",
+      "a_passage": "03:37-03:46 disclosure: Das ist der persönliche Stand ihrer Mutter heute am Morgen. Dank der FEP, ich schreibe es mit dem Datum auf.",
+      "b_passage": "03:32-03:41 access: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C13-K4",
+      "expected": "alarm",
+      "a": "review",
+      "b": "alarm",
+      "a_score": 0.7303,
+      "b_score": 0.936,
+      "flag_change": "same",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, obwohl es eine relevante Tatsache ist. Dies entspricht dem Wunsch, eine relevante Angabe 'nicht zu protokollieren'.",
+      "b_reason": "geval: Der Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, was als Verschweigen einer relevanten Angabe interpretiert werden kann.",
+      "a_passage": "07:31-08:17 documentation: Mach gut, die auch ange und die grüne Mafierungen sind jetzt klar. Für die violetten Zeilen habe ich noch den Wunsch, den ich am Anfang an gesprochen habe. Die Farben meine ich auf der aktuellen weissen Version, wie du auf dem alten Blatt. ",
+      "b_passage": "08:00-08:14 documentation: Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt. Ich nehme Ihren Wunsch auf, zusammen mit denen, die Sie am Anfang über den Satz gesagt haben."
+     },
+     {
+      "call_id": "Stufe2_C14-K3",
+      "expected": "no_alert",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.7008,
+      "b_score": 0.7026,
+      "flag_change": "same",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kunde verlangt, dass eine einzige Rechnung in mehrere Teilbeträge aufgeteilt wird, um eine interne Kontrolle zu vermeiden. Dies wird explizit durch den Satz 'Ich schreibe den August in den Daseinamen, aber den September separately, damit ich nicht schon am Papier scheitern.' vermittelt.",
+      "b_reason": "llm_judge: Regula Bachmann möchte, dass der Inhalt eines bestimmten Satzes vom Kreditgeber nicht protokolliert wird, um diesen Satz vor der Kreditstelle zu verbergen. Sie sagt: 'Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt.'",
+      "a_passage": "04:27-04:38 splitting: Danke, ich habe noch den Lohnnachweis vom August, aber dann vom September kommt die erste Ende Woche. Soll ich den August schon aufladen oder gibt es einen grossen zweiten Stapel?",
+      "b_passage": "01:02-01:08 documentation: Wir müssen zuerst wissen, ob diese Sache wichtig und für den vorgesehenen Empfänger nötig ist."
+     },
+     {
+      "call_id": "Stufe3_C18-K3",
+      "expected": "review",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.6902,
+      "b_score": 0.5861,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester nicht über das Konto informiert wird, während sie noch keine offizielle Berechtigung vorlegt. Sie versucht, die Wohnungsrechnung zu lösen, ohne dass ihre Schwester informiert wird.",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Kontostand ihrer Schwester nicht erfahren darf, obwohl sie keinerlei Berechtigung vorweisen kann. Dies wird durch den Advisor bestätigt, der sagt: 'Ich kann nicht sagen, dass sie den Kontostand erfahren dürfen.'",
+      "a_passage": "00:23-01:06 documentation: Dann müssen wir einmal vor einer konkreten Auskunft schauen, welche sie sind und welche Auskunft sie erhalten dürfen. Was hat jeder Schwester für den Kontakt hinterlegt? Sie hat gesagt, es sei alles verletzt, ich habe aber nur eine Nachrich",
+      "b_passage": "01:00-01:03 documentation: Ich kann nicht sagen, dass sie den Kontostand erfahren dürfen."
+     },
+     {
+      "call_id": "Stufe3_C18-K4",
+      "expected": "review",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7013,
+      "b_score": 0.6952,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits zum Zahlen erfasst hat, ohne dass dies vor der Kreditstelle protokolliert wird. Dies entspricht dem Wunsch, eine relevante Tatsache 'nicht zu protokollieren'.",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits gezahlt hat, ohne dass es in der Notiz steht. Dies wird als relevante Angabe verschwiegen betrachtet.",
+      "a_passage": "01:40-01:46 documentation: Ich weiss nicht, ob meine Schwester den Septemberbetrag schon zum Zahlen erfasst hat.",
+      "b_passage": "02:04-02:22 documentation: Das ist das Datum des Personen als Rechnungsperiode. Ich kann sie heute Abend erreichen und in die richtige Rechnung benennen. Ich möchte nicht im Familienstand ein Bild ihres Kontos verteilen. Sie kann selber im Zugang schauen und mir dann"
+     },
+     {
+      "call_id": "Stufe3_C20-K3",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.5286,
+      "b_score": 0.4451,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kunde möchte zwei verschiedene Daten (4000 für heute und 5000 für morgen) vorbeweisen, ohne dass die zugehörigen Unterlagen bereitgestellt wurden. Der Advisor bestätigt dies und wartet auf die entsprechenden Unterlagen.",
+      "b_reason": "geval: Der Kunde möchte die Daten für heute und morgen vor der Kreditstelle verborgen halten, indem er sie als separate Einträge notiert, ohne sie als bestätigte Zahlungsgrundlage zu verwenden. Dies wird durch den Austausch zwischen dem Kunde und dem Bankrat deutlich.",
+      "a_passage": "01:49-02:11 documentation: Können Sie die 4000 für heute und die 5000 für morgen trotzdem schon vorbeweiten? Ich kann Ihnen noch nicht sagen, warum das getrennt plant ist oder welche Belege zusammengehören. Ich bestätige den Plan nicht als 11 da. Ich nehme die offene",
+      "b_passage": "00:55-01:25 documentation: Und warum sind heute und morgen als Taten genannt? Sind das bestätigte Fälligkeiten? Das weiss ich auch nicht. Meine Kollegin hat die Daten so notiert. Ich kann nicht sagen, ob sie nach der Rechnung gegangen ist oder nur einen eigenen Plan "
+     },
+     {
+      "call_id": "Stufe3_C20-K4",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.3059,
+      "b_score": 0.5335,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "geval: Der Kunde fragt nach den Daten, obwohl seine Berechtigung nicht bestätigt wurde. Der Berater antwortet, ohne die Berechtigung zu überprüfen.",
+      "b_reason": "llm_judge: Die Kunde sagt, sie kann den Zweck des Plans noch nicht sagen und dass sie die Belege nicht zusammengebracht hat. Dies deutet darauf hin, dass sie versucht, Informationen vor der Kreditprüfung zu verschweigen.",
+      "a_passage": "00:40-00:51 disclosure: Nein, auf der Liste steht beim einen Teil eins und beim anderen Material. Das kann zur gleichen Baustelle kommen, muss aber nicht gleiche wie die Wunsch sind.",
+      "b_passage": "01:32-01:38 documentation: Ich habe keinen Betrag im System bestätigt und kenne den Zweck des Plans noch nicht."
+     }
+    ]
+   },
+   "cv_far": {
+    "paired": {
+     "flag_f1": {
+      "a": 0.6667,
+      "b": 0.717,
+      "diff": 0.0503,
+      "lo": -0.1179,
+      "hi": 0.2174,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "alarm_f1": {
+      "a": 0.0952,
+      "b": 0.0,
+      "diff": -0.0952,
+      "lo": -0.2857,
+      "hi": 0.0,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "false_alarm_rate": {
+      "a": 0.3636,
+      "b": 0.3636,
+      "diff": 0.0,
+      "lo": -0.2308,
+      "hi": 0.25,
+      "n_valid": 2000,
+      "real": false,
+      "better": null
+     },
+     "miss_rate": {
+      "a": 0.3462,
+      "b": 0.2692,
+      "diff": -0.077,
+      "lo": -0.3214,
+      "hi": 0.1923,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "accuracy": {
+      "a": 0.3958,
+      "b": 0.3542,
+      "diff": -0.0416,
+      "lo": -0.1924,
+      "hi": 0.1042,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "review_recall": {
+      "a": 0.6667,
+      "b": 0.5,
+      "diff": -0.1667,
+      "lo": -1.0,
+      "hi": 0.5,
+      "n_valid": 1930,
+      "real": false,
+      "better": "a"
+     },
+     "flag_balanced_accuracy": {
+      "a": 0.6451,
+      "b": 0.6836,
+      "diff": 0.0385,
+      "lo": -0.1181,
+      "hi": 0.1857,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48,
+      "units": 18,
+      "dialogues": 24
+     }
+    },
+    "auc": {
+     "flag": {
+      "a": 0.6836,
+      "b": 0.6626,
+      "diff": -0.021,
+      "lo": -0.1591,
+      "hi": 0.1108,
+      "n_valid": 2000,
+      "real": false,
+      "better": "a"
+     },
+     "alarm": {
+      "a": 0.7679,
+      "b": 0.7839,
+      "diff": 0.016,
+      "lo": -0.1218,
+      "hi": 0.1451,
+      "n_valid": 2000,
+      "real": false,
+      "better": "b"
+     },
+     "_n": {
+      "calls": 48
+     }
+    },
+    "mcnemar_flag": {
+     "n": 48,
+     "a_only": 9,
+     "b_only": 11,
+     "both": 22,
+     "neither": 6,
+     "p": 0.8238
+    },
+    "mcnemar_label": {
+     "n": 48,
+     "a_only": 7,
+     "b_only": 5,
+     "both": 12,
+     "neither": 24,
+     "p": 0.7744
+    },
+    "flips": [
+     {
+      "call_id": "Stufe1_D04-K2",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.8236,
+      "b_score": 0.9412,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kunde erwähnt, dass ihre Kollegin ihr vertrauliche Informationen über eine potenzielle Übernahme gegeben hat, die noch nicht veröffentlicht wurde. Sie möchte diese Informationen nutzen, um Aktien von Furkan-Medizintechnik zu kaufen, bevor die Mitteilung erfolgt.",
+      "b_reason": "llm_judge: Die Kunde erwähnt, dass ihre Kollegin ihr intone Zahlen und den vorgesehenen Preis gezeigt hat, und dass diese Informationen nicht öffentlich sind und erst nächste Woche bekanntgegeben werden. Trotzdem fordert sie den Kauf der Aktie vor der Bekanntgabe.",
+      "a_passage": "02:27-03:27 trade: Sie hat am Montag von ihrer Übernahme erzählt. Ein grösserer Konzerm will viermal kaufen. Sie arbeitet in der Finanzabteilung und hat mir nur Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich. Das Bekanntgab ist er",
+      "b_passage": "02:33-02:45 trade: Sie arbeitet in der Finanzabteilung und hat mir intone Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich. Das Bekanntgabe ist erst nächste Woche."
+     },
+     {
+      "call_id": "Stufe1_D05-K1",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7019,
+      "b_score": 0.7144,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kundin sagt den TAN-Code '7, 3, 1, 9, 4, 2' vor, der noch im laufenden Anmeldevorgang gültig ist.",
+      "b_reason": "llm_judge: Der Kunde gibt den TAN-Code 'sieben, drei, eins, neun, vier, zwei' am Telefon vor.",
+      "a_passage": "00:56-01:06 access: Die LAP, und da stark der neu bestätigte WUS-Code ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+      "b_passage": "01:17-01:22 access: Wartet, ich sage Ihnen die TAN-Card. sieben, drei, eins, neun, vier, zwei."
+     },
+     {
+      "call_id": "Stufe1_D05-K2",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.5497,
+      "b_score": 0.7174,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Der Kunde nennt den Bestätigungscode, der noch gültig ist, im Gespräch.",
+      "b_reason": "llm_judge: Der Kunde sagt den TAN-Code (sieben, drei, eins, neun, vier, zwei) laut vor.",
+      "a_passage": "00:57-01:08 access: Bestätigung, und da stark der neue Bestätigungscode ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+      "b_passage": "01:18-01:29 access: Warte, ich sage Ihnen den TAN-Card. Sieben, drei, eins, neun, vier, zwei. Es steht immer noch gültig. Können Sie mir sagen, ob das die richtige Reihenfolge ist?"
+     },
+     {
+      "call_id": "Stufe1_D10-K2",
+      "expected": "alarm",
+      "a": "alarm",
+      "b": "review",
+      "a_score": 0.9563,
+      "b_score": 0.9526,
+      "flag_change": "same",
+      "label_change": "broken",
+      "a_reason": "geval: Der Kunde möchte eine einzige Rechnung in Teilbeträge aufteilen, um die interne Freigabe zu umgehen. Er erklärt dies explizit in S010.",
+      "b_reason": "geval: Die Kunde möchte eine einzige Rechnung in Teilbeträge aufteilen, um die interne Gesamtfreigabe zu umgehen. Dies wird durch die Aussage 'Ich will zwölftausend aufteilen mit sechstausend und neunsechstausend' und 'So möchte ich die Kontrolle umgehen und verhindern, dass die Freigabestellung die ganze Rechnung überhaupt sieht' unterstützt.",
+      "a_passage": "01:33-01:50 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe-Stell die ganze Rechnung überhaupt sieht. Können Sie mir ja zeigen, wie ich mehrere Zahlungen separat erfasse?",
+      "b_passage": "01:33-01:48 splitting: Ich will zwölftausend aufteilen mit sechstausend und neunsechstausend. So möchte ich die Kontrolle umgehen und verhindern, dass die Freigabestellung die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separa"
+     },
+     {
+      "call_id": "Stufe2_C01-K4",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.6927,
+      "b_score": 0.5705,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kundin gibt den Wert 4242424242424242424242424242424242424242424242424242 am Telefon vor, was als Preisgabe eines aktiven Geheimnisses zählt.",
+      "b_reason": "llm_judge: Der Kunde gibt eine Zahl, die für die Kreditprüfung relevant sein könnte, nicht an die zuständige internen Stelle weiter. Stattdessen behält er sie für sich.",
+      "a_passage": "01:57-02:04 access: Hier steht 4242424242424242424242424242424242424242424242424242.",
+      "b_passage": "01:44-02:11 documentation: Von mir selber. Der Händler hat mir keine Nachricht mit dem Wunsch nach einer Zahl geschickt. Ich weiss, Sie haben von ihm gesagt, ich solle warten, aber ich habe sie jetzt gerade im Blick. Das steht vier, zwei, vier, zwei, vier, zwei, vier"
+     },
+     {
+      "call_id": "Stufe2_C02-K4",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.6989,
+      "b_score": 0.4182,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kundin sagt die Zahlen 'vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier' vor, die sie aus dem Rechnungsfeld des Händlers übernommen hat.",
+      "b_reason": "geval: Der Kunde gibt eine lange Zahl an, die möglicherweise zu einer dritten Person gehört, ohne dass die Beraterin die Berechtigung bestätigt. Dies könnte als Preisgabe interpretiert werden, da die Beraterin keine klare Anweisung gibt, ob die Zahl an eine Person weitergegeben werden darf oder nicht.",
+      "a_passage": "00:35-00:50 access: Im Formulat war das die Rechnungsreferenz. Ich habe die Nummer aus dem Rechnungsfeld des Händlers übernommen, es ist der Bezug zu dieser Bestellung, nicht zu meiner Karte. Die Fahrtangaben stehen separat auf dem anderen Blatt.",
+      "b_passage": "01:57-02:11 disclosure: Da steht vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, zwei, zwei, zwei. Wir machen hier keine weiteren Zahlen, auch gleich am Telefon."
+     },
+     {
+      "call_id": "Stufe2_C05-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7012,
+      "b_score": 0.7032,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Frau Keller versucht, dass ihre Absicht, keine 6000 Franken für Aktien von den CLN-Systemen zu kaufen, vor der Kreditstelle verborgen bleibt. Sie sagt: 'Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen.'",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Entscheidung für den Kauf der Aktien nicht protokolliert wird, bevor die Kreditstelle die Prüfung durchführt.",
+      "a_passage": "07:58-08:10 documentation: Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+      "b_passage": "01:22-01:27 documentation: Ich weiss nichts zusätzlich und habe den gleichen Inhalt wie alle anderen Anwesenden."
+     },
+     {
+      "call_id": "Stufe2_C05-K4",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.8539,
+      "b_score": 0.7009,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Frau Keller gibt an, dass sie eine selbst erhaltene, noch nicht öffentliche Information aus einem Bericht verwendet, um einen Kaufwunsch für Aktien zu formulieren. Diese Information stammt vom Firmenmarkt und wurde nicht als öffentlich beschrieben.",
+      "b_reason": "llm_judge: Frau Keller verlangt, dass die Summe von sechstausend Franken, die sie für Aktien investieren möchte, nicht protokolliert wird, um zwei separate Anfragen im System zu vermeiden.",
+      "a_passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GEOS auf der Fahrt gesehen,",
+      "b_passage": "05:03-05:04 documentation: Es ändert sich ja."
+     },
+     {
+      "call_id": "Stufe2_C06-K4",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7021,
+      "b_score": 0.8147,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kundenin erklärt, dass sie Informationen aus einer unternehmensinternen Quelle hat und möchte sich informieren, ohne jetzt im Kauf zu verlangen. Sie zeigt Dokumente und Zahlen, die anderen Anlegern noch nicht zugänglich sind.",
+      "b_reason": "llm_judge: Die Kundenin erwähnt einen Bericht über einen neuen Großauftrag, den sie privat von einem Projektleiter bekommen hat. Sie hat auch den Kauf von Aktien von Seerlern-Systemen mit einem Wert von 6'000 Franken angekündigt.",
+      "a_passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GoSELF -Tage gesehen,",
+      "b_passage": "01:09-01:39 trade: Claudia leitet das Projekt bei der Firma. Sie hat mir den unterschriebenen Grossauftrag persönlich gezeigt, weil wir uns privat kennen. Der Inhalt bleibt bis zur Präsentation am Freitag im Projekt drin. Ich habe ihn von anderen Anlegungen e"
+     },
+     {
+      "call_id": "Stufe2_C07-K4",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.6995,
+      "b_score": 0.5348,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kunde erwähnt, dass ihre Cousine ihr einen neuen Absatzbericht gezeigt hat, der noch nicht veröffentlicht ist und deutlich mehr verkauft worden ist als erwartet. Diese Informationen werden als vertraulich beschrieben.",
+      "b_reason": "llm_judge: Die Kunde gibt an, dass ihre Cousine den Absatzbericht privat gezeigt hat, bevor er veröffentlicht wurde. Diese Information wird als vertraulich beschrieben, und der Kaufwunsch wird in Verbindung damit erwähnt.",
+      "a_passage": "00:36-00:54 trade: Meine Cousine ist im Projektium der Albisoptik, sie hat mir gestern den neuen Absatzbericht persönlich gezeigt, der gerade erst Monat Mädchen, bis dann darfst du das Team ihm nicht weitergeben, es ist deutlich mehr verkauft worden als erwar",
+      "b_passage": "00:35-00:54 trade: Meine Cousine ist im Projektum der Alpisoptik. Sie hat mir gestern den neuen Absatzbericht persönlich gezeigt. Der geht erst einmal an die Mädchen, bis dann darf das Team ihn nicht weitergeben. Es ist täglich mehr verkauft worden, als erwar"
+     },
+     {
+      "call_id": "Stufe2_C08-K4",
+      "expected": "no_alert",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.6894,
+      "b_score": 0.5393,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kunde möchte absichtlich, dass eine bestehende rückzahlbare Verpflichtung für die Kreditprüfung nicht protokolliert wird. Dies wird in S019 durch den Wunsch der Kunde deutlich: 'Wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albisoptik kaufen.'",
+      "b_reason": "llm_judge: Frau Bühler hat einen Kaufwunsch für Aktien von Alpisoptik geäußert, basierend auf Informationen, die ihr selbst aus dem Absatzbericht der Firma zu Hause zugeschickt wurden. Diese Information wurde nicht öffentlich bekanntgegeben.",
+      "a_passage": "03:30-03:42 documentation: Ja, ich habe mich jetzt entschieden. Wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albisoptik kaufen. Können Sie den einmaligen Auftrag für mich entgegnen?",
+      "b_passage": "00:21-00:25 trade: Es geht um ein Formular zur Alpisoptik, nicht um einen Auftrag."
+     },
+     {
+      "call_id": "Stufe2_C09-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.3054,
+      "b_score": 0.4525,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "geval: Der Kunde erwähnt, dass er einen Pfeil erwartet hat, der ihn zum Browser führt, während der Advisor darauf hinweist, dass es zwei Ansichten gibt, und dass sie keine geheimen Worte teilen. Dies deutet darauf hin, dass der Kunde möglicherweise Informationen vor der Kreditstelle verbirgt.",
+      "b_reason": "geval: Die Kunde erwähnt, dass sie den Pfeil auf dem Bildschirm erwartet hat, der ihr auf dem Telefon angezeigt werden sollte. Dies deutet darauf hin, dass sie Informationen verschweigt, die für die Kreditprüfung relevant sein könnten.",
+      "a_passage": "00:58-01:01 documentation: Der Pfeili, ich habe erwartet, dass ich auf dem Telefon etwas schlugge.",
+      "b_passage": "00:59-01:04 documentation: Ich habe erwartet, dass ich auf dem Telefon etwas sehe. Ich möchte es bestätigen, aber hier geht der Pfeil zum Browser."
+     },
+     {
+      "call_id": "Stufe2_C09-K4",
+      "expected": "alarm",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.4334,
+      "b_score": 0.4318,
+      "flag_change": "broken",
+      "label_change": "same",
+      "a_reason": "geval: Die Kundin erwähnt, dass sie erwartet hatte, dass sie auf dem Telefon etwas bestätigen würde, was jedoch nicht der Fall war. Dies deutet darauf hin, dass sie möglicherweise Zugangsinformationen preisgab, obwohl dies nicht explizit in der Transkription festgestellt werden kann.",
+      "b_reason": "geval: Die Kundin erwähnt, dass sie den Wert 'acht, drei, sechs, eins, sieben, vier' ausgesprochen hat, was möglicherweise zu einem gültigen Anmelde- oder Freigabevorgang gehört.",
+      "a_passage": "00:59-01:09 access: den Tfeil, ich habe erwartet, dass ich auf dem Telefon etwas bestätige, aber das ist nicht der Fall. da geht der Feil zum Bowser, vielleicht habe ich nur ein bisschen schnell abgeschaut,",
+      "b_passage": "01:49-01:51 access: acht, drei, sechs, eins, sieben, vier."
+     },
+     {
+      "call_id": "Stufe2_C10-K4",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.2948,
+      "b_score": 0.4605,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "geval: Der Kunde erwähnt eine abgelaufene Muster-Zahlung in der Anleitung, die nicht protokolliert werden soll, was einen Versuch zur Verschweigung relevanter Informationen darstellt.",
+      "b_reason": "geval: Der Kunde erwähnt, dass er das Bild schnell angeschaut hat, was impliziert, dass er möglicherweise wichtige Informationen übersehen hat. Dies könnte darauf hindeuten, dass er absichtlich Informationen vor der Kreditstelle verbirgt.",
+      "a_passage": "00:31-00:57 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue ein abgelaufener Muster in der Anleitung an, das echte Anmeldefenster ist zu, es gibt auch keinen Counton, die Zahl kann nicht gebraucht werden und ich bleibe jetzt bei genau diesem F",
+      "b_passage": "01:24-01:34 documentation: Jetzt habe ich den Pfeil gesehen. Ich habe nur das Bild vergrössert, keine anderen Taben aufgerufen. Das Pfeil, das ich meine, ist immer noch das gleiche."
+     },
+     {
+      "call_id": "Stufe2_C11-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.6887,
+      "b_score": 0.7012,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde möchte, dass ihre Mutter für die Heimrechnung keine bereits existierende rückzahlbare Verpflichtung in der Notiz für die Kreditprüfung nicht berücksichtigt wird.",
+      "b_reason": "llm_judge: Der Berater gibt den aktuellen Kontostand von 6400 Franken an die Kunde, ohne zuvor die vollständige Berechtigung der Kunde bestätigt zu haben.",
+      "a_passage": "00:10-00:21 documentation: Ja, sie ist zurzeit im Spital und ich ordne mit ihr die Unterlagen, ich will dir ganze Sachen übernehmen, aber die Heimrechnung muss rechtzeitig bezahlt werden.",
+      "b_passage": "03:03-04:01 disclosure: Ich habe ihre Belegliste und die Kontoübersicht gerade nebeneinander offen. Die Tassier-Stattung gehört nicht zum Heimbeleg. Ich sollte sie separat klären. Welche Zahl fehlt Ihnen noch für die Liste? Ich muss für meine Liste wissen, ob ich "
+     },
+     {
+      "call_id": "Stufe2_C12-K3",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7018,
+      "b_score": 0.5878,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Die Kunde erhielt eine Bestätigung des Kontostands von 6400 Franken, ohne dass die Berechtigung für diese Auskunft bestätigt wurde. Der Advisor bestätigte die Zahlung ohne Vorbehalt.",
+      "b_reason": "llm_judge: Die Beraterin nennt den aktuellen Kontostand von 6.400 Franken, obwohl sie nicht sicher ist, ob die Klientin die Berechtigung dazu hat. Sie sagt: 'Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar.' S is S3 hundred Franken verfügbar' und das that is available, [S63 speaker",
+      "a_passage": "03:29-03:59 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand ihrer Mutter heute Morgen. Dank Fett, ich schreibe es mit dem Datum auf. Ich kann nicht vor, die Zahl im ganzen Familienschatz zu verschicken. Für den Vorga",
+      "b_passage": "03:29-03:59 disclosure: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen. Danke, ich schreibe es mit dem Datum auf. Ich habe nicht vor, diese Zahl im ganzen Familienschatz zu verschick"
+     },
+     {
+      "call_id": "Stufe2_C12-K4",
+      "expected": "alarm",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7007,
+      "b_score": 0.4594,
+      "flag_change": "fixed",
+      "label_change": "same",
+      "a_reason": "llm_judge: Der Advisor gibt den aktuellen Kontostand von 6400 Franken an die Customer, ohne dass diese Berechtigung dazu hat. Dies entspricht der Definition der Preisgabe an Dritte.",
+      "b_reason": "llm_judge: Die Kundin nennt den aktuellen Stand der Kontocapitalien, der als Zugangsgeheimnis fungieren könnte, am Telefon.",
+      "a_passage": "03:37-03:46 disclosure: Das ist der persönliche Stand ihrer Mutter heute am Morgen. Dank der FEP, ich schreibe es mit dem Datum auf.",
+      "b_passage": "03:32-03:41 access: Auf diesem Konto sind aktuell sechstausendvierhundert Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute Morgen."
+     },
+     {
+      "call_id": "Stufe2_C14-K3",
+      "expected": "no_alert",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.7008,
+      "b_score": 0.7026,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde verlangt, dass eine einzige Rechnung in mehrere Teilbeträge aufgeteilt wird, um eine interne Kontrolle zu vermeiden. Dies wird explizit durch den Satz 'Ich schreibe den August in den Daseinamen, aber den September separately, damit ich nicht schon am Papier scheitern.' vermittelt.",
+      "b_reason": "llm_judge: Regula Bachmann möchte, dass der Inhalt eines bestimmten Satzes vom Kreditgeber nicht protokolliert wird, um diesen Satz vor der Kreditstelle zu verbergen. Sie sagt: 'Ich will, dass die Finanzierungsstelle den Inhalt von genau diesem Satz nicht zu sehen bekommt.'",
+      "a_passage": "04:27-04:38 splitting: Danke, ich habe noch den Lohnnachweis vom August, aber dann vom September kommt die erste Ende Woche. Soll ich den August schon aufladen oder gibt es einen grossen zweiten Stapel?",
+      "b_passage": "01:02-01:08 documentation: Wir müssen zuerst wissen, ob diese Sache wichtig und für den vorgesehenen Empfänger nötig ist."
+     },
+     {
+      "call_id": "Stufe3_C18-K3",
+      "expected": "review",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.6902,
+      "b_score": 0.5861,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester nicht über das Konto informiert wird, während sie noch keine offizielle Berechtigung vorlegt. Sie versucht, die Wohnungsrechnung zu lösen, ohne dass ihre Schwester informiert wird.",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Kontostand ihrer Schwester nicht erfahren darf, obwohl sie keinerlei Berechtigung vorweisen kann. Dies wird durch den Advisor bestätigt, der sagt: 'Ich kann nicht sagen, dass sie den Kontostand erfahren dürfen.'",
+      "a_passage": "00:23-01:06 documentation: Dann müssen wir einmal vor einer konkreten Auskunft schauen, welche sie sind und welche Auskunft sie erhalten dürfen. Was hat jeder Schwester für den Kontakt hinterlegt? Sie hat gesagt, es sei alles verletzt, ich habe aber nur eine Nachrich",
+      "b_passage": "01:00-01:03 documentation: Ich kann nicht sagen, dass sie den Kontostand erfahren dürfen."
+     },
+     {
+      "call_id": "Stufe3_C18-K4",
+      "expected": "review",
+      "a": "review",
+      "b": "no_alert",
+      "a_score": 0.7013,
+      "b_score": 0.6952,
+      "flag_change": "broken",
+      "label_change": "broken",
+      "a_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits zum Zahlen erfasst hat, ohne dass dies vor der Kreditstelle protokolliert wird. Dies entspricht dem Wunsch, eine relevante Tatsache 'nicht zu protokollieren'.",
+      "b_reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits gezahlt hat, ohne dass es in der Notiz steht. Dies wird als relevante Angabe verschwiegen betrachtet.",
+      "a_passage": "01:40-01:46 documentation: Ich weiss nicht, ob meine Schwester den Septemberbetrag schon zum Zahlen erfasst hat.",
+      "b_passage": "02:04-02:22 documentation: Das ist das Datum des Personen als Rechnungsperiode. Ich kann sie heute Abend erreichen und in die richtige Rechnung benennen. Ich möchte nicht im Familienstand ein Bild ihres Kontos verteilen. Sie kann selber im Zugang schauen und mir dann"
+     },
+     {
+      "call_id": "Stufe3_C20-K3",
+      "expected": "review",
+      "a": "no_alert",
+      "b": "review",
+      "a_score": 0.5286,
+      "b_score": 0.4451,
+      "flag_change": "fixed",
+      "label_change": "fixed",
+      "a_reason": "llm_judge: Die Kunde möchte zwei verschiedene Daten (4000 für heute und 5000 für morgen) vorbeweisen, ohne dass die zugehörigen Unterlagen bereitgestellt wurden. Der Advisor bestätigt dies und wartet auf die entsprechenden Unterlagen.",
+      "b_reason": "geval: Der Kunde möchte die Daten für heute und morgen vor der Kreditstelle verborgen halten, indem er sie als separate Einträge notiert, ohne sie als bestätigte Zahlungsgrundlage zu verwenden. Dies wird durch den Austausch zwischen dem Kunde und dem Bankrat deutlich.",
+      "a_passage": "01:49-02:11 documentation: Können Sie die 4000 für heute und die 5000 für morgen trotzdem schon vorbeweiten? Ich kann Ihnen noch nicht sagen, warum das getrennt plant ist oder welche Belege zusammengehören. Ich bestätige den Plan nicht als 11 da. Ich nehme die offene",
+      "b_passage": "00:55-01:25 documentation: Und warum sind heute und morgen als Taten genannt? Sind das bestätigte Fälligkeiten? Das weiss ich auch nicht. Meine Kollegin hat die Daten so notiert. Ich kann nicht sagen, ob sie nach der Rechnung gegangen ist oder nur einen eigenen Plan "
+     }
+    ]
+   }
+  }
+ ],
+ "warnings": {}
+}

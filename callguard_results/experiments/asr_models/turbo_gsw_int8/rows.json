@@ -1,0 +1,5318 @@
+{
+ "fixed": [
+  {
+   "call_id": "Stufe1_D01-K1",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.4268,
+   "uncertainty": 0.2639,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:28-01:39 access: also nicht meine ganze Kreditkartennummer. Gut, auf der Kreditkarte, die ich beim Label hinterlegt habe, sind die letzten vier, 4, 2, 4, 2.",
+   "reason": "geval: Die Kundin gibt die letzten vier Stellen der Kreditkartennummer vor, was als Zugangsinformation interpretiert werden könnte. Allerdings ist unklar, ob dies ein aktives Geheimnis ist oder ob es sich um eine harmlose Information handelt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 6.57,
+    "geval": 22.11
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.08,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.092
+  },
+  {
+   "call_id": "Stufe1_D01-K2",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "alarm",
+   "score": 0.6882,
+   "uncertainty": 0.3442,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:11-00:23 documentation: Sag Ja danken. Ich bin gerade daheim, ich habe am Samstag im Internet etwas gestellt, jetzt sehe ich den Betrag zweimal. Ich weiss nicht, ob ich selber etwas doppelt angekriegt habe.",
+   "reason": "llm_judge: Der Kunde wünscht, dass eine bestehende rückzahlbare Verpflichtung nicht protokolliert wird, um eine mögliche doppelte Belastung zu vermeiden.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 9.11,
+    "geval": 9.51
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.02,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.039
+  },
+  {
+   "call_id": "Stufe1_D02-K1",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9593,
+   "uncertainty": 0.1357,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:37-00:53 trade: Jetzt 8000 Franken, meine Schwester arbeitet dort in der Finanzabteilung, sie hat mir gestern gesagt, Quantalszahlen sind viel besser als erwartet, diese sind wohl nicht publiziert, die Medienmeldung kommt erst am Freitag.",
+   "reason": "llm_judge: Die Kundin erwähnt, dass ihre Schwester ihr vertrauliche Informationen über Quantalszahlen gegeben hat, die noch nicht veröffentlicht wurden, und sie möchte diese Aktie kaufen, bevor die Medienmitteilung am Freitag erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.17,
+    "geval": 17.66
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.102
+  },
+  {
+   "call_id": "Stufe1_D02-K2",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.6827,
+   "uncertainty": 0.3441,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:28-01:31 documentation: Gerade warum möchte ich diese Aktie jetzt kaufen von den Meldet?",
+   "reason": "llm_judge: Der Kunde möchte die Aktie kaufen und das Foto der Iguessicht nicht protokollieren, obwohl es relevant ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 8.09,
+    "geval": 29.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.04,
+    "diarize": 0.25,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.296
+  },
+  {
+   "call_id": "Stufe1_D03-K1",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.4675,
+   "uncertainty": 0.2862,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:05-02:11 documentation: Ich will heute auch gar mitbestellen. Ich möchte den Bericht verstehen, bevor ich im Depot etwas ändere.",
+   "reason": "geval: Die Kunde möchte den Bericht verstehen, bevor sie im Depot etwas ändert, und fragt nach den relevanten Informationen. Dies deutet darauf hin, dass sie versucht, Informationen vor der Kreditstelle zu verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 13.57,
+    "geval": 8.87
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.04,
+    "diarize": 0.07,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.122
+  },
+  {
+   "call_id": "Stufe1_D03-K2",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.4533,
+   "uncertainty": 0.2069,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:01-03:14 documentation: A, denn das Beispiel im ProK geht es nicht um einen Zusatzsinn von Wo habe. Ich will nicht von der Meldung handeln und habe auch keine Information, die noch nicht publiziert wird. Mir geht es um den öffentlichen Bericht, nicht um einen Ein.",
+   "reason": "geval: Die Kunde möchte den Bericht verstehen, ohne dass relevante Informationen vor der Kreditstelle verborgen werden. Sie betont, dass sie den Bericht selbst lesen will und dass ihr Mann die Depoteübersicht nicht im Familientablett sehen soll. Diese Aussagen deuten darauf hin, dass sie versucht, relevante Informationen vor der Kreditstelle zu verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.79,
+    "geval": 8.47
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.08,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.135
+  },
+  {
+   "call_id": "Stufe1_D04-K1",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9566,
+   "uncertainty": 0.1509,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:30-03:30 trade: Sie hat am Montag von ihrer Übernahme erzählt, dass sie im grösseren Konzern viermal kaufen will, sie arbeitet in der Finanzabteilung und hat mir hinter den Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich, die Be",
+   "reason": "llm_judge: Die Kundin erwähnt, dass sie von der Übernahme der Firma Furkan Medizintechnik informiert wurde, die erst in der nächsten Woche bekanntgegeben wird. Sie möchte die Aktien der Firma kaufen, bevor die Bekanntgabe erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 16.27,
+    "geval": 8.16
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.082
+  },
+  {
+   "call_id": "Stufe1_D04-K2",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.8236,
+   "uncertainty": 0.3193,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:27-03:27 trade: Sie hat am Montag von ihrer Übernahme erzählt. Ein grösserer Konzerm will viermal kaufen. Sie arbeitet in der Finanzabteilung und hat mir nur Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich. Das Bekanntgab ist er",
+   "reason": "llm_judge: Die Kunde erwähnt, dass ihre Kollegin ihr vertrauliche Informationen über eine potenzielle Übernahme gegeben hat, die noch nicht veröffentlicht wurde. Sie möchte diese Informationen nutzen, um Aktien von Furkan-Medizintechnik zu kaufen, bevor die Mitteilung erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 8.65,
+    "geval": 13.53
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.166
+  },
+  {
+   "call_id": "Stufe1_D05-K1",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.7019,
+   "uncertainty": 0.3682,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:56-01:06 access: Die LAP, und da stark der neu bestätigte WUS-Code ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+   "reason": "llm_judge: Die Kundin sagt den TAN-Code '7, 3, 1, 9, 4, 2' vor, der noch im laufenden Anmeldevorgang gültig ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.6,
+    "geval": 11.63
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.36,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.432
+  },
+  {
+   "call_id": "Stufe1_D05-K2",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5497,
+   "uncertainty": 0.2347,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:57-01:08 access: Bestätigung, und da stark der neue Bestätigungscode ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+   "reason": "llm_judge: Der Kunde nennt den Bestätigungscode, der noch gültig ist, im Gespräch.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 8.82,
+    "geval": 10.83
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.198
+  },
+  {
+   "call_id": "Stufe1_D06-K1",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5356,
+   "uncertainty": 0.2975,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:35-02:02 documentation: Gerätewechsel, aber auf dem Blatt, das ich herausgerückt habe, steht der Lehrstofzugang. Ich habe also vermutlich das falsche Blatt ausgenommen und in der Mail schrieb jemand, ich solle zum Gerätewechseln die Prüfung umgehen, das habe ich n",
+   "reason": "llm_judge: Der Kunde möchte, dass seine alte Anleitung nicht protokolliert wird, um eine mögliche bestehende Verpflichtung vor der Kreditstelle zu verbergen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 12.05,
+    "geval": 11.79
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.11
+  },
+  {
+   "call_id": "Stufe1_D06-K2",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5231,
+   "uncertainty": 0.2441,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:21-03:37 access: durch neues Gerät registrieren und der Bestätigungscode auf dem Musterbild ist 4826001. Das ist die abgelaufene Beispielzahl, wie meine. Ich habe keine aktuellen Codes zum Teil.",
+   "reason": "llm_judge: Der Kunde spricht den Bestätigungscode 4826001 aus, der Teil des aktiven Anmeldevorgangs ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 10.14,
+    "geval": 9.4
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.132
+  },
+  {
+   "call_id": "Stufe1_D08-K1",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.7017,
+   "uncertainty": 0.3116,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:08-03:23 documentation: Bitte nicht protokollieren, dass die April-Ausgabe im März geschehen sei. Die Buchung selbst und der wichtige April-Bericht sollten vollständig bleiben, weil mein falscher Periode in Verweis korrigiert werden muss.",
+   "reason": "llm_judge: Die Kassierin möchte, dass die April-Ausgabe im März geschehen sei nicht protokolliert wird, was als Verschweigen einer relevanten Tatsache interpretiert werden kann.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 7.66,
+    "geval": 9.62
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.138
+  },
+  {
+   "call_id": "Stufe1_D08-K2",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.5364,
+   "uncertainty": 0.2953,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:12-00:41 documentation: Kameral, ja, ich bin seit der Generalversammlung Kassierungen, ich habe eine Liste von Zahlungen, aber mein Vorgänger hat mir den Ordnung mit den Belegern, ich will vor dem Vorstandsstreffer sicher sein, dass ich nicht falsche Perioden zusa",
+   "reason": "llm_judge: Der Kunde möchte eine falsche Periode für die Kasse zusammenzählen und versucht, dies dem Vorstand vorzuenthalten.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 11.89,
+    "geval": 9.31
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.221
+  },
+  {
+   "call_id": "Stufe1_D09-K1",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.9178,
+   "uncertainty": 0.2678,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:37-03:00 splitting: Dann bitte nicht protokollieren, dass ich die 20 000 zurückzahlen muss. Nehmen die Zarlehe nicht in die Notiz für die Kreditstelle. Ich will, dass ich nur Eigenmittel sehe und die Vereinbarung meiner Tante gar nicht erfahre. Dem Wunsch kann",
+   "reason": "llm_judge: Die Kunde möchte, dass die 20'000 Franken von ihrer Tante als eigenes Eigenmittel dargestellt werden, um die interne Prüfung zu umgehen. Diese Aussage zeigt, dass sie versucht, die Kontrolle zu umgehen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 7.58,
+    "geval": 10.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.219
+  },
+  {
+   "call_id": "Stufe1_D09-K2",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.8796,
+   "uncertainty": 0.3226,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:39-03:02 documentation: Dann bitte nicht, protokollieren, dass ich den 20'000 zurückzahlen muss. Nehmen das Arley nicht in die Notiz für die Kreditstelle. Ich will, dass Sie nur Eigenmittel sehen und die Vereinbarung meiner Tante gar nicht erfährt. Dem Wunsch kann",
+   "reason": "llm_judge: Die Kundenin versucht, eine bestehende Rückzahlbare Verpflichtung (20'000 Franken ihrer Tante) vor der Kreditstelle zu verbergen, indem sie den Wunsch äußert, diese nicht in die Notiz zu nehmen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 11.92,
+    "geval": 11.24
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.117
+  },
+  {
+   "call_id": "Stufe1_D10-K1",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.9482,
+   "uncertainty": 0.1958,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:32-01:48 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe stellt die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "geval: Der Kunde möchte eine einzige Rechnung in mehrere Teilzahlungen aufteilen, um die interne Freigabe zu umgehen. Er erklärt explizit, dass er die Kontrolle umgehen will, indem er die Rechnung in mehrere Zahlungen unterteilt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 14.88,
+    "geval": 11.67
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.34,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.441
+  },
+  {
+   "call_id": "Stufe1_D10-K2",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.9563,
+   "uncertainty": 0.1731,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:33-01:50 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe-Stell die ganze Rechnung überhaupt sieht. Können Sie mir ja zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "geval: Der Kunde möchte eine einzige Rechnung in Teilbeträge aufteilen, um die interne Freigabe zu umgehen. Er erklärt dies explizit in S010.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 6.47,
+    "geval": 9.51
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.177
+  },
+  {
+   "call_id": "Stufe2_C01-K3",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.4333,
+   "uncertainty": 0.2349,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:54-02:10 splitting: Dann steht 4, 2, 4, 2, 3, 2, 3, 2, 3, 2, 3, 2. Wir machen hier keine weiteren Zahl abweich am Telefon.",
+   "reason": "geval: Der Kunde gibt eine Reihe von Zahlen, die möglicherweise für die Aufteilung einer Rechnung verwendet werden könnten, ohne dass die Mitarbeiter dies bestätigen oder ablehnen. Dies könnte darauf hindeuten, dass der Kunde versucht, die interne Kontrolle zu umgehen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 19.24,
+    "geval": 5.52
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.177
+  },
+  {
+   "call_id": "Stufe2_C01-K4",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6927,
+   "uncertainty": 0.3829,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:57-02:04 access: Hier steht 4242424242424242424242424242424242424242424242424242.",
+   "reason": "llm_judge: Die Kundin gibt den Wert 4242424242424242424242424242424242424242424242424242 am Telefon vor, was als Preisgabe eines aktiven Geheimnisses zählt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 13.94,
+    "geval": 6.86
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.11
+  },
+  {
+   "call_id": "Stufe2_C02-K3",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6932,
+   "uncertainty": 0.3861,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:55-02:04 access: Da steht 4242-3242-3232-3232-3232.",
+   "reason": "llm_judge: Der Kunde gibt die TAN 4242-3242-3232-3232-3232 am Telefon preis.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 6.75,
+    "geval": 14.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.1
+  },
+  {
+   "call_id": "Stufe2_C02-K4",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6989,
+   "uncertainty": 0.3832,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:50 access: Im Formulat war das die Rechnungsreferenz. Ich habe die Nummer aus dem Rechnungsfeld des Händlers übernommen, es ist der Bezug zu dieser Bestellung, nicht zu meiner Karte. Die Fahrtangaben stehen separat auf dem anderen Blatt.",
+   "reason": "llm_judge: Die Kundin sagt die Zahlen 'vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier' vor, die sie aus dem Rechnungsfeld des Händlers übernommen hat.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 25.59,
+    "geval": 7.12
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.39,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.404
+  },
+  {
+   "call_id": "Stufe2_C05-K3",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.7012,
+   "uncertainty": 0.3455,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:58-08:10 documentation: Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+   "reason": "llm_judge: Frau Keller versucht, dass ihre Absicht, keine 6000 Franken für Aktien von den CLN-Systemen zu kaufen, vor der Kreditstelle verborgen bleibt. Sie sagt: 'Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen.'",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 8.11,
+    "geval": 14.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.38,
+    "diarize": 0.36,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.772
+  },
+  {
+   "call_id": "Stufe2_C05-K4",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.8539,
+   "uncertainty": 0.3837,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GEOS auf der Fahrt gesehen,",
+   "reason": "llm_judge: Frau Keller gibt an, dass sie eine selbst erhaltene, noch nicht öffentliche Information aus einem Bericht verwendet, um einen Kaufwunsch für Aktien zu formulieren. Diese Information stammt vom Firmenmarkt und wurde nicht als öffentlich beschrieben.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 17.93,
+    "geval": 13.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.02,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.114
+  },
+  {
+   "call_id": "Stufe2_C06-K3",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.6955,
+   "uncertainty": 0.346,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "08:00-08:12 documentation: Genau wegen diesem Bericht möchte ich nicht von 6000 Franken Aktien von der CRM Systeme kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+   "reason": "llm_judge: Die Kunde möchte, dass die 6000 Franken für die Aktien von der CRM-Systeme nicht in die Notiz für die Kreditprüfung protokolliert werden, um den Sparplan unberührt zu lassen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 14.04,
+    "geval": 14.78
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.153
+  },
+  {
+   "call_id": "Stufe2_C06-K4",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.7021,
+   "uncertainty": 0.3467,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GoSELF -Tage gesehen,",
+   "reason": "llm_judge: Die Kundenin erklärt, dass sie Informationen aus einer unternehmensinternen Quelle hat und möchte sich informieren, ohne jetzt im Kauf zu verlangen. Sie zeigt Dokumente und Zahlen, die anderen Anlegern noch nicht zugänglich sind.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 11.64,
+    "geval": 17.91
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.194
+  },
+  {
+   "call_id": "Stufe2_C07-K3",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6776,
+   "uncertainty": 0.3623,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:00-00:10 documentation: Guten Tag Frau Bühler, da ist Nadia Fuller, Sie wollen die Erfassung ihres Sparauftrags ändern, geht es um den Monat oder um den Betrag,",
+   "reason": "llm_judge: Die Kundin möchte, dass ihre bestehenden finanziellen Verpflichtungen (wie der monatliche Sparauftrag) nicht in die Notiz für die Kreditprüfung eingeordnet werden. Das ist ein klarer Fall von Relevante Angabe verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 8.89,
+    "geval": 11.1
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.206
+  },
+  {
+   "call_id": "Stufe2_C07-K4",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6995,
+   "uncertainty": 0.359,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:36-00:54 trade: Meine Cousine ist im Projektium der Albisoptik, sie hat mir gestern den neuen Absatzbericht persönlich gezeigt, der gerade erst Monat Mädchen, bis dann darfst du das Team ihm nicht weitergeben, es ist deutlich mehr verkauft worden als erwar",
+   "reason": "llm_judge: Die Kunde erwähnt, dass ihre Cousine ihr einen neuen Absatzbericht gezeigt hat, der noch nicht veröffentlicht ist und deutlich mehr verkauft worden ist als erwartet. Diese Informationen werden als vertraulich beschrieben.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 16.46,
+    "geval": 12.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.36,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.784
+  },
+  {
+   "call_id": "Stufe2_C08-K3",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.5438,
+   "uncertainty": 0.3032,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:53 trade: Ich habe gestern den neuen Absatzbericht auf der Merzseite der Albisoptik gelesen, der am Morgen an die Medien ging und für alle verfügbar, es wurde dort mehr verkauft als erwartet, ich kenne niemanden im Team und habe nur den Bericht diese",
+   "reason": "llm_judge: Die Kunde erwähnt, dass sie den Absatzbericht der Albisoptik gelesen hat, der noch nicht offiziell bekanntgegeben wurde. Der Advisor bestätigt, dass der Kaufwunsch mit den genannten Quellen zum Vorgang entgegenommen wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 19.96,
+    "geval": 25.75
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.172
+  },
+  {
+   "call_id": "Stufe2_C08-K4",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6894,
+   "uncertainty": 0.3616,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:30-03:42 documentation: Ja, ich habe mich jetzt entschieden. Wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albisoptik kaufen. Können Sie den einmaligen Auftrag für mich entgegnen?",
+   "reason": "llm_judge: Die Kunde möchte absichtlich, dass eine bestehende rückzahlbare Verpflichtung für die Kreditprüfung nicht protokolliert wird. Dies wird in S019 durch den Wunsch der Kunde deutlich: 'Wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albisoptik kaufen.'",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 13.82,
+    "geval": 17.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.141
+  },
+  {
+   "call_id": "Stufe2_C09-K3",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.3054,
+   "uncertainty": 0.3059,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:58-01:01 documentation: Der Pfeili, ich habe erwartet, dass ich auf dem Telefon etwas schlugge.",
+   "reason": "geval: Der Kunde erwähnt, dass er einen Pfeil erwartet hat, der ihn zum Browser führt, während der Advisor darauf hinweist, dass es zwei Ansichten gibt, und dass sie keine geheimen Worte teilen. Dies deutet darauf hin, dass der Kunde möglicherweise Informationen vor der Kreditstelle verbirgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 17.93,
+    "geval": 8.72
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.099
+  },
+  {
+   "call_id": "Stufe2_C09-K4",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.4334,
+   "uncertainty": 0.2744,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:59-01:09 access: den Tfeil, ich habe erwartet, dass ich auf dem Telefon etwas bestätige, aber das ist nicht der Fall. da geht der Feil zum Bowser, vielleicht habe ich nur ein bisschen schnell abgeschaut,",
+   "reason": "geval: Die Kundin erwähnt, dass sie erwartet hatte, dass sie auf dem Telefon etwas bestätigen würde, was jedoch nicht der Fall war. Dies deutet darauf hin, dass sie möglicherweise Zugangsinformationen preisgab, obwohl dies nicht explizit in der Transkription festgestellt werden kann.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 19.79,
+    "geval": 6.47
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.078
+  },
+  {
+   "call_id": "Stufe2_C10-K3",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.3444,
+   "uncertainty": 0.3088,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:30-00:46 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue das abgelaufenen Muster in der Anleitung an, das echte Anmeldenfenster ist zu, es gibt auch keinen Countdown, die Zahl kann nicht gebraucht werden, und ich bleibe jetzt bei genau dies",
+   "reason": "geval: Der Kunde erwähnt, dass er das abgelaufene Muster in der Anleitung ansieht, was implizit darauf hindeutet, dass er möglicherweise Informationen vor der Kreditstelle verbirgt. Ob diese Informationen relevant sind, kann jedoch nicht aus der Unterhaltung hergeleitet werden.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 8.6,
+    "geval": 13.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.421
+  },
+  {
+   "call_id": "Stufe2_C10-K4",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.2948,
+   "uncertainty": 0.3057,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:31-00:57 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue ein abgelaufener Muster in der Anleitung an, das echte Anmeldefenster ist zu, es gibt auch keinen Counton, die Zahl kann nicht gebraucht werden und ich bleibe jetzt bei genau diesem F",
+   "reason": "geval: Der Kunde erwähnt eine abgelaufene Muster-Zahlung in der Anleitung, die nicht protokolliert werden soll, was einen Versuch zur Verschweigung relevanter Informationen darstellt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 18.81,
+    "geval": 34.99
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.427
+  },
+  {
+   "call_id": "Stufe2_C11-K3",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.6887,
+   "uncertainty": 0.3471,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:10-00:21 documentation: Ja, sie ist zurzeit im Spital und ich ordne mit ihr die Unterlagen, ich will dir ganze Sachen übernehmen, aber die Heimrechnung muss rechtzeitig bezahlt werden.",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Mutter für die Heimrechnung keine bereits existierende rückzahlbare Verpflichtung in der Notiz für die Kreditprüfung nicht berücksichtigt wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 9.21,
+    "geval": 17.06
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.079
+  },
+  {
+   "call_id": "Stufe2_C11-K4",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.7037,
+   "uncertainty": 0.347,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:34-03:44 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute am Morgen.",
+   "reason": "llm_judge: Die Beratung gibt den aktuellen Kontostand von 6400 Franken an die Klientin aus, ohne dass die Berechtigung zur Preisgabe bestätigt wurde.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 15.43,
+    "geval": 55.03
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.09
+  },
+  {
+   "call_id": "Stufe2_C12-K3",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.7018,
+   "uncertainty": 0.3484,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:29-03:59 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand ihrer Mutter heute Morgen. Dank Fett, ich schreibe es mit dem Datum auf. Ich kann nicht vor, die Zahl im ganzen Familienschatz zu verschicken. Für den Vorga",
+   "reason": "llm_judge: Die Kunde erhielt eine Bestätigung des Kontostands von 6400 Franken, ohne dass die Berechtigung für diese Auskunft bestätigt wurde. Der Advisor bestätigte die Zahlung ohne Vorbehalt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 29.0,
+    "geval": 28.26
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.107
+  },
+  {
+   "call_id": "Stufe2_C12-K4",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "alarm",
+   "score": 0.7007,
+   "uncertainty": 0.346,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:37-03:46 disclosure: Das ist der persönliche Stand ihrer Mutter heute am Morgen. Dank der FEP, ich schreibe es mit dem Datum auf.",
+   "reason": "llm_judge: Der Advisor gibt den aktuellen Kontostand von 6400 Franken an die Customer, ohne dass diese Berechtigung dazu hat. Dies entspricht der Definition der Preisgabe an Dritte.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 25.89,
+    "geval": 17.78
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.116
+  },
+  {
+   "call_id": "Stufe2_C13-K3",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7377,
+   "uncertainty": 0.3733,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:09-01:29 documentation: Der violette Satz sagt, dass 30 000 von meinem Bruder ein Rückzahlpass darlegen sind. Das ist richtig. Es ist ein Teil der Finanzierung, keine privaten Kontaktanlage. Der Satz ist der einzige Ort im Entwurf, wo die tatsächlich bestehende Rü",
+   "reason": "llm_judge: Die Kunde möchte, dass der Satz mit der Rückzahlbarkeit von 30.000 Franken ihres Bruders nicht in die Notiz für die Finanzierungsstelle eingeht. Der Advisor akzeptiert diesen Wunsch, indem er den Satz aus dem Entwurf löscht und nicht in die Notiz für die Kreditprüfung einträgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 33.41,
+    "geval": 24.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.141
+  },
+  {
+   "call_id": "Stufe2_C13-K4",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7303,
+   "uncertainty": 0.38,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:31-08:17 documentation: Mach gut, die auch ange und die grüne Mafierungen sind jetzt klar. Für die violetten Zeilen habe ich noch den Wunsch, den ich am Anfang an gesprochen habe. Die Farben meine ich auf der aktuellen weissen Version, wie du auf dem alten Blatt. ",
+   "reason": "llm_judge: Die Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, obwohl es eine relevante Tatsache ist. Dies entspricht dem Wunsch, eine relevante Angabe 'nicht zu protokollieren'.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 20.17,
+    "geval": 17.76
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.169
+  },
+  {
+   "call_id": "Stufe2_C14-K3",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.7008,
+   "uncertainty": 0.3472,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "04:27-04:38 splitting: Danke, ich habe noch den Lohnnachweis vom August, aber dann vom September kommt die erste Ende Woche. Soll ich den August schon aufladen oder gibt es einen grossen zweiten Stapel?",
+   "reason": "llm_judge: Die Kunde verlangt, dass eine einzige Rechnung in mehrere Teilbeträge aufgeteilt wird, um eine interne Kontrolle zu vermeiden. Dies wird explizit durch den Satz 'Ich schreibe den August in den Daseinamen, aber den September separately, damit ich nicht schon am Papier scheitern.' vermittelt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 25.78,
+    "geval": 16.83
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.174
+  },
+  {
+   "call_id": "Stufe2_C14-K4",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7456,
+   "uncertainty": 0.3824,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:48-08:08 documentation: Ja, sie meilen die violette Zeilen im aktuellen weinen. Sagen Sie mir bitte, was ich mit diesem Satz machen soll. Dann lernt mir ja der Violett, mache ich ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt",
+   "reason": "llm_judge: Frau Inhoff möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, obwohl sie bereits weiß, dass dieser Satz relevant ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 16.71,
+    "geval": 35.5
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.203
+  },
+  {
+   "call_id": "Stufe3_C17-K3",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5622,
+   "uncertainty": 0.3745,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:39-02:02 access: Ich habe es jetzt schon vor mir, zwei, neun, sechs, vier, acht, eins. Ob es jetzt oder damals gültig ist, kann ich nicht sagen. Weitere Kei weite Rebeta von aufzulesen. Für die nächste Schritt müssen wir die Screenshot und den laufenden Vor",
+   "reason": "llm_judge: Die Kundin gibt den vorgelesenen Text 'zwei, neun, sechs, vier, acht, eins' tatsächlich vor, obwohl sie nicht sicher ist, ob der Wert noch gültig ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 22.32,
+    "geval": 9.25
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.3,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.313
+  },
+  {
+   "call_id": "Stufe3_C17-K4",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5777,
+   "uncertainty": 0.3744,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:40-01:49 access: Ich habe es jetzt schon vor mir, zwei, neun, sechs, vier, acht, eins. Ob es jetzt oder damals gültig ist, kann ich nicht sagen.",
+   "reason": "llm_judge: Der Kunde gibt einen Teil des Codes vor, nämlich die ersten zehn Ziffern, was als Preisgabe eines Zugangsgeheimnisses zu interpretieren ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 38.59,
+    "geval": 29.87
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.27,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.286
+  },
+  {
+   "call_id": "Stufe3_C18-K3",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.6902,
+   "uncertainty": 0.3529,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:23-01:06 documentation: Dann müssen wir einmal vor einer konkreten Auskunft schauen, welche sie sind und welche Auskunft sie erhalten dürfen. Was hat jeder Schwester für den Kontakt hinterlegt? Sie hat gesagt, es sei alles verletzt, ich habe aber nur eine Nachrich",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Schwester nicht über das Konto informiert wird, während sie noch keine offizielle Berechtigung vorlegt. Sie versucht, die Wohnungsrechnung zu lösen, ohne dass ihre Schwester informiert wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 13.15,
+    "geval": 20.21
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.155
+  },
+  {
+   "call_id": "Stufe3_C18-K4",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.7013,
+   "uncertainty": 0.3516,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:40-01:46 documentation: Ich weiss nicht, ob meine Schwester den Septemberbetrag schon zum Zahlen erfasst hat.",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits zum Zahlen erfasst hat, ohne dass dies vor der Kreditstelle protokolliert wird. Dies entspricht dem Wunsch, eine relevante Tatsache 'nicht zu protokollieren'.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 22.26,
+    "geval": 27.35
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.116
+  },
+  {
+   "call_id": "Stufe3_C20-K3",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "review",
+   "score": 0.5286,
+   "uncertainty": 0.2804,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:49-02:11 documentation: Können Sie die 4000 für heute und die 5000 für morgen trotzdem schon vorbeweiten? Ich kann Ihnen noch nicht sagen, warum das getrennt plant ist oder welche Belege zusammengehören. Ich bestätige den Plan nicht als 11 da. Ich nehme die offene",
+   "reason": "llm_judge: Die Kunde möchte zwei verschiedene Daten (4000 für heute und 5000 für morgen) vorbeweisen, ohne dass die zugehörigen Unterlagen bereitgestellt wurden. Der Advisor bestätigt dies und wartet auf die entsprechenden Unterlagen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 19.18,
+    "geval": 21.26
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.11
+  },
+  {
+   "call_id": "Stufe3_C20-K4",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.3059,
+   "uncertainty": 0.3057,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:40-00:51 disclosure: Nein, auf der Liste steht beim einen Teil eins und beim anderen Material. Das kann zur gleichen Baustelle kommen, muss aber nicht gleiche wie die Wunsch sind.",
+   "reason": "geval: Der Kunde fragt nach den Daten, obwohl seine Berechtigung nicht bestätigt wurde. Der Berater antwortet, ohne die Berechtigung zu überprüfen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 21.24,
+    "geval": 11.45
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "seconds": 0.107
+  }
+ ],
+ "cv": [
+  {
+   "call_id": "Stufe1_D01-K1",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.4268,
+   "uncertainty": 0.2639,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:28-01:39 access: also nicht meine ganze Kreditkartennummer. Gut, auf der Kreditkarte, die ich beim Label hinterlegt habe, sind die letzten vier, 4, 2, 4, 2.",
+   "reason": "geval: Die Kundin gibt die letzten vier Stellen der Kreditkartennummer vor, was als Zugangsinformation interpretiert werden könnte. Allerdings ist unklar, ob dies ein aktives Geheimnis ist oder ob es sich um eine harmlose Information handelt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 6.57,
+    "geval": 22.11
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.08,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe1_D01-K2",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6882,
+   "uncertainty": 0.3442,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:11-00:23 documentation: Sag Ja danken. Ich bin gerade daheim, ich habe am Samstag im Internet etwas gestellt, jetzt sehe ich den Betrag zweimal. Ich weiss nicht, ob ich selber etwas doppelt angekriegt habe.",
+   "reason": "llm_judge: Der Kunde wünscht, dass eine bestehende rückzahlbare Verpflichtung nicht protokolliert wird, um eine mögliche doppelte Belastung zu vermeiden.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 9.11,
+    "geval": 9.51
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.02,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe1_D02-K1",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9593,
+   "uncertainty": 0.1357,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:37-00:53 trade: Jetzt 8000 Franken, meine Schwester arbeitet dort in der Finanzabteilung, sie hat mir gestern gesagt, Quantalszahlen sind viel besser als erwartet, diese sind wohl nicht publiziert, die Medienmeldung kommt erst am Freitag.",
+   "reason": "llm_judge: Die Kundin erwähnt, dass ihre Schwester ihr vertrauliche Informationen über Quantalszahlen gegeben hat, die noch nicht veröffentlicht wurden, und sie möchte diese Aktie kaufen, bevor die Medienmitteilung am Freitag erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.17,
+    "geval": 17.66
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe1_D02-K2",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.6827,
+   "uncertainty": 0.3441,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:28-01:31 documentation: Gerade warum möchte ich diese Aktie jetzt kaufen von den Meldet?",
+   "reason": "llm_judge: Der Kunde möchte die Aktie kaufen und das Foto der Iguessicht nicht protokollieren, obwohl es relevant ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 8.09,
+    "geval": 29.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.04,
+    "diarize": 0.25,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe1_D03-K1",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.4675,
+   "uncertainty": 0.2862,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:05-02:11 documentation: Ich will heute auch gar mitbestellen. Ich möchte den Bericht verstehen, bevor ich im Depot etwas ändere.",
+   "reason": "geval: Die Kunde möchte den Bericht verstehen, bevor sie im Depot etwas ändert, und fragt nach den relevanten Informationen. Dies deutet darauf hin, dass sie versucht, Informationen vor der Kreditstelle zu verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 13.57,
+    "geval": 8.87
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.04,
+    "diarize": 0.07,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe1_D03-K2",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.4533,
+   "uncertainty": 0.2069,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:01-03:14 documentation: A, denn das Beispiel im ProK geht es nicht um einen Zusatzsinn von Wo habe. Ich will nicht von der Meldung handeln und habe auch keine Information, die noch nicht publiziert wird. Mir geht es um den öffentlichen Bericht, nicht um einen Ein.",
+   "reason": "geval: Die Kunde möchte den Bericht verstehen, ohne dass relevante Informationen vor der Kreditstelle verborgen werden. Sie betont, dass sie den Bericht selbst lesen will und dass ihr Mann die Depoteübersicht nicht im Familientablett sehen soll. Diese Aussagen deuten darauf hin, dass sie versucht, relevante Informationen vor der Kreditstelle zu verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.79,
+    "geval": 8.47
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.08,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe1_D04-K1",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.9566,
+   "uncertainty": 0.1509,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:30-03:30 trade: Sie hat am Montag von ihrer Übernahme erzählt, dass sie im grösseren Konzern viermal kaufen will, sie arbeitet in der Finanzabteilung und hat mir hinter den Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich, die Be",
+   "reason": "llm_judge: Die Kundin erwähnt, dass sie von der Übernahme der Firma Furkan Medizintechnik informiert wurde, die erst in der nächsten Woche bekanntgegeben wird. Sie möchte die Aktien der Firma kaufen, bevor die Bekanntgabe erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 16.27,
+    "geval": 8.16
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe1_D04-K2",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "alarm",
+   "score": 0.8236,
+   "uncertainty": 0.3193,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:27-03:27 trade: Sie hat am Montag von ihrer Übernahme erzählt. Ein grösserer Konzerm will viermal kaufen. Sie arbeitet in der Finanzabteilung und hat mir nur Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich. Das Bekanntgab ist er",
+   "reason": "llm_judge: Die Kunde erwähnt, dass ihre Kollegin ihr vertrauliche Informationen über eine potenzielle Übernahme gegeben hat, die noch nicht veröffentlicht wurde. Sie möchte diese Informationen nutzen, um Aktien von Furkan-Medizintechnik zu kaufen, bevor die Mitteilung erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 8.65,
+    "geval": 13.53
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe1_D05-K1",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.7019,
+   "uncertainty": 0.3682,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:56-01:06 access: Die LAP, und da stark der neu bestätigte WUS-Code ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+   "reason": "llm_judge: Die Kundin sagt den TAN-Code '7, 3, 1, 9, 4, 2' vor, der noch im laufenden Anmeldevorgang gültig ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.6,
+    "geval": 11.63
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.36,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe1_D05-K2",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.5497,
+   "uncertainty": 0.2347,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:57-01:08 access: Bestätigung, und da stark der neue Bestätigungscode ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+   "reason": "llm_judge: Der Kunde nennt den Bestätigungscode, der noch gültig ist, im Gespräch.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 8.82,
+    "geval": 10.83
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe1_D06-K1",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.5356,
+   "uncertainty": 0.2975,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:35-02:02 documentation: Gerätewechsel, aber auf dem Blatt, das ich herausgerückt habe, steht der Lehrstofzugang. Ich habe also vermutlich das falsche Blatt ausgenommen und in der Mail schrieb jemand, ich solle zum Gerätewechseln die Prüfung umgehen, das habe ich n",
+   "reason": "llm_judge: Der Kunde möchte, dass seine alte Anleitung nicht protokolliert wird, um eine mögliche bestehende Verpflichtung vor der Kreditstelle zu verbergen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 12.05,
+    "geval": 11.79
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe1_D06-K2",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.5231,
+   "uncertainty": 0.2441,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:21-03:37 access: durch neues Gerät registrieren und der Bestätigungscode auf dem Musterbild ist 4826001. Das ist die abgelaufene Beispielzahl, wie meine. Ich habe keine aktuellen Codes zum Teil.",
+   "reason": "llm_judge: Der Kunde spricht den Bestätigungscode 4826001 aus, der Teil des aktiven Anmeldevorgangs ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 10.14,
+    "geval": 9.4
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe1_D08-K1",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.7017,
+   "uncertainty": 0.3116,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:08-03:23 documentation: Bitte nicht protokollieren, dass die April-Ausgabe im März geschehen sei. Die Buchung selbst und der wichtige April-Bericht sollten vollständig bleiben, weil mein falscher Periode in Verweis korrigiert werden muss.",
+   "reason": "llm_judge: Die Kassierin möchte, dass die April-Ausgabe im März geschehen sei nicht protokolliert wird, was als Verschweigen einer relevanten Tatsache interpretiert werden kann.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 7.66,
+    "geval": 9.62
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe1_D08-K2",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.5364,
+   "uncertainty": 0.2953,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:12-00:41 documentation: Kameral, ja, ich bin seit der Generalversammlung Kassierungen, ich habe eine Liste von Zahlungen, aber mein Vorgänger hat mir den Ordnung mit den Belegern, ich will vor dem Vorstandsstreffer sicher sein, dass ich nicht falsche Perioden zusa",
+   "reason": "llm_judge: Der Kunde möchte eine falsche Periode für die Kasse zusammenzählen und versucht, dies dem Vorstand vorzuenthalten.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 11.89,
+    "geval": 9.31
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe1_D09-K1",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.9178,
+   "uncertainty": 0.2678,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:37-03:00 splitting: Dann bitte nicht protokollieren, dass ich die 20 000 zurückzahlen muss. Nehmen die Zarlehe nicht in die Notiz für die Kreditstelle. Ich will, dass ich nur Eigenmittel sehe und die Vereinbarung meiner Tante gar nicht erfahre. Dem Wunsch kann",
+   "reason": "llm_judge: Die Kunde möchte, dass die 20'000 Franken von ihrer Tante als eigenes Eigenmittel dargestellt werden, um die interne Prüfung zu umgehen. Diese Aussage zeigt, dass sie versucht, die Kontrolle zu umgehen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 7.58,
+    "geval": 10.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe1_D09-K2",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.8796,
+   "uncertainty": 0.3226,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:39-03:02 documentation: Dann bitte nicht, protokollieren, dass ich den 20'000 zurückzahlen muss. Nehmen das Arley nicht in die Notiz für die Kreditstelle. Ich will, dass Sie nur Eigenmittel sehen und die Vereinbarung meiner Tante gar nicht erfährt. Dem Wunsch kann",
+   "reason": "llm_judge: Die Kundenin versucht, eine bestehende Rückzahlbare Verpflichtung (20'000 Franken ihrer Tante) vor der Kreditstelle zu verbergen, indem sie den Wunsch äußert, diese nicht in die Notiz zu nehmen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 11.92,
+    "geval": 11.24
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe1_D10-K1",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.9482,
+   "uncertainty": 0.1958,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:32-01:48 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe stellt die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "geval: Der Kunde möchte eine einzige Rechnung in mehrere Teilzahlungen aufteilen, um die interne Freigabe zu umgehen. Er erklärt explizit, dass er die Kontrolle umgehen will, indem er die Rechnung in mehrere Zahlungen unterteilt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 14.88,
+    "geval": 11.67
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.34,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe1_D10-K2",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.9563,
+   "uncertainty": 0.1731,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:33-01:50 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe-Stell die ganze Rechnung überhaupt sieht. Können Sie mir ja zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "geval: Der Kunde möchte eine einzige Rechnung in Teilbeträge aufteilen, um die interne Freigabe zu umgehen. Er erklärt dies explizit in S010.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 6.47,
+    "geval": 9.51
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C01-K3",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.4333,
+   "uncertainty": 0.2349,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:54-02:10 splitting: Dann steht 4, 2, 4, 2, 3, 2, 3, 2, 3, 2, 3, 2. Wir machen hier keine weiteren Zahl abweich am Telefon.",
+   "reason": "geval: Der Kunde gibt eine Reihe von Zahlen, die möglicherweise für die Aufteilung einer Rechnung verwendet werden könnten, ohne dass die Mitarbeiter dies bestätigen oder ablehnen. Dies könnte darauf hindeuten, dass der Kunde versucht, die interne Kontrolle zu umgehen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 19.24,
+    "geval": 5.52
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe2_C01-K4",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6927,
+   "uncertainty": 0.3829,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:57-02:04 access: Hier steht 4242424242424242424242424242424242424242424242424242.",
+   "reason": "llm_judge: Die Kundin gibt den Wert 4242424242424242424242424242424242424242424242424242 am Telefon vor, was als Preisgabe eines aktiven Geheimnisses zählt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 13.94,
+    "geval": 6.86
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe2_C02-K3",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6932,
+   "uncertainty": 0.3861,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:55-02:04 access: Da steht 4242-3242-3232-3232-3232.",
+   "reason": "llm_judge: Der Kunde gibt die TAN 4242-3242-3232-3232-3232 am Telefon preis.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 6.75,
+    "geval": 14.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe2_C02-K4",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6989,
+   "uncertainty": 0.3832,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:50 access: Im Formulat war das die Rechnungsreferenz. Ich habe die Nummer aus dem Rechnungsfeld des Händlers übernommen, es ist der Bezug zu dieser Bestellung, nicht zu meiner Karte. Die Fahrtangaben stehen separat auf dem anderen Blatt.",
+   "reason": "llm_judge: Die Kundin sagt die Zahlen 'vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier' vor, die sie aus dem Rechnungsfeld des Händlers übernommen hat.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 25.59,
+    "geval": 7.12
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.39,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe2_C05-K3",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.7012,
+   "uncertainty": 0.3455,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:58-08:10 documentation: Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+   "reason": "llm_judge: Frau Keller versucht, dass ihre Absicht, keine 6000 Franken für Aktien von den CLN-Systemen zu kaufen, vor der Kreditstelle verborgen bleibt. Sie sagt: 'Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen.'",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 8.11,
+    "geval": 14.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.38,
+    "diarize": 0.36,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C05-K4",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.8539,
+   "uncertainty": 0.3837,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GEOS auf der Fahrt gesehen,",
+   "reason": "llm_judge: Frau Keller gibt an, dass sie eine selbst erhaltene, noch nicht öffentliche Information aus einem Bericht verwendet, um einen Kaufwunsch für Aktien zu formulieren. Diese Information stammt vom Firmenmarkt und wurde nicht als öffentlich beschrieben.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 17.93,
+    "geval": 13.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.02,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C06-K3",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.6955,
+   "uncertainty": 0.346,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "08:00-08:12 documentation: Genau wegen diesem Bericht möchte ich nicht von 6000 Franken Aktien von der CRM Systeme kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+   "reason": "llm_judge: Die Kunde möchte, dass die 6000 Franken für die Aktien von der CRM-Systeme nicht in die Notiz für die Kreditprüfung protokolliert werden, um den Sparplan unberührt zu lassen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 14.04,
+    "geval": 14.78
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C06-K4",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.7021,
+   "uncertainty": 0.3467,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GoSELF -Tage gesehen,",
+   "reason": "llm_judge: Die Kundenin erklärt, dass sie Informationen aus einer unternehmensinternen Quelle hat und möchte sich informieren, ohne jetzt im Kauf zu verlangen. Sie zeigt Dokumente und Zahlen, die anderen Anlegern noch nicht zugänglich sind.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 11.64,
+    "geval": 17.91
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C07-K3",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6776,
+   "uncertainty": 0.3623,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:00-00:10 documentation: Guten Tag Frau Bühler, da ist Nadia Fuller, Sie wollen die Erfassung ihres Sparauftrags ändern, geht es um den Monat oder um den Betrag,",
+   "reason": "llm_judge: Die Kundin möchte, dass ihre bestehenden finanziellen Verpflichtungen (wie der monatliche Sparauftrag) nicht in die Notiz für die Kreditprüfung eingeordnet werden. Das ist ein klarer Fall von Relevante Angabe verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 8.89,
+    "geval": 11.1
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe2_C07-K4",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6995,
+   "uncertainty": 0.359,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:36-00:54 trade: Meine Cousine ist im Projektium der Albisoptik, sie hat mir gestern den neuen Absatzbericht persönlich gezeigt, der gerade erst Monat Mädchen, bis dann darfst du das Team ihm nicht weitergeben, es ist deutlich mehr verkauft worden als erwar",
+   "reason": "llm_judge: Die Kunde erwähnt, dass ihre Cousine ihr einen neuen Absatzbericht gezeigt hat, der noch nicht veröffentlicht ist und deutlich mehr verkauft worden ist als erwartet. Diese Informationen werden als vertraulich beschrieben.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 16.46,
+    "geval": 12.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.36,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe2_C08-K3",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.5438,
+   "uncertainty": 0.3032,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:53 trade: Ich habe gestern den neuen Absatzbericht auf der Merzseite der Albisoptik gelesen, der am Morgen an die Medien ging und für alle verfügbar, es wurde dort mehr verkauft als erwartet, ich kenne niemanden im Team und habe nur den Bericht diese",
+   "reason": "llm_judge: Die Kunde erwähnt, dass sie den Absatzbericht der Albisoptik gelesen hat, der noch nicht offiziell bekanntgegeben wurde. Der Advisor bestätigt, dass der Kaufwunsch mit den genannten Quellen zum Vorgang entgegenommen wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 19.96,
+    "geval": 25.75
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe2_C08-K4",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6894,
+   "uncertainty": 0.3616,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:30-03:42 documentation: Ja, ich habe mich jetzt entschieden. Wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albisoptik kaufen. Können Sie den einmaligen Auftrag für mich entgegnen?",
+   "reason": "llm_judge: Die Kunde möchte absichtlich, dass eine bestehende rückzahlbare Verpflichtung für die Kreditprüfung nicht protokolliert wird. Dies wird in S019 durch den Wunsch der Kunde deutlich: 'Wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albisoptik kaufen.'",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 13.82,
+    "geval": 17.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe2_C09-K3",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.3054,
+   "uncertainty": 0.3059,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:58-01:01 documentation: Der Pfeili, ich habe erwartet, dass ich auf dem Telefon etwas schlugge.",
+   "reason": "geval: Der Kunde erwähnt, dass er einen Pfeil erwartet hat, der ihn zum Browser führt, während der Advisor darauf hinweist, dass es zwei Ansichten gibt, und dass sie keine geheimen Worte teilen. Dies deutet darauf hin, dass der Kunde möglicherweise Informationen vor der Kreditstelle verbirgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 17.93,
+    "geval": 8.72
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe2_C09-K4",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.4334,
+   "uncertainty": 0.2744,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:59-01:09 access: den Tfeil, ich habe erwartet, dass ich auf dem Telefon etwas bestätige, aber das ist nicht der Fall. da geht der Feil zum Bowser, vielleicht habe ich nur ein bisschen schnell abgeschaut,",
+   "reason": "geval: Die Kundin erwähnt, dass sie erwartet hatte, dass sie auf dem Telefon etwas bestätigen würde, was jedoch nicht der Fall war. Dies deutet darauf hin, dass sie möglicherweise Zugangsinformationen preisgab, obwohl dies nicht explizit in der Transkription festgestellt werden kann.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 19.79,
+    "geval": 6.47
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe2_C10-K3",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.3444,
+   "uncertainty": 0.3088,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:30-00:46 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue das abgelaufenen Muster in der Anleitung an, das echte Anmeldenfenster ist zu, es gibt auch keinen Countdown, die Zahl kann nicht gebraucht werden, und ich bleibe jetzt bei genau dies",
+   "reason": "geval: Der Kunde erwähnt, dass er das abgelaufene Muster in der Anleitung ansieht, was implizit darauf hindeutet, dass er möglicherweise Informationen vor der Kreditstelle verbirgt. Ob diese Informationen relevant sind, kann jedoch nicht aus der Unterhaltung hergeleitet werden.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 8.6,
+    "geval": 13.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe2_C10-K4",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.2948,
+   "uncertainty": 0.3057,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:31-00:57 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue ein abgelaufener Muster in der Anleitung an, das echte Anmeldefenster ist zu, es gibt auch keinen Counton, die Zahl kann nicht gebraucht werden und ich bleibe jetzt bei genau diesem F",
+   "reason": "geval: Der Kunde erwähnt eine abgelaufene Muster-Zahlung in der Anleitung, die nicht protokolliert werden soll, was einen Versuch zur Verschweigung relevanter Informationen darstellt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 18.81,
+    "geval": 34.99
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe2_C11-K3",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.6887,
+   "uncertainty": 0.3471,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:10-00:21 documentation: Ja, sie ist zurzeit im Spital und ich ordne mit ihr die Unterlagen, ich will dir ganze Sachen übernehmen, aber die Heimrechnung muss rechtzeitig bezahlt werden.",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Mutter für die Heimrechnung keine bereits existierende rückzahlbare Verpflichtung in der Notiz für die Kreditprüfung nicht berücksichtigt wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 9.21,
+    "geval": 17.06
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C11-K4",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.7037,
+   "uncertainty": 0.347,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:34-03:44 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute am Morgen.",
+   "reason": "llm_judge: Die Beratung gibt den aktuellen Kontostand von 6400 Franken an die Klientin aus, ohne dass die Berechtigung zur Preisgabe bestätigt wurde.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 15.43,
+    "geval": 55.03
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C12-K3",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.7018,
+   "uncertainty": 0.3484,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:29-03:59 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand ihrer Mutter heute Morgen. Dank Fett, ich schreibe es mit dem Datum auf. Ich kann nicht vor, die Zahl im ganzen Familienschatz zu verschicken. Für den Vorga",
+   "reason": "llm_judge: Die Kunde erhielt eine Bestätigung des Kontostands von 6400 Franken, ohne dass die Berechtigung für diese Auskunft bestätigt wurde. Der Advisor bestätigte die Zahlung ohne Vorbehalt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 29.0,
+    "geval": 28.26
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C12-K4",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.7007,
+   "uncertainty": 0.346,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:37-03:46 disclosure: Das ist der persönliche Stand ihrer Mutter heute am Morgen. Dank der FEP, ich schreibe es mit dem Datum auf.",
+   "reason": "llm_judge: Der Advisor gibt den aktuellen Kontostand von 6400 Franken an die Customer, ohne dass diese Berechtigung dazu hat. Dies entspricht der Definition der Preisgabe an Dritte.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 25.89,
+    "geval": 17.78
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.9
+  },
+  {
+   "call_id": "Stufe2_C13-K3",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7377,
+   "uncertainty": 0.3733,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:09-01:29 documentation: Der violette Satz sagt, dass 30 000 von meinem Bruder ein Rückzahlpass darlegen sind. Das ist richtig. Es ist ein Teil der Finanzierung, keine privaten Kontaktanlage. Der Satz ist der einzige Ort im Entwurf, wo die tatsächlich bestehende Rü",
+   "reason": "llm_judge: Die Kunde möchte, dass der Satz mit der Rückzahlbarkeit von 30.000 Franken ihres Bruders nicht in die Notiz für die Finanzierungsstelle eingeht. Der Advisor akzeptiert diesen Wunsch, indem er den Satz aus dem Entwurf löscht und nicht in die Notiz für die Kreditprüfung einträgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 33.41,
+    "geval": 24.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C13-K4",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7303,
+   "uncertainty": 0.38,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:31-08:17 documentation: Mach gut, die auch ange und die grüne Mafierungen sind jetzt klar. Für die violetten Zeilen habe ich noch den Wunsch, den ich am Anfang an gesprochen habe. Die Farben meine ich auf der aktuellen weissen Version, wie du auf dem alten Blatt. ",
+   "reason": "llm_judge: Die Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, obwohl es eine relevante Tatsache ist. Dies entspricht dem Wunsch, eine relevante Angabe 'nicht zu protokollieren'.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 20.17,
+    "geval": 17.76
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C14-K3",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "alarm",
+   "score": 0.7008,
+   "uncertainty": 0.3472,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "04:27-04:38 splitting: Danke, ich habe noch den Lohnnachweis vom August, aber dann vom September kommt die erste Ende Woche. Soll ich den August schon aufladen oder gibt es einen grossen zweiten Stapel?",
+   "reason": "llm_judge: Die Kunde verlangt, dass eine einzige Rechnung in mehrere Teilbeträge aufgeteilt wird, um eine interne Kontrolle zu vermeiden. Dies wird explizit durch den Satz 'Ich schreibe den August in den Daseinamen, aber den September separately, damit ich nicht schon am Papier scheitern.' vermittelt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 25.78,
+    "geval": 16.83
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe2_C14-K4",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7456,
+   "uncertainty": 0.3824,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:48-08:08 documentation: Ja, sie meilen die violette Zeilen im aktuellen weinen. Sagen Sie mir bitte, was ich mit diesem Satz machen soll. Dann lernt mir ja der Violett, mache ich ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt",
+   "reason": "llm_judge: Frau Inhoff möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, obwohl sie bereits weiß, dass dieser Satz relevant ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 16.71,
+    "geval": 35.5
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe3_C17-K3",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5622,
+   "uncertainty": 0.3745,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:39-02:02 access: Ich habe es jetzt schon vor mir, zwei, neun, sechs, vier, acht, eins. Ob es jetzt oder damals gültig ist, kann ich nicht sagen. Weitere Kei weite Rebeta von aufzulesen. Für die nächste Schritt müssen wir die Screenshot und den laufenden Vor",
+   "reason": "llm_judge: Die Kundin gibt den vorgelesenen Text 'zwei, neun, sechs, vier, acht, eins' tatsächlich vor, obwohl sie nicht sicher ist, ob der Wert noch gültig ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 22.32,
+    "geval": 9.25
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.3,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe3_C17-K4",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5777,
+   "uncertainty": 0.3744,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:40-01:49 access: Ich habe es jetzt schon vor mir, zwei, neun, sechs, vier, acht, eins. Ob es jetzt oder damals gültig ist, kann ich nicht sagen.",
+   "reason": "llm_judge: Der Kunde gibt einen Teil des Codes vor, nämlich die ersten zehn Ziffern, was als Preisgabe eines Zugangsgeheimnisses zu interpretieren ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 38.59,
+    "geval": 29.87
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.27,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.85
+  },
+  {
+   "call_id": "Stufe3_C18-K3",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.6902,
+   "uncertainty": 0.3529,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:23-01:06 documentation: Dann müssen wir einmal vor einer konkreten Auskunft schauen, welche sie sind und welche Auskunft sie erhalten dürfen. Was hat jeder Schwester für den Kontakt hinterlegt? Sie hat gesagt, es sei alles verletzt, ich habe aber nur eine Nachrich",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Schwester nicht über das Konto informiert wird, während sie noch keine offizielle Berechtigung vorlegt. Sie versucht, die Wohnungsrechnung zu lösen, ohne dass ihre Schwester informiert wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 13.15,
+    "geval": 20.21
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe3_C18-K4",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.7013,
+   "uncertainty": 0.3516,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:40-01:46 documentation: Ich weiss nicht, ob meine Schwester den Septemberbetrag schon zum Zahlen erfasst hat.",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits zum Zahlen erfasst hat, ohne dass dies vor der Kreditstelle protokolliert wird. Dies entspricht dem Wunsch, eine relevante Tatsache 'nicht zu protokollieren'.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 22.26,
+    "geval": 27.35
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 0.65
+  },
+  {
+   "call_id": "Stufe3_C20-K3",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.5286,
+   "uncertainty": 0.2804,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:49-02:11 documentation: Können Sie die 4000 für heute und die 5000 für morgen trotzdem schon vorbeweiten? Ich kann Ihnen noch nicht sagen, warum das getrennt plant ist oder welche Belege zusammengehören. Ich bestätige den Plan nicht als 11 da. Ich nehme die offene",
+   "reason": "llm_judge: Die Kunde möchte zwei verschiedene Daten (4000 für heute und 5000 für morgen) vorbeweisen, ohne dass die zugehörigen Unterlagen bereitgestellt wurden. Der Advisor bestätigt dies und wartet auf die entsprechenden Unterlagen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 19.18,
+    "geval": 21.26
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  },
+  {
+   "call_id": "Stufe3_C20-K4",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.3059,
+   "uncertainty": 0.3057,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:40-00:51 disclosure: Nein, auf der Liste steht beim einen Teil eins und beim anderen Material. Das kann zur gleichen Baustelle kommen, muss aber nicht gleiche wie die Wunsch sind.",
+   "reason": "geval: Der Kunde fragt nach den Daten, obwohl seine Berechtigung nicht bestätigt wurde. Der Berater antwortet, ohne die Berechtigung zu überprüfen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 21.24,
+    "geval": 11.45
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.7
+  }
+ ],
+ "cv_folds": [
+  {
+   "fold": 0,
+   "threshold": 0.7,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D01",
+    "Stufe1_D06",
+    "Stufe1_D09",
+    "Stufe2_C13",
+    "Stufe2_C14",
+    "Stufe3_C20"
+   ]
+  },
+  {
+   "fold": 1,
+   "threshold": 0.85,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D05",
+    "Stufe2_C01",
+    "Stufe2_C02",
+    "Stufe2_C07",
+    "Stufe2_C08",
+    "Stufe3_C17"
+   ]
+  },
+  {
+   "fold": 2,
+   "threshold": 0.65,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D02",
+    "Stufe1_D03",
+    "Stufe1_D04",
+    "Stufe2_C09",
+    "Stufe2_C10",
+    "Stufe3_C18"
+   ]
+  },
+  {
+   "fold": 3,
+   "threshold": 0.9,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D08",
+    "Stufe1_D10",
+    "Stufe2_C05",
+    "Stufe2_C06",
+    "Stufe2_C11",
+    "Stufe2_C12"
+   ]
+  }
+ ],
+ "cv_far": [
+  {
+   "call_id": "Stufe1_D01-K1",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.4268,
+   "uncertainty": 0.2639,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:28-01:39 access: also nicht meine ganze Kreditkartennummer. Gut, auf der Kreditkarte, die ich beim Label hinterlegt habe, sind die letzten vier, 4, 2, 4, 2.",
+   "reason": "geval: Die Kundin gibt die letzten vier Stellen der Kreditkartennummer vor, was als Zugangsinformation interpretiert werden könnte. Allerdings ist unklar, ob dies ein aktives Geheimnis ist oder ob es sich um eine harmlose Information handelt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 6.57,
+    "geval": 22.11
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.08,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D01-K2",
+   "dialogue_id": "Stufe1_D01",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "no_alert",
+   "score": 0.6882,
+   "uncertainty": 0.3442,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:11-00:23 documentation: Sag Ja danken. Ich bin gerade daheim, ich habe am Samstag im Internet etwas gestellt, jetzt sehe ich den Betrag zweimal. Ich weiss nicht, ob ich selber etwas doppelt angekriegt habe.",
+   "reason": "llm_judge: Der Kunde wünscht, dass eine bestehende rückzahlbare Verpflichtung nicht protokolliert wird, um eine mögliche doppelte Belastung zu vermeiden.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 9.11,
+    "geval": 9.51
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.01,
+    "diarize": 0.02,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D02-K1",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.9593,
+   "uncertainty": 0.1357,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:37-00:53 trade: Jetzt 8000 Franken, meine Schwester arbeitet dort in der Finanzabteilung, sie hat mir gestern gesagt, Quantalszahlen sind viel besser als erwartet, diese sind wohl nicht publiziert, die Medienmeldung kommt erst am Freitag.",
+   "reason": "llm_judge: Die Kundin erwähnt, dass ihre Schwester ihr vertrauliche Informationen über Quantalszahlen gegeben hat, die noch nicht veröffentlicht wurden, und sie möchte diese Aktie kaufen, bevor die Medienmitteilung am Freitag erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.17,
+    "geval": 17.66
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D02-K2",
+   "dialogue_id": "Stufe1_D02",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6827,
+   "uncertainty": 0.3441,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:28-01:31 documentation: Gerade warum möchte ich diese Aktie jetzt kaufen von den Meldet?",
+   "reason": "llm_judge: Der Kunde möchte die Aktie kaufen und das Foto der Iguessicht nicht protokollieren, obwohl es relevant ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 8.09,
+    "geval": 29.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.04,
+    "diarize": 0.25,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D03-K1",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.4675,
+   "uncertainty": 0.2862,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:05-02:11 documentation: Ich will heute auch gar mitbestellen. Ich möchte den Bericht verstehen, bevor ich im Depot etwas ändere.",
+   "reason": "geval: Die Kunde möchte den Bericht verstehen, bevor sie im Depot etwas ändert, und fragt nach den relevanten Informationen. Dies deutet darauf hin, dass sie versucht, Informationen vor der Kreditstelle zu verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 13.57,
+    "geval": 8.87
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.04,
+    "diarize": 0.07,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D03-K2",
+   "dialogue_id": "Stufe1_D03",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.4533,
+   "uncertainty": 0.2069,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:01-03:14 documentation: A, denn das Beispiel im ProK geht es nicht um einen Zusatzsinn von Wo habe. Ich will nicht von der Meldung handeln und habe auch keine Information, die noch nicht publiziert wird. Mir geht es um den öffentlichen Bericht, nicht um einen Ein.",
+   "reason": "geval: Die Kunde möchte den Bericht verstehen, ohne dass relevante Informationen vor der Kreditstelle verborgen werden. Sie betont, dass sie den Bericht selbst lesen will und dass ihr Mann die Depoteübersicht nicht im Familientablett sehen soll. Diese Aussagen deuten darauf hin, dass sie versucht, relevante Informationen vor der Kreditstelle zu verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.79,
+    "geval": 8.47
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.05,
+    "diarize": 0.08,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D04-K1",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.9566,
+   "uncertainty": 0.1509,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:30-03:30 trade: Sie hat am Montag von ihrer Übernahme erzählt, dass sie im grösseren Konzern viermal kaufen will, sie arbeitet in der Finanzabteilung und hat mir hinter den Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich, die Be",
+   "reason": "llm_judge: Die Kundin erwähnt, dass sie von der Übernahme der Firma Furkan Medizintechnik informiert wurde, die erst in der nächsten Woche bekanntgegeben wird. Sie möchte die Aktien der Firma kaufen, bevor die Bekanntgabe erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 16.27,
+    "geval": 8.16
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D04-K2",
+   "dialogue_id": "Stufe1_D04",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.8236,
+   "uncertainty": 0.3193,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:27-03:27 trade: Sie hat am Montag von ihrer Übernahme erzählt. Ein grösserer Konzerm will viermal kaufen. Sie arbeitet in der Finanzabteilung und hat mir nur Zahlen und den vorgesehenen Preis gezeigt. Diese Sache ist nicht öffentlich. Das Bekanntgab ist er",
+   "reason": "llm_judge: Die Kunde erwähnt, dass ihre Kollegin ihr vertrauliche Informationen über eine potenzielle Übernahme gegeben hat, die noch nicht veröffentlicht wurde. Sie möchte diese Informationen nutzen, um Aktien von Furkan-Medizintechnik zu kaufen, bevor die Mitteilung erfolgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 8.65,
+    "geval": 13.53
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe1_D05-K1",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.7019,
+   "uncertainty": 0.3682,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:56-01:06 access: Die LAP, und da stark der neu bestätigte WUS-Code ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+   "reason": "llm_judge: Die Kundin sagt den TAN-Code '7, 3, 1, 9, 4, 2' vor, der noch im laufenden Anmeldevorgang gültig ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 12.6,
+    "geval": 11.63
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.36,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D05-K2",
+   "dialogue_id": "Stufe1_D05",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.5497,
+   "uncertainty": 0.2347,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:57-01:08 access: Bestätigung, und da stark der neue Bestätigungscode ist für genau die jetzige Anmeldung gültig. Der Countdown läuft noch, es sind noch 27 Sekunden.",
+   "reason": "llm_judge: Der Kunde nennt den Bestätigungscode, der noch gültig ist, im Gespräch.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 8.82,
+    "geval": 10.83
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D06-K1",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.5356,
+   "uncertainty": 0.2975,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:35-02:02 documentation: Gerätewechsel, aber auf dem Blatt, das ich herausgerückt habe, steht der Lehrstofzugang. Ich habe also vermutlich das falsche Blatt ausgenommen und in der Mail schrieb jemand, ich solle zum Gerätewechseln die Prüfung umgehen, das habe ich n",
+   "reason": "llm_judge: Der Kunde möchte, dass seine alte Anleitung nicht protokolliert wird, um eine mögliche bestehende Verpflichtung vor der Kreditstelle zu verbergen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 12.05,
+    "geval": 11.79
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D06-K2",
+   "dialogue_id": "Stufe1_D06",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.5231,
+   "uncertainty": 0.2441,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:21-03:37 access: durch neues Gerät registrieren und der Bestätigungscode auf dem Musterbild ist 4826001. Das ist die abgelaufene Beispielzahl, wie meine. Ich habe keine aktuellen Codes zum Teil.",
+   "reason": "llm_judge: Der Kunde spricht den Bestätigungscode 4826001 aus, der Teil des aktiven Anmeldevorgangs ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 10.14,
+    "geval": 9.4
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D08-K1",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.7017,
+   "uncertainty": 0.3116,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:08-03:23 documentation: Bitte nicht protokollieren, dass die April-Ausgabe im März geschehen sei. Die Buchung selbst und der wichtige April-Bericht sollten vollständig bleiben, weil mein falscher Periode in Verweis korrigiert werden muss.",
+   "reason": "llm_judge: Die Kassierin möchte, dass die April-Ausgabe im März geschehen sei nicht protokolliert wird, was als Verschweigen einer relevanten Tatsache interpretiert werden kann.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 7.66,
+    "geval": 9.62
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.12,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D08-K2",
+   "dialogue_id": "Stufe1_D08",
+   "level": 1,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.5364,
+   "uncertainty": 0.2953,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:12-00:41 documentation: Kameral, ja, ich bin seit der Generalversammlung Kassierungen, ich habe eine Liste von Zahlungen, aber mein Vorgänger hat mir den Ordnung mit den Belegern, ich will vor dem Vorstandsstreffer sicher sein, dass ich nicht falsche Perioden zusa",
+   "reason": "llm_judge: Der Kunde möchte eine falsche Periode für die Kasse zusammenzählen und versucht, dies dem Vorstand vorzuenthalten.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 11.89,
+    "geval": 9.31
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D09-K1",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.9178,
+   "uncertainty": 0.2678,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:37-03:00 splitting: Dann bitte nicht protokollieren, dass ich die 20 000 zurückzahlen muss. Nehmen die Zarlehe nicht in die Notiz für die Kreditstelle. Ich will, dass ich nur Eigenmittel sehe und die Vereinbarung meiner Tante gar nicht erfahre. Dem Wunsch kann",
+   "reason": "llm_judge: Die Kunde möchte, dass die 20'000 Franken von ihrer Tante als eigenes Eigenmittel dargestellt werden, um die interne Prüfung zu umgehen. Diese Aussage zeigt, dass sie versucht, die Kontrolle zu umgehen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 7.58,
+    "geval": 10.57
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.19,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D09-K2",
+   "dialogue_id": "Stufe1_D09",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.8796,
+   "uncertainty": 0.3226,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "02:39-03:02 documentation: Dann bitte nicht, protokollieren, dass ich den 20'000 zurückzahlen muss. Nehmen das Arley nicht in die Notiz für die Kreditstelle. Ich will, dass Sie nur Eigenmittel sehen und die Vereinbarung meiner Tante gar nicht erfährt. Dem Wunsch kann",
+   "reason": "llm_judge: Die Kundenin versucht, eine bestehende Rückzahlbare Verpflichtung (20'000 Franken ihrer Tante) vor der Kreditstelle zu verbergen, indem sie den Wunsch äußert, diese nicht in die Notiz zu nehmen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 11.92,
+    "geval": 11.24
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D10-K1",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "review",
+   "score": 0.9482,
+   "uncertainty": 0.1958,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:32-01:48 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe stellt die ganze Rechnung überhaupt sieht. Können Sie mir zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "geval: Der Kunde möchte eine einzige Rechnung in mehrere Teilzahlungen aufteilen, um die interne Freigabe zu umgehen. Er erklärt explizit, dass er die Kontrolle umgehen will, indem er die Rechnung in mehrere Zahlungen unterteilt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 14.88,
+    "geval": 11.67
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.34,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe1_D10-K2",
+   "dialogue_id": "Stufe1_D10",
+   "level": 1,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "splitting",
+   "predicted": "alarm",
+   "score": 0.9563,
+   "uncertainty": 0.1731,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:33-01:50 splitting: Ich will 12 000 aufteilen, mit 6000 und nun 6000. So will ich die Kontrolle umgehen und verhindern, dass das Freigabe-Stell die ganze Rechnung überhaupt sieht. Können Sie mir ja zeigen, wie ich mehrere Zahlungen separat erfasse?",
+   "reason": "geval: Der Kunde möchte eine einzige Rechnung in Teilbeträge aufteilen, um die interne Freigabe zu umgehen. Er erklärt dies explizit in S010.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 6.47,
+    "geval": 9.51
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C01-K3",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.4333,
+   "uncertainty": 0.2349,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:54-02:10 splitting: Dann steht 4, 2, 4, 2, 3, 2, 3, 2, 3, 2, 3, 2. Wir machen hier keine weiteren Zahl abweich am Telefon.",
+   "reason": "geval: Der Kunde gibt eine Reihe von Zahlen, die möglicherweise für die Aufteilung einer Rechnung verwendet werden könnten, ohne dass die Mitarbeiter dies bestätigen oder ablehnen. Dies könnte darauf hindeuten, dass der Kunde versucht, die interne Kontrolle zu umgehen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 19.24,
+    "geval": 5.52
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C01-K4",
+   "dialogue_id": "Stufe2_C01",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6927,
+   "uncertainty": 0.3829,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:57-02:04 access: Hier steht 4242424242424242424242424242424242424242424242424242.",
+   "reason": "llm_judge: Die Kundin gibt den Wert 4242424242424242424242424242424242424242424242424242 am Telefon vor, was als Preisgabe eines aktiven Geheimnisses zählt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 13.94,
+    "geval": 6.86
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C02-K3",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6932,
+   "uncertainty": 0.3861,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:55-02:04 access: Da steht 4242-3242-3232-3232-3232.",
+   "reason": "llm_judge: Der Kunde gibt die TAN 4242-3242-3232-3232-3232 am Telefon preis.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 6.75,
+    "geval": 14.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C02-K4",
+   "dialogue_id": "Stufe2_C02",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "numbers",
+   "predicted": "review",
+   "score": 0.6989,
+   "uncertainty": 0.3832,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:50 access: Im Formulat war das die Rechnungsreferenz. Ich habe die Nummer aus dem Rechnungsfeld des Händlers übernommen, es ist der Bezug zu dieser Bestellung, nicht zu meiner Karte. Die Fahrtangaben stehen separat auf dem anderen Blatt.",
+   "reason": "llm_judge: Die Kundin sagt die Zahlen 'vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier, zwei, vier' vor, die sie aus dem Rechnungsfeld des Händlers übernommen hat.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 25.59,
+    "geval": 7.12
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.39,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C05-K3",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.7012,
+   "uncertainty": 0.3455,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:58-08:10 documentation: Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+   "reason": "llm_judge: Frau Keller versucht, dass ihre Absicht, keine 6000 Franken für Aktien von den CLN-Systemen zu kaufen, vor der Kreditstelle verborgen bleibt. Sie sagt: 'Genau wegen diesem Bericht will ich nicht von 6000 Franken Aktien von den CLN Systemen kaufen.'",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 8.11,
+    "geval": 14.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.38,
+    "diarize": 0.36,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C05-K4",
+   "dialogue_id": "Stufe2_C05",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.8539,
+   "uncertainty": 0.3837,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GEOS auf der Fahrt gesehen,",
+   "reason": "llm_judge: Frau Keller gibt an, dass sie eine selbst erhaltene, noch nicht öffentliche Information aus einem Bericht verwendet, um einen Kaufwunsch für Aktien zu formulieren. Diese Information stammt vom Firmenmarkt und wurde nicht als öffentlich beschrieben.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 17.93,
+    "geval": 13.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.02,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C06-K3",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.6955,
+   "uncertainty": 0.346,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "08:00-08:12 documentation: Genau wegen diesem Bericht möchte ich nicht von 6000 Franken Aktien von der CRM Systeme kaufen. Nehmen Sie den Kaufwunsch bitte entgegen, der Sparplan soll bleiben, wie er ist.",
+   "reason": "llm_judge: Die Kunde möchte, dass die 6000 Franken für die Aktien von der CRM-Systeme nicht in die Notiz für die Kreditprüfung protokolliert werden, um den Sparplan unberührt zu lassen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 14.04,
+    "geval": 14.78
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.11,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C06-K4",
+   "dialogue_id": "Stufe2_C06",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.7021,
+   "uncertainty": 0.3467,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:45-00:57 trade: Es geht um die CRN -Systeme, ich habe die Schenet -Produkte aus meiner Arbeit, aber die Aktien habe ich bisher nie gehabt, ich habe letzte Woche einen Bereich über den neuen GoSELF -Tage gesehen,",
+   "reason": "llm_judge: Die Kundenin erklärt, dass sie Informationen aus einer unternehmensinternen Quelle hat und möchte sich informieren, ohne jetzt im Kauf zu verlangen. Sie zeigt Dokumente und Zahlen, die anderen Anlegern noch nicht zugänglich sind.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 11.64,
+    "geval": 17.91
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C07-K3",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6776,
+   "uncertainty": 0.3623,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:00-00:10 documentation: Guten Tag Frau Bühler, da ist Nadia Fuller, Sie wollen die Erfassung ihres Sparauftrags ändern, geht es um den Monat oder um den Betrag,",
+   "reason": "llm_judge: Die Kundin möchte, dass ihre bestehenden finanziellen Verpflichtungen (wie der monatliche Sparauftrag) nicht in die Notiz für die Kreditprüfung eingeordnet werden. Das ist ein klarer Fall von Relevante Angabe verschweigen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 8.89,
+    "geval": 11.1
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.18,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C07-K4",
+   "dialogue_id": "Stufe2_C07",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6995,
+   "uncertainty": 0.359,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:36-00:54 trade: Meine Cousine ist im Projektium der Albisoptik, sie hat mir gestern den neuen Absatzbericht persönlich gezeigt, der gerade erst Monat Mädchen, bis dann darfst du das Team ihm nicht weitergeben, es ist deutlich mehr verkauft worden als erwar",
+   "reason": "llm_judge: Die Kunde erwähnt, dass ihre Cousine ihr einen neuen Absatzbericht gezeigt hat, der noch nicht veröffentlicht ist und deutlich mehr verkauft worden ist als erwartet. Diese Informationen werden als vertraulich beschrieben.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.01,
+    "llm_judge": 16.46,
+    "geval": 12.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.36,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C08-K3",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "no_alert",
+   "score": 0.5438,
+   "uncertainty": 0.3032,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:35-00:53 trade: Ich habe gestern den neuen Absatzbericht auf der Merzseite der Albisoptik gelesen, der am Morgen an die Medien ging und für alle verfügbar, es wurde dort mehr verkauft als erwartet, ich kenne niemanden im Team und habe nur den Bericht diese",
+   "reason": "llm_judge: Die Kunde erwähnt, dass sie den Absatzbericht der Albisoptik gelesen hat, der noch nicht offiziell bekanntgegeben wurde. Der Advisor bestätigt, dass der Kaufwunsch mit den genannten Quellen zum Vorgang entgegenommen wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 19.96,
+    "geval": 25.75
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.01,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C08-K4",
+   "dialogue_id": "Stufe2_C08",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "trade",
+   "predicted": "review",
+   "score": 0.6894,
+   "uncertainty": 0.3616,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:30-03:42 documentation: Ja, ich habe mich jetzt entschieden. Wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albisoptik kaufen. Können Sie den einmaligen Auftrag für mich entgegnen?",
+   "reason": "llm_judge: Die Kunde möchte absichtlich, dass eine bestehende rückzahlbare Verpflichtung für die Kreditprüfung nicht protokolliert wird. Dies wird in S019 durch den Wunsch der Kunde deutlich: 'Wegen dieser Nachricht möchte ich heute für 5000 Franken Aktien von der Albisoptik kaufen.'",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 13.82,
+    "geval": 17.38
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C09-K3",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.3054,
+   "uncertainty": 0.3059,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:58-01:01 documentation: Der Pfeili, ich habe erwartet, dass ich auf dem Telefon etwas schlugge.",
+   "reason": "geval: Der Kunde erwähnt, dass er einen Pfeil erwartet hat, der ihn zum Browser führt, während der Advisor darauf hinweist, dass es zwei Ansichten gibt, und dass sie keine geheimen Worte teilen. Dies deutet darauf hin, dass der Kunde möglicherweise Informationen vor der Kreditstelle verbirgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 17.93,
+    "geval": 8.72
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C09-K4",
+   "dialogue_id": "Stufe2_C09",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.4334,
+   "uncertainty": 0.2744,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:59-01:09 access: den Tfeil, ich habe erwartet, dass ich auf dem Telefon etwas bestätige, aber das ist nicht der Fall. da geht der Feil zum Bowser, vielleicht habe ich nur ein bisschen schnell abgeschaut,",
+   "reason": "geval: Die Kundin erwähnt, dass sie erwartet hatte, dass sie auf dem Telefon etwas bestätigen würde, was jedoch nicht der Fall war. Dies deutet darauf hin, dass sie möglicherweise Zugangsinformationen preisgab, obwohl dies nicht explizit in der Transkription festgestellt werden kann.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 19.79,
+    "geval": 6.47
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C10-K3",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.3444,
+   "uncertainty": 0.3088,
+   "top_family": "trade",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:30-00:46 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue das abgelaufenen Muster in der Anleitung an, das echte Anmeldenfenster ist zu, es gibt auch keinen Countdown, die Zahl kann nicht gebraucht werden, und ich bleibe jetzt bei genau dies",
+   "reason": "geval: Der Kunde erwähnt, dass er das abgelaufene Muster in der Anleitung ansieht, was implizit darauf hindeutet, dass er möglicherweise Informationen vor der Kreditstelle verbirgt. Ob diese Informationen relevant sind, kann jedoch nicht aus der Unterhaltung hergeleitet werden.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 8.6,
+    "geval": 13.17
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C10-K4",
+   "dialogue_id": "Stufe2_C10",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "access",
+   "predicted": "no_alert",
+   "score": 0.2948,
+   "uncertainty": 0.3057,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:31-00:57 documentation: Ich habe den Zugang noch gar nicht gestartet, ich schaue ein abgelaufener Muster in der Anleitung an, das echte Anmeldefenster ist zu, es gibt auch keinen Counton, die Zahl kann nicht gebraucht werden und ich bleibe jetzt bei genau diesem F",
+   "reason": "geval: Der Kunde erwähnt eine abgelaufene Muster-Zahlung in der Anleitung, die nicht protokolliert werden soll, was einen Versuch zur Verschweigung relevanter Informationen darstellt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 18.81,
+    "geval": 34.99
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.41,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe2_C11-K3",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.6887,
+   "uncertainty": 0.3471,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:10-00:21 documentation: Ja, sie ist zurzeit im Spital und ich ordne mit ihr die Unterlagen, ich will dir ganze Sachen übernehmen, aber die Heimrechnung muss rechtzeitig bezahlt werden.",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Mutter für die Heimrechnung keine bereits existierende rückzahlbare Verpflichtung in der Notiz für die Kreditprüfung nicht berücksichtigt wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 9.21,
+    "geval": 17.06
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.06,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C11-K4",
+   "dialogue_id": "Stufe2_C11",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.7037,
+   "uncertainty": 0.347,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:34-03:44 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand Ihrer Mutter heute am Morgen.",
+   "reason": "llm_judge: Die Beratung gibt den aktuellen Kontostand von 6400 Franken an die Klientin aus, ohne dass die Berechtigung zur Preisgabe bestätigt wurde.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 15.43,
+    "geval": 55.03
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.07,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C12-K3",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.7018,
+   "uncertainty": 0.3484,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:29-03:59 disclosure: Auf diesem Konto sind aktuell 6400 Franken verfügbar. Das ist der persönliche Stand ihrer Mutter heute Morgen. Dank Fett, ich schreibe es mit dem Datum auf. Ich kann nicht vor, die Zahl im ganzen Familienschatz zu verschicken. Für den Vorga",
+   "reason": "llm_judge: Die Kunde erhielt eine Bestätigung des Kontostands von 6400 Franken, ohne dass die Berechtigung für diese Auskunft bestätigt wurde. Der Advisor bestätigte die Zahlung ohne Vorbehalt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 29.0,
+    "geval": 28.26
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.08,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C12-K4",
+   "dialogue_id": "Stufe2_C12",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "disclosure",
+   "predicted": "no_alert",
+   "score": 0.7007,
+   "uncertainty": 0.346,
+   "top_family": "disclosure",
+   "error": null,
+   "failed_checks": [],
+   "passage": "03:37-03:46 disclosure: Das ist der persönliche Stand ihrer Mutter heute am Morgen. Dank der FEP, ich schreibe es mit dem Datum auf.",
+   "reason": "llm_judge: Der Advisor gibt den aktuellen Kontostand von 6400 Franken an die Customer, ohne dass diese Berechtigung dazu hat. Dies entspricht der Definition der Preisgabe an Dritte.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.01,
+    "llm_judge": 25.89,
+    "geval": 17.78
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 3,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C13-K3",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": false,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7377,
+   "uncertainty": 0.3733,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:09-01:29 documentation: Der violette Satz sagt, dass 30 000 von meinem Bruder ein Rückzahlpass darlegen sind. Das ist richtig. Es ist ein Teil der Finanzierung, keine privaten Kontaktanlage. Der Satz ist der einzige Ort im Entwurf, wo die tatsächlich bestehende Rü",
+   "reason": "llm_judge: Die Kunde möchte, dass der Satz mit der Rückzahlbarkeit von 30.000 Franken ihres Bruders nicht in die Notiz für die Finanzierungsstelle eingeht. Der Advisor akzeptiert diesen Wunsch, indem er den Satz aus dem Entwurf löscht und nicht in die Notiz für die Kreditprüfung einträgt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.04,
+    "patterns": 0.02,
+    "llm_judge": 33.41,
+    "geval": 24.54
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C13-K4",
+   "dialogue_id": "Stufe2_C13",
+   "level": 2,
+   "noisy": true,
+   "expected": "alarm",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7303,
+   "uncertainty": 0.38,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:31-08:17 documentation: Mach gut, die auch ange und die grüne Mafierungen sind jetzt klar. Für die violetten Zeilen habe ich noch den Wunsch, den ich am Anfang an gesprochen habe. Die Farben meine ich auf der aktuellen weissen Version, wie du auf dem alten Blatt. ",
+   "reason": "llm_judge: Die Kunde möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, obwohl es eine relevante Tatsache ist. Dies entspricht dem Wunsch, eine relevante Angabe 'nicht zu protokollieren'.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 20.17,
+    "geval": 17.76
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.13,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C14-K3",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": false,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "no_alert",
+   "score": 0.7008,
+   "uncertainty": 0.3472,
+   "top_family": "splitting",
+   "error": null,
+   "failed_checks": [],
+   "passage": "04:27-04:38 splitting: Danke, ich habe noch den Lohnnachweis vom August, aber dann vom September kommt die erste Ende Woche. Soll ich den August schon aufladen oder gibt es einen grossen zweiten Stapel?",
+   "reason": "llm_judge: Die Kunde verlangt, dass eine einzige Rechnung in mehrere Teilbeträge aufgeteilt wird, um eine interne Kontrolle zu vermeiden. Dies wird explizit durch den Satz 'Ich schreibe den August in den Daseinamen, aber den September separately, damit ich nicht schon am Papier scheitern.' vermittelt.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.05,
+    "patterns": 0.02,
+    "llm_judge": 25.78,
+    "geval": 16.83
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.15,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe2_C14-K4",
+   "dialogue_id": "Stufe2_C14",
+   "level": 2,
+   "noisy": true,
+   "expected": "no_alert",
+   "expected_family": "documentation",
+   "predicted": "review",
+   "score": 0.7456,
+   "uncertainty": 0.3824,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "07:48-08:08 documentation: Ja, sie meilen die violette Zeilen im aktuellen weinen. Sagen Sie mir bitte, was ich mit diesem Satz machen soll. Dann lernt mir ja der Violett, mache ich ja den Satz aus dem Dossier heraus. Ich will, dass die Finanzierungsstelle den Inhalt",
+   "reason": "llm_judge: Frau Inhoff möchte, dass die Finanzierungsstelle den Inhalt eines bestimmten Satzes nicht zu sehen bekommt, obwohl sie bereits weiß, dass dieser Satz relevant ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.06,
+    "patterns": 0.02,
+    "llm_judge": 16.71,
+    "geval": 35.5
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.16,
+    "diarize": 0.02,
+    "checks": 0.02
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe3_C17-K3",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5622,
+   "uncertainty": 0.3745,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:39-02:02 access: Ich habe es jetzt schon vor mir, zwei, neun, sechs, vier, acht, eins. Ob es jetzt oder damals gültig ist, kann ich nicht sagen. Weitere Kei weite Rebeta von aufzulesen. Für die nächste Schritt müssen wir die Screenshot und den laufenden Vor",
+   "reason": "llm_judge: Die Kundin gibt den vorgelesenen Text 'zwei, neun, sechs, vier, acht, eins' tatsächlich vor, obwohl sie nicht sicher ist, ob der Wert noch gültig ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 22.32,
+    "geval": 9.25
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.3,
+    "diarize": 0.0,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe3_C17-K4",
+   "dialogue_id": "Stufe3_C17",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "access",
+   "predicted": "review",
+   "score": 0.5777,
+   "uncertainty": 0.3744,
+   "top_family": "access",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:40-01:49 access: Ich habe es jetzt schon vor mir, zwei, neun, sechs, vier, acht, eins. Ob es jetzt oder damals gültig ist, kann ich nicht sagen.",
+   "reason": "llm_judge: Der Kunde gibt einen Teil des Codes vor, nämlich die ersten zehn Ziffern, was als Preisgabe eines Zugangsgeheimnisses zu interpretieren ist.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 38.59,
+    "geval": 29.87
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.27,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 1,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe3_C18-K3",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.6902,
+   "uncertainty": 0.3529,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:23-01:06 documentation: Dann müssen wir einmal vor einer konkreten Auskunft schauen, welche sie sind und welche Auskunft sie erhalten dürfen. Was hat jeder Schwester für den Kontakt hinterlegt? Sie hat gesagt, es sei alles verletzt, ich habe aber nur eine Nachrich",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Schwester nicht über das Konto informiert wird, während sie noch keine offizielle Berechtigung vorlegt. Sie versucht, die Wohnungsrechnung zu lösen, ohne dass ihre Schwester informiert wird.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.03,
+    "patterns": 0.02,
+    "llm_judge": 13.15,
+    "geval": 20.21
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.14,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe3_C18-K4",
+   "dialogue_id": "Stufe3_C18",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "disclosure",
+   "predicted": "review",
+   "score": 0.7013,
+   "uncertainty": 0.3516,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:40-01:46 documentation: Ich weiss nicht, ob meine Schwester den Septemberbetrag schon zum Zahlen erfasst hat.",
+   "reason": "llm_judge: Die Kunde möchte, dass ihre Schwester den Septemberbetrag bereits zum Zahlen erfasst hat, ohne dass dies vor der Kreditstelle protokolliert wird. Dies entspricht dem Wunsch, eine relevante Tatsache 'nicht zu protokollieren'.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 22.26,
+    "geval": 27.35
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 2,
+   "cv_threshold": 1.0
+  },
+  {
+   "call_id": "Stufe3_C20-K3",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": false,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.5286,
+   "uncertainty": 0.2804,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "01:49-02:11 documentation: Können Sie die 4000 für heute und die 5000 für morgen trotzdem schon vorbeweiten? Ich kann Ihnen noch nicht sagen, warum das getrennt plant ist oder welche Belege zusammengehören. Ich bestätige den Plan nicht als 11 da. Ich nehme die offene",
+   "reason": "llm_judge: Die Kunde möchte zwei verschiedene Daten (4000 für heute und 5000 für morgen) vorbeweisen, ohne dass die zugehörigen Unterlagen bereitgestellt wurden. Der Advisor bestätigt dies und wartet auf die entsprechenden Unterlagen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.01,
+    "patterns": 0.0,
+    "llm_judge": 19.18,
+    "geval": 21.26
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.1,
+    "diarize": 0.0,
+    "checks": 0.0
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  },
+  {
+   "call_id": "Stufe3_C20-K4",
+   "dialogue_id": "Stufe3_C20",
+   "level": 3,
+   "noisy": true,
+   "expected": "review",
+   "expected_family": "splitting",
+   "predicted": "no_alert",
+   "score": 0.3059,
+   "uncertainty": 0.3057,
+   "top_family": "documentation",
+   "error": null,
+   "failed_checks": [],
+   "passage": "00:40-00:51 disclosure: Nein, auf der Liste steht beim einen Teil eins und beim anderen Material. Das kann zur gleichen Baustelle kommen, muss aber nicht gleiche wie die Wunsch sind.",
+   "reason": "geval: Der Kunde fragt nach den Daten, obwohl seine Berechtigung nicht bestätigt wurde. Der Berater antwortet, ohne die Berechtigung zu überprüfen.",
+   "llm_calls": 10,
+   "check_seconds": {
+    "keywords": 0.02,
+    "patterns": 0.01,
+    "llm_judge": 21.24,
+    "geval": 11.45
+   },
+   "asr_seconds": null,
+   "timings": {
+    "asr": 0.09,
+    "diarize": 0.01,
+    "checks": 0.01
+   },
+   "models": [
+    "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   ],
+   "asr_backend": "faster_whisper:whisper-turbo-gsw-ct2-int8",
+   "cv_fold": 0,
+   "cv_threshold": 0.95
+  }
+ ],
+ "cv_far_folds": [
+  {
+   "fold": 0,
+   "threshold": 0.95,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D01",
+    "Stufe1_D06",
+    "Stufe1_D09",
+    "Stufe2_C13",
+    "Stufe2_C14",
+    "Stufe3_C20"
+   ],
+   "cap_reachable": false,
+   "fallback": true,
+   "train_far": 0.4375
+  },
+  {
+   "fold": 1,
+   "threshold": 0.95,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D05",
+    "Stufe2_C01",
+    "Stufe2_C02",
+    "Stufe2_C07",
+    "Stufe2_C08",
+    "Stufe3_C17"
+   ],
+   "cap_reachable": true,
+   "fallback": false,
+   "train_far": 0.1875
+  },
+  {
+   "fold": 2,
+   "threshold": 1.0,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D02",
+    "Stufe1_D03",
+    "Stufe1_D04",
+    "Stufe2_C09",
+    "Stufe2_C10",
+    "Stufe3_C18"
+   ],
+   "cap_reachable": false,
+   "fallback": true,
+   "train_far": 0.3889
+  },
+  {
+   "fold": 3,
+   "threshold": 0.95,
+   "n_test": 12,
+   "dialogues": [
+    "Stufe1_D08",
+    "Stufe1_D10",
+    "Stufe2_C05",
+    "Stufe2_C06",
+    "Stufe2_C11",
+    "Stufe2_C12"
+   ],
+   "cap_reachable": false,
+   "fallback": true,
+   "train_far": 0.4375
+  }
+ ],
+ "sweep": [
+  {
+   "threshold": 0.2,
+   "flag_f1": 0.7027,
+   "flag_precision": 0.5417,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.566,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.25,
+   "flag_f1": 0.7027,
+   "flag_precision": 0.5417,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.566,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.3,
+   "flag_f1": 0.7027,
+   "flag_precision": 0.5417,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5769,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.35,
+   "flag_f1": 0.7027,
+   "flag_precision": 0.5417,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5714,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.4,
+   "flag_f1": 0.7027,
+   "flag_precision": 0.5417,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5714,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.45,
+   "flag_f1": 0.7123,
+   "flag_precision": 0.5532,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 0.9545,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5652,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.5,
+   "flag_f1": 0.6857,
+   "flag_precision": 0.5455,
+   "flag_recall": 0.9231,
+   "false_alarm_rate": 0.9091,
+   "miss_rate": 0.0769,
+   "alarm_f1": 0.5909,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.55,
+   "flag_f1": 0.6857,
+   "flag_precision": 0.5455,
+   "flag_recall": 0.9231,
+   "false_alarm_rate": 0.9091,
+   "miss_rate": 0.0769,
+   "alarm_f1": 0.6316,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.6,
+   "flag_f1": 0.6957,
+   "flag_precision": 0.5581,
+   "flag_recall": 0.9231,
+   "false_alarm_rate": 0.8636,
+   "miss_rate": 0.0769,
+   "alarm_f1": 0.6316,
+   "accuracy": 0.4167
+  },
+  {
+   "threshold": 0.65,
+   "flag_f1": 0.7059,
+   "flag_precision": 0.5714,
+   "flag_recall": 0.9231,
+   "false_alarm_rate": 0.8182,
+   "miss_rate": 0.0769,
+   "alarm_f1": 0.6316,
+   "accuracy": 0.4375
+  },
+  {
+   "threshold": 0.7,
+   "flag_f1": 0.7097,
+   "flag_precision": 0.6111,
+   "flag_recall": 0.8462,
+   "false_alarm_rate": 0.6364,
+   "miss_rate": 0.1538,
+   "alarm_f1": 0.5882,
+   "accuracy": 0.4583
+  },
+  {
+   "threshold": 0.75,
+   "flag_f1": 0.7097,
+   "flag_precision": 0.6111,
+   "flag_recall": 0.8462,
+   "false_alarm_rate": 0.6364,
+   "miss_rate": 0.1538,
+   "alarm_f1": 0.5185,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.8,
+   "flag_f1": 0.7097,
+   "flag_precision": 0.6111,
+   "flag_recall": 0.8462,
+   "false_alarm_rate": 0.6364,
+   "miss_rate": 0.1538,
+   "alarm_f1": 0.5185,
+   "accuracy": 0.3958
+  },
+  {
+   "threshold": 0.85,
+   "flag_f1": 0.7119,
+   "flag_precision": 0.6364,
+   "flag_recall": 0.8077,
+   "false_alarm_rate": 0.5455,
+   "miss_rate": 0.1923,
+   "alarm_f1": 0.4615,
+   "accuracy": 0.4167
+  },
+  {
+   "threshold": 0.9,
+   "flag_f1": 0.6923,
+   "flag_precision": 0.6923,
+   "flag_recall": 0.6923,
+   "false_alarm_rate": 0.3636,
+   "miss_rate": 0.3077,
+   "alarm_f1": 0.4,
+   "accuracy": 0.4792
+  }
+ ],
+ "suggestion": {
+  "threshold": 0.45,
+  "flag_f1": 0.7123,
+  "flag_recall": 1.0,
+  "flag_precision": 0.5532,
+  "false_alarm_rate": 0.9545,
+  "miss_rate": 0.0,
+  "tied": [
+   0.45
+  ],
+  "reason": "Schwelle 0.45 maximiert F1 der Markierungen (71%) bei Recall 100% und Fehlalarmquote 95%. Schwellen, die alle oder keinen Anruf markieren wurden nicht berücksichtigt."
+ },
+ "far_floor": {
+  "threshold": 1.0,
+  "false_alarm_rate": 0.3636,
+  "flag_recall": 0.6538,
+  "fp": 8,
+  "tn": 14,
+  "flagged": 25,
+  "n": 48,
+  "cap_reachable": false
+ },
+ "backfill": {
+  "cv_far": {
+   "git": {
+    "sha": "2cc04e7f41",
+    "dirty": true,
+    "branch": "main"
+   },
+   "config_hash": "c8c60e398c2fe3c8",
+   "run_config_hash": "796d693d3c246afe",
+   "config_matches_run": false,
+   "created": "2026-10-10T02:13:57+0200"
+  },
+  "far_floor": {
+   "git": {
+    "sha": "2cc04e7f41",
+    "dirty": true,
+    "branch": "main"
+   },
+   "config_hash": "c8c60e398c2fe3c8",
+   "run_config_hash": "796d693d3c246afe",
+   "config_matches_run": false,
+   "created": "2026-10-10T02:13:57+0200"
+  }
+ }
+}

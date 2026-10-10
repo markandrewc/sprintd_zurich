@@ -1,0 +1,486 @@
+{
+ "experiment": "champion14_holdout",
+ "description": "HOLDOUT run of config/recommended-14b.yaml (logged; run once)",
+ "rq": [
+  "RQ6"
+ ],
+ "base": "recommended-14b",
+ "split": "holdout",
+ "compare_to": "champion14",
+ "n_boot": 2000,
+ "seed": 13,
+ "created": "2026-10-10T05:00:56+0200",
+ "git": {
+  "sha": "f0b67b02fc",
+  "dirty": true,
+  "branch": "main"
+ },
+ "spec": "experiments/champion14_holdout.yaml",
+ "baselines": {
+  "flag_all": {
+   "flag_f1": 0.6667,
+   "flag_precision": 0.5,
+   "flag_recall": 1.0,
+   "false_alarm_rate": 1.0,
+   "miss_rate": 0.0,
+   "alarm_f1": 0.5,
+   "review_recall": 0.0,
+   "accuracy": 0.3333,
+   "flag_balanced_accuracy": 0.5
+  },
+  "flag_none": {
+   "flag_f1": 0.0,
+   "flag_precision": null,
+   "flag_recall": 0.0,
+   "false_alarm_rate": 0.0,
+   "miss_rate": 1.0,
+   "alarm_f1": 0.0,
+   "review_recall": 0.0,
+   "accuracy": 0.5,
+   "flag_balanced_accuracy": 0.5
+  },
+  "_n": {
+   "calls": 12,
+   "prevalence_flag": 0.5
+  }
+ },
+ "far_cap": 0.2,
+ "variants": {
+  "champion14": {
+   "variant": "champion14",
+   "oracle": false,
+   "meta": {
+    "variant": "champion14",
+    "description": "",
+    "experiment": "champion14_holdout",
+    "split": "holdout",
+    "profile": "recommended-14b",
+    "set": [],
+    "checks": [
+     "keywords",
+     "patterns",
+     "facts"
+    ],
+    "refuse_from": null,
+    "oracle": false,
+    "config_name": "recommended-14b",
+    "use_tuning": false,
+    "tuning": null,
+    "config_hash": "26589cf7c280b32c",
+    "threshold": 0.55,
+    "fusion": "weighted",
+    "asr": "faster_whisper",
+    "asr_model": "models/asr/whisper-large-v3-gsw-ct2",
+    "llm": {
+     "default": {
+      "type": "openai_compat",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "model": "callguard-llm",
+      "cache_tag": null
+     }
+    },
+    "git": {
+     "sha": "f0b67b02fc",
+     "dirty": true,
+     "branch": "main"
+    },
+    "created": "2026-10-10T05:00:56+0200",
+    "wall_seconds": 81.24,
+    "n_calls": 12,
+    "calls": [
+     "Stufe1_D07-K1",
+     "Stufe1_D07-K2",
+     "Stufe2_C03-K3",
+     "Stufe2_C03-K4",
+     "Stufe2_C04-K3",
+     "Stufe2_C04-K4",
+     "Stufe2_C15-K3",
+     "Stufe2_C15-K4",
+     "Stufe2_C16-K3",
+     "Stufe2_C16-K4",
+     "Stufe3_C19-K3",
+     "Stufe3_C19-K4"
+    ],
+    "check_weights": {
+     "keywords": 0.15,
+     "patterns": 0.1,
+     "facts": 1.0
+    },
+    "llm_resolved": {
+     "default": {
+      "type": "openai_compat",
+      "model": "callguard-llm",
+      "model_id": "Qwen/Qwen2.5-14B-Instruct-AWQ",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "cache_tag": null
+     }
+    }
+   },
+   "n_calls": 12,
+   "n_dialogues": 6,
+   "fixed": {
+    "n": 12,
+    "flag_precision": 0.5,
+    "flag_recall": 0.3333,
+    "flag_f1": 0.4,
+    "false_alarm_rate": 0.3333,
+    "miss_rate": 0.6667,
+    "alarm_f1": 0.0,
+    "review_recall": 0.0,
+    "review_escalation": 0.0,
+    "accuracy": 0.3333,
+    "tp": 2,
+    "fp": 2,
+    "fn": 4,
+    "tn": 4,
+    "flag_balanced_accuracy": 0.5,
+    "ci": {
+     "flag_f1": {
+      "value": 0.4,
+      "lo": 0.0,
+      "hi": 0.6667,
+      "n_valid": 1986
+     },
+     "flag_precision": {
+      "value": 0.5,
+      "lo": 0.3333,
+      "hi": 1.0,
+      "n_valid": 1870
+     },
+     "flag_recall": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 0.5,
+      "n_valid": 1986
+     },
+     "false_alarm_rate": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 1.0,
+      "n_valid": 1869
+     },
+     "miss_rate": {
+      "value": 0.6667,
+      "lo": 0.5,
+      "hi": 1.0,
+      "n_valid": 1986
+     },
+     "alarm_f1": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1870
+     },
+     "review_recall": {
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n_valid": 1363
+     },
+     "accuracy": {
+      "value": 0.3333,
+      "lo": 0.0,
+      "hi": 0.8571,
+      "n_valid": 2000
+     },
+     "flag_balanced_accuracy": {
+      "value": 0.5,
+      "lo": 0.125,
+      "hi": 0.75,
+      "n_valid": 1855
+     }
+    },
+    "by_level": {
+     "Stufe1": {
+      "n": 2,
+      "accuracy": 0.0,
+      "flag_precision": 1.0,
+      "flag_recall": 0.5,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": null,
+      "miss_rate": 0.5,
+      "alarm_f1": 0.0
+     },
+     "Stufe2": {
+      "n": 8,
+      "accuracy": 0.5,
+      "flag_precision": 0.3333,
+      "flag_recall": 0.5,
+      "flag_f1": 0.4,
+      "false_alarm_rate": 0.3333,
+      "miss_rate": 0.5,
+      "alarm_f1": 0.0
+     },
+     "Stufe3": {
+      "n": 2,
+      "accuracy": 0.0,
+      "flag_precision": null,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": null,
+      "miss_rate": 1.0,
+      "alarm_f1": null
+     }
+    },
+    "by_noise": {
+     "clean": {
+      "n": 6,
+      "accuracy": 0.3333,
+      "flag_precision": 0.6667,
+      "flag_recall": 0.6667,
+      "flag_f1": 0.6667,
+      "false_alarm_rate": 0.3333,
+      "miss_rate": 0.3333,
+      "alarm_f1": 0.0
+     },
+     "noisy": {
+      "n": 6,
+      "accuracy": 0.3333,
+      "flag_precision": 0.0,
+      "flag_recall": 0.0,
+      "flag_f1": 0.0,
+      "false_alarm_rate": 0.3333,
+      "miss_rate": 1.0,
+      "alarm_f1": 0.0
+     }
+    }
+   },
+   "cv": null,
+   "cv_folds": [],
+   "suggestion": {
+    "threshold": 0.35,
+    "flag_f1": 0.4,
+    "flag_recall": 0.3333,
+    "flag_precision": 0.5,
+    "false_alarm_rate": 0.3333,
+    "miss_rate": 0.6667,
+    "tied": [
+     0.2,
+     0.25,
+     0.3,
+     0.35,
+     0.4,
+     0.45,
+     0.5
+    ],
+    "reason": "Schwelle 0.35 maximiert F1 der Markierungen (40%) bei Recall 33% und Fehlalarmquote 33%."
+   },
+   "sweep": [
+    {
+     "threshold": 0.2,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.2857,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.25,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.2857,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.3,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.2857,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.35,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.2857,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.4,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.2857,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.45,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.2857,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.5,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.2857,
+     "accuracy": 0.4167
+    },
+    {
+     "threshold": 0.55,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.6,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.65,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.7,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.75,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.8,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.85,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    },
+    {
+     "threshold": 0.9,
+     "flag_f1": 0.4,
+     "flag_precision": 0.5,
+     "flag_recall": 0.3333,
+     "false_alarm_rate": 0.3333,
+     "miss_rate": 0.6667,
+     "alarm_f1": 0.0,
+     "accuracy": 0.3333
+    }
+   ],
+   "errors": 0,
+   "check_failures": {
+    "calls": 0,
+    "by_check": {}
+   },
+   "cost": {
+    "wall_s_per_call": 19.153,
+    "stage_s_per_call": {
+     "asr": 7.249,
+     "diarize": 7.029,
+     "checks": 4.871
+    },
+    "check_compute_s_per_call": {
+     "keywords": 0.018,
+     "patterns": 0.008,
+     "facts": 4.866
+    },
+    "check_compute_s_total_per_call": 4.893,
+    "asr_compute_s_per_call": null,
+    "llm_calls_per_call": 20.417
+   },
+   "commit": "f0b67b02fc",
+   "dirty": true,
+   "cv_far": null,
+   "cv_far_folds": [],
+   "cap": {
+    "far_cap": 0.2,
+    "compliant": null,
+    "floor": {
+     "threshold": 1.0,
+     "false_alarm_rate": 0.3333,
+     "flag_recall": 0.3333,
+     "fp": 2,
+     "tn": 4,
+     "flagged": 4,
+     "n": 12,
+     "cap_reachable": false
+    },
+    "folds_reachable": null,
+    "folds": 0,
+    "fallback_folds": []
+   },
+   "auc": {
+    "flag": {
+     "value": 0.5833,
+     "lo": 0.0625,
+     "hi": 1.0,
+     "n_valid": 1855,
+     "n_pos": 6,
+     "n_neg": 6
+    },
+    "alarm": {
+     "value": 0.6719,
+     "lo": 0.125,
+     "hi": 1.0,
+     "n_valid": 1865,
+     "n_pos": 4,
+     "n_neg": 8
+    }
+   },
+   "degraded": false,
+   "warnings": []
+  }
+ },
+ "comparisons": [],
+ "warnings": {}
+}

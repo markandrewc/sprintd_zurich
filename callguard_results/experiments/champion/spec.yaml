@@ -1,0 +1,47 @@
+# The frozen Sunday candidate (config/recommended.yaml) on the dev split + robustness re-fusions around it.
+# RQ: all (final numbers for MORNING_REPORT). ~5-8 min on the 4070 (facts with the 7B; ASR + roles cached).
+# The single holdout run uses exactly the `champion` variant: callguard experiment experiments/champion.yaml
+#   --split holdout --variants champion  (logged to runs/holdout_log.jsonl; run ONCE).
+name: champion
+description: Recommended profile (large-v3 MIT + Qwen2.5-7B facts + light keywords/patterns) and its neighbours
+rq: [RQ2, RQ4, RQ5, RQ9]
+base: recommended
+split: dev
+compare_to: champion
+variants:
+  - {name: champion, description: "config/recommended.yaml as is"}
+  - {name: facts_only, refuse_from: champion, checks: [facts], description: "without keywords/patterns in the score"}
+  - {name: t045, refuse_from: champion, set: [fusion.threshold=0.45]}
+  - {name: t065, refuse_from: champion, set: [fusion.threshold=0.65]}
+  - {name: noesc, refuse_from: champion, set: [fusion.max_uncertainty=1.0]}
+  - {name: band025, refuse_from: champion, set: [fusion.review_band=0.25]}
+  - {name: table_v2, set: [checks.facts.policy_table=config/policy_table_v2.yaml], description: "+ access.review_2 (spoken, validity unknown -> review); fact answers cached, only rules re-evaluated"}
+  - {name: para, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.parallel=1], description: "R3: every fact question paraphrased (blind, same meaning), ids/rules identical; parallel=1 only to cap vLLM concurrency (speed-only param)"}
+  - {name: table_v3, set: [checks.facts.policy_table=config/policy_table_v3.yaml], description: "R2: + per-family explicit open-fact review rules (from criteria review_when) + splitting re-check facts; v1 fact answers cached, new facts computed"}
+  # R6 paraphrase ensemble (checks/facts.py paraphrase_tables / unclear_band): average p(yes/no/unclear) over several
+  # wordings of the SAME fact before thresholding; the tuned table's rules decide. Per-question probes are cached.
+  - {name: para2, set: [checks.facts.policy_table=config/policy_table_para2.yaml, checks.facts.parallel=1], description: "R6: second independent blind paraphrase set alone (second fragility datapoint)"}
+  - {name: ens2, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml]", checks.facts.parallel=1], description: "R6: tuned + para wordings averaged"}
+  - {name: ens3, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: tuned + para + para2 wordings averaged"}
+  - {name: ens3_d06, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", checks.facts.decide_at=0.6, checks.facts.parallel=1], description: "R6: ens3, yes/no need p >= 0.6 (else unclear)"}
+  - {name: ens3_band, set: ["checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", "checks.facts.unclear_band=[0.2, 0.6]", checks.facts.parallel=1], description: "R6: ens3, fact value from averaged p(yes) alone: yes >= 0.6, no < 0.2, else unclear"}
+  - {name: ens2b, set: ["checks.facts.paraphrase_tables=[config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: tuned + para2 (ens2 with the other paraphrase set: ensemble sensitivity to swapping one wording)"}
+  - {name: ens_blind, set: [checks.facts.policy_table=config/policy_table_para.yaml, "checks.facts.paraphrase_tables=[config/policy_table_para2.yaml]", checks.facts.parallel=1], description: "R6: para + para2 averaged, no tuned wording (ensemble of untuned wordings)"}
+  # ---- single-pass option (no staging): turbo int8 ASR (no prompt, no conditioning) fits next to vLLM on 12 GB
+  - {name: turbo_clean, set: [asr.model=models/asr/whisper-turbo-gsw-ct2-int8, asr.compute_type=int8_float16, asr.condition_on_previous_text=false, asr.initial_prompt=null], description: "champion checks on the fast turbo ASR (single pass on 12 GB)"}
+  # ---- S1 (ideas_round3): review hardening, shaky "no" -> unclear. decide_at is SYMMETRIC in facts.py (yes also
+  # needs p >= 0.8); fact probes are cached, only the discretisation + rules change.
+  - {name: s1_v1_08, set: [checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: table v1, yes/no need p >= 0.8 (else unclear)"}
+  - {name: s1_v3_08, set: [checks.facts.policy_table=config/policy_table_v3.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: table v3, yes/no need p >= 0.8"}
+  - {name: s1_para_08, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2], description: "S1: paraphrased table (wording-shift bench), yes/no need p >= 0.8"}
+  # ---- S2 (ideas_round3): contrastive few-shot examples in the fact probes, fold-aware. NOT runnable directly:
+  # scripts/research/s2_fewshot.py runs each dev fold k with a few-shot file built from folds != k
+  # (checks.facts.fewshot=runs/research/s2/fewshot_fold<k>.json) and merges the 4 runs here; then --rescore.
+  - {name: fs_tuned, set: [checks.facts.parallel=1], description: "S2: tuned table + per-fold contrast few-shot (built by scripts/research/s2_fewshot.py)"}
+  - {name: fs_para, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.parallel=1], description: "S2: paraphrased table + per-fold contrast few-shot (same examples)"}
+  # ---- design ablations of the champion's facts check (05:30)
+  - {name: qlang_de, set: [checks.facts.question_lang=de], description: "fact questions sent in German instead of English"}
+  - {name: noroles, set: [checks.facts.roles=false], description: "advisor/customer labels hidden from the fact probes"}
+  - {name: prefixmax, set: [checks.facts.prefix_max=true], description: "act facts also on growing prefixes (max)"}
+  # ---- S3 (ideas_round3, simplified): "no silent clearance" re-fusion (fusion/no_silent.py), no LLM calls
+  - {name: s3, refuse_from: champion, set: [fusion.type=no_silent], description: "S3: no_alert with act p(yes) >= 0.3 or a non-negated keyword hit and no exculpatory yes -> review"}

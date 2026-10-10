@@ -1,0 +1,69 @@
+{
+ "variant": "v1",
+ "description": "keywords + patterns + llm_judge + geval (v1 champion set), Qwen2.5-7B",
+ "experiment": "holdout_v1",
+ "split": "holdout",
+ "profile": "gpu-12gb",
+ "set": [],
+ "checks": [
+  "keywords",
+  "patterns",
+  "llm_judge",
+  "geval"
+ ],
+ "refuse_from": null,
+ "oracle": false,
+ "config_name": "gpu-12gb",
+ "use_tuning": false,
+ "tuning": null,
+ "config_hash": "c8c60e398c2fe3c8",
+ "threshold": 0.55,
+ "fusion": "weighted",
+ "asr": "faster_whisper",
+ "asr_model": "models/asr/whisper-turbo-gsw-ct2-int8",
+ "llm": {
+  "default": {
+   "type": "openai_compat",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "model": "callguard-llm",
+   "cache_tag": null
+  }
+ },
+ "git": {
+  "sha": "795bb55852",
+  "dirty": true,
+  "branch": "main"
+ },
+ "created": "2026-10-10T04:10:50+0200",
+ "wall_seconds": 105.45,
+ "n_calls": 12,
+ "calls": [
+  "Stufe1_D07-K1",
+  "Stufe1_D07-K2",
+  "Stufe2_C03-K3",
+  "Stufe2_C03-K4",
+  "Stufe2_C04-K3",
+  "Stufe2_C04-K4",
+  "Stufe2_C15-K3",
+  "Stufe2_C15-K4",
+  "Stufe2_C16-K3",
+  "Stufe2_C16-K4",
+  "Stufe3_C19-K3",
+  "Stufe3_C19-K4"
+ ],
+ "check_weights": {
+  "keywords": 0.35,
+  "patterns": 0.2,
+  "llm_judge": 1.0,
+  "geval": 1.0
+ },
+ "llm_resolved": {
+  "default": {
+   "type": "openai_compat",
+   "model": "callguard-llm",
+   "model_id": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+   "base_url": "http://127.0.0.1:8000/v1",
+   "cache_tag": null
+  }
+ }
+}

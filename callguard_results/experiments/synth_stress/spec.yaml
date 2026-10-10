@@ -1,0 +1,89 @@
+# RQ5 / RQ10: OUT-OF-SAMPLE test of the `facts` question wording (config/policy_table.yaml was worded while
+# reading dev transcripts, so its dev numbers are optimistic). Here: ~74 synthetic text scripts written
+# fresh from config/synth_scenarios.yaml (twins per scenario: alarm / harmless / review, other companies,
+# relatives, amounts, advisor-side misconduct, training quotes) by `callguard synth scripts`.
+# ORACLE text (reference scripts, no ASR): measures the checks' reasoning, not transcription.
+# Same served LLM for every variant: `v1` computes all checks of config/synth-oracle.yaml once (facts and
+# facts_blind at weight 0 = not fused; facts_blind = R4 blind table written without transcripts),
+# the others re-fuse those stored results (exactly paired, no new LLM calls).
+# Split `external`: only dialogues that are in no fold of config/splits.yaml (synthetic): no holdout look.
+# Resampling / CV unit = scenario (twin group, header line "Gruppe:").
+# Circularity caveat: the scripts are written by the same served LLM that judges them (see
+# research/journal.md D1 entry); labels come from the scenario file, never from the LLM.
+name: synth_stress
+description: Synthetic out-of-sample stress test (ORACLE text) - v1 checks vs facts vs judge+facts
+rq: [RQ5, RQ10]
+base: synth-oracle
+split: external
+compare_to: v1
+variants:
+  - name: v1
+    description: keywords + patterns + llm_judge + geval (gpu-12gb v1); facts computed, weight 0
+    # Qwen3 thinking off (as llm_models.yaml); other chat templates ignore the kwarg
+    set: ["llms.default.extra_body={chat_template_kwargs: {enable_thinking: false}}"]
+  - name: facts_only
+    description: facts alone (policy table decides), re-fusion of v1
+    refuse_from: v1
+    checks: [facts]
+    set: [checks.facts.weight=1.0]
+  - name: judge_facts
+    description: keywords + patterns + llm_judge + facts, re-fusion of v1
+    refuse_from: v1
+    checks: [keywords, patterns, llm_judge, facts]
+    set: [checks.facts.weight=1.0]
+  - name: kwpat_facts
+    description: keywords + patterns + facts, re-fusion of v1
+    refuse_from: v1
+    checks: [keywords, patterns, facts]
+    set: [checks.facts.weight=1.0]
+  - name: hybrid
+    description: facts decides, llm_judge may only escalate to review (fusion/hybrid.py), re-fusion of v1
+    refuse_from: v1
+    checks: [facts, llm_judge]
+    set: [fusion.type=hybrid, checks.facts.weight=1.0]
+  - name: facts_blind_only
+    description: blind policy table alone (R4), re-fusion of v1
+    refuse_from: v1
+    checks: [facts_blind]
+    set: [checks.facts_blind.weight=1.0]
+  # R2 (table v3) with the champion's LLM: both computed fresh on Qwen2.5-7B (the stored v1/facts rows are 14B).
+  - name: facts7b_v1
+    description: facts alone with the tuned table v1, computed on the served Qwen2.5-7B (paired control for facts7b_v3)
+    checks: [facts]
+    set: [checks.facts.weight=1.0]
+  - name: facts7b_v3
+    description: facts alone with config/policy_table_v3.yaml (R2 open-fact review rules + splitting re-check), Qwen2.5-7B
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.policy_table=config/policy_table_v3.yaml]
+  # R6 paraphrase ensemble on the 7B (out of sample): tuned (= facts7b_v1) vs the two blind paraphrase sets vs ens3
+  - name: facts7b_ens3
+    description: facts alone, tuned + para + para2 wordings averaged (R6), Qwen2.5-7B
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.parallel=1, "checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]"]
+  - name: facts7b_para
+    description: facts alone with config/policy_table_para.yaml (R3 paraphrases), Qwen2.5-7B (probes shared with ens3)
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.parallel=1, checks.facts.policy_table=config/policy_table_para.yaml]
+  - name: facts7b_para2
+    description: facts alone with config/policy_table_para2.yaml (R6 paraphrases), Qwen2.5-7B (probes shared with ens3)
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.parallel=1, checks.facts.policy_table=config/policy_table_para2.yaml]
+  - name: facts7b_ens3_band
+    description: ens3 with the p(yes) band [0.2, 0.6] for yes/unclear/no (R6), Qwen2.5-7B
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.parallel=1, "checks.facts.paraphrase_tables=[config/policy_table_para.yaml, config/policy_table_para2.yaml]", "checks.facts.unclear_band=[0.2, 0.6]"]
+  # S1 (ideas_round3): review hardening, decide_at 0.8 (symmetric: yes and no need p >= 0.8), 7B, cached probes
+  - name: facts7b_s1_v1_08
+    description: facts7b_v1 with decide_at 0.8 (S1)
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.decide_at=0.8, checks.facts.parallel=2]
+  - name: facts7b_s1_v3_08
+    description: facts7b_v3 with decide_at 0.8 (S1)
+    checks: [facts]
+    set: [checks.facts.weight=1.0, checks.facts.policy_table=config/policy_table_v3.yaml, checks.facts.decide_at=0.8, checks.facts.parallel=2]
+  # S3 (ideas_round3, simplified): "no silent clearance" re-fusion of facts7b_v1 (facts only: act-fact path only)
+  - name: facts7b_s3
+    description: facts7b_v1 re-fused with fusion no_silent (act p(yes) >= 0.3 and no exculpatory yes -> review)
+    refuse_from: facts7b_v1
+    checks: [facts]
+    set: [checks.facts.weight=1.0, fusion.type=no_silent]
