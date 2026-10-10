@@ -593,3 +593,12 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   call flips. => false alarms are stable under a recording change; the cost shows up as a few more misses.
 - Pitfall found: `callguard experiment` loads calls from the BASE profile's data_dir — a per-variant paths.data_dir is
   silently ignored (first attempt reused the original audio; discarded). Dedicated profile config/recommended-perturbed.yaml.
+
+## 2026-10-10T05:57 table v3 on re-recorded audio (robustness proxy)
+- perturbed audio, champion with table v3: flag AUC 0.88 [0.76, 0.98] vs v1 table 0.83; CV FAR 14% = 14%; miss 15% vs 23%.
+- v3 now beats v1 on misses with unchanged false alarms in three independent dev-side tests (dev 8% vs 15%, synthetic
+  review recall 48% vs 38%, re-recorded audio 15% vs 23%). Caveats unchanged: no holdout validation (spent), and its
+  builder knew that splitting was missed on the holdout.
+- RECOMMENDATION to the team (DECISIONS D2b): adopt v3 for Sunday unless you weigh the caveat higher; the frozen v1
+  champion's holdout run remains the documented sanity check. Switch = one line in config/recommended.yaml
+  (checks.facts.policy_table: config/policy_table_v3.yaml) or `--set checks.2.policy_table=config/policy_table_v3.yaml`.

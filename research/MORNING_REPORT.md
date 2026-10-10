@@ -100,8 +100,10 @@ Holdout misses (C16 splitting, C19 documentation review) fall in the same weak f
 See `research/findings/RQ*.md`. Each has the setup, a CI table, flips, a recommendation and the strongest counter-argument.
 
 ## Still open (for the team on Saturday)
-- Review side of facts (Stufe3) and the splitting family; table v3 with criteria-derived "open fact" questions was
-  evaluated on dev + synthetic: team decision, see DECISIONS.md D2b (cannot be validated on the used holdout).
+- **Team decision: policy table v1 (frozen, holdout-run) or v3 (+ criteria-derived "open fact" review questions)?**
+  v3 cuts misses with unchanged false alarms on dev (15% -> 8%), synthetic (review recall 38% -> 48%) and re-recorded
+  audio (23% -> 15%, AUC 0.83 -> 0.88); no holdout validation and its builder knew a holdout failure mode.
+  Our lean: adopt v3 (one line in config/recommended.yaml). See DECISIONS.md D2b.
 - Ask the organisers how `review` is scored. Flag F1 is meaningless here (flag-all = 0.70); we report AUC + FAR.
 - Event GPUs: with ≥24 GB, Qwen2.5-14B (or larger) + large-v3 run side by side (`config/recommended-14b.yaml`): more
   robust to question wording on dev, but not better on dev or the holdout here (candidate B above).
