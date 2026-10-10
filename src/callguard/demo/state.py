@@ -87,7 +87,9 @@ def bootstrap(pages: Mapping[str, Any]) -> AppState:
     default_weights = be.check_weights(cfg)
     all_families = engine.families()
     try:
-        modes = ses._mode_state(cfg, engine, loaded, runs_root)
+        # fact policy profiles (two_readers rule policy): the combination of the two readers per fact
+        # (tab «Fakten») replaces the Prüfmodus
+        modes = None if uses_fact_policy(cfg) else ses._mode_state(cfg, engine, loaded, runs_root)
     except Exception:  # a broken mode spec must not take the demo down
         modes = None
 
@@ -136,6 +138,11 @@ def bootstrap(pages: Mapping[str, Any]) -> AppState:
 # --------------------------------------------------------------------------------------------
 # small shared helpers for the pages
 # --------------------------------------------------------------------------------------------
+
+
+def uses_fact_policy(cfg: AppConfig) -> bool:
+    f = cfg.fusion or {}
+    return f.get("type") == "two_readers" and f.get("rule") == "policy"
 
 
 def profile_threshold(app: AppState) -> float:
