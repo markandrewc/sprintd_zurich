@@ -198,46 +198,50 @@ def knob_text(kind: str, key: str) -> str | None:
 
 
 def strip_chart(answers: list[fpol.FactAnswer], policy: fpol.FactPolicy, family: str, fact: str) -> Any:
+    """Two rows (reader A on top, reader B below) on one p(ja) axis; rows are a quantitative position (0, 1) plus a
+    small deterministic jitter, so the layers share one y scale."""
     import altair as alt
 
     ra, rb_ = policy.reader(0, family, fact), policy.reader(1, family, fact)
     rows = []
     for i, a in enumerate(answers):
         rf = fpol.resolve_fact(policy, family, fact, a.pa, a.pb)
-        jitter = ((i * 37) % 11 - 5) / 14  # deterministic, keeps dots of one reader apart
-        if a.ya is not None:
-            rows.append({"Leser": ra.label, "p": a.ya, "Anruf": a.call_id, "Wert": VALUE_DE[rf.va], "j": jitter,
-                         "Ergebnis": VALUE_DE[rf.value]})
-        if a.yb is not None:
-            rows.append({"Leser": rb_.label, "p": a.yb, "Anruf": a.call_id, "Wert": VALUE_DE[rf.vb], "j": jitter,
-                         "Ergebnis": VALUE_DE[rf.value]})
+        jitter = ((i * 37) % 11 - 5) / 22  # deterministic, keeps dots of one reader apart (±0.23 of a row)
+        for row, (r, py, v) in enumerate(((ra, a.ya, rf.va), (rb_, a.yb, rf.vb))):
+            if py is not None:
+                rows.append({"Leser": r.label, "row": row + jitter, "p": py, "Anruf": a.call_id,
+                             "Wert": VALUE_DE[v], "Ergebnis": VALUE_DE[rf.value]})
     df = pd.DataFrame(rows)
-    order = [ra.label, rb_.label]
-    bands = pd.DataFrame([{"Leser": r.label, "lo": r.lo, "hi": r.hi} for r in (ra, rb_) if r.mode == "band"])
-    three = pd.DataFrame([{"Leser": r.label, "x": r.decide_at} for r in (ra, rb_) if r.mode != "band"])
-    x = alt.X("p:Q", scale=alt.Scale(domain=[0, 1]), title="p(ja)",
-              axis=alt.Axis(values=[0, 0.25, 0.5, 0.75, 1], format=".2f", grid=False, labelColor=INK_MUTED,
-                            titleColor=INK_MUTED, tickColor=BAND_FILL, domainColor=BAND_FILL))
-    y = alt.Y("Leser:N", sort=order, title=None, axis=alt.Axis(labelColor="#0b0b0b", labelFontWeight="bold",
-                                                               ticks=False, domain=False))
+    bands = pd.DataFrame([{"Leser": r.label, "lo": r.lo, "hi": r.hi, "y0": i - 0.38, "y1": i + 0.38}
+                          for i, r in enumerate((ra, rb_)) if r.mode == "band"])
+    three = pd.DataFrame([{"Leser": r.label, "x": r.decide_at, "y0": i - 0.38, "y1": i + 0.38}
+                          for i, r in enumerate((ra, rb_)) if r.mode != "band"])
+    xs = alt.Scale(domain=[0, 1])
+    ys = alt.Scale(domain=[1.55, -0.55], nice=False)  # reader A on top
+    label_expr = f"datum.value == 0 ? '{ra.label}' : datum.value == 1 ? '{rb_.label}' : ''"
+    y_axis = alt.Axis(values=[0, 1], labelExpr=label_expr, labelColor="#0b0b0b", labelFontWeight="bold",
+                      labelFontSize=12, ticks=False, domain=False, grid=False, title=None)
     layers = []
     if not bands.empty:
-        layers.append(alt.Chart(bands).mark_bar(color=BAND_FILL, opacity=0.6, cornerRadius=4, height=26).encode(
-            x=alt.X("lo:Q", scale=alt.Scale(domain=[0, 1])), x2="hi:Q", y=alt.Y("Leser:N", sort=order),
-            tooltip=[alt.Tooltip("Leser:N"), alt.Tooltip("lo:Q", title="unklar ab", format=".2f"),
-                     alt.Tooltip("hi:Q", title="unklar bis", format=".2f")]))
+        layers.append(alt.Chart(bands).mark_rect(color=BAND_FILL, opacity=0.7, cornerRadius=4).encode(
+            x=alt.X("lo:Q", scale=xs), x2="hi:Q", y=alt.Y("y0:Q", scale=ys, axis=y_axis), y2="y1:Q",
+            tooltip=[alt.Tooltip("Leser:N"), alt.Tooltip("lo:Q", title="nein bis", format=".2f"),
+                     alt.Tooltip("hi:Q", title="ja ab", format=".2f")]))
     if not three.empty:
-        layers.append(alt.Chart(three).mark_tick(color=INK_MUTED, thickness=1, size=26, strokeDash=[3, 2]).encode(
-            x=alt.X("x:Q", scale=alt.Scale(domain=[0, 1])), y=alt.Y("Leser:N", sort=order),
+        layers.append(alt.Chart(three).mark_rule(color=INK_MUTED, strokeWidth=1, strokeDash=[3, 2]).encode(
+            x=alt.X("x:Q", scale=xs), y=alt.Y("y0:Q", scale=ys, axis=y_axis), y2="y1:Q",
             tooltip=[alt.Tooltip("Leser:N"), alt.Tooltip("x:Q", title="ja ab p(ja) / nein ab p(nein)", format=".2f")]))
     if not df.empty:
-        layers.append(alt.Chart(df).mark_circle(size=64, opacity=0.85, stroke="#fcfcfb", strokeWidth=1).encode(
-            x=x, y=y, yOffset=alt.YOffset("j:Q", scale=alt.Scale(domain=[-0.5, 0.5])),
-            color=alt.Color("Leser:N", sort=order, scale=alt.Scale(domain=order, range=list(READER_COLORS)),
+        layers.append(alt.Chart(df).mark_circle(size=64, opacity=0.9, stroke="#fcfcfb", strokeWidth=1).encode(
+            x=alt.X("p:Q", scale=xs, title="p(ja)",
+                    axis=alt.Axis(values=[0, 0.25, 0.5, 0.75, 1], format=".2f", grid=False, labelColor=INK_MUTED,
+                                  titleColor=INK_MUTED, tickColor=BAND_FILL, domainColor=BAND_FILL)),
+            y=alt.Y("row:Q", scale=ys, axis=y_axis),
+            color=alt.Color("Leser:N", scale=alt.Scale(domain=[ra.label, rb_.label], range=list(READER_COLORS)),
                             legend=None),
             tooltip=[alt.Tooltip("Anruf:N"), alt.Tooltip("Leser:N"), alt.Tooltip("p:Q", title="p(ja)", format=".2f"),
                      alt.Tooltip("Wert:N", title="Wert dieses Lesers"), alt.Tooltip("Ergebnis:N", title="zusammen")]))
-    return alt.layer(*layers).properties(height=96).configure_view(stroke=None).configure_axis(labelFontSize=12)
+    return alt.layer(*layers).properties(height=110).configure_view(stroke=None)
 
 
 # --------------------------------------------------------------------------------------------
