@@ -21,7 +21,13 @@ def load_families(keywords_path: Path, criteria_path: Path | None = None,
     crit: dict[str, Any] = {}
     if criteria_path and Path(criteria_path).exists():
         crit = (yaml.safe_load(Path(criteria_path).read_text()) or {}).get("families", {})
+    return families_from_raw(kw_raw, crit, only)
 
+
+def families_from_raw(kw_raw: dict[str, Any], crit: dict[str, Any], only: list[str] | None = None) -> list[Family]:
+    """Families from the parsed keyword list and the parsed ``criteria.yaml`` ``families:`` block (the UI
+    previews unsaved drafts with this). A family defined only in the criteria is a family too."""
+    crit = crit or {}
     kw_by_id = {k["id"]: k for k in kw_raw.get("keywords", [])}
     policies = kw_raw.get("policy_examples", {})
     families: list[Family] = []
