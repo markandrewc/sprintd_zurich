@@ -1,6 +1,6 @@
 # Team-Optionen: alle Kandidaten mit denselben Zahlen
 
-Generiert 2026-10-10T13:14:31+0200 von `callguard candidates` (Spezifikation `experiments/contrib/candidates.yaml`, 2000 Bootstrap-Stichproben, Seed 13). Nicht von Hand bearbeiten: Texte in `experiments/contrib/decisions.yaml` / `comparison_zurich.yaml` ändern und neu erzeugen.
+Generiert 2026-10-10T13:24:02+0200 von `callguard candidates` (Spezifikation `experiments/contrib/candidates.yaml`, 2000 Bootstrap-Stichproben, Seed 13). Nicht von Hand bearbeiten: Texte in `experiments/contrib/decisions.yaml` / `comparison_zurich.yaml` ändern und neu erzeugen.
 
 Lesehilfe: Dev-Split (48 Anrufe / 24 Dialoge), 95%-Bootstrap-KI über Zwillingsgruppen/Dialoge. AUC = Flag-AUC aus den Scores (schwellenfrei); Fehlalarme / Verpasst / Prüf-Recall / Exakt an der out-of-fold CV-Schwelle. **Fett** = bester Wert der Spalte unter den Kandidaten; „belegt“ nur, wenn das gepaarte KI gegen den Champion 0 ausschliesst, sonst „≈ Champion“. Δ = gepaarte Differenz zum eigenen abgestimmten Lauf (gleiche Anrufe). „ausstehend“ / „läuft noch“ füllt sich beim nächsten Lauf von `callguard candidates` automatisch. Der Holdout ist verbraucht und kommt hier nicht vor.
 
@@ -11,21 +11,21 @@ Lesehilfe: Dev-Split (48 Anrufe / 24 Dialoge), 95%-Bootstrap-KI über Zwillingsg
 | Champion: Qwen2.5-7B Fakten, Tabelle v1 | 0.87 [0.72, 0.99] | 14% [0, 35] | 15% [0, 36] | 67% [0, 100] | 79% [63, 95] | Referenz | 0.73 [0.53, 0.89] (Ø 2) | -0.14 [-0.30, -0.02] belegt | 0.73 [0.53, 0.90] | -0.14 [-0.32, -0.01] belegt | 0.83 [0.67, 0.96] | -0.04 [-0.11, +0.01] ≈ | 73% [45, 91], Zufall 24% | ja | 4.1 | 12 GB 4070 gestaffelt (ASR, dann vLLM); 24 GB: alles zusammen | LLM Apache-2.0, ASR MIT | ja (gestaffelt, neue Dateien, Journal 04:50) |
 | Champion mit Tabelle v3 | 0.92 [0.80, 1.00] | 14% [0, 35] | **8% [0, 25]** (≈ Champion) | **100% [100, 100]** (≈ Champion) | **83% [68, 100]** (≈ Champion) | ≈ Champion | n/a | n/a | n/a | n/a | **0.88 [0.76, 0.98]** (≈ Champion) | -0.037 [-0.102, +0.002] ≈ | – | ja | 4.9 | wie Champion | LLM Apache-2.0, ASR MIT | teilweise (gleiche Kette, Profil recommended-v3; auf neuen Dateien nicht separat gelaufen) |
 | Kev-4B Fakten, Tabelle v1 | 0.86 [0.67, 0.98] | **0% [0, 0]** (≈ Champion) | 31% [9, 56] | 0% [0, 0] | 69% [48, 86] | ▲ AUC umformuliert +0.17 [+0.04, +0.31] | **0.90 [0.73, 1.00] (Ø 2)** belegt | +0.04 [-0.01, +0.11] ≈ | **0.85 [0.68, 1.00]** (≈ Champion) | -0.00 [-0.09, +0.11] ≈ | 0.81 [0.60, 0.96] | -0.05 [-0.15, +0.01] ≈ | 43% [12, 75], Zufall 17%, 8/14 ohne Passage | nein (nur Stichwort-/Muster-Treffer) | 15.7 | 12 GB gestaffelt: ASR, vLLM 7B für Rollen, dann Kev (~8 GB); 24 GB zusammen | Kev Apache-2.0 (LoRA auf Qwen3.5-4B), ASR MIT | nein (nur Experimente auf gecachten Transkripten + Rollen) |
-| Kev-4B Fakten, Tabelle v3 | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | n/a | n/a | n/a | n/a | ausstehend | ausstehend | – | nein (nur Stichwort-/Muster-Treffer) | ausstehend | wie Kev v1 | Kev Apache-2.0, ASR MIT | nein |
+| Kev-4B Fakten, Tabelle v3 | 0.83 [0.65, 0.96] | 5% [0, 15] | 31% [9, 56] | 0% [0, 0] | 67% [47, 83] | ≈ Champion | n/a | n/a | n/a | n/a | 0.79 [0.58, 0.95] | -0.04 [-0.15, +0.03] ≈ | 47% [13, 80], Zufall 18%, 8/15 ohne Passage | nein (nur Stichwort-/Muster-Treffer) | 6.3 | wie Kev v1 | Kev Apache-2.0, ASR MIT | nein |
 | Qwen3.8-27B 3-bit Fakten, Tabelle v1 | 0.85 [0.64, 1.00] | **0% [0, 0]** (≈ Champion) | 31% [8, 58] | 0% [0, 0] | 77% [60, 92] | ≈ Champion | 0.87 [0.66, 1.00] | +0.017 [+0.000, +0.069] ≈ | 0.83 [0.63, 0.97] | -0.02 [-0.14, +0.06] ≈ | n/a | n/a | 50% [22, 78], Zufall 18%, 8/18 ohne Passage | nein (evidence aus; nur Stichwort-/Muster-Treffer) | 26.3 | 12 GB 4070 allein (10.9 GB GGUF); ASR + Rollen (vLLM 7B) vorher in eigenen Stufen | Qwen3.8: Lizenz nicht geprüft (Modellkarte), ASR MIT | nein (Experimente; Rollen aus dem Cache) |
-| Qwen3.8-27B 3-bit Fakten, Tabelle v3 | läuft noch | läuft noch | läuft noch | läuft noch | läuft noch | läuft noch | n/a | n/a | n/a | n/a | n/a | n/a | – | nein (nur Stichwort-/Muster-Treffer) | läuft noch | wie Q3.8 3-bit | Qwen3.8: nicht geprüft, ASR MIT | nein |
-| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | 0.85 [0.65, 1.00] | **0% [0, 0]** (≈ Champion) | 27% [7, 50] | 0% [0, 0] | 79% [62, 93] | ≈ Champion | läuft noch | läuft noch | ausstehend | ausstehend | ausstehend | ausstehend | 47% [19, 75], Zufall 18%, 9/19 ohne Passage | nein (evidence aus; nur Stichwort-/Muster-Treffer) | 135.6 | 24 GB A5000 (22 GB GGUF füllt die Karte); ASR + Rollen in eigenen Stufen | Qwen3.8: nicht geprüft, ASR MIT | nein (Experimente auf dem A5000; Rollen aus dem Cache) |
+| Qwen3.8-27B 3-bit Fakten, Tabelle v3 | 0.85 [0.64, 1.00] | **0% [0, 0]** (≈ Champion) | 31% [8, 58] | 0% [0, 0] | 77% [60, 92] | ≈ Champion | n/a | n/a | n/a | n/a | n/a | n/a | 50% [22, 78], Zufall 18%, 8/18 ohne Passage | nein (nur Stichwort-/Muster-Treffer) | 11.9 | wie Q3.8 3-bit | Qwen3.8: nicht geprüft, ASR MIT | nein |
+| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | 0.85 [0.65, 1.00] | **0% [0, 0]** (≈ Champion) | 27% [7, 50] | 0% [0, 0] | 79% [62, 93] | ≈ Champion | 0.86 [0.66, 1.00] | +0.012 [+0.000, +0.044] ≈ | läuft noch | läuft noch | ausstehend | ausstehend | 47% [19, 75], Zufall 18%, 9/19 ohne Passage | nein (evidence aus; nur Stichwort-/Muster-Treffer) | 135.6 | 24 GB A5000 (22 GB GGUF füllt die Karte); ASR + Rollen in eigenen Stufen | Qwen3.8: nicht geprüft, ASR MIT | nein (Experimente auf dem A5000; Rollen aus dem Cache) |
 | Qwen3.8-27B 6-bit Fakten, Tabelle v3 | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | ausstehend | n/a | n/a | n/a | n/a | ausstehend | ausstehend | – | nein (nur Stichwort-/Muster-Treffer) | ausstehend | wie Q3.8 6-bit | Qwen3.8: nicht geprüft, ASR MIT | nein |
 | Allgemeine Fragen auf Qwen2.5-7B | 0.72 [0.55, 0.88] | 64% [38, 88] | **8% [0, 25]** (≈ Champion) | 33% [0, 100] | 54% [39, 71] | ▼ Fehlalarme (CV) +50 Pkt. [+17, +80]; ▼ Exakt 3 Klassen -25 Pkt. [-45, -7] | 0.71 [0.50, 0.89] | -0.01 [-0.15, +0.09] ≈ | n/a | n/a | 0.76 [0.58, 0.91] | +0.04 [-0.05, +0.11] ≈ | 57% [23, 88], Zufall 18%, 5/14 ohne Passage | nein (nur Stichwort-/Muster-Treffer) | 3.0 | wie Champion | LLM Apache-2.0, ASR MIT | nein |
 | Allgemeine Fragen auf Kev-4B (Teamkollege) | 0.79 [0.62, 0.93] | 68% [44, 89] | 27% [7, 50] | 17% [0, 50] | 50% [35, 64] | ▼ Fehlalarme (CV) +55 Pkt. [+30, +75]; ▼ Exakt 3 Klassen -29 Pkt. [-50, -10]; ▲ AUC umformuliert +0.157 [+0.003, +0.387] | 0.88 [0.74, 1.00] | +0.09 [-0.03, +0.28] ≈ | n/a | n/a | 0.76 [0.56, 0.92] | -0.03 [-0.12, +0.05] ≈ | **87% [60, 100], Zufall 55%** (ungepaart, Zufall beachten) | ja (Fenster ~40 Wörter, lang) | **2.4** | wie Kev v1 | Kev Apache-2.0, ASR MIT | nein bei uns (im Prototyp des Teamkollegen ja, andere ASR) |
 | Allgemeine Fragen auf Qwen3.8 3-bit | 0.83 [0.65, 0.96] | 32% [6, 64] | 27% [6, 50] | 0% [0, 0] | 62% [43, 80] | ▼ Exakt 3 Klassen -17 Pkt. [-37, -2] | 0.83 [0.67, 0.96] | +0.00 [-0.12, +0.11] ≈ | n/a | n/a | n/a | n/a | 50% [22, 78], Zufall 18%, 8/18 ohne Passage | nein (nur Stichwort-/Muster-Treffer) | 20.4 | wie Q3.8 3-bit | Qwen3.8: nicht geprüft, ASR MIT | nein |
 | Allgemeine Fragen auf Qwen3.8 6-bit | 0.86 [0.69, 0.99] | 32% [10, 58] | 15% [0, 33] | 17% [0, 50] | 71% [55, 85] | ≈ Champion | ausstehend | ausstehend | n/a | n/a | ausstehend | ausstehend | 47% [18, 79], Zufall 18%, 9/19 ohne Passage | nein (nur Stichwort-/Muster-Treffer) | 102.6 | wie Q3.8 6-bit | Qwen3.8: nicht geprüft, ASR MIT | nein |
-| Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit) | **0.93 [0.82, 1.00]** (≈ Champion) | 14% [0, 35] | 12% [0, 29] | 50% [0, 100] | 65% [45, 83] | ▼ Exakt 3 Klassen -15 Pkt. [-32, -2]; ▲ AUC umformuliert +0.13 [+0.04, +0.23]; ▲ AUC blinde Tabelle +0.12 [+0.03, +0.25] | 0.86 [0.69, 0.98] (Ø 2) | -0.071 [-0.194, +0.000] ≈ | 0.84 [0.71, 0.96] | -0.08 [-0.21, +0.03] ≈ | ausstehend | ausstehend | 70% [45, 91], Zufall 24%, 1/23 ohne Passage | ja (aus Qwen) | 19.7 | 24 GB zusammen (nie getestet) oder 12 GB gestaffelt + `agreement merge` | Apache-2.0 (beide), ASR MIT | nein (nur Re-Fusion gespeicherter Läufe) |
+| Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit) | **0.93 [0.82, 1.00]** (≈ Champion) | 14% [0, 35] | 12% [0, 29] | 50% [0, 100] | 65% [45, 83] | ▼ Exakt 3 Klassen -15 Pkt. [-32, -2]; ▲ AUC umformuliert +0.13 [+0.04, +0.23]; ▲ AUC blinde Tabelle +0.12 [+0.03, +0.25] | 0.86 [0.69, 0.98] (Ø 2) | -0.071 [-0.194, +0.000] ≈ | 0.84 [0.71, 0.96] | -0.08 [-0.21, +0.03] ≈ | 0.86 [0.72, 0.98] | -0.069 [-0.165, -0.004] belegt | 70% [45, 91], Zufall 24%, 1/23 ohne Passage | ja (aus Qwen) | 19.7 | 24 GB zusammen (nie getestet) oder 12 GB gestaffelt + `agreement merge` | Apache-2.0 (beide), ASR MIT | nein (nur Re-Fusion gespeicherter Läufe) |
 | v1 (Stichwörter + freier LLM-Richter, Turbo-ASR) | 0.68 [0.53, 0.84] | 86% [64, 100] | 15% [0, 35] | 83% [50, 100] | 38% [23, 55] | ▼ Flag-AUC -0.19 [-0.33, -0.05]; ▼ Fehlalarme (CV) +73 Pkt. [+46, +94]; ▼ Exakt 3 Klassen -42 Pkt. [-65, -18] | n/a | n/a | n/a | n/a | n/a | n/a | – | ja | 82.6 | 12 GB | Apache-2.0 / ASR CC-BY-NC-Herkunft (Turbo) | ja (Ausgangssystem) |
 | Nur Stichwörter | 0.55 [0.38, 0.73] | 32% [7, 61] | 62% [33, 87] | 0% [0, 0] | 50% [35, 65] | ▼ Flag-AUC -0.32 [-0.51, -0.15]; ▼ Verpasst (CV) +46 Pkt. [+19, +73]; ▼ Exakt 3 Klassen -29 Pkt. [-50, -11] | n/a | n/a | n/a | n/a | n/a | n/a | – | ja | 0.0 | CPU (+ ASR) | – | ja |
 | Alles markieren (Alarm) | 0.50 [0.50, 0.50] | 100% [100, 100] | 0% [0, 0] | 0% [0, 0] | 42% [25, 58] | Untergrenze | n/a | n/a | n/a | n/a | n/a | n/a | – | – | 0.0 | – | – | – |
 
-Prüfen-Fälle (CV, vorhergesagt, davon richtig; Soll 6 von 48): Champion v1 10 (4 richtig); Champion v3 12 (6 richtig); Kev v1 6 (0 richtig); Q3.8 3-bit v1 1 (0 richtig); Q3.8 6-bit v1 1 (0 richtig); Allg. Qwen 7B 7 (2 richtig); Allg. Kev 11 (1 richtig); Allg. Q3.8 3-bit 4 (0 richtig); Allg. Q3.8 6-bit 6 (1 richtig); Zwei Leser R1 16 (3 richtig); v1 20 (5 richtig); Stichwörter 1 (0 richtig); Alles markieren 0 (0 richtig).
+Prüfen-Fälle (CV, vorhergesagt, davon richtig; Soll 6 von 48): Champion v1 10 (4 richtig); Champion v3 12 (6 richtig); Kev v1 6 (0 richtig); Kev v3 6 (0 richtig); Q3.8 3-bit v1 1 (0 richtig); Q3.8 3-bit v3 1 (0 richtig); Q3.8 6-bit v1 1 (0 richtig); Allg. Qwen 7B 7 (2 richtig); Allg. Kev 11 (1 richtig); Allg. Q3.8 3-bit 4 (0 richtig); Allg. Q3.8 6-bit 6 (1 richtig); Zwei Leser R1 16 (3 richtig); v1 20 (5 richtig); Stichwörter 1 (0 richtig); Alles markieren 0 (0 richtig).
 
 Beleg hit@1 = Anteil der richtig markierten Anrufe, deren erste angezeigte Passage eine annotierte Beleg-Zeile trifft (`callguard evidence-eval`-Methode, Dev). „Zufall“ = was eine gleich lange Passage an zufälliger Stelle träfe: lange Passagen (Kev allgemein, ~48 s) treffen schon zufällig oft. Anrufe ohne Passage zählen als Fehltreffer.
 
@@ -47,33 +47,28 @@ Beleg hit@1 = Anteil der richtig markierten Anrufe, deren erste angezeigte Passa
 | Champion: Qwen2.5-7B Fakten, Tabelle v1 | `champion/champion` (da) | `kev_vs_facts/qwen_facts_para` (da), `kev_vs_facts/qwen_facts_para2` (da) | `kev_vs_facts/qwen_facts_blind` (da) | `perturbed:perturbed/perturbed` (da) |
 | Champion mit Tabelle v3 | `champion/table_v3` (da) | n/a | n/a | `perturbed:perturbed/table_v3` (da) |
 | Kev-4B Fakten, Tabelle v1 | `kev_vs_facts/kev_facts` (da) | `kev_vs_facts/kev_facts_para` (da), `kev_vs_facts/kev_facts_para2` (da) | `kev_vs_facts/kev_facts_blind` (da) | `perturbed:kev_perturbed/kev_facts` (da) |
-| Kev-4B Fakten, Tabelle v3 | `kev_vs_facts/kev_facts_v3` (ausstehend) | n/a | n/a | `perturbed:kev_perturbed/kev_facts_v3` (ausstehend) |
+| Kev-4B Fakten, Tabelle v3 | `kev_vs_facts/kev_facts_v3` (da) | n/a | n/a | `perturbed:kev_perturbed/kev_facts_v3` (da) |
 | Qwen3.8-27B 3-bit Fakten, Tabelle v1 | `qwen38/q38_facts` (da) | `qwen38/q38_facts_para` (da) | `qwen38/q38_facts_blind` (da) | n/a |
-| Qwen3.8-27B 3-bit Fakten, Tabelle v3 | `qwen38/q38_facts_v3` (läuft noch) | n/a | n/a | n/a |
-| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | `qwen38_q6/q38q6_facts` (da) | `qwen38_q6/q38q6_facts_para` (läuft noch) | `qwen38_q6/q38q6_facts_blind` (ausstehend) | `perturbed:qwen38_q6_perturbed/q38q6_facts` (ausstehend) |
+| Qwen3.8-27B 3-bit Fakten, Tabelle v3 | `qwen38/q38_facts_v3` (da) | n/a | n/a | n/a |
+| Qwen3.8-27B 6-bit Fakten, Tabelle v1 | `qwen38_q6/q38q6_facts` (da) | `qwen38_q6/q38q6_facts_para` (da) | `qwen38_q6/q38q6_facts_blind` (läuft noch) | `perturbed:qwen38_q6_perturbed/q38q6_facts` (ausstehend) |
 | Qwen3.8-27B 6-bit Fakten, Tabelle v3 | `qwen38_q6/q38q6_facts_v3` (ausstehend) | n/a | n/a | `perturbed:qwen38_q6_perturbed/q38q6_facts_v3` (ausstehend) |
 | Allgemeine Fragen auf Qwen2.5-7B | `kev_vs_facts/qwen_general` (da) | `kev_vs_facts/qwen_general_para` (da) | n/a | `perturbed:kev_perturbed/qwen_general` (da) |
 | Allgemeine Fragen auf Kev-4B (Teamkollege) | `kev_vs_facts/kev_general` (da) | `kev_vs_facts/kev_general_para` (da) | n/a | `perturbed:kev_perturbed/kev_general` (da) |
 | Allgemeine Fragen auf Qwen3.8 3-bit | `qwen38/q38_general` (da) | `qwen38/q38_general_para` (da) | n/a | n/a |
 | Allgemeine Fragen auf Qwen3.8 6-bit | `qwen38_q6/q38q6_general` (da) | `qwen38_q6/q38q6_general_para` (ausstehend) | n/a | `perturbed:qwen38_q6_perturbed/q38q6_general` (ausstehend) |
-| Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit) | `two_readers/r1` (da) | `two_readers/r1_para` (da), `two_readers/r1_para2` (da) | `two_readers/r1_blind` (da) | `perturbed:two_readers_perturbed/r1` (ausstehend) |
+| Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit) | `two_readers/r1` (da) | `two_readers/r1_para` (da), `two_readers/r1_para2` (da) | `two_readers/r1_blind` (da) | `perturbed:two_readers_perturbed/r1` (da) |
 | v1 (Stichwörter + freier LLM-Richter, Turbo-ASR) | `llm_models/qwen25_7b` (da) | n/a | n/a | n/a |
 | Nur Stichwörter | `checks_ablation/keywords` (da) | n/a | n/a | n/a |
 | Alles markieren (Alarm) | `trivial/flag_all` (da) | n/a | n/a | n/a |
 
 ### Ausstehend / läuft noch
 
-- Kev-4B Fakten, Tabelle v3: abgestimmt (Dev) `kev_vs_facts/kev_facts_v3` (ausstehend)
-- Kev-4B Fakten, Tabelle v3: neu aufgenommen `perturbed:kev_perturbed/kev_facts_v3` (ausstehend)
-- Qwen3.8-27B 3-bit Fakten, Tabelle v3: abgestimmt (Dev) `qwen38/q38_facts_v3` (läuft noch)
-- Qwen3.8-27B 6-bit Fakten, Tabelle v1: umformuliert `qwen38_q6/q38q6_facts_para` (läuft noch)
-- Qwen3.8-27B 6-bit Fakten, Tabelle v1: blinde Tabelle `qwen38_q6/q38q6_facts_blind` (ausstehend)
+- Qwen3.8-27B 6-bit Fakten, Tabelle v1: blinde Tabelle `qwen38_q6/q38q6_facts_blind` (läuft noch)
 - Qwen3.8-27B 6-bit Fakten, Tabelle v1: neu aufgenommen `perturbed:qwen38_q6_perturbed/q38q6_facts` (ausstehend)
 - Qwen3.8-27B 6-bit Fakten, Tabelle v3: abgestimmt (Dev) `qwen38_q6/q38q6_facts_v3` (ausstehend)
 - Qwen3.8-27B 6-bit Fakten, Tabelle v3: neu aufgenommen `perturbed:qwen38_q6_perturbed/q38q6_facts_v3` (ausstehend)
 - Allgemeine Fragen auf Qwen3.8 6-bit: umformuliert `qwen38_q6/q38q6_general_para` (ausstehend)
 - Allgemeine Fragen auf Qwen3.8 6-bit: neu aufgenommen `perturbed:qwen38_q6_perturbed/q38q6_general` (ausstehend)
-- Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit): neu aufgenommen `perturbed:two_readers_perturbed/r1` (ausstehend)
 
 ## Offene Team-Entscheidungen
 
@@ -98,7 +93,7 @@ v3 ergänzt v1 um aus den Kriterien abgeleitete Regeln „entscheidender Fakt of
   - contra: Jede einzelne Differenz liegt im Rauschen (gepaart: AUC +0.052 [+0.000, +0.172] ≈, exakt +4 Pkt. [+0, +14] ≈).
   - contra: In Kenntnis eines Holdout-Fehlers (Aufteilen) entworfen; kein Holdout-Lauf möglich.
   - contra: Keine Paraphrasen-Probe für v3; mehr LLM-Aufrufe (4.9 s pro Anruf).
-  - contra: Auf Kev / Qwen3.8: Kev v3 ausstehend, Q3.8 3-bit v3 läuft noch, Q3.8 6-bit v3 ausstehend.
+  - contra: Auf Kev / Qwen3.8: Kev v3 0.83 [0.65, 0.96], Q3.8 3-bit v3 0.85 [0.64, 1.00], Q3.8 6-bit v3 ausstehend.
   - Aufwand: `-c recommended-v3` bzw. `scripts/run_staged.sh recommended-v3`; 5 min Doctor + Smoke-Test.
 
 **Unsere Empfehlung:** v3 übernehmen (Stand D2b): weniger Verpasste bei gleichen Fehlalarmen in drei unabhängigen Tests; ehrlich kommunizieren, dass keine Einzeldifferenz belegt ist.
@@ -125,7 +120,7 @@ Antwort der Organisatoren (Sa ~13:00, docs/CASE.md): exakte Werte zählen wenige
   - Aufwand: keiner
 - **Option Qwen3.8-27B 6-bit**: AUC 0.85 [0.65, 1.00] (gepaart -0.01 [-0.20, +0.12] ≈), Fehlalarme 0% [0, 0], verpasst 27% [7, 50], exakt 79% [62, 93].
   - pro: Allgemeine Fragen ohne Regelschicht: nur auf 6-bit ist kein Mass belegt schlechter als der Champion (Fehlalarme 32% [10, 58], gepaart +18 Pkt. [-14, +47] ≈; exakt -8 Pkt. [-28, +6] ≈).
-  - pro: Die 3-bit-Variante ist formulierungsrobust (umformuliert 0.87 [0.66, 1.00], +0.017 [+0.000, +0.069] ≈); 6-bit: läuft noch.
+  - pro: Die 3-bit-Variante ist formulierungsrobust (umformuliert 0.87 [0.66, 1.00], +0.017 [+0.000, +0.069] ≈); 6-bit: 0.86 [0.66, 1.00].
   - contra: Braucht den 24 GB A5000 (Verfügbarkeit Sonntag offen); ~135.6 s Prüfzeit pro Anruf.
   - contra: Keine Prüfen-Fälle (Prüf-Recall 0% [0, 0]), keine Fakten-Passagen (evidence aus).
   - contra: Nie end-to-end auf neuen Dateien gelaufen.
