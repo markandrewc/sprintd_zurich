@@ -109,3 +109,38 @@ pushing stages as they land (see docs/STATUS.md). First CPU-only numbers in READ
   (diff -0.02 [-0.16, +0.11]); alarm AUC 0.78 vs 0.77 (+0.02 [-0.12, +0.15]) -> no detectable difference.
 - Interpretation: with the 7B judge the LLM layer, not the ASR, limits detection; the better keyword recall of large-v3
   does not show up. Re-test with the winning LLM. Keep large-v3 MIT as licence-clean option either way.
+
+## 2026-10-10T01:57 A6 decoding knobs on the default turbo int8 (keyword-spot recall, all 60 calls)
+| variant | kw recall | clean | noisy | false hits/call | CER |
+|---|---|---|---|---|---|
+| default (prompt, condition_on_previous_text) | 71.4% | 79.6% | 63.3% | 0.03 | 27.6% |
+| condition_on_previous_text=false | 76.5% | 79.6% | 73.5% | 0.03 | 25.2% |
+| no initial_prompt | 77.5% | 79.6% | 75.5% | 0.00 | 27.6% |
+- Both knobs only help on NOISY audio (+10-12 pp) where the prompt/previous text drives hallucinated loops; CIs overlap
+  (n = 10 level-1 dialogues). Direction is consistent with the D02-K2 loop diagnosis. DECISION: candidate ASR settings for
+  the champion = no keyword-list prompt + condition_on_previous_text=false (test together, then detection F1).
+  Note: the vocabulary prompt was meant to help keywords; on this data it does the opposite.
+
+## 2026-10-10T01:59 independent audit of the evidence code (adversarial reviewer agent)
+- Verified correct: all metrics recomputed from rows (21 variants), twin-group bootstrap, McNemar p, AUC, CV threshold
+  choice never sees test-fold labels, re-fusion == weight 0, no holdout dialogue in any stored experiment row.
+- Findings being fixed (fixer agent): F1 leaderboard ranks FAR-cap violators above compliant variants and review rules
+  give a FAR floor no threshold can lower; F2 `eval`/`experiment --split all` and `asr-eval` touch holdout unlogged;
+  F3 an experiment started while vLLM is loading can silently reuse the previous model's cached results;
+  F4 G-Eval step fallback cached silently; F5 re-fusion provenance; F6 cosmetic.
+- HOLDOUT DISCLOSURE: asr-eval runs A1-A3/A6 used all 60 calls, incl. holdout dialogue D07 (6 of 98 keyword spots).
+  Nothing was tuned on it, but the ASR numbers above include it. Dev-only recall: turbo int8 70.7%, nocond 75.0%,
+  large-v3 83.7% (vs 71.4 / 76.5 / 83.7 reported) -> same conclusions. Future ASR evals: --split dev.
+- F3 check for the LLM sweep: every variant's rows[].models is verified by hand after it finishes.
+
+## 2026-10-10T02:01 C4/RQ5 facts vs free judge (re-fusion of the 7B sweep variant, 0 extra GPU)
+- facts only: flag AUC 0.84 [0.70, 0.95] vs v1 0.68 (diff +0.16 [+0.05, +0.28] real), FAR 18% vs 86%, 3-class acc 73% vs 38%,
+  McNemar 3-class p=0.0009. Adding judge/geval/anchored to facts makes it WORSE at 7B (they add false alarms).
+- Weak spot: review recall 33% (Stufe3 C18, C20 -> no_alert). In-sample caveat on prompt wording (see RQ5).
+- NEXT: hybrid "facts decides alarm/no_alert, judge undetermined -> review"; review-side fact questions.
+
+## 2026-10-10T02:04 hybrid fusion (facts decides, llm_judge "undetermined" may escalate to review) on 7B results
+- fusion/hybrid.py (new plugin). qwen25_7b__hybrid: flag AUC 0.82 vs facts_only 0.84; CV FAR 27% vs 18%; review recall
+  unchanged 33%. The 7B judge's "undetermined" does not coincide with the expected-review calls. REJECTED at 7B
+  (re-test on the 14B results: free). Qwen3-8B failed to start (KV cache too small next to an ASR sweep) -> re-planned:
+  large-model ASR sweeps now (vLLM down), then Qwen2.5-14B (GPU exclusive), Qwen3-8B (fp8 KV), Qwen3-14B.
