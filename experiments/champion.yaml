@@ -39,3 +39,7 @@ variants:
   # (checks.facts.fewshot=runs/research/s2/fewshot_fold<k>.json) and merges the 4 runs here; then --rescore.
   - {name: fs_tuned, set: [checks.facts.parallel=1], description: "S2: tuned table + per-fold contrast few-shot (built by scripts/research/s2_fewshot.py)"}
   - {name: fs_para, set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts.parallel=1], description: "S2: paraphrased table + per-fold contrast few-shot (same examples)"}
+  # ---- design ablations of the champion's facts check (05:30)
+  - {name: qlang_de, set: [checks.facts.question_lang=de], description: "fact questions sent in German instead of English"}
+  - {name: noroles, set: [checks.facts.roles=false], description: "advisor/customer labels hidden from the fact probes"}
+  - {name: prefixmax, set: [checks.facts.prefix_max=true], description: "act facts also on growing prefixes (max)"}

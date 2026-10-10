@@ -31,3 +31,10 @@ or on bigger event GPUs. Do not expect a big jump from a bigger model.
 The fact wording was developed against 7B answers, which favours the 7B in this table (Qwen3-8B may be penalised by
 wording it was not tuned on). 30B+ models (event GPUs) were not testable here. With n = 24 dialogues a +0.05 AUC
 model effect is undetectable.
+
+
+## Update 05:31: prompt language (C9) on the champion
+Fact questions in German instead of English (same table, 7B, large-v3): flag AUC 0.73 vs 0.87, diff -0.13
+[-0.29, -0.01] (real); miss 42% vs 15%. The question language matters as much as a model swap — English questions
+for the model, German labels/reasons for the officer. Caveat: the English wording received more tuning.
+Hiding speaker roles: -0.06 [-0.15, +0.00] (borderline); prefix-max: no change.

@@ -568,3 +568,14 @@ Holdout = 6 dialogues / 12 calls (D07, C03, C04, C15, C16, C19): alarm 4 calls, 
   0.70 (diff +0.012 [-0.009, +0.046]); quote_judge replacing llm_judge: 0.69 (FAR 55% vs 45%, miss 19% vs 31%).
 - CV FAR unchanged at 45% for both keyword_context variants -> on top of the free judge, keyword-window G-Eval does
   NOT fix the harmless keyword calls; facts does (RQ7: FAR 86% -> 18%). No errors; ~11 LLM calls/call.
+
+## 2026-10-10T05:31 C9/N12/S4 design ablations of the champion's facts check (dev 48 calls, 7B, large-v3)
+| variant | flag AUC [CI] | diff vs champion [CI] | CV FAR | CV miss | 3-class |
+|---|---|---|---|---|---|
+| champion (English questions, roles shown) | 0.87 [0.72, 0.99] | - | 14% | 15% | 79% |
+| German questions (question_lang de) | 0.73 [0.54, 0.91] | -0.13 [-0.29, -0.01] real | 14% | 42% | 71% |
+| roles hidden | 0.81 [0.64, 0.95] | -0.06 [-0.15, +0.00] | 18% | 27% | 67% |
+| prefix_max | 0.87 [0.72, 0.99] | +0.00 | 18% | 15% | 77% |
+- English fact questions beat German ones with the 7B (real) — consistent with the prompt design (English instructions,
+  German criteria/answers for the officer). Caveat: the English wording received more tuning than the German one.
+- Speaker roles help (borderline). prefix_max adds nothing (it stays off).
