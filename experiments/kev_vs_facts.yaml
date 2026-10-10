@@ -115,3 +115,10 @@ variants:
     add_checks: [{name: general, type: questions, llm: default, questions: config/general_questions_para.yaml, parallel: 5, weight: 1.0}]
     set: [fusion.threshold=0.7]
   - {name: qwen_general_para_alone, refuse_from: qwen_general_para, checks: [general]}
+  # ---- team-decision matrix: policy table v3 on Kev (champion's table_v3 lives in experiments/champion.yaml) ----
+  - name: kev_facts_v3
+    profile: kev
+    description: "Kev facts with policy table v3 (criteria-derived open-fact review rules)"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0, policy_table: config/policy_table_v3.yaml}]
+    set: [fusion.threshold=0.55]

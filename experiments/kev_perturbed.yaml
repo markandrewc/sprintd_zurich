@@ -26,3 +26,9 @@ variants:
     add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0}]
     set: [fusion.threshold=0.55]
   - {name: kev_facts_alone, refuse_from: kev_facts, checks: [facts]}
+  - name: kev_facts_v3
+    profile: kev-perturbed
+    description: "Kev facts with policy table v3 on re-recorded audio"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0, policy_table: config/policy_table_v3.yaml}]
+    set: [fusion.threshold=0.55]

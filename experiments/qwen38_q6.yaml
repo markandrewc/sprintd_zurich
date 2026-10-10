@@ -36,3 +36,4 @@ variants:
     add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions_para.yaml, parallel: 4, weight: 1.0}]
     set: [fusion.threshold=0.7]
   - {name: q38q6_general_para_alone, refuse_from: q38q6_general_para, checks: [general]}
+  - {name: q38q6_facts_v3, profile: qwen38-q6, set: [checks.facts.policy_table=config/policy_table_v3.yaml, fusion.threshold=0.55], description: "Qwen3.8 facts with policy table v3"}

@@ -1,0 +1,14 @@
+# Qwen3.8-27B Q6_K on re-recorded dev audio (same audio as experiments/perturbed.yaml / kev_perturbed.yaml).
+name: qwen38_q6_perturbed
+description: Qwen3.8-27B Q6_K facts (v1 / v3 table) and general questions on re-recorded dev audio
+rq: [RQ10]
+base: qwen38-q6-perturbed
+split: dev
+compare_to: q38q6_facts
+variants:
+  - {name: q38q6_facts, set: [fusion.threshold=0.55]}
+  - {name: q38q6_facts_v3, set: [checks.facts.policy_table=config/policy_table_v3.yaml, fusion.threshold=0.55]}
+  - name: q38q6_general
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: q38, questions: config/general_questions.yaml, parallel: 4, weight: 1.0}]
+    set: [fusion.threshold=0.7]
