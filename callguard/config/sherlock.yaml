@@ -1,0 +1,121 @@
+# Sherlock Phones: the PRODUCTION profile. Dashboard and the hidden test set use this profile (GUIDE.md, RESULTS.md).
+#
+#   ASR       gcoli/whisper-large-v3-swiss-german-mit, fp16 (as recommended) -> Standard German transcript
+#   roles     advisor / customer: Qwen3.8-27B (3-bit GGUF UD-IQ3_XXS) on llama.cpp's llama-server (:8004)
+#   facts     TWO readers answer every fact of the active table (config/policy_table.yaml, v3):
+#               reader A  Qwen3.8-27B 3-bit   check `facts`      p(ja / nein / unklar) + evidence (segment ids
+#                                                                + German reason: the passages the officer hears)
+#               reader B  Kev-4B (bf16)       check `facts_kev`  p(ja) + passages (mask-4: window whose removal drops p(ja) most)
+#   decision  the fact policy (config/fact_policy.yaml: per reader a band, combination «Einigkeit») then the
+#             policy table's rules; keywords + patterns stay as light, editable cues
+#   display   Swiss German transcript (dialect CTC model, CPU, separate step); display only, never analysed
+#
+# Why Qwen3.8 3-bit: it fits a 12 GB card next to nothing else and was the strongest fact reader the team tried on
+# the case dev calls (in-sample comparison, not repeated in this hand-in).
+#
+# Staged on ONE 12 GB card (Qwen3.8 IQ3 ~11 GB and Kev ~8 GB do not fit together; Whisper ~4 GB runs alone):
+#   0. ASR, no LLM loaded            scripts/run_testset.sh does it (Pipeline.transcribe, profile sherlock)
+#   A. llama-server Qwen3.8 up       uv run callguard batch -c sherlock-qwen   (roles + Qwen facts + evidence;
+#                                    result = Qwen-only decision, the fallback)
+#   B. llama-server down, Kev up     uv run callguard batch -c sherlock        (Kev facts; roles and Qwen's answers
+#                                    come from the cache through the `pinned` stand-in below)
+#   C. Swiss German view (CPU)       uv run callguard display-views -c sherlock
+# One command for a folder of wavs: scripts/run_testset.sh <folder> [name].
+# Dashboard on stored results (no GPU): uv run callguard api -c sherlock --set paths.runs_dir=<run folder> + frontends/swiss
+extends: recommended.yaml
+description: Sherlock Phones (large-v3 ASR; Qwen3.8-27B 3-bit roles/facts/evidence + Kev-4B facts; fact policy)
+
+llms:
+  # Stage B and the demo: roles, Qwen fact answers and evidence come from the cache. `pinned` carries exactly the
+  # cache identity of the live llama-server client in sherlock-qwen.yaml (tests/test_sherlock.py checks this) and
+  # refuses every request, so a cache miss is loud instead of silently answered by another model.
+  default:
+    type: pinned
+    identity:
+      type: openai_compat
+      model: ${CALLGUARD_Q38_TAG:-qwen3.8-27b-ud-iq3_xxs}
+      json_mode: json_schema
+      seed: null
+      extra_body: {chat_template_kwargs: {enable_thinking: false}}
+    note: Qwen3.8 roles / fact answers / evidence come from the cache (stage A, callguard batch -c sherlock-qwen)
+  kev:
+    type: kev
+    base_url: ${CALLGUARD_KEV_URL:-http://127.0.0.1:8003}
+    model: ${KEV_MODEL:-jaredpalmer/kev-4b}   # must equal what serve_kev.py reports
+    dtype: bf16
+    calibrated: false
+    fact_answer: noul                         # p(yes) / 1 - p(yes)
+    max_concurrency: 1
+    timeout: 300
+  assistant:   # the KI-Assistent in Einstellungen (drafts rules / phrases facts): a LIVE Qwen3.8 (off by default)
+    type: openai_compat
+    base_url: ${CALLGUARD_Q38_URL:-http://127.0.0.1:8004/v1}
+    model: callguard-llm
+    cache_tag: ${CALLGUARD_Q38_TAG:-qwen3.8-27b-ud-iq3_xxs}
+    timeout: 180
+    json_mode: json_schema
+    supports_n: false
+    extra_body: {chat_template_kwargs: {enable_thinking: false}}
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.15
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.1
+  - name: facts                     # reader A: Qwen3.8 (identical block in sherlock-qwen.yaml: same cache key)
+    type: facts
+    llm: default
+    parallel: 2                     # = llama-server slots (-np 2)
+    evidence: true
+    weight: 1.0
+  - name: facts_kev                 # reader B: Kev-4B; also finds the passages (mask-4, see checks/kev_facts.py)
+    type: kev_facts
+    llm: kev
+    yes_at: {act: 0.5, context: 0.5, exculpatory: 0.5, authorization: 0.5}   # = plain facts read-out; the fact policy decides
+    no_below: 0.5
+    evidence: true
+    evidence_method: mask
+    mask_segments: 4
+    weight: 1.0
+
+# The officer's fact policy decides (demo tabs «Fakten» / «Regeln»): per fact, each reader's p -> ja / unklar / nein,
+# combined «Einigkeit», then the rules of config/policy_table.yaml. Pure re-fusion: changing a band or rule never
+# runs a model.
+fusion:
+  type: two_readers
+  rule: policy
+  fact_policy: config/fact_policy.yaml
+  readers: [facts, facts_kev]
+  reader_labels: [Qwen, Kev]
+  gap: 0.5
+  threshold: 0.55
+  review_band: 0.15
+  max_uncertainty: 0.35
+  min_score_for_review: 0.25
+  abstain_on_empty: true
+
+# DISPLAY ONLY: «Schweizerdeutsch (automatisch)» in «Anruf prüfen».
+# Each transcript segment is re-transcribed from the recording by a Swiss German dialect CTC model (wav2vec2 XLS-R,
+# SwissDial; ONNX on CPU), ids and times stay those of the transcript. No check, fusion or AI decision reads it.
+#   uv run callguard display-views -c sherlock      (adds `display_views.gsw` to every stored result.json)
+display_views:
+  gsw:
+    lang: gsw
+    in_pipeline: false
+    description: Schweizerdeutsch (automatisch aus der Aufnahme, Dialekt-Spracherkennung pro Abschnitt)
+    translator:
+      type: ctc_dialect
+      model: models/asr/wav2vec2-gsw-swissdial-onnx
+      pad_end: 0.6
+      threads: 6
+
+app:
+  base_url: http://localhost:8502
+  assistant_llm: assistant
+  assistant_enabled: false   # KI-Assistent off: manual wizards only, no LLM call
+
+paths:
+  runs_dir: runs/sherlock

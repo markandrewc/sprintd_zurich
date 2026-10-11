@@ -1,0 +1,512 @@
+{
+ "families": [
+  {
+   "id": "trade",
+   "label": "Insider trading",
+   "label_de": "Insiderhandel (Information und Kaufwunsch)",
+   "facts": [
+    {
+     "id": "wish",
+     "label": "Own trading wish expressed",
+     "label_de": "Eigener Handelswunsch geäussert",
+     "role": "act",
+     "question": "Does a person in the call (usually the customer) express their own concrete wish to buy, sell or trade a specific security (even if the order is then not executed or is refused by the advisor)?",
+     "question_de": "Äussert eine Person im Gespräch (meist die Kundin/der Kunde) einen eigenen, konkreten Wunsch, ein bestimmtes Wertpapier zu kaufen, zu verkaufen oder damit zu handeln (auch wenn der Auftrag danach nicht ausgeführt oder von der Beratung abgelehnt wird)?",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 10,
+      "no": 48,
+      "unclear": 2,
+      "agree": 58
+     }
+    },
+    {
+     "id": "inside_info",
+     "label": "Justified with non-public inside information",
+     "label_de": "Begründet mit nicht öffentlicher Insider-Information",
+     "role": "context",
+     "question": "Does this person justify the trading wish with information they received themselves from an internal or confidential source (e.g. family, employer, finance department, \"between us\", figures or documents shown in advance) that is not yet public (e.g. quarterly results, a takeover or a large order before the announcement)?",
+     "question_de": "Begründet diese Person den Handelswunsch mit Information, die sie selbst aus einer internen oder vertraulichen Quelle erhalten hat (z.B. Familie, Arbeitgeber, Finanzabteilung, \"unter uns\", vorab gezeigte Zahlen oder Dokumente) und die noch nicht öffentlich ist (z.B. Quartalszahlen, Übernahme oder Grossauftrag vor der Bekanntgabe)?",
+     "used_in_rules": 2,
+     "answers": {
+      "calls": 60,
+      "yes": 8,
+      "no": 48,
+      "unclear": 4,
+      "agree": 57
+     }
+    },
+    {
+     "id": "public",
+     "label": "Information already public",
+     "label_de": "Information bereits öffentlich",
+     "role": "exculpatory",
+     "question": "Does the call say that the information the trading wish is based on is already public (press release, published report, generally available figures)?",
+     "question_de": "Wird im Gespräch gesagt, dass die Information, auf die sich der Handelswunsch stützt, bereits öffentlich ist (Medienmitteilung, veröffentlichter Bericht, allgemein zugängliche Zahlen)?",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 6,
+      "no": 54,
+      "unclear": 0,
+      "agree": 60
+     }
+    },
+    {
+     "id": "source_open",
+     "label": "Call leaves open where the information comes from or whether it is public",
+     "label_de": "Im Gespräch offen, woher die Information stammt oder ob sie öffentlich ist",
+     "role": "context",
+     "question": "Does someone in the call explicitly say that it is unclear or unknown where the information behind the trading wish comes from, or whether it is already public (e.g. \"I don't know if that has been published yet\", \"where did you get that?\" without a clear answer)?",
+     "question_de": "Sagt jemand im Gespräch ausdrücklich, dass unklar oder unbekannt ist, woher die Information stammt, auf die sich der Handelswunsch stützt, oder ob sie schon öffentlich bekannt ist (z.B. \"ich weiss nicht, ob das schon publiziert ist\", \"woher haben Sie das?\" ohne klare Antwort)?",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 48,
+      "unclear": 12,
+      "agree": 48
+     }
+    }
+   ]
+  },
+  {
+   "id": "access",
+   "label": "Access credentials disclosed",
+   "label_de": "Zugangsinformation preisgegeben",
+   "facts": [
+    {
+     "id": "spoken",
+     "label": "Code/value read out on the phone",
+     "label_de": "Code/Wert am Telefon vorgelesen",
+     "role": "act",
+     "question": "Does a person (usually the customer) read out on the phone the digits or characters of a value that may be a PIN, TAN, password, confirmation, approval or login code, even if its validity is unclear and even if the advisor then stops them? (Only the last four digits, a reference number or an amount do not count.)",
+     "question_de": "Liest eine Person (meist die Kundin/der Kunde) am Telefon die Ziffern oder Zeichen eines Werts vor, der eine PIN, TAN, ein Passwort oder ein Bestätigungs-, Freigabe- oder Anmeldecode sein könnte, auch wenn seine Gültigkeit unklar ist und auch wenn die Beratung sie danach stoppt? (Nur die letzten vier Ziffern, eine Referenznummer oder ein Betrag zählen nicht.)",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 6,
+      "no": 45,
+      "unclear": 9,
+      "agree": 51
+     }
+    },
+    {
+     "id": "current",
+     "label": "Value belongs to the current, valid process",
+     "label_de": "Wert gehört zum laufenden, gültigen Vorgang",
+     "role": "context",
+     "question": "Does the value that was said belong to a current, still valid login or approval process? Answer \"unknown\" if it stays open which process it belongs to or whether it is still valid.",
+     "question_de": "Gehört der ausgesprochene Wert zu einem laufenden, noch gültigen Anmelde- oder Freigabevorgang? Antworte \"unknown\", wenn offen bleibt, zu welchem Vorgang er gehört oder ob er noch gültig ist.",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 54,
+      "unclear": 6,
+      "agree": 54
+     }
+    },
+    {
+     "id": "validity_open",
+     "label": "Call leaves open whether the value is valid",
+     "label_de": "Im Gespräch offen, ob der Wert gültig ist",
+     "role": "context",
+     "question": "Does someone in the call say that it is unclear or unknown whether the value that was read out is still valid, or to which process it belongs?",
+     "question_de": "Sagt jemand im Gespräch, dass unklar oder unbekannt ist, ob der vorgelesene Wert noch gültig ist oder zu welchem Vorgang er gehört?",
+     "used_in_rules": 2,
+     "answers": {
+      "calls": 60,
+      "yes": 2,
+      "no": 30,
+      "unclear": 28,
+      "agree": 32
+     }
+    },
+    {
+     "id": "expired_or_sample",
+     "label": "Value expired or a sample",
+     "label_de": "Wert abgelaufen oder Muster",
+     "role": "exculpatory",
+     "question": "Is the value that was said described in the call as expired, invalid, not usable, or as a sample or example (e.g. from instructions or a help page)?",
+     "question_de": "Wird der ausgesprochene Wert im Gespräch als abgelaufen, ungültig, nicht verwendbar oder als Muster bzw. Beispiel (z.B. aus einer Anleitung oder Hilfeseite) bezeichnet?",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 2,
+      "no": 50,
+      "unclear": 8,
+      "agree": 52
+     }
+    },
+    {
+     "id": "asked_by_advisor",
+     "label": "Code asked for by the advisor",
+     "label_de": "Code von der Beratung erfragt",
+     "role": "context",
+     "question": "Does the advisor ask the customer to tell or read out a code, PIN, TAN or password?",
+     "question_de": "Fordert die Beraterin/der Berater die Kundin/den Kunden auf, einen Code, eine PIN, eine TAN oder ein Passwort zu nennen oder vorzulesen?",
+     "used_in_rules": 0,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 54,
+      "unclear": 6,
+      "agree": 55
+     }
+    },
+    {
+     "id": "process_open",
+     "label": "Call leaves open which process the value belongs to",
+     "label_de": "Im Gespräch offen, zu welchem Vorgang der Wert gehört",
+     "role": "context",
+     "question": "Does someone in the call explicitly say that it is not clear where the value that was read out comes from, or to which process, message or account it belongs (e.g. \"I don't know whether this is the new or the old code\")?",
+     "question_de": "Sagt jemand im Gespräch ausdrücklich, dass nicht klar ist, woher der vorgelesene Wert stammt oder zu welchem Vorgang, welcher Nachricht oder welchem Konto er gehört (z.B. \"ich weiss nicht, ob das der neue oder der alte Code ist\")?",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 2,
+      "no": 44,
+      "unclear": 14,
+      "agree": 46
+     }
+    }
+   ]
+  },
+  {
+   "id": "disclosure",
+   "label": "Information given to third parties",
+   "label_de": "Auskunft an Dritte",
+   "facts": [
+    {
+     "id": "data_given",
+     "label": "Concrete data of a third person given out",
+     "label_de": "Konkrete Daten einer Drittperson herausgegeben",
+     "role": "act",
+     "question": "Does the advisor tell the caller concrete figures or details from an account, loan or customer file that belongs to someone other than the caller (e.g. an account balance, a loan amount, an interest date, payments)?",
+     "question_de": "Nennt die Beraterin/der Berater der anrufenden Person konkrete Zahlen oder Angaben aus einem Konto, Darlehen oder Kundendossier, das einer anderen Person als der anrufenden gehört (z.B. Kontostand, Darlehensbetrag, Zinstermin, Zahlungen)?",
+     "used_in_rules": 4,
+     "answers": {
+      "calls": 60,
+      "yes": 7,
+      "no": 50,
+      "unclear": 3,
+      "agree": 57
+     }
+    },
+    {
+     "id": "third_party_request",
+     "label": "Information about a third person requested",
+     "label_de": "Auskunft über Drittperson verlangt",
+     "role": "context",
+     "question": "Does the caller ask the advisor to tell them information that the bank holds about another person's accounts, loans or banking business (not the caller's own)?",
+     "question_de": "Bittet die anrufende Person die Beratung, ihr Angaben zu nennen, die die Bank über Konten, Darlehen oder Bankgeschäfte einer anderen Person (nicht der eigenen) hat?",
+     "used_in_rules": 2,
+     "answers": {
+      "calls": 60,
+      "yes": 4,
+      "no": 52,
+      "unclear": 4,
+      "agree": 57
+     }
+    },
+    {
+     "id": "authorized",
+     "label": "Power of attorney / right to information confirmed",
+     "label_de": "Vollmacht/Auskunftsrecht bestätigt",
+     "role": "authorization",
+     "question": "Does the advisor confirm in the call that the caller has a registered power of attorney or right to information that covers exactly this information?",
+     "question_de": "Bestätigt die Beratung im Gespräch, dass die anrufende Person eine hinterlegte Vollmacht oder ein Auskunftsrecht hat, das genau diese Auskunft abdeckt?",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 55,
+      "unclear": 5,
+      "agree": 55
+     }
+    },
+    {
+     "id": "not_authorized",
+     "label": "No power of attorney / authorization established",
+     "label_de": "Keine Vollmacht/Berechtigung festgestellt",
+     "role": "authorization",
+     "question": "Does the advisor say in the call that the caller has no power of attorney, no right to information or no authorization for this information?",
+     "question_de": "Sagt die Beratung im Gespräch, dass die anrufende Person keine Vollmacht, kein Auskunftsrecht oder keine Berechtigung für diese Auskunft hat?",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 3,
+      "no": 52,
+      "unclear": 5,
+      "agree": 55
+     }
+    },
+    {
+     "id": "beyond_scope",
+     "label": "Information beyond the scope of the power of attorney",
+     "label_de": "Auskunft über den Umfang der Vollmacht hinaus",
+     "role": "context",
+     "question": "Does the information given go beyond the confirmed scope of a power of attorney?",
+     "question_de": "Geht die herausgegebene Auskunft über den bestätigten Umfang einer Vollmacht hinaus?",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 47,
+      "unclear": 13,
+      "agree": 47
+     }
+    },
+    {
+     "id": "authorization_open",
+     "label": "Call leaves open whether an authorization exists",
+     "label_de": "Im Gespräch offen, ob eine Berechtigung besteht",
+     "role": "authorization",
+     "question": "Does someone in the call explicitly say that it is (still) unclear, not checked, or cannot be established right now whether the caller has a power of attorney or authorization for information about the other person?",
+     "question_de": "Sagt jemand im Gespräch ausdrücklich, dass (noch) unklar, nicht geprüft oder im Moment nicht feststellbar ist, ob die anrufende Person eine Vollmacht oder Berechtigung für Auskünfte über die andere Person hat?",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 2,
+      "no": 53,
+      "unclear": 5,
+      "agree": 55
+     }
+    }
+   ]
+  },
+  {
+   "id": "documentation",
+   "label": "Withholding relevant information",
+   "label_de": "Relevante Angabe verschweigen",
+   "facts": [
+    {
+     "id": "omit_request",
+     "label": "Asked not to record something",
+     "label_de": "Verlangt, etwas nicht zu protokollieren",
+     "role": "act",
+     "question": "Does a person ask or demand that a fact is not recorded, not put into the notes, or hidden from an internal unit (e.g. credit check, financing department)?",
+     "question_de": "Verlangt oder bittet eine Person, dass eine Tatsache nicht protokolliert, nicht in die Notiz aufgenommen oder vor einer internen Stelle (z.B. Kreditprüfung, Finanzierungsstelle) verborgen wird?",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 5,
+      "no": 45,
+      "unclear": 10,
+      "agree": 50
+     }
+    },
+    {
+     "id": "relevant",
+     "label": "Hidden fact is relevant",
+     "label_de": "Verborgene Tatsache ist relevant",
+     "role": "context",
+     "question": "Is the fact that should be hidden or not recorded relevant to the process, e.g. an existing repayable debt or obligation in a credit check?",
+     "question_de": "Ist die Tatsache, die verborgen oder nicht protokolliert werden soll, für den Vorgang relevant, z.B. eine bestehende rückzahlbare Schuld oder Verpflichtung bei einer Kreditprüfung?",
+     "used_in_rules": 2,
+     "answers": {
+      "calls": 60,
+      "yes": 2,
+      "no": 51,
+      "unclear": 7,
+      "agree": 53
+     }
+    },
+    {
+     "id": "correction_or_private",
+     "label": "Only a correction or private details",
+     "label_de": "Nur Korrektur oder private Details",
+     "role": "exculpatory",
+     "question": "Is it only about correcting or removing a wrong or unrelated old entry, or leaving out private details that are irrelevant to the process, while everything relevant stays visible?",
+     "question_de": "Geht es nur darum, eine falsche oder sachfremde alte Angabe zu korrigieren oder zu entfernen, oder private, für den Vorgang irrelevante Details wegzulassen, während alles Relevante sichtbar bleibt?",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 46,
+      "unclear": 14,
+      "agree": 46
+     }
+    },
+    {
+     "id": "relevance_open",
+     "label": "Call leaves open whether the hidden information is relevant",
+     "label_de": "Im Gespräch offen, ob die verborgene Angabe relevant ist",
+     "role": "context",
+     "question": "Does someone in the call explicitly say that it is unclear or still to be clarified whether the information that should not be recorded or passed on is relevant to the process (e.g. whether it is a repayable obligation, or whether the responsible unit needs to know it)?",
+     "question_de": "Sagt jemand im Gespräch ausdrücklich, dass unklar oder noch abzuklären ist, ob die Angabe, die nicht protokolliert oder nicht weitergegeben werden soll, für den Vorgang relevant ist (z.B. ob es sich um eine rückzahlbare Verpflichtung handelt oder ob die zuständige Stelle sie wissen muss)?",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 1,
+      "no": 54,
+      "unclear": 5,
+      "agree": 55
+     }
+    }
+   ]
+  },
+  {
+   "id": "splitting",
+   "label": "Splitting to bypass a control",
+   "label_de": "Zuständigkeit/Kontrolle umgehen (Aufteilen)",
+   "facts": [
+    {
+     "id": "split_request",
+     "label": "Splitting into partial amounts requested",
+     "label_de": "Aufteilung in Teilbeträge verlangt",
+     "role": "act",
+     "question": "Does a person ask to split a payment or an invoice into several partial amounts or partial payments?",
+     "question_de": "Verlangt eine Person, eine Zahlung oder Rechnung in mehrere Teilbeträge oder Teilzahlungen aufzuteilen?",
+     "used_in_rules": 3,
+     "answers": {
+      "calls": 60,
+      "yes": 5,
+      "no": 51,
+      "unclear": 4,
+      "agree": 56
+     }
+    },
+    {
+     "id": "avoid_control",
+     "label": "Purpose is to bypass a control or approval",
+     "label_de": "Zweck ist, Kontrolle oder Freigabe zu umgehen",
+     "role": "context",
+     "question": "Is it stated, or clearly recognizable, that the split is meant to get around an internal control, approval, limit or responsibility?",
+     "question_de": "Wird als Grund für die Aufteilung genannt oder ist klar erkennbar, dass damit eine interne Kontrolle, Freigabe, Limite oder Zuständigkeit umgangen werden soll?",
+     "used_in_rules": 2,
+     "answers": {
+      "calls": 60,
+      "yes": 4,
+      "no": 50,
+      "unclear": 6,
+      "agree": 54
+     }
+    },
+    {
+     "id": "single_invoice",
+     "label": "Partial amounts belong to a single invoice",
+     "label_de": "Teilbeträge gehören zu einer einzigen Rechnung",
+     "role": "context",
+     "question": "Do the partial amounts belong to one single, connected invoice or payment?",
+     "question_de": "Gehören die Teilbeträge zu einer einzigen zusammenhängenden Rechnung oder Zahlung?",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 22,
+      "unclear": 38,
+      "agree": 22
+     }
+    },
+    {
+     "id": "harmless",
+     "label": "Independent invoices or only an example",
+     "label_de": "Unabhängige Rechnungen oder nur Beispiel",
+     "role": "exculpatory",
+     "question": "Are these several independent, genuine invoices paid by their due dates, or is getting around a control only denied or quoted as a training example?",
+     "question_de": "Handelt es sich um mehrere unabhängige, echte Rechnungen, die nach Fälligkeit bezahlt werden, oder wird eine Umgehung nur verneint oder als Schulungsbeispiel zitiert?",
+     "used_in_rules": 4,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 49,
+      "unclear": 11,
+      "agree": 49
+     }
+    },
+    {
+     "id": "link_open",
+     "label": "Call leaves open whether the partial amounts belong together",
+     "label_de": "Im Gespräch offen, ob die Teilbeträge zusammengehören",
+     "role": "context",
+     "question": "Does someone in the call explicitly say that it is unclear or unknown whether the partial amounts belong to one single invoice or deal, or to several independent invoices?",
+     "question_de": "Sagt jemand im Gespräch ausdrücklich, dass unklar oder unbekannt ist, ob die Teilbeträge zu einer einzigen Rechnung bzw. einem einzigen Geschäft gehören oder zu mehreren unabhängigen Rechnungen?",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 3,
+      "no": 47,
+      "unclear": 10,
+      "agree": 50
+     }
+    },
+    {
+     "id": "motive_open",
+     "label": "Call leaves open why the payment should be split",
+     "label_de": "Im Gespräch offen, warum aufgeteilt werden soll",
+     "role": "context",
+     "question": "Is it explicitly left open in the call why the payment should be split (e.g. the advisor asks for the reason and gets no clear answer, or someone says the reason is unknown)?",
+     "question_de": "Bleibt im Gespräch ausdrücklich offen, warum die Zahlung aufgeteilt werden soll (z.B. die Beratung fragt nach dem Grund und bekommt keine klare Antwort, oder jemand sagt, der Grund sei unbekannt)?",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 58,
+      "unclear": 2,
+      "agree": 58
+     }
+    },
+    {
+     "id": "split_connected",
+     "label": "One connected payment is to be split into partial payments",
+     "label_de": "Eine zusammenhängende Zahlung soll in Teilzahlungen aufgeteilt werden",
+     "role": "act",
+     "question": "Does a person ask to pay one single invoice or one connected amount not as one payment but as several smaller payments or transfers (e.g. spread over several days, accounts or orders)?",
+     "question_de": "Verlangt eine Person, eine einzige Rechnung oder einen zusammenhängenden Betrag nicht als eine Zahlung, sondern in mehreren kleineren Zahlungen oder Überweisungen zu begleichen (z.B. aufgeteilt auf mehrere Tage, Konten oder Aufträge)?",
+     "used_in_rules": 2,
+     "answers": {
+      "calls": 60,
+      "yes": 3,
+      "no": 49,
+      "unclear": 8,
+      "agree": 52
+     }
+    },
+    {
+     "id": "approval_avoided",
+     "label": "Reason given - approval / check / responsibility should not apply",
+     "label_de": "Begründung - Freigabe/Prüfung/Zuständigkeit soll nicht greifen",
+     "role": "context",
+     "question": "Does the person who wants the split say that this way each part stays below an amount threshold or limit, or that a specific internal approval, review, second signature or responsible unit or person is not triggered or not involved? (A guess or leading question by the other side that the person denies does not count.)",
+     "question_de": "Sagt die Person, die die Aufteilung will, dass damit jeder Teil unter einer Betragsgrenze oder Limite bleibt oder dass eine bestimmte interne Freigabe, Prüfung, Zweitunterschrift oder zuständige Stelle bzw. Person nicht ausgelöst oder nicht einbezogen wird? (Eine Vermutung oder Suggestivfrage der Gegenseite, die die Person verneint, zählt nicht.)",
+     "used_in_rules": 1,
+     "answers": {
+      "calls": 60,
+      "yes": 0,
+      "no": 55,
+      "unclear": 5,
+      "agree": 55
+     }
+    }
+   ]
+  }
+ ],
+ "readers": [
+  {
+   "id": "qwen",
+   "label": "Qwen",
+   "model": "Qwen/Qwen2.5-7B-Instruct-AWQ",
+   "mode": "band",
+   "band": [
+    0.4,
+    0.6
+   ]
+  },
+  {
+   "id": "kev",
+   "label": "Kev",
+   "model": "jaredpalmer/kev-4b",
+   "mode": "band",
+   "band": [
+    0.4,
+    0.6
+   ]
+  }
+ ],
+ "combination": "agree",
+ "active_version": null,
+ "proposals": []
+}

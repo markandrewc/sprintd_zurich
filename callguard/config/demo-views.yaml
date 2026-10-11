@@ -1,0 +1,43 @@
+# Transcript views with zero models: demo-offline (reference scripts + fake LLM) plus a translated view.
+# Exercises the views plumbing (DAG, per-view checks, Passage.texts, provenance) offline:
+#   uv run callguard batch -c demo-views
+# The "translation" is the identity translator: en_from_de holds the same Swiss German text labelled
+# `en`, so the English keyword check finds next to nothing. Real translations: config/gpu-views.yaml.
+extends: demo-offline.yaml
+description: Offline views demo (reference scripts as view main + identity-"translated" en view, fake LLM)
+
+views:
+  main:
+    lang: gsw                # reference scripts are Swiss German dialect
+    # asr: top-level (reference) ; diarize: true (top-level diarizer is `none` here)
+  en_from_de:
+    lang: en
+    from: main
+    translator: {type: identity}
+primary_view: main
+check_view: null
+extra_views: []
+
+checks:   # lists replace the parent's: the full list of demo-offline plus one check on the en view
+  - name: keywords
+    type: keywords
+    weight: 0.35
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.2
+  - name: llm_judge
+    type: llm_judge
+    llm: default
+    samples: 1
+    temperature: 0.0
+    weight: 1.0
+  - name: geval
+    type: geval
+    llm: default
+    weight: 1.0
+  - name: keywords_en      # multi-view ensemble member: same check type, English view, English forms
+    type: keywords
+    view: en_from_de
+    weight: 0.2
+    fuzzy: 90

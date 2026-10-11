@@ -1,0 +1,78 @@
+{
+ "app": "Sherlock Phones",
+ "api_version": "1",
+ "profile": "dual-facts",
+ "runs_dir": "runs/dual-facts/dual-facts",
+ "code_version": "2a36900",
+ "models": {
+  "asr": "whisper-large-v3-gsw-ct2",
+  "fact_readers": [
+   {
+    "id": "qwen",
+    "label": "Qwen",
+    "check": "facts",
+    "model": "Qwen/Qwen2.5-7B-Instruct-AWQ"
+   },
+   {
+    "id": "kev",
+    "label": "Kev",
+    "check": "facts_kev",
+    "model": "jaredpalmer/kev-4b"
+   }
+  ],
+  "swiss_german_view": "ctc_dialect:wav2vec2-gsw-swissdial-onnx"
+ },
+ "counts": {
+  "calls": 60,
+  "alarm": 15,
+  "review": 18,
+  "no_alert": 27,
+  "reviewed": 0
+ },
+ "families": [
+  {
+   "id": "numbers",
+   "label": "Card and reference numbers",
+   "label_de": "Zahlenobjekte (Karten- und Referenznummern)",
+   "can_alarm": false,
+   "legal_basis": ""
+  },
+  {
+   "id": "trade",
+   "label": "Insider trading",
+   "label_de": "Insiderhandel (Information und Kaufwunsch)",
+   "can_alarm": true,
+   "legal_basis": "FinfraG Art. 142 (Ausnützen von Insiderinformationen) – Vorschlag, durch Compliance zu bestätigen"
+  },
+  {
+   "id": "access",
+   "label": "Access credentials disclosed",
+   "label_de": "Zugangsinformation preisgegeben",
+   "can_alarm": true,
+   "legal_basis": "Interne Weisung Informationssicherheit (Zugangsdaten nie am Telefon) – Vorschlag, durch Compliance zu bestätigen"
+  },
+  {
+   "id": "disclosure",
+   "label": "Information given to third parties",
+   "label_de": "Auskunft an Dritte",
+   "can_alarm": true,
+   "legal_basis": "BankG Art. 47 (Bankkundengeheimnis) – Vorschlag, durch Compliance zu bestätigen"
+  },
+  {
+   "id": "documentation",
+   "label": "Withholding relevant information",
+   "label_de": "Relevante Angabe verschweigen",
+   "can_alarm": true,
+   "legal_basis": "FIDLEG Art. 15 (Dokumentation) / interne Weisung Kreditprüfung – Vorschlag, durch Compliance zu bestätigen"
+  },
+  {
+   "id": "splitting",
+   "label": "Splitting to bypass a control",
+   "label_de": "Zuständigkeit/Kontrolle umgehen (Aufteilen)",
+   "can_alarm": true,
+   "legal_basis": "GwG (Sorgfaltspflichten) / interne Kompetenzordnung – Vorschlag, durch Compliance zu bestätigen"
+  }
+ ],
+ "has_fact_policy": true,
+ "load_errors": []
+}

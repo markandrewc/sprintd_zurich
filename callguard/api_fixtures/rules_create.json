@@ -1,0 +1,22 @@
+{
+ "rule": {
+  "id": "eigene.alarm_1",
+  "family": "cross",
+  "outcome": "alarm",
+  "title": "Code read out while a third person asks",
+  "text": "A code is read out on the phone and the call is about a third person.",
+  "condition": "access.spoken = yes and disclosure.third_party_request = yes",
+  "condition_text": "\"Access credentials disclosed: Code/value read out on the phone\" is yes AND \"Information given to third parties: Information about a third person requested\" is yes",
+  "report_as": "access"
+ },
+ "version": 2,
+ "effect": {
+  "changed": [],
+  "net": {
+   "alarm": 0,
+   "review": 0,
+   "no_alert": 0
+  },
+  "summary": "changes none of the 60 calls"
+ }
+}

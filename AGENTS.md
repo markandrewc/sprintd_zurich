@@ -1,0 +1,29 @@
+# Notes for a coding agent working in this repo (sprintd Zürich 2026, Inventx/Outcept case)
+
+Two parts live here:
+
+| folder | what |
+|---|---|
+| `callguard/` | **Sherlock Phones, the production pipeline we hand in.** Start with `callguard/GUIDE.md` (install on one or two GPUs, run a folder of `.wav` files, dashboard, scoring) and `callguard/RESULTS.md` (what we measured on the 60 case calls, and how). The case brief is `callguard/docs/CASE.md`. |
+| `fraud_analysis/`, `transcription/`, `dashboard/`, `finetuning/`, `shared/`, `misc/`, `start.*` | The first prototype (see `README.md`). Of it, the production pipeline uses only the Kev-4B service code in `fraud_analysis/kev/` (reader B, served by `callguard/scripts/remote/serve_kev.py`). |
+
+Production chain = profile `sherlock` (`callguard/config/sherlock.yaml`): Whisper large-v3 Swiss German -> sherpa-onnx
+speakers -> Qwen3.8-27B 3-bit roles + reader A -> Kev-4B reader B + masking passages -> fact policy -> policy table rules
+-> keywords/patterns -> fusion. `callguard/scripts/run_testset.sh <wavs> <name>` runs it staged on one GPU.
+
+## Commands (run inside `callguard/`)
+```bash
+uv sync --extra asr --extra diarize --extra ui --extra dev
+uv run pytest -q -m "not slow"                   # offline tests, must stay green
+scripts/run_testset.sh /path/to/wavs NAME         # new calls -> runs/testset-NAME/
+uv run callguard api -c sherlock --set paths.runs_dir=runs/testset-NAME --set paths.data_dir=runs/testset-NAME/.no_case_data --port 8600   # dashboard API
+(cd frontends/swiss && npm ci && npm run dev -- --port 8605)                          # dashboard
+```
+
+## Rules
+1. Self-hosted models only; no cloud API in transcription or checks.
+2. Never feed file names, call ids, reference scripts or expected labels into the audio pipeline. `oracle` /
+   `demo-offline` profiles read scripts instead of audio: tests and UI work only, never results.
+3. Results are only what the pipeline produces from the .wav files; label numbers come from
+   `callguard/scripts/score_results.py` after the run.
+4. Never commit `data_upstream/`, `models/`, `.cache/`, `runs/` or secrets. Stop processes by PID, never `pkill -f`.

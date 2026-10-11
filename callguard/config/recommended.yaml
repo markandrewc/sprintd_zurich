@@ -1,0 +1,40 @@
+# Base of the production profile `sherlock` (which replaces its LLM, checks and fusion). As a profile of its own: the
+# earlier single-reader chain (Qwen2.5-7B on vLLM); kept for the research configs and tests, not used for results.
+#
+#   ASR    gcoli/whisper-large-v3-swiss-german-mit (MIT licence), fp16, beam 1 -> Standard German text (view `de`)
+#   LLM    Qwen2.5-7B-Instruct-AWQ on vLLM as `callguard-llm` (scripts/remote/swap_llm.sh Qwen/Qwen2.5-7B-Instruct-AWQ 0.80)
+#   checks facts (atomic yes/no/unknown questions + officer-editable config/policy_table.yaml) decides;
+#          keywords + patterns stay visible and editable with a light weight (no keyword = abstain, not "harmless")
+#
+# Whisper large-v3 fp16 (~4 GB) and vLLM (~8-9 GB) do not fit the 12 GB card at the same time: process NEW calls
+# with scripts/run_staged.sh recommended (ASR for all calls with vLLM stopped, then the LLM). Cached calls (the case
+# set) run directly: uv run callguard batch -c recommended / uv run callguard ui -c recommended.
+extends: gpu-12gb.yaml
+description: Recommended (large-v3 MIT ASR + Qwen2.5-7B facts + light keywords/patterns)
+
+asr:
+  model: models/asr/whisper-large-v3-gsw-ct2
+  compute_type: float16
+  model_tag: whisper-large-v3-gsw-fp16-cuda
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.15
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.1
+  - name: facts
+    type: facts
+    llm: default
+    parallel: 5
+    weight: 1.0
+
+fusion:
+  type: weighted
+  threshold: 0.55
+  review_band: 0.15
+  max_uncertainty: 0.35
+  min_score_for_review: 0.25
+  abstain_on_empty: true

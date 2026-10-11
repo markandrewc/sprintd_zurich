@@ -1,0 +1,18 @@
+# recommended + an English view of its large-v3 `de` transcript (research: experiments/kev_vs_facts.yaml).
+# en_from_de = Qwen2.5-7B-AWQ (llms.default on vLLM) translates the de view segment by segment (ids, times, roles
+# kept). NOTE: the en_from_de translations cached by RQ1 (llm-sweep-views) came from the TURBO de transcript; this
+# view translates the large-v3 one, so the first run needs vLLM (~15 s per call). config/kev-views.yaml has the
+# identical views block with a pinned stand-in LLM: the translator cache key is the same, so Kev variants reuse
+# these translations without vLLM. Keep the two blocks identical (tests/test_kev.py checks it).
+extends: recommended.yaml
+description: recommended + English view (LLM translation of the large-v3 de transcript; research only)
+
+views:
+  de: {lang: de, diarize: true}          # the top-level (large-v3) ASR + roles: same caches as recommended
+  en_from_de:
+    lang: en
+    from: de
+    translator: {type: llm_translate, llm: default, batch_size: 12, context: 3, concurrency: 4}
+primary_view: de
+check_view: null
+extra_views: []

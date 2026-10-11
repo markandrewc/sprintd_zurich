@@ -1,0 +1,48 @@
+# Prüfmodi: the operating modes the compliance officer picks in the sidebar (UI: callguard.ui.modes).
+#
+# A mode is a rule of the two_readers fusion (src/callguard/fusion/two_readers.py) applied to the STORED per-check
+# results of every call (pure re-fusion, no model runs):
+#   a       reader A alone (the champion: Qwen2.5-7B reads the fact sheet; = the profile's weighted fusion)
+#   b       reader B alone (Kev-4B reads the same fact sheet)
+#   labels  R1: each reader decides; agreement decides, disagreement -> Prüfen
+# Modes with `needs_second: true` need reader B's results (check `facts_kev`) in the shown calls; without them they
+# are shown disabled with the reason. Calls that lack reader B are decided like the default mode (and say so).
+#
+# The measured consequences shown next to each mode are NOT written here: they are read from the experiment's
+# out-of-fold CV rows (runs/experiments/<experiment>/summary.json + <variant>/rows.json), or, when runs/ is absent,
+# from the committed snapshot research/evidence/pruefmodi_metrics.json (`uv run python -m callguard.ui.modes
+# snapshot` regenerates it). Dev split only, n = 48 calls: the intervals are wide and the officer sees them.
+#
+# threshold: profile   = the profile's own Alarmschwelle (incl. a saved tuning overlay)
+#            suggested = the threshold the experiment suggests for this variant on the dev split
+#            <number>  = fixed
+experiment: two_readers
+default: ausgewogen
+readers: [facts, facts_kev]          # used when the profile's fusion is not two_readers (else fusion.readers)
+reader_labels: [Qwen, Kev]
+second_reader: Kev                   # named in the "disabled" reason
+
+modes:
+  - id: zurueckhaltend
+    label: Zurückhaltend
+    text: Wenige Prüfungen. Nur das zweite Modell (Kev) liest die Fakten; es meldet kaum grundlos, übersieht aber mehr.
+    rule: b
+    needs_second: true
+    metrics: kev_v3
+    threshold: suggested
+
+  - id: ausgewogen
+    label: Ausgewogen
+    text: Standard. Das Hauptmodell (Qwen) liest die Fakten, das Regelwerk entscheidet; Unklares geht zur Prüfung.
+    rule: a
+    needs_second: false
+    metrics: qwen_v3
+    threshold: profile
+
+  - id: vorsichtig
+    label: Vorsichtig – mit Zweitmeinung
+    text: Zwei Modelle lesen unabhängig. Sind sie einig, gilt ihr Entscheid; sind sie uneinig, prüft ein Mensch.
+    rule: labels
+    needs_second: true
+    metrics: r1_v3
+    threshold: profile

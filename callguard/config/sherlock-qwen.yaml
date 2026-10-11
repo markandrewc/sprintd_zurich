@@ -1,0 +1,45 @@
+# Sherlock stage A (config/sherlock.yaml): Qwen3.8-27B 3-bit LIVE on llama-server (:8004) assigns advisor /
+# customer roles, answers every fact and points to the evidence. Result = the Qwen-only decision (fallback when Kev
+# is unavailable); stage B (`-c sherlock`, Kev live) then reuses all of it from the cache.
+#   scripts/remote/serve_llamacpp.sh models/llm/qwen38-27b-gguf/Qwen3.8-27B-UD-IQ3_XXS.gguf    (alone on the GPU)
+#   uv run callguard batch -c sherlock-qwen        -> runs/sherlock/sherlock-qwen/
+# The facts block below must stay identical to sherlock.yaml's (same cache key; tests/test_sherlock.py).
+extends: sherlock.yaml
+description: Sherlock stage A (Qwen3.8-27B 3-bit live on llama-server; roles + facts + evidence; Qwen-only decision)
+
+llms:
+  default:                          # type changes -> replaces the pinned block whole
+    type: openai_compat
+    base_url: ${CALLGUARD_Q38_URL:-http://127.0.0.1:8004/v1}
+    model: callguard-llm
+    # llama-server does not name the weights in GET /models: the tag keys the cache. Change it with the GGUF
+    # (and nothing else: sherlock.yaml's pinned identity reads the same variable).
+    cache_tag: ${CALLGUARD_Q38_TAG:-qwen3.8-27b-ud-iq3_xxs}
+    timeout: 600
+    json_mode: json_schema
+    supports_n: false               # llama-server answers one choice per request
+    max_concurrency: 2              # = llama-server slots (-np 2)
+    extra_body: {chat_template_kwargs: {enable_thinking: false}}
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.15
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.1
+  - name: facts
+    type: facts
+    llm: default
+    parallel: 2
+    evidence: true
+    weight: 1.0
+
+fusion:                             # type changes -> replaces the two_readers block whole (recommended's values)
+  type: weighted
+  threshold: 0.55
+  review_band: 0.15
+  max_uncertainty: 0.35
+  min_score_for_review: 0.25
+  abstain_on_empty: true

@@ -1,0 +1,80 @@
+# LOCKED dialogue split. Generated once by `callguard splits --make`; do not edit or regenerate.
+# Tune only on dev folds (CV over dev0..devN). The holdout is scored once per final candidate:
+#   callguard eval -c <profile> --split holdout     (every run is logged to runs/holdout_log.jsonl)
+# Fold composition (dialogues; labels; levels):
+#   holdout  n=6  labels={'alarm': 2, 'no_alert': 3, 'review': 1}  levels={1: 1, 2: 4, 3: 1}
+#   dev0     n=6  labels={'alarm': 2, 'no_alert': 3, 'review': 1}  levels={1: 3, 2: 2, 3: 1}
+#   dev1     n=6  labels={'alarm': 2, 'no_alert': 3, 'review': 1}  levels={1: 1, 2: 4, 3: 1}
+#   dev2     n=6  labels={'alarm': 3, 'no_alert': 2, 'review': 1}  levels={1: 3, 2: 2, 3: 1}
+#   dev3     n=6  labels={'alarm': 3, 'no_alert': 3}  levels={1: 2, 2: 4}
+# Twin groups (one unit for folds and for the bootstrap): 8
+# NOTE: Regenerated 2026-10-10 01:30 (before any use or commit) to keep twin groups together: the Stufe2 pairs
+# NOTE: C01/C02 ... C15/C16 share title, Testziel and 92-97% of the script. Stufe1 dialogues that only share a
+# NOTE: family (e.g. D02/D03) have different titles and scripts (~5% text overlap) and are not grouped.
+seed: 13
+n_dev_folds: 4
+n_dialogues: 30
+created: '2026-10-10 01:24:54'
+method: whole twin groups, stratified by (expected label, level); clean+noisy of a
+  dialogue together
+holdout:
+- Stufe1_D07
+- Stufe2_C03
+- Stufe2_C04
+- Stufe2_C15
+- Stufe2_C16
+- Stufe3_C19
+dev_folds:
+  0:
+  - Stufe1_D01
+  - Stufe1_D06
+  - Stufe1_D09
+  - Stufe2_C13
+  - Stufe2_C14
+  - Stufe3_C20
+  1:
+  - Stufe1_D05
+  - Stufe2_C01
+  - Stufe2_C02
+  - Stufe2_C07
+  - Stufe2_C08
+  - Stufe3_C17
+  2:
+  - Stufe1_D02
+  - Stufe1_D03
+  - Stufe1_D04
+  - Stufe2_C09
+  - Stufe2_C10
+  - Stufe3_C18
+  3:
+  - Stufe1_D08
+  - Stufe1_D10
+  - Stufe2_C05
+  - Stufe2_C06
+  - Stufe2_C11
+  - Stufe2_C12
+groups:
+  Stufe2_C01+Stufe2_C02:
+  - Stufe2_C01
+  - Stufe2_C02
+  Stufe2_C03+Stufe2_C04:
+  - Stufe2_C03
+  - Stufe2_C04
+  Stufe2_C05+Stufe2_C06:
+  - Stufe2_C05
+  - Stufe2_C06
+  Stufe2_C07+Stufe2_C08:
+  - Stufe2_C07
+  - Stufe2_C08
+  Stufe2_C09+Stufe2_C10:
+  - Stufe2_C09
+  - Stufe2_C10
+  Stufe2_C11+Stufe2_C12:
+  - Stufe2_C11
+  - Stufe2_C12
+  Stufe2_C13+Stufe2_C14:
+  - Stufe2_C13
+  - Stufe2_C14
+  Stufe2_C15+Stufe2_C16:
+  - Stufe2_C15
+  - Stufe2_C16

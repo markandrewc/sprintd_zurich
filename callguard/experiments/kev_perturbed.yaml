@@ -1,0 +1,34 @@
+# Robustness proxy for the hidden set (RQ8) applied to Kev: the same 48 dev calls re-recorded (speed 0.96 = slower
+# and lower pitch, gain -3 dB) -> different ASR output, same labels. Pair with experiments/kev_vs_facts.yaml: the drop
+# clean -> perturbed per variant is the audio-robustness number. Runbook: docs/KEV.md.
+# Needs data_perturbed/v1 and its transcripts + roles cached (experiments/perturbed.yaml ran on the GPU host).
+# The runner loads calls from the BASE profile's data_dir (recommended-perturbed); variants use kev-perturbed.
+# Stages as in kev_vs_facts: A (Kev up) kev_*; B (vLLM up) perturbed, perturbed_facts_only, qwen_general*.
+name: kev_perturbed
+description: Kev / general questions vs champion on re-recorded dev audio (speed 0.96, -3 dB)
+rq: [RQ8, RQ10]
+base: recommended-perturbed
+split: dev
+compare_to: perturbed
+variants:
+  - {name: perturbed, description: "champion on re-recorded audio (= experiments/perturbed.yaml perturbed)"}
+  - {name: perturbed_facts_only, refuse_from: perturbed, checks: [facts]}
+  - name: qwen_general
+    drop_checks: [facts]
+    add_checks: [{name: general, type: questions, llm: default, questions: config/general_questions.yaml, parallel: 5, weight: 1.0}]
+    set: [fusion.threshold=0.7]
+  - {name: qwen_general_alone, refuse_from: qwen_general, checks: [general]}
+  - {name: kev_general, profile: kev-perturbed}
+  - {name: kev_general_alone, refuse_from: kev_general, checks: [general]}
+  - name: kev_facts
+    profile: kev-perturbed
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0}]
+    set: [fusion.threshold=0.55]
+  - {name: kev_facts_alone, refuse_from: kev_facts, checks: [facts]}
+  - name: kev_facts_v3
+    profile: kev-perturbed
+    description: "Kev facts with policy table v3 on re-recorded audio"
+    drop_checks: [general]
+    add_checks: [{name: facts, type: facts, llm: kev, evidence: false, weight: 1.0, policy_table: config/policy_table_v3.yaml}]
+    set: [fusion.threshold=0.55]

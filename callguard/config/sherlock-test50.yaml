@@ -1,0 +1,8 @@
+# sherlock on the EXTERNAL held-out test50 set (own data + runs dir; never tune on it; one logged look per
+# candidate: research/findings/test50_prereg.md). Stage A on test50:
+#   uv run callguard batch -c sherlock-qwen --set paths.data_dir=data_test50/v1 --set paths.runs_dir=runs/test50/sherlock
+extends: sherlock.yaml
+description: sherlock on test50 (external held-out set)
+paths:
+  data_dir: data_test50/v1
+  runs_dir: runs/test50/sherlock

@@ -1,0 +1,56 @@
+# Two readers (pre-registered: research/findings/two_readers_prereg.md): Qwen2.5-7B and Kev-4B read the same fact
+# sheet; agreement decides, disagreement escalates to review. Dev split only (holdout spent).
+#
+# The *_src variants are the two readers' stored results JOINED (reader B's facts -> check `facts_kev`):
+#   12 GB host / laptop:  uv run callguard agreement run          (joins the finished kev_vs_facts variants, then
+#                                                                  runs every re-fusion below; no model runs)
+#   24 GB host (both models up at once): uv run callguard experiment experiments/two_readers.yaml --variants tuned_src
+#                                       computes both readers fresh, then the re-fusions as usual.
+# Re-fusions per wording (all from one *_src): rule a = reader A alone (must reproduce the stored single-reader
+# run exactly: sanity check), b = reader B alone (same), labels = R1, facts = R2. Thresholds: one per pair, CV
+# picks it per fold like for every variant.
+name: two_readers
+description: Two readers (Qwen2.5-7B + Kev-4B facts) - agreement decides, disagreement -> review
+rq: [RQ10]
+base: two-readers
+split: dev
+compare_to: champion
+variants:
+  # ---- tuned table (the candidate) ---------------------------------------------------------------------------
+  - name: tuned_src
+    set: [checks.facts.policy_table=config/policy_table_v1.yaml, checks.facts_kev.policy_table=config/policy_table_v1.yaml]
+    description: "JOINED: kev_vs_facts/champion (A) + kev_vs_facts/kev_facts (B); callguard agreement merge (table v1, frozen copy)"
+  - {name: champion, refuse_from: tuned_src, set: [fusion.rule=a], description: "reader A alone (= kev_vs_facts/champion)"}
+  - {name: kev, refuse_from: tuned_src, set: [fusion.rule=b], description: "reader B alone (= kev_vs_facts/kev_facts)"}
+  - {name: r1, refuse_from: tuned_src, set: [fusion.rule=labels], description: "R1 label agreement, tuned table"}
+  - {name: r2, refuse_from: tuned_src, set: [fusion.rule=facts], description: "R2 fact agreement (gap 0.5), tuned table"}
+  # ---- reworded tables (generalisation proxy) ----------------------------------------------------------------
+  - name: para_src
+    set: [checks.facts.policy_table=config/policy_table_para.yaml, checks.facts_kev.policy_table=config/policy_table_para.yaml]
+    description: "JOINED: kev_vs_facts/qwen_facts_para + kev_vs_facts/kev_facts_para"
+  - {name: qwen_para, refuse_from: para_src, set: [fusion.rule=a]}
+  - {name: kev_para, refuse_from: para_src, set: [fusion.rule=b]}
+  - {name: r1_para, refuse_from: para_src, set: [fusion.rule=labels]}
+  - {name: r2_para, refuse_from: para_src, set: [fusion.rule=facts]}
+  - name: para2_src
+    set: [checks.facts.policy_table=config/policy_table_para2.yaml, checks.facts_kev.policy_table=config/policy_table_para2.yaml]
+    description: "JOINED: kev_vs_facts/qwen_facts_para2 + kev_vs_facts/kev_facts_para2"
+  - {name: qwen_para2, refuse_from: para2_src, set: [fusion.rule=a]}
+  - {name: kev_para2, refuse_from: para2_src, set: [fusion.rule=b]}
+  - {name: r1_para2, refuse_from: para2_src, set: [fusion.rule=labels]}
+  - {name: r2_para2, refuse_from: para2_src, set: [fusion.rule=facts]}
+  - name: blind_src
+    set: [checks.facts.policy_table=config/policy_table_blind.yaml, checks.facts_kev.policy_table=config/policy_table_blind.yaml]
+    description: "JOINED: kev_vs_facts/qwen_facts_blind + kev_vs_facts/kev_facts_blind"
+  - {name: qwen_blind, refuse_from: blind_src, set: [fusion.rule=a]}
+  - {name: kev_blind, refuse_from: blind_src, set: [fusion.rule=b]}
+  - {name: r1_blind, refuse_from: blind_src, set: [fusion.rule=labels]}
+  - {name: r2_blind, refuse_from: blind_src, set: [fusion.rule=facts]}
+  # ---- table v3 (adopted 2026-10-10; not pre-registered: describes the live table for the Prüfmodus page) ------
+  - name: v3_src
+    set: [checks.facts.policy_table=config/policy_table_v3.yaml, checks.facts_kev.policy_table=config/policy_table_v3.yaml]
+    description: "JOINED: champion/table_v3 (A) + kev_vs_facts/kev_facts_v3 (B)"
+  - {name: qwen_v3, refuse_from: v3_src, set: [fusion.rule=a]}
+  - {name: kev_v3, refuse_from: v3_src, set: [fusion.rule=b]}
+  - {name: r1_v3, refuse_from: v3_src, set: [fusion.rule=labels]}
+  - {name: r2_v3, refuse_from: v3_src, set: [fusion.rule=facts]}

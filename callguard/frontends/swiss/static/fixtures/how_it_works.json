@@ -1,0 +1,64 @@
+{
+ "steps": [
+  {
+   "id": "audio",
+   "title": "Recording",
+   "model": null,
+   "description": "Each bank phone call (Swiss German) is processed on our own GPU; nothing leaves the bank."
+  },
+  {
+   "id": "asr",
+   "title": "Speech to text",
+   "model": "whisper-large-v3-gsw-ct2",
+   "description": "A Whisper model fine-tuned on Swiss German writes a Standard German transcript with timestamps per segment."
+  },
+  {
+   "id": "diarization",
+   "title": "Who speaks",
+   "model": "sherpa_onnx",
+   "description": "Speaker turns are separated and labelled advisor or customer."
+  },
+  {
+   "id": "swiss_german",
+   "title": "Swiss German view (display only)",
+   "model": "ctc_dialect:wav2vec2-gsw-swissdial-onnx",
+   "description": "A dialect speech model re-transcribes each segment so officers can read the original dialect; no decision reads it."
+  },
+  {
+   "id": "keywords",
+   "title": "Keywords and patterns",
+   "model": null,
+   "description": "The case's keyword list and number patterns mark candidate passages instantly."
+  },
+  {
+   "id": "facts",
+   "title": "Two AI readers answer yes/no facts",
+   "model": "Qwen (Qwen/Qwen2.5-7B-Instruct-AWQ) + Kev (jaredpalmer/kev-4b)",
+   "description": "For every category, each reader answers small yes/no questions about the call with a probability. Both answers are stored."
+  },
+  {
+   "id": "combine",
+   "title": "Combine the readers",
+   "model": null,
+   "description": "Each answer becomes yes / no / unclear with the certainty cutoff c; the two readers are combined per fact (Agreement by default)."
+  },
+  {
+   "id": "rules",
+   "title": "Rules decide",
+   "model": null,
+   "description": "Per category, the first matching rule of the compliance rule book decides alarm, review or no alert. Officers edit rules instantly; new facts need a second person."
+  },
+  {
+   "id": "fusion",
+   "title": "Score and label",
+   "model": null,
+   "description": "Rule outcomes and keyword evidence become a call score; the threshold and review band give the call label and the passages to listen to."
+  },
+  {
+   "id": "review",
+   "title": "Officer review",
+   "model": null,
+   "description": "The officer listens to the passages, confirms or corrects; every review is stored as a training data point and audit-logged."
+  }
+ ]
+}

@@ -1,0 +1,66 @@
+# English display labels for the HTTP API (callguard api, docs/API.md). DISPLAY ONLY: never read by checks,
+# fusion or the cache. The rule book (config/policy_table.yaml) stays the source of truth; anything missing
+# here (a new fact or rule) is shown with its German label from the rule book.
+families:
+  numbers: Card and reference numbers
+  trade: Insider trading
+  access: Access credentials disclosed
+  disclosure: Information given to third parties
+  documentation: Withholding relevant information
+  splitting: Splitting to bypass a control
+  eigene_regeln: Own rules (across categories)
+
+facts:
+  trade.wish: Own trading wish expressed
+  trade.inside_info: Justified with non-public inside information
+  trade.public: Information already public
+  trade.source_open: Call leaves open where the information comes from or whether it is public
+  access.spoken: Code/value read out on the phone
+  access.current: Value belongs to the current, valid process
+  access.validity_open: Call leaves open whether the value is valid
+  access.expired_or_sample: Value expired or a sample
+  access.asked_by_advisor: Code asked for by the advisor
+  access.process_open: Call leaves open which process the value belongs to
+  disclosure.data_given: Concrete data of a third person given out
+  disclosure.third_party_request: Information about a third person requested
+  disclosure.authorized: Power of attorney / right to information confirmed
+  disclosure.not_authorized: No power of attorney / authorization established
+  disclosure.beyond_scope: Information beyond the scope of the power of attorney
+  disclosure.authorization_open: Call leaves open whether an authorization exists
+  documentation.omit_request: Asked not to record something
+  documentation.relevant: Hidden fact is relevant
+  documentation.correction_or_private: Only a correction or private details
+  documentation.relevance_open: Call leaves open whether the hidden information is relevant
+  splitting.split_request: Splitting into partial amounts requested
+  splitting.avoid_control: Purpose is to bypass a control or approval
+  splitting.single_invoice: Partial amounts belong to a single invoice
+  splitting.harmless: Independent invoices or only an example
+  splitting.link_open: Call leaves open whether the partial amounts belong together
+  splitting.motive_open: Call leaves open why the payment should be split
+  splitting.split_connected: One connected payment is to be split into partial payments
+  splitting.approval_avoided: Reason given - approval / check / responsibility should not apply
+
+rules:
+  trade.alarm_1: Trading wish based on non-public information from an internal source.
+  trade.review_1: Trading wish, but the origin or publicity of the information stays open.
+  trade.review_open: Trading wish; the call says that the origin or publicity of the information is open.
+  trade.no_alert: No trading wish based on non-public information.
+  access.alarm_1: A valid access value was spoken on the phone.
+  access.review_1: A value was read out, but it is unclear which process it belongs to or whether it is valid.
+  access.review_open: A value was (possibly) read out; the call says that validity or process are open.
+  access.no_alert: No valid access value spoken.
+  disclosure.alarm_1: Data of a third person given out although authorization was found to be missing.
+  disclosure.alarm_2: Information beyond the confirmed scope of the power of attorney.
+  disclosure.review_1: Data of a third person given out, authorization not confirmed.
+  disclosure.review_2: Information about a third person requested, authorization stays unresolved.
+  disclosure.review_open: Information about a third person requested; the call says the authorization is unresolved.
+  disclosure.no_alert: No unauthorized information given to third parties.
+  documentation.alarm_1: A relevant obligation is to be hidden from the responsible office.
+  documentation.review_1: Something is to be hidden; whether it is relevant stays open.
+  documentation.review_open: Something is to be hidden; the call says it is open whether it is relevant.
+  documentation.no_alert: No relevant information is to be withheld.
+  splitting.alarm_1: Splitting a payment to bypass an internal control.
+  splitting.alarm_2: One connected payment is to be split so that an approval or check does not apply.
+  splitting.review_1: Partial amounts requested, but the connection or motive stays unclear.
+  splitting.review_open: Partial amounts requested; the call says the connection of the receipts or the motive is open.
+  splitting.no_alert: No splitting to bypass a control.

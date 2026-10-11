@@ -1,0 +1,9 @@
+# Ceiling experiment: skip audio and use the reference scripts as "perfect ASR".
+# Tells you whether misses come from transcription or from the checks.
+# Never use for the submission: the case forbids feeding scripts into the audio pipeline.
+extends: local.yaml
+description: Reference scripts instead of ASR (upper bound for the checks)
+asr:
+  type: reference
+diarizer:
+  type: none

@@ -1,0 +1,52 @@
+[project]
+name = "callguard"
+version = "0.1.0"
+description = "Swiss German bank-call compliance checker: transcribe, run pluggable fraud checks, fuse, decide."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "pydantic>=2.7",
+  "pyyaml>=6",
+  "numpy>=1.26",
+  "soundfile>=0.12",
+  "rapidfuzz>=3.9",
+  "httpx>=0.27",
+  "typer>=0.12",
+  "rich>=13",
+  "jiwer>=4.0.0",
+  "matplotlib>=3.8",  # callguard report (charts, Agg backend)
+  "fastapi>=0.110",  # callguard api (docs/API.md)
+  "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+asr = ["faster-whisper>=1.1"]
+diarize = ["sherpa-onnx>=1.13", "sherpa-onnx-core>=1.13"]
+ui = ["streamlit>=1.38", "pandas>=2.2"]
+llm-local = ["llama-cpp-python[server]>=0.3.2"]
+api = ["fastapi>=0.110", "uvicorn>=0.29"]  # callguard api (docs/API.md)
+dev = ["pytest>=8"]
+
+[project.scripts]
+callguard = "callguard.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/callguard"]
+
+[tool.uv]
+python-preference = "managed"
+
+[[tool.uv.index]]
+name = "llama-cpp-cpu"
+url = "https://abetlen.github.io/llama-cpp-python/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+llama-cpp-python = { index = "llama-cpp-cpu" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow: needs real models, case audio or the live LLM server (deselect with -m 'not slow')"]

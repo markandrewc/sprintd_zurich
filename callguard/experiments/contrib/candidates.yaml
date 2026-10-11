@@ -1,0 +1,296 @@
+# Candidate systems for the open team decisions (docs/TEAM_OPTIONS.md, UI page "Team-Entscheidungen").
+# Run:  uv run callguard candidates            (-> runs/candidates/candidates.json + docs/TEAM_OPTIONS.md)
+# No model runs: every number comes from stored rows.json (+ results.jsonl for the evidence hit rate).
+#
+# Each candidate maps to stored experiment variants ("[root:]<experiment>/<variant>"; root `perturbed` =
+# runs/perturbed/experiments, otherwise runs/experiments). A list = fallbacks (first available wins), except
+# `reworded`, where every entry is one paraphrase set and the AUC is their mean. `na` = does not apply.
+# A slot without rows.json is shown as "läuft noch" (variant folder exists), "ausstehend" (named in an
+# experiments/*.yaml spec) or "nicht geplant"; it fills in on the next run / UI reload.
+#
+# Mapping verified 2026-10-10 against each variant's meta.json (profile, LLM ids, --set) and experiments/*.yaml:
+#   champion/champion == kev_vs_facts/champion (same rows, AUC 0.866); champion/para == kev_vs_facts/qwen_facts_para.
+#   runs/experiments/perturbed/* == runs/perturbed/experiments/perturbed/* (copies; the perturbed root is primary).
+#   Qwen3.8 (both quantisations) and Kev read the facts with `evidence: false`: their passages come from the
+#   keyword/pattern hits only. Roles (advisor/customer) of every candidate come from the Qwen2.5-7B cache.
+# `test50`: the teammate's EXTERNAL held-out set (runs/test50/experiments/test50/<variant>, pre-registered candidate
+#   list in experiments/test50.yaml). Its own column group; never pooled with dev / holdout / synthetic / re-recorded
+#   numbers (callguard.datasets raises if rows of different datasets would be combined). Unmapped -> "nicht geplant".
+name: candidates
+description: Candidate matrix for the team decisions (dev split, paired against the champion)
+reference: champion
+rows: cv
+n_boot: 2000
+seed: 13
+data_roots:
+  default: runs/experiments
+  perturbed: runs/perturbed/experiments
+  test50: runs/test50/experiments          # EXTERNAL held-out set (experiments/test50.yaml): own dataset, own column
+root_datasets:                             # every root holds exactly one dataset; rows are checked (callguard.datasets)
+  default: case
+  perturbed: case
+  test50: test50
+evidence_note: >-
+  Beleg hit@1 = Anteil der richtig markierten Anrufe, deren erste angezeigte Passage eine annotierte Beleg-Zeile
+  trifft (`callguard evidence-eval`-Methode, Dev). „Zufall“ = was eine gleich lange Passage an zufälliger Stelle
+  träfe: lange Passagen (Kev allgemein, ~48 s) treffen schon zufällig oft. Anrufe ohne Passage zählen als
+  Fehltreffer.
+
+candidates:
+  # ---- facts design (tuned questions + policy table) ----------------------------------------------------------
+  - id: champion
+    label: "Champion: Qwen2.5-7B Fakten, Tabelle v1"
+    short: "Champion v1"
+    group: Fakten
+    model: Qwen2.5-7B-AWQ
+    table: v1
+    profile: recommended
+    tuned: champion/champion
+    evidence_ref: kev_vs_facts/champion          # identical rows; this copy has results.jsonl
+    reworded: [kev_vs_facts/qwen_facts_para, kev_vs_facts/qwen_facts_para2]
+    blind: kev_vs_facts/qwen_facts_blind
+    rerecorded: [perturbed:perturbed/perturbed, perturbed/perturbed]
+    test50: test50:test50/champion
+    passages: ja
+    hardware: "12 GB 4070 gestaffelt (ASR, dann vLLM); 24 GB: alles zusammen"
+    licence: "LLM Apache-2.0, ASR MIT"
+    e2e: "ja (gestaffelt, neue Dateien, Journal 04:50)"
+    note: "Eingefroren, einziger Kandidat mit Holdout-Lauf (3 Blicke, nur Plausibilität)."
+  - id: champion_v3
+    label: "Champion mit Tabelle v3"
+    short: "Champion v3"
+    group: Fakten
+    model: Qwen2.5-7B-AWQ
+    table: v3
+    profile: recommended-v3
+    tuned: champion/table_v3
+    reworded: na                                 # no paraphrase of the v3 table exists
+    blind: na                                    # the blind table replaces the whole table (see champion row)
+    rerecorded: [perturbed:perturbed/table_v3, perturbed/table_v3]
+    test50: test50:test50/champion_v3
+    passages: ja
+    hardware: "wie Champion"
+    licence: "LLM Apache-2.0, ASR MIT"
+    e2e: "teilweise (gleiche Kette, Profil recommended-v3; auf neuen Dateien nicht separat gelaufen)"
+    note: "v3 wurde in Kenntnis eines Holdout-Fehlers (Aufteilen) entworfen; kein Holdout-Lauf."
+  - id: kev
+    label: "Kev-4B Fakten, Tabelle v1"
+    short: "Kev v1"
+    group: Fakten
+    model: Kev-4B
+    table: v1
+    profile: kev (Variante kev_facts)
+    tuned: kev_vs_facts/kev_facts
+    reworded: [kev_vs_facts/kev_facts_para, kev_vs_facts/kev_facts_para2]
+    blind: kev_vs_facts/kev_facts_blind
+    rerecorded: perturbed:kev_perturbed/kev_facts
+    test50: test50:test50/kev_facts
+    passages: "nein (nur Stichwort-/Muster-Treffer)"
+    hardware: "12 GB gestaffelt: ASR, vLLM 7B für Rollen, dann Kev (~8 GB); 24 GB zusammen"
+    licence: "Kev Apache-2.0 (LoRA auf Qwen3.5-4B), ASR MIT"
+    e2e: "nein (nur Experimente auf gecachten Transkripten + Rollen)"
+    note: "Kev kennt kein „unklar“: offene Fakten werden ja/nein, die Prüfen-Regeln der Tabelle feuern kaum."
+  - id: kev_v3
+    label: "Kev-4B Fakten, Tabelle v3"
+    short: "Kev v3"
+    group: Fakten
+    model: Kev-4B
+    table: v3
+    tuned: kev_vs_facts/kev_facts_v3
+    reworded: na
+    blind: na
+    rerecorded: perturbed:kev_perturbed/kev_facts_v3
+    passages: "nein (nur Stichwort-/Muster-Treffer)"
+    hardware: "wie Kev v1"
+    licence: "Kev Apache-2.0, ASR MIT"
+    e2e: nein
+  - id: q38
+    label: "Qwen3.8-27B 3-bit Fakten, Tabelle v1"
+    short: "Q3.8 3-bit v1"
+    group: Fakten
+    model: Qwen3.8-27B IQ3_XXS (llama.cpp)
+    table: v1
+    profile: qwen38
+    tuned: qwen38/q38_facts
+    reworded: [qwen38/q38_facts_para]
+    blind: qwen38/q38_facts_blind
+    rerecorded: na                               # no re-recorded run planned for the 3-bit model
+    passages: "nein (evidence aus; nur Stichwort-/Muster-Treffer)"
+    hardware: "12 GB 4070 allein (10.9 GB GGUF); ASR + Rollen (vLLM 7B) vorher in eigenen Stufen"
+    licence: "Qwen3.8: Lizenz nicht geprüft (Modellkarte), ASR MIT"
+    e2e: "nein (Experimente; Rollen aus dem Cache)"
+    note: "Nur eine Paraphrase gerechnet (para2 nicht geplant)."
+  - id: q38_v3
+    label: "Qwen3.8-27B 3-bit Fakten, Tabelle v3"
+    short: "Q3.8 3-bit v3"
+    group: Fakten
+    model: Qwen3.8-27B IQ3_XXS (llama.cpp)
+    table: v3
+    tuned: qwen38/q38_facts_v3
+    reworded: na
+    blind: na
+    rerecorded: na
+    passages: "nein (nur Stichwort-/Muster-Treffer)"
+    hardware: "wie Q3.8 3-bit"
+    licence: "Qwen3.8: nicht geprüft, ASR MIT"
+    e2e: nein
+  - id: q38q6
+    label: "Qwen3.8-27B 6-bit Fakten, Tabelle v1"
+    short: "Q3.8 6-bit v1"
+    group: Fakten
+    model: Qwen3.8-27B Q6_K (llama.cpp)
+    table: v1
+    profile: qwen38-q6
+    tuned: qwen38_q6/q38q6_facts
+    reworded: [qwen38_q6/q38q6_facts_para]
+    blind: qwen38_q6/q38q6_facts_blind
+    rerecorded: perturbed:qwen38_q6_perturbed/q38q6_facts
+    test50: test50:test50/q38q6_facts
+    passages: "nein (evidence aus; nur Stichwort-/Muster-Treffer)"
+    hardware: "24 GB A5000 (22 GB GGUF füllt die Karte); ASR + Rollen in eigenen Stufen"
+    licence: "Qwen3.8: nicht geprüft, ASR MIT"
+    e2e: "nein (Experimente auf dem A5000; Rollen aus dem Cache)"
+    note: "Kosten auf dem A5000 gemessen (llama.cpp, 4 Slots): ~135 s Prüfzeit pro Anruf."
+  - id: q38q6_v3
+    label: "Qwen3.8-27B 6-bit Fakten, Tabelle v3"
+    short: "Q3.8 6-bit v3"
+    group: Fakten
+    model: Qwen3.8-27B Q6_K (llama.cpp)
+    table: v3
+    tuned: qwen38_q6/q38q6_facts_v3
+    reworded: na
+    blind: na
+    rerecorded: perturbed:qwen38_q6_perturbed/q38q6_facts_v3
+    passages: "nein (nur Stichwort-/Muster-Treffer)"
+    hardware: "wie Q3.8 6-bit"
+    licence: "Qwen3.8: nicht geprüft, ASR MIT"
+    e2e: nein
+
+  # ---- the teammate's 15 general law-based questions (max p(yes) >= 0.7, + light keywords/patterns) ----------
+  - id: gen_qwen
+    label: "Allgemeine Fragen auf Qwen2.5-7B"
+    short: "Allg. Qwen 7B"
+    group: Allgemeine Fragen
+    model: Qwen2.5-7B-AWQ
+    profile: recommended (Variante qwen_general)
+    tuned: kev_vs_facts/qwen_general
+    reworded: [kev_vs_facts/qwen_general_para]
+    blind: na                                    # the general questions are written without data already
+    rerecorded: perturbed:kev_perturbed/qwen_general
+    test50: test50:test50/qwen_general
+    passages: "nein (nur Stichwort-/Muster-Treffer)"
+    hardware: "wie Champion"
+    licence: "LLM Apache-2.0, ASR MIT"
+    e2e: nein
+  - id: gen_kev
+    label: "Allgemeine Fragen auf Kev-4B (Teamkollege)"
+    short: "Allg. Kev"
+    group: Allgemeine Fragen
+    model: Kev-4B
+    profile: kev
+    tuned: kev_vs_facts/kev_general
+    reworded: [kev_vs_facts/kev_general_para]
+    blind: na
+    rerecorded: perturbed:kev_perturbed/kev_general
+    test50: test50:test50/kev_general
+    passages: "ja (Fenster ~40 Wörter, lang)"
+    hardware: "wie Kev v1"
+    licence: "Kev Apache-2.0, ASR MIT"
+    e2e: "nein bei uns (im Prototyp des Teamkollegen ja, andere ASR)"
+  - id: gen_q38
+    label: "Allgemeine Fragen auf Qwen3.8 3-bit"
+    short: "Allg. Q3.8 3-bit"
+    group: Allgemeine Fragen
+    model: Qwen3.8-27B IQ3_XXS
+    tuned: qwen38/q38_general
+    reworded: [qwen38/q38_general_para]
+    blind: na
+    rerecorded: na
+    passages: "nein (nur Stichwort-/Muster-Treffer)"
+    hardware: "wie Q3.8 3-bit"
+    licence: "Qwen3.8: nicht geprüft, ASR MIT"
+    e2e: nein
+  - id: gen_q38q6
+    label: "Allgemeine Fragen auf Qwen3.8 6-bit"
+    short: "Allg. Q3.8 6-bit"
+    group: Allgemeine Fragen
+    model: Qwen3.8-27B Q6_K
+    tuned: qwen38_q6/q38q6_general
+    reworded: [qwen38_q6/q38q6_general_para]
+    blind: na
+    rerecorded: perturbed:qwen38_q6_perturbed/q38q6_general
+    test50: test50:test50/q38q6_general
+    passages: "nein (nur Stichwort-/Muster-Treffer)"
+    hardware: "wie Q3.8 6-bit"
+    licence: "Qwen3.8: nicht geprüft, ASR MIT"
+    e2e: nein
+
+  - id: gen_kev_oracle
+    label: "ORACLE: allgemeine Fragen auf Kev, Dialekt-Referenzskripte (nur Experiment)"
+    short: "Allg. Kev ORACLE"
+    group: Allgemeine Fragen
+    kind: oracle
+    hidden: true                                 # not a candidate: only for the teammate comparison texts
+    tuned: kev_vs_facts/kev_general_oracle
+    reworded: na
+    blind: na
+    rerecorded: na
+    note: "Die Bewertungs-Einstellung des Teamkollegen (Referenzskripte statt ASR); nie ein Abgabe-Kandidat."
+
+  # ---- two readers (pre-registered, both rules FAILED: research/findings/two_readers.md) ----------------------
+  - id: r1
+    label: "Zwei Leser R1 (Qwen 7B + Kev, Label-Einigkeit)"
+    short: "Zwei Leser R1"
+    group: Zwei Leser
+    model: Qwen2.5-7B + Kev-4B
+    profile: two-readers
+    tuned: two_readers/r1
+    reworded: [two_readers/r1_para, two_readers/r1_para2]
+    blind: two_readers/r1_blind
+    rerecorded: perturbed:two_readers_perturbed/r1
+    passages: "ja (aus Qwen)"
+    hardware: "24 GB zusammen (nie getestet) oder 12 GB gestaffelt + `agreement merge`"
+    licence: "Apache-2.0 (beide), ASR MIT"
+    e2e: "nein (nur Re-Fusion gespeicherter Läufe)"
+    note: "Vorregistriert, nicht bestanden: 3-Klassen-Genauigkeit belegt schlechter, Prüf-Recall 3/6."
+
+  # ---- references ------------------------------------------------------------------------------------------
+  - id: v1
+    label: "v1 (Stichwörter + freier LLM-Richter, Turbo-ASR)"
+    short: "v1"
+    group: Referenz
+    kind: reference
+    model: Qwen2.5-7B-AWQ
+    tuned: llm_models/qwen25_7b
+    reworded: na
+    blind: na
+    rerecorded: na
+    passages: ja
+    hardware: "12 GB"
+    licence: "Apache-2.0 / ASR CC-BY-NC-Herkunft (Turbo)"
+    e2e: "ja (Ausgangssystem)"
+    note: "Freier Richter mit T=0.7: von Lauf zu Lauf nicht reproduzierbar."
+  - id: keywords
+    label: "Nur Stichwörter"
+    short: "Stichwörter"
+    group: Referenz
+    kind: reference
+    tuned: checks_ablation/keywords
+    reworded: na
+    blind: na
+    rerecorded: na
+    passages: ja
+    hardware: "CPU (+ ASR)"
+    licence: "–"
+    e2e: ja
+    note: "Turbo-Transkripte (gpu-12gb), gleiche Anrufe."
+  - id: flag_all
+    label: "Alles markieren (Alarm)"
+    short: "Alles markieren"
+    group: Referenz
+    kind: trivial
+    trivial: flag_all
+    passages: "–"
+    hardware: "–"
+    licence: "–"
+    e2e: "–"

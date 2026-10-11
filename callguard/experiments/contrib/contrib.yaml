@@ -1,0 +1,551 @@
+# "Which part gives us which part of the result": paired factor comparisons over STORED experiment results.
+# Run:  uv run callguard contrib [--data-root runs/experiments] [--out runs/contrib]
+# No models run: every number is computed from runs/experiments/<experiment>/<variant>/rows.json (+ meta.json).
+#
+# Each pair = (a, b) = "<experiment>/<variant>" on the SAME calls; deltas are B - A. Orientation: B is the option
+# being considered (the component added, the alternative knob value). Verified against experiments/*.yaml and each
+# variant's meta.json (2026-10-10):
+#   status: exact      only the named factor differs (re-fusions of one run, or the same profile with one --set)
+#           caveat     near-exact; read `note` (e.g. A is a re-fusion of an earlier run of the same config)
+#           confounded something else differs too; `differs` names it
+#   unpaired: true     different calls: shown side by side, never as a paired delta
+#   pending: true      expected future run; skipped (listed as pending) until its rows.json exists, then it
+#                      lights up automatically
+#   rows: fixed        use the fixed-threshold rows (threshold knobs: the CV rows re-choose the threshold, which
+#                      would hide exactly the knob being tested)
+# `callguard contrib` also prints an automatic meta.json diff per pair, so every `status` can be re-checked.
+name: contrib
+description: Contribution / ablation analysis of the callguard components (dev split, paired over twin groups)
+data_root: runs/experiments
+rows: cv
+n_boot: 2000
+seed: 13
+reference: champion/champion
+
+factors:
+  - id: check_design
+    short: Prüfdesign
+    title: "Prüfungsdesign: freier Richter + G-Eval (v1) → Fakten"
+    meaning: "Atomare Ja/Nein-Fakten + Policy-Tabelle statt freiem LLM-Urteil."
+    lead: "v1 → nur Fakten (Turbo, 7B)"     # the dev comparison leads the takeaway (else: cleanest status, largest effect)
+    pairs:
+      - label: "v1 → nur Fakten (Turbo, 7B)"
+        a: llm_models/qwen25_7b
+        b: llm_models/qwen25_7b__facts_only
+        status: caveat
+        differs: "check set: keywords 0.35 + patterns 0.2 + llm_judge + geval -> facts alone"
+        note: "B is a re-fusion of an EARLIER run of the same llm-sweep config (stale-source warning). The facts probes are deterministic (log-probs, T=0, no facts code change between commits f012763 and 1fd19e7); v1's judge samples at T=0.7, so A itself varies run to run (see the rerun row)."
+      - label: "v1 → Stichwörter/Muster + Fakten (Turbo, 7B)"
+        a: llm_models/qwen25_7b
+        b: llm_models/qwen25_7b__kwpat_facts
+        status: caveat
+        differs: "llm_judge + geval replaced by facts; keywords/patterns kept at the v1 weights"
+        note: "same stale-source caveat as above"
+      - label: "v1 → nur Fakten (synthetisch, 14B, ORACLE-Text)"
+        a: synth_stress/v1
+        b: synth_stress/facts_only
+        status: exact
+        differs: "check set only (re-fusion of one run on 74 synthetic out-of-sample calls; Qwen2.5-14B; reference text, no ASR)"
+
+  - id: asr
+    short: ASR
+    title: "ASR: Turbo → large-v3 (MIT)"
+    meaning: "Besseres Schweizerdeutsch-ASR, gleiche Prüfungen."
+    pairs:
+      - label: "Champion-Prüfungen: Turbo (ohne Prompt) → large-v3"
+        a: champion/turbo_clean
+        b: champion/champion
+        status: exact
+        differs: "ASR model (turbo int8, no initial prompt, no conditioning -> large-v3 fp16); speaker roles are re-derived on each transcript"
+      - label: "Nur Fakten, 7B: Turbo → large-v3"
+        a: llm_models/qwen25_7b__facts_only
+        b: llm_models/qwen25_7b_facts_l3
+        status: caveat
+        differs: "ASR model (turbo int8 with the default keyword prompt -> large-v3)"
+        note: "A is a stale re-fusion of an earlier run (commit f012763 vs 1fd19e7; no facts code change in between)"
+      - label: "Nur Fakten, 14B: Turbo → large-v3"
+        a: llm_models/qwen25_14b_facts
+        b: llm_models/qwen25_14b_facts_l3
+        status: exact
+        differs: "ASR model only (commit 5d9264d vs 1fd19e7, no facts code change)"
+      - label: "v1-Prüfungen: Turbo → large-v3"
+        a: asr_models/turbo_gsw_int8
+        b: asr_models/large_v3_gsw
+        status: confounded
+        differs: "v1's free judge re-samples at T=0.7 in every run: judge sampling noise is mixed into the ASR effect"
+
+  - id: oracle
+    short: Transkript
+    title: "Transkript-Obergrenze: ASR → ORACLE-Referenzskript"
+    meaning: "Wie viel bringt ein perfektes Transkript noch?"
+    pairs:
+      - label: "7B Fakten: large-v3 → ORACLE"
+        a: llm_models/qwen25_7b_facts_l3
+        b: llm_models/qwen25_7b_facts_oracle
+        status: confounded
+        differs: "the reference scripts are Swiss German DIALECT text with reference speakers, the ASR view is Standard German with diarized roles: transcript quality AND language change together. ORACLE is never a submission candidate."
+      - label: "14B Fakten: large-v3 → ORACLE"
+        a: llm_models/qwen25_14b_facts_l3
+        b: llm_models/qwen25_14b_facts_oracle
+        status: confounded
+        differs: "dialect reference text vs Standard German ASR (quality and language change together)"
+
+  - id: llm_size
+    short: LLM-Grösse
+    title: "LLM-Grösse: 7B → 8B → 14B (Fakten)"
+    meaning: "Grösseres Modell, gleiche Fragen und Transkripte."
+    pairs:
+      - label: "7B → 14B (large-v3, nur Fakten)"
+        a: llm_models/qwen25_7b_facts_l3
+        b: llm_models/qwen25_14b_facts_l3
+        status: exact
+        differs: "check LLM only (same commit, same transcripts, roles pinned to the 7B)"
+      - label: "7B → 14B (Turbo, nur Fakten)"
+        a: llm_models/qwen25_7b__facts_only
+        b: llm_models/qwen25_14b_facts
+        status: caveat
+        differs: "check LLM"
+        note: "A is a stale re-fusion of an earlier 7B run (commit f012763 vs 5d9264d)"
+      - label: "Qwen2.5-7B → Qwen3-8B (Turbo, nur Fakten)"
+        a: llm_models/qwen25_7b__facts_only
+        b: llm_models/qwen3_8b__facts_only
+        status: confounded
+        differs: "model family/generation changes too (Qwen3, thinking off), not only the size"
+      - label: "Champion 7B → Champion 14B"
+        a: champion/champion
+        b: champion14/champion14
+        status: confounded
+        differs: "the 14B is the `default` LLM in recommended-14b, so it also assigns the advisor/customer roles (7B in A); facts parallel 2 vs 5"
+
+  - id: wording
+    short: Formulierung
+    title: "Fragen-Formulierung / Dev-Anpassung"
+    meaning: "Hängt das Ergebnis an der auf Dev geschriebenen Formulierung? (Überanpassung)"
+    pairs:
+      - label: "abgestimmt → Paraphrase 1 (7B)"
+        a: champion/champion
+        b: champion/para
+        status: exact
+        differs: "fact question wording only (blind paraphrases, same ids and rules)"
+      - label: "abgestimmt → Paraphrase 2 (7B)"
+        a: champion/champion
+        b: champion/para2
+        status: exact
+        differs: "fact question wording only (second independent paraphrase set)"
+      - label: "abgestimmt → Ensemble 3 Formulierungen (7B)"
+        a: champion/champion
+        b: champion/ens3
+        status: exact
+        differs: "p(yes/no/unclear) averaged over tuned + para + para2 wordings"
+      - label: "abgestimmt → Ensemble ohne abgestimmte Formulierung (7B)"
+        a: champion/champion
+        b: champion/ens_blind
+        status: exact
+        differs: "para + para2 averaged, tuned wording not used"
+      - label: "abgestimmte → blinde Tabelle (7B, large-v3)"
+        a: llm_models/qwen25_7b_facts_l3
+        b: llm_models/qwen25_7b_facts_l3__blind_only
+        status: exact
+        differs: "whole policy table (questions AND rules) written from the criteria only, without transcripts (re-fusion of one run)"
+      - label: "abgestimmt → Paraphrase 1 (14B, large-v3)"
+        a: llm_models/qwen25_14b_facts_l3
+        b: llm_models/qwen25_14b_para_l3
+        status: caveat
+        differs: "fact question wording"
+        note: "separate runs (commit 1fd19e7 vs f0b67b0); facts are deterministic"
+      - label: "abgestimmte → blinde Tabelle (14B, large-v3)"
+        a: llm_models/qwen25_14b_facts_l3
+        b: llm_models/qwen25_14b_facts_l3__blind_only
+        status: exact
+        differs: "whole policy table (re-fusion of one run)"
+      - label: "abgestimmt → Paraphrase 1 (synthetisch, 7B)"
+        a: synth_stress/facts7b_v1
+        b: synth_stress/facts7b_para
+        status: exact
+        differs: "fact question wording (74 synthetic calls, reference text)"
+      - label: "abgestimmt → Ensemble 3 (synthetisch, 7B)"
+        a: synth_stress/facts7b_v1
+        b: synth_stress/facts7b_ens3
+        status: exact
+        differs: "3-wording ensemble (74 synthetic calls)"
+
+  - id: language
+    short: Sprache
+    title: "Sprache: Deutsch → Englisch"
+    meaning: "Fakt-Fragen auf Englisch statt Deutsch; Transkript übersetzt."
+    pairs:
+      - label: "Fakt-Fragen Deutsch → Englisch (Champion)"
+        a: champion/qlang_de
+        b: champion/champion
+        status: exact
+        differs: "checks.facts.question_lang de -> en (the champion asks in English)"
+      - label: "Transkript Deutsch → englische Übersetzung (7B, Turbo)"
+        a: llm_models/qwen25_7b__facts_only
+        b: llm_models/qwen25_7b_facts_en
+        status: caveat
+        differs: "the facts check reads the LLM's English translation of the Standard German view"
+        note: "A is a stale re-fusion of an earlier run (commit f012763 vs 1fd19e7)"
+
+  - id: roles
+    short: Rollen
+    title: "Rollen Berater/Kunde sichtbar"
+    meaning: "Die Fakt-Fragen sehen, wer spricht."
+    pairs:
+      - label: "Rollen verborgen → sichtbar (Champion)"
+        a: champion/noroles
+        b: champion/champion
+        status: exact
+        differs: "checks.facts.roles false -> true"
+
+  - id: keywords
+    short: Stichwörter
+    title: "Stichwörter/Muster mit leichtem Gewicht"
+    meaning: "Die editierbare Stichwortliste zählt leicht mit (kein Treffer = enthält sich)."
+    pairs:
+      - label: "nur Fakten → + leichte Stichwörter/Muster (Champion)"
+        a: champion/facts_only
+        b: champion/champion
+        status: exact
+        differs: "keywords 0.15 + patterns 0.1 (abstain on empty) added to the score (re-fusion)"
+      - label: "nur Fakten → + leichte Stichwörter/Muster (Turbo, 7B)"
+        a: llm_models/qwen25_7b__facts_only
+        b: llm_models/qwen25_7b__facts_kwlight
+        status: caveat
+        differs: "keywords 0.15 + patterns 0.1 + abstain_on_empty"
+        note: "both are re-fusions of different (stale) source runs of qwen25_7b; facts deterministic"
+      - label: "v1 ohne Stichwörter → mit Stichwörtern"
+        a: checks_ablation/all_minus_keywords
+        b: checks_ablation/all
+        status: exact
+        differs: "keywords (0.35) in the v1 fusion (re-fusion of one run)"
+
+  - id: fusion
+    short: Fusion
+    title: "Fusion: Schwelle, Prüfband, Eskalation"
+    meaning: "Regler der Entscheidungslogik (kein neuer LLM-Aufruf)."
+    pairs:
+      - label: "Schwelle 0.55 → 0.45 (feste Schwelle)"
+        a: champion/champion
+        b: champion/t045
+        rows: fixed
+        status: exact
+        differs: "fusion.threshold"
+      - label: "Schwelle 0.55 → 0.65 (feste Schwelle)"
+        a: champion/champion
+        b: champion/t065
+        rows: fixed
+        status: exact
+        differs: "fusion.threshold"
+      - label: "Prüfband 0.15 → 0.25 (Champion)"
+        a: champion/champion
+        b: champion/band025
+        status: exact
+        differs: "fusion.review_band"
+      - label: "Unsicherheits-Eskalation an → aus (Champion)"
+        a: champion/champion
+        b: champion/noesc
+        status: exact
+        differs: "fusion.max_uncertainty 0.35 -> 1.0"
+      - label: "Unsicherheits-Eskalation an → aus (v1)"
+        a: fusion/base
+        b: fusion/noesc
+        status: exact
+        differs: "fusion.max_uncertainty 0.35 -> 1.0 (re-fusion of the v1 checks)"
+      - label: "Stichwörter enthalten sich ohne Treffer (v1)"
+        a: fusion/base
+        b: fusion/abstain
+        status: exact
+        differs: "fusion.abstain_on_empty"
+
+  - id: policy_table
+    short: Tabelle
+    title: "Policy-Tabelle v1 → v2 / v3"
+    meaning: "Zusätzliche Regeln für offene Fakten (Prüfen statt Kein Alarm)."
+    pairs:
+      - label: "Tabelle v1 → v2 (Dev)"
+        a: champion/champion
+        b: champion/table_v2
+        status: exact
+        differs: "policy table (+ access validity-unknown -> review)"
+      - label: "Tabelle v1 → v3 (Dev)"
+        a: champion/champion
+        b: champion/table_v3
+        status: exact
+        differs: "policy table (+ criteria-derived open-fact review rules, splitting re-check facts)"
+        note: "v3 was designed knowing a holdout failure mode (splitting)"
+      - label: "Tabelle v1 → v3 (neu aufgenommenes Audio)"
+        a: perturbed/perturbed
+        b: perturbed/table_v3
+        status: exact
+        differs: "policy table on the re-recorded dev audio"
+      - label: "Tabelle v1 → v3 (synthetisch, 7B)"
+        a: synth_stress/facts7b_v1
+        b: synth_stress/facts7b_v3
+        status: exact
+        differs: "policy table on 74 synthetic calls (facts only, reference text)"
+
+  - id: robustness
+    short: Robustheit
+    title: "Robustheit: Dev → andere Bedingungen"
+    meaning: "Dasselbe System unter veränderten Bedingungen (kein Bauteil, sondern ein Stresstest)."
+    pairs:
+      - label: "Dev-Audio → neu aufgenommen (Tempo 0.96, -3 dB)"
+        a: champion/champion
+        b: perturbed/perturbed
+        status: exact
+        differs: "audio only (same 48 dev calls and labels, re-recorded -> different ASR output)"
+      - label: "Dev-Audio → neu aufgenommen (Tabelle v3)"
+        a: champion/table_v3
+        b: perturbed/table_v3
+        status: exact
+        differs: "audio only"
+      - label: "Dev → synthetisch out-of-sample (nur Fakten, 7B)"
+        a: champion/facts_only
+        b: synth_stress/facts7b_v1
+        unpaired: true
+        differs: "different calls (74 synthetic scripts, reference text instead of ASR): side by side only"
+
+  # ---- two readers (pre-registered: research/findings/two_readers_prereg.md; uv run callguard agreement run).
+  # Every two_readers/* variant is a re-fusion of ONE joined source per wording (Qwen + Kev results of
+  # kev_vs_facts); two_readers/champion etc. reproduce the stored single-reader runs exactly (sanity check).
+  - id: two_readers
+    short: Zwei Leser
+    title: "Zwei Leser: Qwen 7B + Kev-4B lesen dieselben Fakten"
+    meaning: "Einig -> deren Urteil; uneinig -> Prüfen (R1 je Anruf, R2 je Fakt). Vorregistriert; beide Regeln nicht bestanden."
+    lead: "Champion → R1 Label-Einigkeit (abgestimmt)"
+    pairs:
+      - label: "Champion → R1 Label-Einigkeit (abgestimmt)"
+        a: two_readers/champion
+        b: two_readers/r1
+        status: exact
+        differs: "fusion.rule a -> labels (re-fusion of one joined source; one threshold for both readers)"
+      - label: "Champion → R2 Fakt-Einigkeit (abgestimmt)"
+        a: two_readers/champion
+        b: two_readers/r2
+        status: exact
+        differs: "fusion.rule a -> facts (gap 0.5)"
+      - label: "Kev allein → R1 (abgestimmt)"
+        a: two_readers/kev
+        b: two_readers/r1
+        status: exact
+        differs: "fusion.rule b -> labels"
+      - label: "Qwen Paraphrase 1 → R1"
+        a: two_readers/qwen_para
+        b: two_readers/r1_para
+        status: exact
+        differs: "fusion.rule a -> labels (policy_table_para.yaml for both readers)"
+      - label: "Qwen Paraphrase 1 → R2"
+        a: two_readers/qwen_para
+        b: two_readers/r2_para
+        status: exact
+        differs: "fusion.rule a -> facts"
+      - label: "Qwen Paraphrase 2 → R1"
+        a: two_readers/qwen_para2
+        b: two_readers/r1_para2
+        status: exact
+        differs: "fusion.rule a -> labels (policy_table_para2.yaml)"
+      - label: "Qwen Paraphrase 2 → R2"
+        a: two_readers/qwen_para2
+        b: two_readers/r2_para2
+        status: exact
+        differs: "fusion.rule a -> facts"
+      - label: "Qwen blinde Tabelle → R1"
+        a: two_readers/qwen_blind
+        b: two_readers/r1_blind
+        status: exact
+        differs: "fusion.rule a -> labels (policy_table_blind.yaml)"
+      - label: "Qwen blinde Tabelle → R2"
+        a: two_readers/qwen_blind
+        b: two_readers/r2_blind
+        status: exact
+        differs: "fusion.rule a -> facts"
+      - label: "Neu aufgenommenes Audio: Champion → R1"
+        a: two_readers_perturbed/perturbed
+        b: two_readers_perturbed/r1
+        pending: true
+        status: exact
+        differs: "fusion.rule a -> labels (needs kev_perturbed/kev_facts)"
+
+  - id: rejected
+    short: Verworfen
+    title: "Weitere geprüfte Ideen"
+    meaning: "Nach dem Einfrieren getestet; verworfen, wenn kein belegter Gewinn."
+    pairs:
+      - label: "S3 'keine stille Entlastung' (Champion)"
+        a: champion/champion
+        b: champion/s3
+        status: exact
+        differs: "fusion.type no_silent (re-fusion)"
+      - label: "S1 Ja/Nein erst ab p ≥ 0.8 (Champion)"
+        a: champion/champion
+        b: champion/s1_v1_08
+        status: exact
+        differs: "checks.facts.decide_at 0.8"
+      - label: "Fakten auch auf Präfixen (prefix-max)"
+        a: champion/champion
+        b: champion/prefixmax
+        status: exact
+        differs: "checks.facts.prefix_max"
+      - label: "S2 Few-Shot-Beispiele pro Fold"
+        a: champion/champion
+        b: champion/fs_tuned
+        status: caveat
+        differs: "contrast few-shot examples in the fact probes"
+        note: "fs_tuned merges 4 fold runs built by scripts/research/s2_fewshot.py"
+      - label: "Hybrid: Richter darf zu Prüfen eskalieren (Turbo, 7B)"
+        a: llm_models/qwen25_7b__facts_only
+        b: llm_models/qwen25_7b__hybrid
+        status: caveat
+        differs: "fusion.type hybrid with llm_judge as second opinion"
+        note: "both re-fusions of the same stale qwen25_7b source"
+
+  # ---- Kev (upcoming experiment kev_vs_facts): placeholders, light up when runs/experiments/kev_vs_facts/ appears
+  - id: kev_scorer
+    short: Kev-Scorer
+    title: "Scorer: Qwen 7B → Kev-4B (gleiche Fragen)"
+    meaning: "Spezialisiertes kleines Modell statt Qwen als Fakten-Scorer."
+    pending: true
+    pairs:
+      - label: "Qwen 7B → Kev-4B (allgemeine, gesetzesbasierte Fragen)"
+        a: kev_vs_facts/qwen_general
+        b: kev_vs_facts/kev_general
+        pending: true
+        status: exact
+        differs: "scorer model only (same general questions)"
+      - label: "Qwen 7B → Kev-4B (abgestimmte Fragen)"
+        a: kev_vs_facts/champion
+        b: kev_vs_facts/kev_facts
+        pending: true
+        status: exact
+        differs: "scorer model only (same tuned fact questions)"
+  - id: kev_questions
+    short: Kev-Fragen
+    title: "Fragen: abgestimmt → allgemein, gesetzesbasiert (gleicher Scorer)"
+    meaning: "Weniger Dev-Anpassung: Fragen aus dem Gesetz statt aus den Dev-Transkripten."
+    pending: true
+    pairs:
+      - label: "abgestimmt → allgemein (Qwen 7B)"
+        a: kev_vs_facts/champion
+        b: kev_vs_facts/qwen_general
+        pending: true
+        status: exact
+        differs: "question set only (scorer Qwen 7B)"
+      - label: "abgestimmt → allgemein (Kev-4B)"
+        a: kev_vs_facts/kev_facts
+        b: kev_vs_facts/kev_general
+        pending: true
+        status: exact
+        differs: "question set only (scorer Kev-4B)"
+      - label: "Kev: abgestimmt → blinde Tabelle"
+        a: kev_vs_facts/kev_facts
+        b: kev_vs_facts/kev_blind
+        pending: true
+        status: exact
+        differs: "blind table (questions + rules from the criteria only)"
+      - label: "Kev: abgestimmt → Paraphrase"
+        a: kev_vs_facts/kev_facts
+        b: kev_vs_facts/kev_para
+        pending: true
+        status: exact
+        differs: "fact question wording only"
+  - id: kev_transcript
+    short: Kev-Transkript
+    title: "Kev: ASR und Transkript-Obergrenze"
+    meaning: "Wie stark hängt Kev am Transkript?"
+    pending: true
+    pairs:
+      - label: "Kev allgemein: Turbo → large-v3"
+        a: kev_vs_facts/kev_general_turbo
+        b: kev_vs_facts/kev_general
+        pending: true
+        status: exact
+        differs: "ASR model only"
+      - label: "Kev allgemein: large-v3 → ORACLE"
+        a: kev_vs_facts/kev_general
+        b: kev_vs_facts/kev_general_oracle
+        pending: true
+        status: confounded
+        differs: "dialect reference text vs Standard German ASR"
+
+# Waterfall from the overnight start to the current lean. Each step is a paired delta; when a step's B is not the
+# next step's A, the link is checked for identical decisions (qwen25_7b_facts_l3 = champion/facts_only).
+path:
+  title: "v1 → Fakten → large-v3 → leichte Stichwörter → Tabelle v3"
+  start_label: "Start: v1 (Turbo, 7B)"
+  end_label: "Ende: Champion + Tabelle v3"
+  steps:
+    - {label: "Fakten statt freier Richter", a: llm_models/qwen25_7b, b: llm_models/qwen25_7b__facts_only, status: caveat}
+    - {label: "large-v3 statt Turbo", a: llm_models/qwen25_7b__facts_only, b: llm_models/qwen25_7b_facts_l3, status: caveat}
+    - {label: "+ leichte Stichwörter/Muster", a: champion/facts_only, b: champion/champion, status: exact}
+    - {label: "Tabelle v3", a: champion/champion, b: champion/table_v3, status: exact}
+
+# The same system under other conditions. First entry of a track = its base; later entries on the same calls get a
+# paired delta against it, entries on other calls (synthetic) are shown side by side.
+generalisation:
+  - title: "Champion (7B, Tabelle v1)"
+    entries:
+      - {label: "Dev, abgestimmte Fragen", ref: champion/champion, kind: dev}
+      - {label: "Paraphrase 1", ref: champion/para, kind: paraphrase}
+      - {label: "Paraphrase 2", ref: champion/para2, kind: paraphrase}
+      - {label: "Neu aufgenommenes Audio", ref: perturbed/perturbed, kind: perturbed}
+      - {label: "Synthetisch, out-of-sample (nur Fakten, Referenztext)", ref: synth_stress/facts7b_v1, kind: synthetic}
+      - {label: "Synthetisch, Paraphrase 1", ref: synth_stress/facts7b_para, kind: synthetic}
+  - title: "Nur Fakten (7B, large-v3)"
+    entries:
+      - {label: "Dev, abgestimmte Tabelle", ref: llm_models/qwen25_7b_facts_l3, kind: dev}
+      - {label: "Blinde Tabelle", ref: llm_models/qwen25_7b_facts_l3__blind_only, kind: blind}
+  - title: "Tabelle v3 (7B)"
+    entries:
+      - {label: "Dev", ref: champion/table_v3, kind: dev}
+      - {label: "Neu aufgenommenes Audio", ref: perturbed/table_v3, kind: perturbed}
+      - {label: "Synthetisch (nur Fakten, Referenztext)", ref: synth_stress/facts7b_v3, kind: synthetic}
+  - title: "14B (large-v3, nur Fakten)"
+    entries:
+      - {label: "Dev, abgestimmte Tabelle", ref: llm_models/qwen25_14b_facts_l3, kind: dev}
+      - {label: "Paraphrase 1", ref: llm_models/qwen25_14b_para_l3, kind: paraphrase}
+      - {label: "Blinde Tabelle", ref: llm_models/qwen25_14b_facts_l3__blind_only, kind: blind}
+  - title: "Kev-4B (allgemeine Fragen)"
+    entries:
+      - {label: "Dev", ref: kev_vs_facts/kev_general, kind: dev, pending: true}
+      - {label: "Paraphrase", ref: kev_vs_facts/kev_para, kind: paraphrase, pending: true}
+      - {label: "Blinde Tabelle", ref: kev_vs_facts/kev_blind, kind: blind, pending: true}
+  - title: "Zwei Leser R1 (Qwen 7B + Kev-4B, Label-Einigkeit)"
+    entries:
+      - {label: "Dev, abgestimmte Tabelle", ref: two_readers/r1, kind: dev}
+      - {label: "Paraphrase 1", ref: two_readers/r1_para, kind: paraphrase}
+      - {label: "Paraphrase 2", ref: two_readers/r1_para2, kind: paraphrase}
+      - {label: "Blinde Tabelle", ref: two_readers/r1_blind, kind: blind}
+
+# Systems for the per-family heat map and the quality/cost table (UI default selection = all available).
+systems:
+  - {label: "v1 (freier Richter, Turbo, 7B)", ref: llm_models/qwen25_7b}
+  - {label: "Nur Stichwörter", ref: checks_ablation/keywords}
+  - {label: "Fakten (Turbo, 7B)", ref: llm_models/qwen25_7b__facts_only}
+  - {label: "Fakten (Turbo, 14B)", ref: llm_models/qwen25_14b_facts}
+  - {label: "Champion (large-v3, 7B)", ref: champion/champion}
+  - {label: "Champion Tabelle v3", ref: champion/table_v3}
+  - {label: "Champion Paraphrase 1", ref: champion/para}
+  - {label: "Champion 14B", ref: champion14/champion14}
+  - {label: "Champion Turbo (Einzel-Durchlauf)", ref: champion/turbo_clean}
+  - {label: "ORACLE 14B (nur Experiment)", ref: llm_models/qwen25_14b_facts_oracle}
+  - {label: "Kev-4B allgemein", ref: kev_vs_facts/kev_general, pending: true}
+  - {label: "Kev-4B abgestimmt", ref: kev_vs_facts/kev_facts, pending: true}
+  - {label: "Qwen 7B allgemein", ref: kev_vs_facts/qwen_general, pending: true}
+  - {label: "Zwei Leser R1 (Label-Einigkeit)", ref: two_readers/r1}
+  - {label: "Zwei Leser R2 (Fakt-Einigkeit)", ref: two_readers/r2}
+
+baselines:
+  reference: champion/champion       # flag-all / flag-none computed live on these calls
+  keyword_only: checks_ablation/keywords
+  v1: llm_models/qwen25_7b
+  rerun:                              # the same v1 config computed twice (judge samples at T=0.7)
+    label: "v1 zweimal gerechnet (Wiederholbarkeit)"
+    a: checks_ablation/all
+    b: llm_models/qwen25_7b
+    differs: "nothing intended: gpu-12gb vs llm-sweep (roles pinned to the 7B cache, LLM entry `judge`) -> fresh judge samples"
+
+# Holdout runs: counted for the metric guide only (never compared, never tuned on)
+holdout:
+  - champion_holdout/champion
+  - holdout_v1/v1
+  - champion14_holdout/champion14

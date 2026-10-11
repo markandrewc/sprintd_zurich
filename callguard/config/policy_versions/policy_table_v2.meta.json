@@ -1,0 +1,33 @@
+{
+ "version": 2,
+ "status": "approved",
+ "kind": "edit",
+ "author": "Benjamin",
+ "created": "2026-10-10T11:45:30+00:00",
+ "comment": "Team-Entscheid 10.10.: Tabelle v3 übernehmen (Review-Regeln für offene Fakten, Splitting-Alarm 2); gemessen: weniger Verpasste bei gleichen Fehlalarmen mit dem 7B-Leser",
+ "parent": 1,
+ "approver": "Team-Review (Sprintd)",
+ "diff": [
+  "trade: neuer Fakt «Im Gespräch offen, woher die Information stammt oder ob sie öffentlich ist» – Frage: «Sagt jemand im Gespräch ausdrücklich, dass unklar oder unbekannt ist, woher die Information stammt, auf die sich der Handelswunsch stützt, oder ob sie schon öffentlich bekannt ist (z.B. \"ich weiss nicht, ob das schon publiziert ist\", \"woher haben Sie das?\" ohne klare Antwort)?»",
+  "trade: neue Regel trade.review_open: WENN «Eigener Handelswunsch geäussert» ≠ nein UND «Im Gespräch offen, woher die Information stammt oder ob sie öffentlich ist» = ja UND «Information bereits öffentlich» ≠ ja → PRÜFEN",
+  "access: neuer Fakt «Im Gespräch offen, zu welchem Vorgang der Wert gehört» – Frage: «Sagt jemand im Gespräch ausdrücklich, dass nicht klar ist, woher der vorgelesene Wert stammt oder zu welchem Vorgang, welcher Nachricht oder welchem Konto er gehört (z.B. \"ich weiss nicht, ob das der neue oder der alte Code ist\")?»",
+  "access: neue Regel access.review_open: WENN «Code/Wert am Telefon vorgelesen» ≠ nein UND («Im Gespräch offen, ob der Wert gültig ist» = ja ODER «Im Gespräch offen, zu welchem Vorgang der Wert gehört» = ja) UND «Wert abgelaufen oder Muster» ≠ ja → PRÜFEN",
+  "disclosure: neuer Fakt «Im Gespräch offen, ob eine Berechtigung besteht» – Frage: «Sagt jemand im Gespräch ausdrücklich, dass (noch) unklar, nicht geprüft oder im Moment nicht feststellbar ist, ob die anrufende Person eine Vollmacht oder Berechtigung für Auskünfte über die andere Person hat?»",
+  "disclosure: neue Regel disclosure.review_open: WENN («Auskunft über Drittperson verlangt» ≠ nein ODER «Konkrete Daten einer Drittperson herausgegeben» ≠ nein) UND «Im Gespräch offen, ob eine Berechtigung besteht» = ja UND «Vollmacht/Auskunftsrecht bestätigt» ≠ ja UND «Keine Vollmacht/Berechtigung festgestellt» ≠ ja → PRÜFEN",
+  "documentation: neuer Fakt «Im Gespräch offen, ob die verborgene Angabe relevant ist» – Frage: «Sagt jemand im Gespräch ausdrücklich, dass unklar oder noch abzuklären ist, ob die Angabe, die nicht protokolliert oder nicht weitergegeben werden soll, für den Vorgang relevant ist (z.B. ob es sich um eine rückzahlbare Verpflichtung handelt oder ob die zuständige Stelle sie wissen muss)?»",
+  "documentation: neue Regel documentation.review_open: WENN «Verlangt, etwas nicht zu protokollieren» ≠ nein UND «Im Gespräch offen, ob die verborgene Angabe relevant ist» = ja UND «Nur Korrektur oder private Details» ≠ ja → PRÜFEN",
+  "splitting: neuer Fakt «Im Gespräch offen, ob die Teilbeträge zusammengehören» – Frage: «Sagt jemand im Gespräch ausdrücklich, dass unklar oder unbekannt ist, ob die Teilbeträge zu einer einzigen Rechnung bzw. einem einzigen Geschäft gehören oder zu mehreren unabhängigen Rechnungen?»",
+  "splitting: neuer Fakt «Im Gespräch offen, warum aufgeteilt werden soll» – Frage: «Bleibt im Gespräch ausdrücklich offen, warum die Zahlung aufgeteilt werden soll (z.B. die Beratung fragt nach dem Grund und bekommt keine klare Antwort, oder jemand sagt, der Grund sei unbekannt)?»",
+  "splitting: neuer Fakt «Eine zusammenhängende Zahlung soll in Teilzahlungen aufgeteilt werden» – Frage: «Verlangt eine Person, eine einzige Rechnung oder einen zusammenhängenden Betrag nicht als eine Zahlung, sondern in mehreren kleineren Zahlungen oder Überweisungen zu begleichen (z.B. aufgeteilt auf mehrere Tage, Konten oder Aufträge)?»",
+  "splitting: neuer Fakt «Begründung - Freigabe/Prüfung/Zuständigkeit soll nicht greifen» – Frage: «Sagt die Person, die die Aufteilung will, dass damit jeder Teil unter einer Betragsgrenze oder Limite bleibt oder dass eine bestimmte interne Freigabe, Prüfung, Zweitunterschrift oder zuständige Stelle bzw. Person nicht ausgelöst oder nicht einbezogen wird? (Eine Vermutung oder Suggestivfrage der Gegenseite, die die Person verneint, zählt nicht.)»",
+  "splitting: neue Regel splitting.alarm_2: WENN «Eine zusammenhängende Zahlung soll in Teilzahlungen aufgeteilt werden» = ja UND «Begründung - Freigabe/Prüfung/Zuständigkeit soll nicht greifen» = ja UND «Unabhängige Rechnungen oder nur Beispiel» ≠ ja → ALARM",
+  "splitting: neue Regel splitting.review_open: WENN («Aufteilung in Teilbeträge verlangt» ≠ nein ODER «Eine zusammenhängende Zahlung soll in Teilzahlungen aufgeteilt werden» ≠ nein) UND («Im Gespräch offen, ob die Teilbeträge zusammengehören» = ja ODER «Im Gespräch offen, warum aufgeteilt werden soll» = ja) UND «Unabhängige Rechnungen oder nur Beispiel» ≠ ja → PRÜFEN"
+ ],
+ "changed_files": [
+  "policy_table"
+ ],
+ "approved_at": "2026-10-10T11:45:30+00:00",
+ "approval_note": "Freigabe im Team-Review",
+ "absent": [],
+ "file_hash": "865d7f7287977ea3"
+}

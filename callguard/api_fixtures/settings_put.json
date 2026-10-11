@@ -1,0 +1,77 @@
+{
+ "settings": {
+  "certainty": 0.7,
+  "combination": "agree",
+  "threshold": 0.55,
+  "review_band": 0.15,
+  "defaults": {
+   "certainty": 0.6,
+   "combination": "agree",
+   "threshold": 0.55
+  },
+  "options": {
+   "certainty": {
+    "min": 0.5,
+    "max": 1.0,
+    "step": 0.01,
+    "help": "A reader's answer counts as yes if p(yes) >= c, as no if p(yes) <= 1 - c, else unclear. Higher c = more unclear facts = more calls to review."
+   },
+   "combination": [
+    {
+     "id": "agree",
+     "label": "Agreement",
+     "help": "Both readers yes -> yes, both no -> no, otherwise unclear (the review rules apply)."
+    },
+    {
+     "id": "a_checked",
+     "label": "Qwen, Kev as check",
+     "help": "Qwen decides, unless Kev clearly says the opposite -> unclear."
+    },
+    {
+     "id": "only_a",
+     "label": "Qwen only",
+     "help": "Only Qwen counts; Kev's answer is shown but does not decide."
+    },
+    {
+     "id": "only_b",
+     "label": "Kev only",
+     "help": "Only Kev counts; Qwen's answer is shown but does not decide."
+    }
+   ],
+   "threshold": {
+    "min": 0.05,
+    "max": 0.95,
+    "step": 0.01,
+    "help": "Call score at or above this is an alarm; within the review band below it, review."
+   }
+  }
+ },
+ "counts": {
+  "alarm": 14,
+  "review": 17,
+  "no_alert": 29
+ },
+ "changed": [
+  {
+   "id": "Stufe2_C07-K4",
+   "before": "alarm",
+   "after": "no_alert"
+  },
+  {
+   "id": "Stufe2_C14-K3",
+   "before": "no_alert",
+   "after": "review"
+  },
+  {
+   "id": "Stufe2_C15-K3",
+   "before": "review",
+   "after": "no_alert"
+  },
+  {
+   "id": "Stufe3_C19-K4",
+   "before": "review",
+   "after": "no_alert"
+  }
+ ],
+ "elapsed_ms": 209.0
+}

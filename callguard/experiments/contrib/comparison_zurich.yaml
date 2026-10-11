@@ -1,0 +1,119 @@
+# Our approach (callguard) vs the teammate's prototype sprintd_zurich, one row per design choice.
+# Shown on the UI page "Team-Entscheidungen" and in docs/TEAM_OPTIONS.md (uv run callguard candidates).
+# Placeholders {{<candidate>.<key>}} as in decisions.yaml (numbers from runs/candidates/candidates.json).
+#
+# written_against = the teammate commit this was written against. The page warns when the repo at teammate_repo
+# (or $CALLGUARD_ZURICH_REPO) has moved on: then re-read the changed files and update the rows + this hash.
+# recommendation: übernehmen (take theirs) | behalten (keep ours) | kombinieren | offen
+teammate_repo: sprintd_zurich
+teammate_repo_url: github.com/markandrewc/sprintd_zurich
+written_against: 954446c70630e87a18ae1c42b0fb5ce5f2d0ae0d  # 954446c only added data/test50 (no code change since 47c4ffd)
+files_read: [README.md, transcription/asr.py, fraud_analysis/analysis.py, fraud_analysis/questions.json,
+             fraud_analysis/runtime.py, dashboard/app.py, dashboard/store.py, finetuning/export_labels.py,
+             misc/analysis_ui/evaluate.py, misc/SwissDial/tts.py, shared/model_slot.py]
+intro: >-
+  Gemessen wurde auf unseren Dev-Daten (48 Anrufe, large-v3-Transkripte, unsere Rollen), nicht in ihrer Umgebung.
+  Ihre README nennt keine Kennzahlen. Wo keine Messung steht, ist die Zeile eine Beschreibung.
+
+rows:
+  - topic: ASR-Modell
+    ours: "gcoli/whisper-large-v3-swiss-german-mit (MIT), Ausgabe Hochdeutsch, Keyword-Prompt"
+    theirs: "Flix-AI/flix-swissgerman-full (Whisper large, Volltraining, Apache-2.0), HF-Pipeline bf16, language=de"
+    evidence: "RQ2 (Dev, Keyword-Stellen-Recall): gcoli 83.7% [77.5, 93.2] vs Flix 76.1%; Intervalle überlappen."
+    impact: "Transkript-Qualität begrenzt alle Prüfungen; Unterschied nicht belegt."
+    recommendation: behalten
+    why: "höherer gemessener Recall, MIT-Lizenz; Flix bleibt Alternative"
+  - topic: Segmentierung / Sprecher
+    ours: "sherpa-onnx-Diarisierung (CPU) + LLM weist Berater/Kunde zu; Rollen gehen in die Fakt-Fragen"
+    theirs: "nvidia/Nemotron-3-Diarization, Sprecher-Chunks ≤ 20 s (Lücke ≤ 1 s), max. 2 Sprecher, keine Rollen"
+    evidence: "Fall-Audio ist eine TTS-Stimme (ihre README: nur „Sprecher 1“). Rollen verbergen: AUC −0.06 [−0.15, +0.00] (RQ6, grenzwertig)."
+    impact: "Rollen helfen den Fakten knapp; akustische Diarisierung trennt auf dem Fall-Audio kaum."
+    recommendation: behalten
+    why: "Rollen per LLM funktionieren auch bei einer Stimme"
+  - topic: Entscheider-Modell
+    ours: "Qwen2.5-7B-AWQ (vLLM, Log-Probs, Champion); Optionen Qwen3.8-27B 3/6-bit, Kev-4B, zwei Leser"
+    theirs: "Kev-4B (jaredpalmer/kev-4b, LoRA auf Qwen3.5-4B, bf16 ~8 GB, in-process)"
+    evidence: "Gleiche Fakten-Tabelle: Champion {{champion.auc}}, Kev {{kev.auc}} (gepaart {{kev.vs_auc}}); umformuliert Champion {{champion.reworded}}, Kev {{kev.reworded}} (gepaart {{kev.vs_reworded}})."
+    impact: "Kev ist formulierungsrobust, kennt aber kein „unklar“ ({{kev.reviews}})."
+    recommendation: kombinieren
+    why: "Kev als umschaltbarer Leser, Champion als Standard"
+  - topic: Fragen
+    ours: "abgestimmte atomare Fakt-Fragen (Englisch) + Policy-Tabelle; Paraphrasen- und Blind-Tabellen als Robustheitsprobe"
+    theirs: "15 allgemeine, gesetzesbasierte Ja/Nein-Fragen (Englisch, 10 gesetzlich + 5 intern), ohne Testdaten geschrieben"
+    evidence: "Auf Kev: allgemein {{gen_kev.auc}}, Fakten {{kev.auc}}. Allgemein umformuliert {{gen_kev.reworded}}. Fakten-Fragen auf Deutsch statt Englisch: AUC −0.13 [−0.29, −0.01] (RQ6)."
+    impact: "Allgemeine Fragen sind weniger an Dev angepasst, markieren ohne Regelschicht aber zu viel (Fehlalarme {{gen_kev.far}})."
+    recommendation: kombinieren
+    why: "ihre Gesetzesbezüge als Kategorien unserer Fakten; Tabelle behalten"
+  - topic: Entscheidungsregel
+    ours: "Policy-Tabelle → Alarm / Prüfen / Kein Alarm, gewichtete Fusion, Schwelle 0.55 (CV gewählt), Prüfband"
+    theirs: "max p(ja) über alle Fragen ≥ 0.7 → Alarm, sonst kein Alarm (binär, keine Prüfen-Klasse)"
+    evidence: "Ihre Regel auf unseren Transkripten (Kev allgemein): Fehlalarme {{gen_kev.far}}, exakt {{gen_kev.acc}} (gepaart {{gen_kev.vs_acc}}); Champion Fehlalarme {{champion.far}}."
+    impact: "Ohne Prüfen-Klasse kein „unsicher → Mensch“; die Organisatoren wollen das Verhalten konfigurierbar."
+    recommendation: behalten
+    why: "3 Klassen + konfigurierbarer Prüfmodus"
+  - topic: Lokalisierung der Belege
+    ours: "Belege = Segment-IDs aus den Fakt-Antworten; Passagen + Audio-Snippets (±2 s) mit Zeitstempel"
+    theirs: "Okklusion: bestes 40-Wort-Fenster (Überlappung 20), darin 25-Wort-Spanne mit grösstem p-Abfall; Snippet ±10 s"
+    evidence: "Beleg hit@1: Champion {{champion.hit1}}; ihr Fensterverfahren (bei uns nachgebaut, Kev allgemein) {{gen_kev.hit1}}."
+    impact: "Lange Fenster treffen schon zufällig oft; kurze Passagen sparen dem Officer Zeit."
+    recommendation: behalten
+    why: "präziser bei kürzeren Passagen; Okklusion als Ersatz, wo ein Modell keine Belege liefert (Kev, Qwen3.8)"
+  - topic: Stichwörter
+    ours: "editierbare Stichwortliste (config/keywords.json, UI-Seite), leichtes Gewicht in der Fusion"
+    theirs: "keine"
+    evidence: "Nur Stichwörter: AUC {{keywords.auc}}; die Liste ist eine Anforderung des Falls."
+    impact: "Allein schwach, aber erklärbar und vom Officer anpassbar."
+    recommendation: behalten
+  - topic: Rechtsgrundlage
+    ours: "keine Gesetzesartikel an den Prüfungen (nur Kriterien-Text)"
+    theirs: "jede Frage mit `basis` (z.B. FinfraG Art. 142 / 154, StGB Art. 305bis, GwG Art. 6 / 9), im Fund angezeigt"
+    evidence: "beschreibend"
+    impact: "Für Compliance-Officer und Jury glaubwürdiger."
+    recommendation: übernehmen
+    why: "Feld `basis` je Familie/Fakt, im Anruf anzeigen"
+  - topic: Schwelle
+    ours: "Schwelle per Out-of-fold-CV gewählt (0.55), Regler + Prüfband in der Seitenleiste, Re-Fusion ohne Modell"
+    theirs: "fest 0.7 in questions.json, Regler in „Einstellungen“ mit Vorschau „N von M Anrufen“, nicht kalibriert"
+    evidence: "beschreibend"
+    impact: "Beide live einstellbar; ihre Vorschau der Fallzahl ist officer-freundlich."
+    recommendation: kombinieren
+    why: "Vorschau der Arbeitslast beim Verstellen"
+  - topic: Evaluation
+    ours: "Dev/Holdout-Split, Zwillinge im selben Fold, Out-of-fold-CV-Schwellen, Bootstrap-KI, AUC, 3 Klassen"
+    theirs: "alle 30 Dialoge auf Referenzskripten (optional ASR), binär, TP/FP/FN/TN, Präzision/Recall/F1, kein KI, kein Split"
+    evidence: "Ihre Einstellung (Kev allgemein auf Dialekt-Referenzskripten, ORACLE): AUC {{gen_kev_oracle.auc}}; auf unserer ASR: {{gen_kev.auc}}."
+    impact: "Referenzskripte überschätzen die Leistung auf Audio; ohne KI ist kein Unterschied belegbar."
+    recommendation: behalten
+  - topic: Officer-Feedback / Labels
+    ours: "Rückmeldung je Anruf → Schwellen-Vorschlag (Feedback & Tuning), offene Fakten beantworten, Audit-Log"
+    theirs: "Urteil je Anruf + richtig/falsch je Fund + übersehene Kategorien; Export labels.jsonl für Fine-Tuning"
+    evidence: "beschreibend"
+    impact: "Ihr Export macht Feedback zu Trainingsdaten."
+    recommendation: übernehmen
+    why: "Feedback je Fund + Label-Export"
+  - topic: Fragen-Versionierung
+    ours: "Tabellen/Kriterien als YAML in Git; Cache-Schlüssel enthalten den Inhalt"
+    theirs: "PUT /questions erhöht `version`, archiviert questions_v{N}.json, jede Analyse speichert ihre Version"
+    evidence: "beschreibend"
+    impact: "Nachvollziehbar, welche Fragen ein Urteil erzeugt haben."
+    recommendation: übernehmen
+    why: "Version der Tabelle in result.json schreiben"
+  - topic: GPU-Handhabung
+    ours: "gestaffelte Läufe (ASR, dann LLM) + inhaltsadressierter Cache; Server getrennt (vLLM, llama.cpp, Kev)"
+    theirs: "ModelSlot: Laden bei Bedarf, Entladen nach 120 s Leerlauf; erst alle ASR, dann Analyse"
+    evidence: "Champion gestaffelt ~30 s pro Anruf (Journal 04:50)."
+    impact: "Ihr Ansatz braucht keine Server-Neustarts."
+    recommendation: offen
+  - topic: UI
+    ours: "Streamlit, mehrseitige Officer-UI (Eingang, Anruf, Stichwörter, Qualität, Experimente, ...)"
+    theirs: "Gradio, 4 Tabs (Anrufe, Neue Anrufe, Prüfpunkte, Einstellungen), SQLite, Auto-Refresh"
+    evidence: "beschreibend"
+    impact: "–"
+    recommendation: behalten
+  - topic: Synthetische Daten
+    ours: "Text-Skripte aus neuen Szenarien (Qwen3-8B), 74 Anrufe, Referenztext ohne ASR"
+    theirs: "SwissDial-TTS (VITS, 8 Dialekte) für Audio; keine Daten im Repo"
+    evidence: "beschreibend"
+    impact: "Ihre TTS könnte Audio mit anderen Stimmen/Dialekten für einen ASR-Robustheitstest liefern."
+    recommendation: kombinieren
+    why: "unsere Skripte mit ihrer TTS vertonen"

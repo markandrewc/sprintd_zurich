@@ -1,0 +1,57 @@
+# Two readers (research: research/findings/two_readers_prereg.md, experiments/two_readers.yaml).
+#
+#   ASR     same as recommended (large-v3 MIT)
+#   checks  the champion's facts check (reader A: Qwen2.5-7B-AWQ on vLLM, log-probs + evidence) AND the same fact
+#           sheet read by Kev-4B (reader B: facts_kev, p(yes) / 1 - p(yes), no evidence); light keywords/patterns
+#   fusion  two_readers: rule `labels` (R1: each reader's weighted-fusion label; agree -> that label, else review)
+#           or `facts` (R2: per fact, |p_A(yes) - p_B(yes)| > 0.5 -> unclear, else the mean; table re-evaluated)
+#
+# GPU: Qwen2.5-7B-AWQ on vLLM (~6 GB weights, set gpu-memory-utilization so the KV cache stays small, e.g. 0.35 on
+# 24 GB) + Kev-4B bf16 (~8 GB) + large-v3 fp16 (~4 GB) fit together on ONE 24 GB card (RTX A5000 / 4090 / 3090),
+# so new calls run in one pass:  uv run callguard run <wav> -c two-readers
+# On the 12 GB 4070 they do NOT fit together: run in stages (recommended with vLLM, then kev-facts with Kev), or
+# evaluate stored runs with `callguard agreement` (merges two finished variants, no model runs).
+extends: recommended.yaml
+description: Two readers (Qwen2.5-7B facts + Kev-4B facts, agreement decides, disagreement -> review)
+
+llms:
+  kev:
+    type: kev
+    base_url: ${CALLGUARD_KEV_URL:-http://127.0.0.1:8003}
+    model: ${KEV_MODEL:-jaredpalmer/kev-4b}
+    dtype: bf16
+    calibrated: false
+    fact_answer: noul
+    max_concurrency: 1
+    timeout: 300
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.15
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.1
+  - name: facts
+    type: facts
+    llm: default
+    parallel: 5
+    weight: 1.0
+  - name: facts_kev
+    type: facts
+    llm: kev
+    evidence: false
+    weight: 1.0
+
+fusion:
+  type: two_readers
+  rule: labels
+  readers: [facts, facts_kev]
+  reader_labels: [Qwen, Kev]
+  gap: 0.5
+  threshold: 0.55
+  review_band: 0.15
+  max_uncertainty: 0.35
+  min_score_for_review: 0.25
+  abstain_on_empty: true

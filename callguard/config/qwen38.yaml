@@ -1,0 +1,43 @@
+# Qwen3.8-27B profile (research: experiments/qwen38.yaml). NOT the Sunday candidate.
+#
+# Qwen3.8 is the newest Qwen generation (2026-08); 27B is its smallest model. Hybrid attention (Gated DeltaNet + full
+# attention every 4th layer): the host's vLLM 0.10.1 cannot load it, so it runs on llama.cpp's llama-server
+# (scripts/remote/serve_llamacpp.sh, :8004) as a ~3-bit GGUF that fits the 12 GB card:
+#   unsloth/Qwen3.8-27B-GGUF  Qwen3.8-27B-UD-IQ3_XXS.gguf (10.9 GB)  -> default (cache_tag below)
+#                             Qwen3.8-27B-UD-Q2_K_XL.gguf (9.8 GB)   -> fallback: CALLGUARD_Q38_TAG=qwen3.8-27b-ud-q2_k_xl
+# ASR and advisor/customer roles come from the cache (Qwen2.5-7B-AWQ assigned them; llms.default is the `pinned`
+# stand-in from config/kev.yaml), so only the decision check changes: a clean "which LLM reads the facts" comparison.
+extends: recommended.yaml
+description: Qwen3.8-27B (GGUF ~3 bit, llama.cpp) as the facts backend; roles from the cache (research only)
+
+llms:
+  default:
+    type: pinned
+    identity: {type: openai_compat, model: Qwen/Qwen2.5-7B-Instruct-AWQ, json_mode: json_schema, seed: null, extra_body: {}}
+    note: advisor/customer roles come from the diarization cache; uncached calls need vLLM (recommended) first
+  q38:
+    type: openai_compat
+    base_url: ${CALLGUARD_Q38_URL:-http://127.0.0.1:8004/v1}
+    model: callguard-llm
+    # llama-server does not name the weights in GET /models: the tag keys the cache. Change it with the GGUF.
+    cache_tag: ${CALLGUARD_Q38_TAG:-qwen3.8-27b-ud-iq3_xxs}
+    timeout: 600
+    json_mode: json_schema
+    supports_n: false               # llama-server answers one choice per request
+    max_concurrency: 2              # = llama-server slots (-np 2)
+    extra_body: {chat_template_kwargs: {enable_thinking: false}}
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.15
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.1
+  - name: facts
+    type: facts
+    llm: q38
+    parallel: 2
+    evidence: false                 # reasons text off for speed; the score and label do not depend on it
+    weight: 1.0

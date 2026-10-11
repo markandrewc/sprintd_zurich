@@ -1,0 +1,36 @@
+# Laptop / CPU profile: smallest models that still make sense. ~0.7-1x realtime ASR on 8 cores.
+# Start the LLM server first:  scripts/serve_llm_local.sh
+# More ASR threads for a demo (cache stays valid, threads are not part of the key): --set asr.cpu_threads=8
+extends: base.yaml
+description: CPU-only local demo (Whisper-turbo GSW int8 + Qwen2.5-1.5B Q4 via llama.cpp)
+
+llms:
+  default:
+    type: openai_compat
+    base_url: http://127.0.0.1:8001/v1
+    model: qwen2.5-1.5b-instruct
+    timeout: 600
+    max_retries: 1                  # a timed-out request keeps the single-slot server busy: retry once only
+    json_mode: json_object_schema   # llama-cpp-python server dialect
+
+# Same checks as base.yaml; the transcript cap keeps prompts inside the server's n_ctx 8192.
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.35
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.2
+  - name: llm_judge
+    type: llm_judge
+    llm: default
+    samples: 1
+    temperature: 0.0
+    max_transcript_chars: 16000
+    weight: 1.0
+  - name: geval
+    type: geval
+    llm: default
+    max_transcript_chars: 16000
+    weight: 1.0

@@ -1,0 +1,41 @@
+# Event GPU profile. Same pipeline, bigger models. Start vLLM first: scripts/serve_vllm.sh
+# UNTESTED so far (built and validated offline only; no GPU was available while writing it).
+extends: base.yaml
+description: GPU profile (Whisper large-v3 GSW fp16 + vLLM with a 30B-class instruct model)
+
+asr:
+  type: faster_whisper
+  model: models/asr/whisper-large-v3-gsw-ct2      # scripts/download_models.sh gpu
+  device: cuda
+  compute_type: float16
+  beam_size: 5
+
+llms:
+  default:
+    type: openai_compat
+    base_url: http://127.0.0.1:8000/v1
+    model: Qwen/Qwen3-30B-A3B-Instruct-2507        # or Qwen2.5-32B-Instruct-AWQ, Llama-3.3-70B-AWQ ...
+    timeout: 120
+    json_mode: json_schema          # OpenAI/vLLM structured outputs
+    max_concurrency: 8              # vLLM batches concurrent requests; checks send one per family
+
+checks:
+  - name: keywords
+    type: keywords
+    weight: 0.35
+    fuzzy: 90
+  - name: patterns
+    type: patterns
+    weight: 0.2
+  - name: llm_judge
+    type: llm_judge
+    llm: default
+    samples: 5           # self-consistency: disagreement across samples -> uncertainty -> review
+    temperature: 0.7
+    parallel: 5          # families scored concurrently (speed only, not part of the cache key)
+    weight: 1.0
+  - name: geval
+    type: geval
+    llm: default
+    parallel: 5
+    weight: 1.0

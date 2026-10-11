@@ -1,0 +1,807 @@
+{
+ "version": null,
+ "can_undo": false,
+ "families": [
+  {
+   "id": "trade",
+   "label": "Insider trading",
+   "label_de": "Insiderhandel (Information und Kaufwunsch)",
+   "legal_basis": "FinfraG Art. 142 (Ausnützen von Insiderinformationen) – Vorschlag, durch Compliance zu bestätigen",
+   "facts": [
+    {
+     "id": "wish",
+     "label": "Own trading wish expressed"
+    },
+    {
+     "id": "inside_info",
+     "label": "Justified with non-public inside information"
+    },
+    {
+     "id": "public",
+     "label": "Information already public"
+    },
+    {
+     "id": "source_open",
+     "label": "Call leaves open where the information comes from or whether it is public"
+    }
+   ],
+   "rules": [
+    {
+     "id": "trade.alarm_1",
+     "family": "trade",
+     "outcome": "alarm",
+     "title": "",
+     "text": "Trading wish based on non-public information from an internal source.",
+     "condition": "wish = yes and inside_info = yes and public != yes",
+     "condition_text": "\"Own trading wish expressed\" is yes AND \"Justified with non-public inside information\" is yes AND \"Information already public\" is not yes",
+     "enabled": true,
+     "position": 0,
+     "hits": 7,
+     "hit_calls": [
+      "Stufe1_D02-K1",
+      "Stufe1_D02-K2",
+      "Stufe1_D04-K1",
+      "Stufe1_D04-K2",
+      "Stufe2_C06-K3",
+      "Stufe2_C06-K4",
+      "Stufe2_C07-K4"
+     ],
+     "basis": null
+    },
+    {
+     "id": "trade.review_1",
+     "family": "trade",
+     "outcome": "review",
+     "title": "",
+     "text": "Trading wish, but the origin or publicity of the information stays open.",
+     "condition": "wish = yes and inside_info = unclear and public != yes",
+     "condition_text": "\"Own trading wish expressed\" is yes AND \"Justified with non-public inside information\" is unclear AND \"Information already public\" is not yes",
+     "enabled": true,
+     "position": 1,
+     "hits": 0,
+     "hit_calls": [],
+     "basis": null
+    },
+    {
+     "id": "trade.review_open",
+     "family": "trade",
+     "outcome": "review",
+     "title": "",
+     "text": "Trading wish; the call says that the origin or publicity of the information is open.",
+     "condition": "wish in [yes, unclear] and source_open = yes and public != yes",
+     "condition_text": "\"Own trading wish expressed\" is not no AND \"Call leaves open where the information comes from or whether it is public\" is yes AND \"Information already public\" is not yes",
+     "enabled": true,
+     "position": 2,
+     "hits": 0,
+     "hit_calls": [],
+     "basis": null
+    },
+    {
+     "id": "trade.no_alert",
+     "family": "trade",
+     "outcome": "no_alert",
+     "title": "",
+     "text": "No trading wish based on non-public information.",
+     "condition": "true",
+     "condition_text": "always",
+     "enabled": true,
+     "position": 3,
+     "hits": 53,
+     "hit_calls": [
+      "Stufe1_D01-K1",
+      "Stufe1_D01-K2",
+      "Stufe1_D03-K1",
+      "Stufe1_D03-K2",
+      "Stufe1_D05-K1",
+      "Stufe1_D05-K2",
+      "Stufe1_D06-K1",
+      "Stufe1_D06-K2",
+      "Stufe1_D07-K1",
+      "Stufe1_D07-K2",
+      "Stufe1_D08-K1",
+      "Stufe1_D08-K2",
+      "Stufe1_D09-K1",
+      "Stufe1_D09-K2",
+      "Stufe1_D10-K1",
+      "Stufe1_D10-K2",
+      "Stufe2_C01-K3",
+      "Stufe2_C01-K4",
+      "Stufe2_C02-K3",
+      "Stufe2_C02-K4",
+      "Stufe2_C03-K3",
+      "Stufe2_C03-K4",
+      "Stufe2_C04-K3",
+      "Stufe2_C04-K4",
+      "Stufe2_C05-K3",
+      "Stufe2_C05-K4",
+      "Stufe2_C07-K3",
+      "Stufe2_C08-K3",
+      "Stufe2_C08-K4",
+      "Stufe2_C09-K3",
+      "Stufe2_C09-K4",
+      "Stufe2_C10-K3",
+      "Stufe2_C10-K4",
+      "Stufe2_C11-K3",
+      "Stufe2_C11-K4",
+      "Stufe2_C12-K3",
+      "Stufe2_C12-K4",
+      "Stufe2_C13-K3",
+      "Stufe2_C13-K4",
+      "Stufe2_C14-K3",
+      "Stufe2_C14-K4",
+      "Stufe2_C15-K3",
+      "Stufe2_C15-K4",
+      "Stufe2_C16-K3",
+      "Stufe2_C16-K4",
+      "Stufe3_C17-K3",
+      "Stufe3_C17-K4",
+      "Stufe3_C18-K3",
+      "Stufe3_C18-K4",
+      "Stufe3_C19-K3",
+      "Stufe3_C19-K4",
+      "Stufe3_C20-K3",
+      "Stufe3_C20-K4"
+     ],
+     "basis": null
+    }
+   ]
+  },
+  {
+   "id": "access",
+   "label": "Access credentials disclosed",
+   "label_de": "Zugangsinformation preisgegeben",
+   "legal_basis": "Interne Weisung Informationssicherheit (Zugangsdaten nie am Telefon) – Vorschlag, durch Compliance zu bestätigen",
+   "facts": [
+    {
+     "id": "spoken",
+     "label": "Code/value read out on the phone"
+    },
+    {
+     "id": "current",
+     "label": "Value belongs to the current, valid process"
+    },
+    {
+     "id": "validity_open",
+     "label": "Call leaves open whether the value is valid"
+    },
+    {
+     "id": "expired_or_sample",
+     "label": "Value expired or a sample"
+    },
+    {
+     "id": "asked_by_advisor",
+     "label": "Code asked for by the advisor"
+    },
+    {
+     "id": "process_open",
+     "label": "Call leaves open which process the value belongs to"
+    }
+   ],
+   "rules": [
+    {
+     "id": "access.alarm_1",
+     "family": "access",
+     "outcome": "alarm",
+     "title": "",
+     "text": "A valid access value was spoken on the phone.",
+     "condition": "spoken = yes and current = yes and expired_or_sample != yes",
+     "condition_text": "\"Code/value read out on the phone\" is yes AND \"Value belongs to the current, valid process\" is yes AND \"Value expired or a sample\" is not yes",
+     "enabled": true,
+     "position": 0,
+     "hits": 0,
+     "hit_calls": [],
+     "basis": null
+    },
+    {
+     "id": "access.review_1",
+     "family": "access",
+     "outcome": "review",
+     "title": "",
+     "text": "A value was read out, but it is unclear which process it belongs to or whether it is valid.",
+     "condition": "spoken = yes and validity_open = yes and expired_or_sample != yes",
+     "condition_text": "\"Code/value read out on the phone\" is yes AND \"Call leaves open whether the value is valid\" is yes AND \"Value expired or a sample\" is not yes",
+     "enabled": true,
+     "position": 1,
+     "hits": 2,
+     "hit_calls": [
+      "Stufe3_C17-K3",
+      "Stufe3_C17-K4"
+     ],
+     "basis": null
+    },
+    {
+     "id": "access.review_open",
+     "family": "access",
+     "outcome": "review",
+     "title": "",
+     "text": "A value was (possibly) read out; the call says that validity or process are open.",
+     "condition": "spoken in [yes, unclear] and (validity_open = yes or process_open = yes) and expired_or_sample != yes",
+     "condition_text": "\"Code/value read out on the phone\" is not no AND (\"Call leaves open whether the value is valid\" is yes OR \"Call leaves open which process the value belongs to\" is yes) AND \"Value expired or a sample\" is not yes",
+     "enabled": true,
+     "position": 2,
+     "hits": 0,
+     "hit_calls": [],
+     "basis": null
+    },
+    {
+     "id": "access.no_alert",
+     "family": "access",
+     "outcome": "no_alert",
+     "title": "",
+     "text": "No valid access value spoken.",
+     "condition": "true",
+     "condition_text": "always",
+     "enabled": true,
+     "position": 3,
+     "hits": 58,
+     "hit_calls": [
+      "Stufe1_D01-K1",
+      "Stufe1_D01-K2",
+      "Stufe1_D02-K1",
+      "Stufe1_D02-K2",
+      "Stufe1_D03-K1",
+      "Stufe1_D03-K2",
+      "Stufe1_D04-K1",
+      "Stufe1_D04-K2",
+      "Stufe1_D05-K1",
+      "Stufe1_D05-K2",
+      "Stufe1_D06-K1",
+      "Stufe1_D06-K2",
+      "Stufe1_D07-K1",
+      "Stufe1_D07-K2",
+      "Stufe1_D08-K1",
+      "Stufe1_D08-K2",
+      "Stufe1_D09-K1",
+      "Stufe1_D09-K2",
+      "Stufe1_D10-K1",
+      "Stufe1_D10-K2",
+      "Stufe2_C01-K3",
+      "Stufe2_C01-K4",
+      "Stufe2_C02-K3",
+      "Stufe2_C02-K4",
+      "Stufe2_C03-K3",
+      "Stufe2_C03-K4",
+      "Stufe2_C04-K3",
+      "Stufe2_C04-K4",
+      "Stufe2_C05-K3",
+      "Stufe2_C05-K4",
+      "Stufe2_C06-K3",
+      "Stufe2_C06-K4",
+      "Stufe2_C07-K3",
+      "Stufe2_C07-K4",
+      "Stufe2_C08-K3",
+      "Stufe2_C08-K4",
+      "Stufe2_C09-K3",
+      "Stufe2_C09-K4",
+      "Stufe2_C10-K3",
+      "Stufe2_C10-K4",
+      "Stufe2_C11-K3",
+      "Stufe2_C11-K4",
+      "Stufe2_C12-K3",
+      "Stufe2_C12-K4",
+      "Stufe2_C13-K3",
+      "Stufe2_C13-K4",
+      "Stufe2_C14-K3",
+      "Stufe2_C14-K4",
+      "Stufe2_C15-K3",
+      "Stufe2_C15-K4",
+      "Stufe2_C16-K3",
+      "Stufe2_C16-K4",
+      "Stufe3_C18-K3",
+      "Stufe3_C18-K4",
+      "Stufe3_C19-K3",
+      "Stufe3_C19-K4",
+      "Stufe3_C20-K3",
+      "Stufe3_C20-K4"
+     ],
+     "basis": null
+    }
+   ]
+  },
+  {
+   "id": "disclosure",
+   "label": "Information given to third parties",
+   "label_de": "Auskunft an Dritte",
+   "legal_basis": "BankG Art. 47 (Bankkundengeheimnis) – Vorschlag, durch Compliance zu bestätigen",
+   "facts": [
+    {
+     "id": "data_given",
+     "label": "Concrete data of a third person given out"
+    },
+    {
+     "id": "third_party_request",
+     "label": "Information about a third person requested"
+    },
+    {
+     "id": "authorized",
+     "label": "Power of attorney / right to information confirmed"
+    },
+    {
+     "id": "not_authorized",
+     "label": "No power of attorney / authorization established"
+    },
+    {
+     "id": "beyond_scope",
+     "label": "Information beyond the scope of the power of attorney"
+    },
+    {
+     "id": "authorization_open",
+     "label": "Call leaves open whether an authorization exists"
+    }
+   ],
+   "rules": [
+    {
+     "id": "disclosure.alarm_1",
+     "family": "disclosure",
+     "outcome": "alarm",
+     "title": "",
+     "text": "Data of a third person given out although authorization was found to be missing.",
+     "condition": "data_given = yes and not_authorized = yes",
+     "condition_text": "\"Concrete data of a third person given out\" is yes AND \"No power of attorney / authorization established\" is yes",
+     "enabled": true,
+     "position": 0,
+     "hits": 3,
+     "hit_calls": [
+      "Stufe1_D07-K1",
+      "Stufe1_D07-K2",
+      "Stufe2_C12-K4"
+     ],
+     "basis": null
+    },
+    {
+     "id": "disclosure.alarm_2",
+     "family": "disclosure",
+     "outcome": "alarm",
+     "title": "",
+     "text": "Information beyond the confirmed scope of the power of attorney.",
+     "condition": "data_given = yes and beyond_scope = yes",
+     "condition_text": "\"Concrete data of a third person given out\" is yes AND \"Information beyond the scope of the power of attorney\" is yes",
+     "enabled": true,
+     "position": 1,
+     "hits": 0,
+     "hit_calls": [],
+     "basis": null
+    },
+    {
+     "id": "disclosure.review_1",
+     "family": "disclosure",
+     "outcome": "review",
+     "title": "",
+     "text": "Data of a third person given out, authorization not confirmed.",
+     "condition": "data_given = yes and authorized != yes",
+     "condition_text": "\"Concrete data of a third person given out\" is yes AND \"Power of attorney / right to information confirmed\" is not yes",
+     "enabled": true,
+     "position": 2,
+     "hits": 4,
+     "hit_calls": [
+      "Stufe1_D08-K2",
+      "Stufe2_C11-K3",
+      "Stufe2_C11-K4",
+      "Stufe2_C12-K3"
+     ],
+     "basis": null
+    },
+    {
+     "id": "disclosure.review_2",
+     "family": "disclosure",
+     "outcome": "review",
+     "title": "",
+     "text": "Information about a third person requested, authorization stays unresolved.",
+     "condition": "third_party_request = yes and authorized = unclear and not_authorized = unclear",
+     "condition_text": "\"Information about a third person requested\" is yes AND \"Power of attorney / right to information confirmed\" is unclear AND \"No power of attorney / authorization established\" is unclear",
+     "enabled": true,
+     "position": 3,
+     "hits": 0,
+     "hit_calls": [],
+     "basis": null
+    },
+    {
+     "id": "disclosure.review_open",
+     "family": "disclosure",
+     "outcome": "review",
+     "title": "",
+     "text": "Information about a third person requested; the call says the authorization is unresolved.",
+     "condition": "(third_party_request in [yes, unclear] or data_given in [yes, unclear]) and authorization_open = yes and authorized != yes and not_authorized != yes",
+     "condition_text": "(\"Information about a third person requested\" is not no OR \"Concrete data of a third person given out\" is not no) AND \"Call leaves open whether an authorization exists\" is yes AND \"Power of attorney / right to information confirmed\" is not yes AND \"No power of attorney / authorization established\" is not yes",
+     "enabled": true,
+     "position": 4,
+     "hits": 2,
+     "hit_calls": [
+      "Stufe3_C18-K3",
+      "Stufe3_C18-K4"
+     ],
+     "basis": null
+    },
+    {
+     "id": "disclosure.no_alert",
+     "family": "disclosure",
+     "outcome": "no_alert",
+     "title": "",
+     "text": "No unauthorized information given to third parties.",
+     "condition": "true",
+     "condition_text": "always",
+     "enabled": true,
+     "position": 5,
+     "hits": 51,
+     "hit_calls": [
+      "Stufe1_D01-K1",
+      "Stufe1_D01-K2",
+      "Stufe1_D02-K1",
+      "Stufe1_D02-K2",
+      "Stufe1_D03-K1",
+      "Stufe1_D03-K2",
+      "Stufe1_D04-K1",
+      "Stufe1_D04-K2",
+      "Stufe1_D05-K1",
+      "Stufe1_D05-K2",
+      "Stufe1_D06-K1",
+      "Stufe1_D06-K2",
+      "Stufe1_D08-K1",
+      "Stufe1_D09-K1",
+      "Stufe1_D09-K2",
+      "Stufe1_D10-K1",
+      "Stufe1_D10-K2",
+      "Stufe2_C01-K3",
+      "Stufe2_C01-K4",
+      "Stufe2_C02-K3",
+      "Stufe2_C02-K4",
+      "Stufe2_C03-K3",
+      "Stufe2_C03-K4",
+      "Stufe2_C04-K3",
+      "Stufe2_C04-K4",
+      "Stufe2_C05-K3",
+      "Stufe2_C05-K4",
+      "Stufe2_C06-K3",
+      "Stufe2_C06-K4",
+      "Stufe2_C07-K3",
+      "Stufe2_C07-K4",
+      "Stufe2_C08-K3",
+      "Stufe2_C08-K4",
+      "Stufe2_C09-K3",
+      "Stufe2_C09-K4",
+      "Stufe2_C10-K3",
+      "Stufe2_C10-K4",
+      "Stufe2_C13-K3",
+      "Stufe2_C13-K4",
+      "Stufe2_C14-K3",
+      "Stufe2_C14-K4",
+      "Stufe2_C15-K3",
+      "Stufe2_C15-K4",
+      "Stufe2_C16-K3",
+      "Stufe2_C16-K4",
+      "Stufe3_C17-K3",
+      "Stufe3_C17-K4",
+      "Stufe3_C19-K3",
+      "Stufe3_C19-K4",
+      "Stufe3_C20-K3",
+      "Stufe3_C20-K4"
+     ],
+     "basis": null
+    }
+   ]
+  },
+  {
+   "id": "documentation",
+   "label": "Withholding relevant information",
+   "label_de": "Relevante Angabe verschweigen",
+   "legal_basis": "FIDLEG Art. 15 (Dokumentation) / interne Weisung Kreditprüfung – Vorschlag, durch Compliance zu bestätigen",
+   "facts": [
+    {
+     "id": "omit_request",
+     "label": "Asked not to record something"
+    },
+    {
+     "id": "relevant",
+     "label": "Hidden fact is relevant"
+    },
+    {
+     "id": "correction_or_private",
+     "label": "Only a correction or private details"
+    },
+    {
+     "id": "relevance_open",
+     "label": "Call leaves open whether the hidden information is relevant"
+    }
+   ],
+   "rules": [
+    {
+     "id": "documentation.alarm_1",
+     "family": "documentation",
+     "outcome": "alarm",
+     "title": "",
+     "text": "A relevant obligation is to be hidden from the responsible office.",
+     "condition": "omit_request = yes and relevant = yes and correction_or_private != yes",
+     "condition_text": "\"Asked not to record something\" is yes AND \"Hidden fact is relevant\" is yes AND \"Only a correction or private details\" is not yes",
+     "enabled": true,
+     "position": 0,
+     "hits": 2,
+     "hit_calls": [
+      "Stufe1_D09-K1",
+      "Stufe1_D09-K2"
+     ],
+     "basis": null
+    },
+    {
+     "id": "documentation.review_1",
+     "family": "documentation",
+     "outcome": "review",
+     "title": "",
+     "text": "Something is to be hidden; whether it is relevant stays open.",
+     "condition": "omit_request = yes and relevant = unclear and correction_or_private != yes",
+     "condition_text": "\"Asked not to record something\" is yes AND \"Hidden fact is relevant\" is unclear AND \"Only a correction or private details\" is not yes",
+     "enabled": true,
+     "position": 1,
+     "hits": 2,
+     "hit_calls": [
+      "Stufe2_C13-K3",
+      "Stufe2_C13-K4"
+     ],
+     "basis": null
+    },
+    {
+     "id": "documentation.review_open",
+     "family": "documentation",
+     "outcome": "review",
+     "title": "",
+     "text": "Something is to be hidden; the call says it is open whether it is relevant.",
+     "condition": "omit_request in [yes, unclear] and relevance_open = yes and correction_or_private != yes",
+     "condition_text": "\"Asked not to record something\" is not no AND \"Call leaves open whether the hidden information is relevant\" is yes AND \"Only a correction or private details\" is not yes",
+     "enabled": true,
+     "position": 2,
+     "hits": 1,
+     "hit_calls": [
+      "Stufe3_C19-K4"
+     ],
+     "basis": null
+    },
+    {
+     "id": "documentation.no_alert",
+     "family": "documentation",
+     "outcome": "no_alert",
+     "title": "",
+     "text": "No relevant information is to be withheld.",
+     "condition": "true",
+     "condition_text": "always",
+     "enabled": true,
+     "position": 3,
+     "hits": 55,
+     "hit_calls": [
+      "Stufe1_D01-K1",
+      "Stufe1_D01-K2",
+      "Stufe1_D02-K1",
+      "Stufe1_D02-K2",
+      "Stufe1_D03-K1",
+      "Stufe1_D03-K2",
+      "Stufe1_D04-K1",
+      "Stufe1_D04-K2",
+      "Stufe1_D05-K1",
+      "Stufe1_D05-K2",
+      "Stufe1_D06-K1",
+      "Stufe1_D06-K2",
+      "Stufe1_D07-K1",
+      "Stufe1_D07-K2",
+      "Stufe1_D08-K1",
+      "Stufe1_D08-K2",
+      "Stufe1_D10-K1",
+      "Stufe1_D10-K2",
+      "Stufe2_C01-K3",
+      "Stufe2_C01-K4",
+      "Stufe2_C02-K3",
+      "Stufe2_C02-K4",
+      "Stufe2_C03-K3",
+      "Stufe2_C03-K4",
+      "Stufe2_C04-K3",
+      "Stufe2_C04-K4",
+      "Stufe2_C05-K3",
+      "Stufe2_C05-K4",
+      "Stufe2_C06-K3",
+      "Stufe2_C06-K4",
+      "Stufe2_C07-K3",
+      "Stufe2_C07-K4",
+      "Stufe2_C08-K3",
+      "Stufe2_C08-K4",
+      "Stufe2_C09-K3",
+      "Stufe2_C09-K4",
+      "Stufe2_C10-K3",
+      "Stufe2_C10-K4",
+      "Stufe2_C11-K3",
+      "Stufe2_C11-K4",
+      "Stufe2_C12-K3",
+      "Stufe2_C12-K4",
+      "Stufe2_C14-K3",
+      "Stufe2_C14-K4",
+      "Stufe2_C15-K3",
+      "Stufe2_C15-K4",
+      "Stufe2_C16-K3",
+      "Stufe2_C16-K4",
+      "Stufe3_C17-K3",
+      "Stufe3_C17-K4",
+      "Stufe3_C18-K3",
+      "Stufe3_C18-K4",
+      "Stufe3_C19-K3",
+      "Stufe3_C20-K3",
+      "Stufe3_C20-K4"
+     ],
+     "basis": null
+    }
+   ]
+  },
+  {
+   "id": "splitting",
+   "label": "Splitting to bypass a control",
+   "label_de": "Zuständigkeit/Kontrolle umgehen (Aufteilen)",
+   "legal_basis": "GwG (Sorgfaltspflichten) / interne Kompetenzordnung – Vorschlag, durch Compliance zu bestätigen",
+   "facts": [
+    {
+     "id": "split_request",
+     "label": "Splitting into partial amounts requested"
+    },
+    {
+     "id": "avoid_control",
+     "label": "Purpose is to bypass a control or approval"
+    },
+    {
+     "id": "single_invoice",
+     "label": "Partial amounts belong to a single invoice"
+    },
+    {
+     "id": "harmless",
+     "label": "Independent invoices or only an example"
+    },
+    {
+     "id": "link_open",
+     "label": "Call leaves open whether the partial amounts belong together"
+    },
+    {
+     "id": "motive_open",
+     "label": "Call leaves open why the payment should be split"
+    },
+    {
+     "id": "split_connected",
+     "label": "One connected payment is to be split into partial payments"
+    },
+    {
+     "id": "approval_avoided",
+     "label": "Reason given - approval / check / responsibility should not apply"
+    }
+   ],
+   "rules": [
+    {
+     "id": "splitting.alarm_1",
+     "family": "splitting",
+     "outcome": "alarm",
+     "title": "",
+     "text": "Splitting a payment to bypass an internal control.",
+     "condition": "split_request = yes and avoid_control = yes and single_invoice != no and harmless != yes",
+     "condition_text": "\"Splitting into partial amounts requested\" is yes AND \"Purpose is to bypass a control or approval\" is yes AND \"Partial amounts belong to a single invoice\" is not no AND \"Independent invoices or only an example\" is not yes",
+     "enabled": true,
+     "position": 0,
+     "hits": 3,
+     "hit_calls": [
+      "Stufe1_D10-K1",
+      "Stufe1_D10-K2",
+      "Stufe2_C16-K3"
+     ],
+     "basis": null
+    },
+    {
+     "id": "splitting.alarm_2",
+     "family": "splitting",
+     "outcome": "alarm",
+     "title": "",
+     "text": "One connected payment is to be split so that an approval or check does not apply.",
+     "condition": "split_connected = yes and approval_avoided = yes and harmless != yes",
+     "condition_text": "\"One connected payment is to be split into partial payments\" is yes AND \"Reason given - approval / check / responsibility should not apply\" is yes AND \"Independent invoices or only an example\" is not yes",
+     "enabled": true,
+     "position": 1,
+     "hits": 0,
+     "hit_calls": [],
+     "basis": null
+    },
+    {
+     "id": "splitting.review_1",
+     "family": "splitting",
+     "outcome": "review",
+     "title": "",
+     "text": "Partial amounts requested, but the connection or motive stays unclear.",
+     "condition": "split_request = yes and avoid_control = unclear and harmless != yes",
+     "condition_text": "\"Splitting into partial amounts requested\" is yes AND \"Purpose is to bypass a control or approval\" is unclear AND \"Independent invoices or only an example\" is not yes",
+     "enabled": true,
+     "position": 2,
+     "hits": 2,
+     "hit_calls": [
+      "Stufe2_C15-K3",
+      "Stufe2_C16-K4"
+     ],
+     "basis": null
+    },
+    {
+     "id": "splitting.review_open",
+     "family": "splitting",
+     "outcome": "review",
+     "title": "",
+     "text": "Partial amounts requested; the call says the connection of the receipts or the motive is open.",
+     "condition": "(split_request in [yes, unclear] or split_connected in [yes, unclear]) and (link_open = yes or motive_open = yes) and harmless != yes",
+     "condition_text": "(\"Splitting into partial amounts requested\" is not no OR \"One connected payment is to be split into partial payments\" is not no) AND (\"Call leaves open whether the partial amounts belong together\" is yes OR \"Call leaves open why the payment should be split\" is yes) AND \"Independent invoices or only an example\" is not yes",
+     "enabled": true,
+     "position": 3,
+     "hits": 2,
+     "hit_calls": [
+      "Stufe3_C20-K3",
+      "Stufe3_C20-K4"
+     ],
+     "basis": null
+    },
+    {
+     "id": "splitting.no_alert",
+     "family": "splitting",
+     "outcome": "no_alert",
+     "title": "",
+     "text": "No splitting to bypass a control.",
+     "condition": "true",
+     "condition_text": "always",
+     "enabled": true,
+     "position": 4,
+     "hits": 53,
+     "hit_calls": [
+      "Stufe1_D01-K1",
+      "Stufe1_D01-K2",
+      "Stufe1_D02-K1",
+      "Stufe1_D02-K2",
+      "Stufe1_D03-K1",
+      "Stufe1_D03-K2",
+      "Stufe1_D04-K1",
+      "Stufe1_D04-K2",
+      "Stufe1_D05-K1",
+      "Stufe1_D05-K2",
+      "Stufe1_D06-K1",
+      "Stufe1_D06-K2",
+      "Stufe1_D07-K1",
+      "Stufe1_D07-K2",
+      "Stufe1_D08-K1",
+      "Stufe1_D08-K2",
+      "Stufe1_D09-K1",
+      "Stufe1_D09-K2",
+      "Stufe2_C01-K3",
+      "Stufe2_C01-K4",
+      "Stufe2_C02-K3",
+      "Stufe2_C02-K4",
+      "Stufe2_C03-K3",
+      "Stufe2_C03-K4",
+      "Stufe2_C04-K3",
+      "Stufe2_C04-K4",
+      "Stufe2_C05-K3",
+      "Stufe2_C05-K4",
+      "Stufe2_C06-K3",
+      "Stufe2_C06-K4",
+      "Stufe2_C07-K3",
+      "Stufe2_C07-K4",
+      "Stufe2_C08-K3",
+      "Stufe2_C08-K4",
+      "Stufe2_C09-K3",
+      "Stufe2_C09-K4",
+      "Stufe2_C10-K3",
+      "Stufe2_C10-K4",
+      "Stufe2_C11-K3",
+      "Stufe2_C11-K4",
+      "Stufe2_C12-K3",
+      "Stufe2_C12-K4",
+      "Stufe2_C13-K3",
+      "Stufe2_C13-K4",
+      "Stufe2_C14-K3",
+      "Stufe2_C14-K4",
+      "Stufe2_C15-K4",
+      "Stufe3_C17-K3",
+      "Stufe3_C17-K4",
+      "Stufe3_C18-K3",
+      "Stufe3_C18-K4",
+      "Stufe3_C19-K3",
+      "Stufe3_C19-K4"
+     ],
+     "basis": null
+    }
+   ]
+  }
+ ],
+ "cross_rules": []
+}

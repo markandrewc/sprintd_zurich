@@ -1,0 +1,368 @@
+# BLIND table: written from config/criteria.yaml and the case README only, without reading any call
+# transcript or the tuned table (experiment R4, 2026-10-10).
+#
+# Same schema as config/policy_table.yaml (see src/callguard/checks/facts.py):
+#   facts: atomic yes / no / unknown questions (role: act | context | exculpatory | authorization)
+#   rules: first matching rule wins; no rule matches -> no_alert.
+# Design: one fact per decisive element of the policy / alarm_when bullets, one exculpatory fact per
+# not_alarm_when look-alike, review rules from review_when (a decisive fact stays "unclear").
+# Rule order per family: alarm -> exculpatory no_alert -> review -> default no_alert.
+# `numbers` has can_alarm: false in criteria.yaml and therefore no fact sheet here.
+
+families:
+
+  trade:
+    facts:
+      - id: trade_wish
+        label: Eigener Handelswunsch
+        role: act
+        de: >-
+          Äussert eine Person im Gespräch den eigenen, konkreten Wunsch oder Auftrag, ein bestimmtes
+          Wertpapier zu kaufen, zu verkaufen oder damit zu handeln?
+        en: >-
+          Does a person in the call express their own concrete wish or order to buy, sell or trade a
+          specific security?
+      - id: info_basis
+        label: Handelswunsch mit erhaltener Information begründet
+        role: context
+        de: >-
+          Begründet die Person diesen Handelswunsch mit einer Information über das Unternehmen, die sie
+          selbst erhalten hat (z.B. Geschäftszahlen, Übernahme, Grossauftrag, Absatzzahlen)?
+        en: >-
+          Does the person justify this trade wish with information about the company that they
+          received themselves (e.g. business figures, a takeover, a large order, sales figures)?
+      - id: nonpublic
+        label: Information noch nicht öffentlich
+        role: context
+        de: >-
+          Wird die Information, auf die sich der Handelswunsch stützt, als noch nicht öffentlich
+          dargestellt, also als vertraulich, "unter uns", vor der offiziellen Meldung, aus einer internen
+          Quelle (Familie, Arbeitgeber, Finanzabteilung) oder als vorab persönlich gezeigte Dokumente oder
+          Zahlen?
+        en: >-
+          Is the information behind the trade wish presented as not yet public, i.e. confidential,
+          "between us", before the official announcement, from an internal source (family, employer,
+          finance department) or as documents or figures shown in advance in person?
+      - id: public_only
+        label: Nur öffentliche Information
+        role: exculpatory
+        de: >-
+          Beruht der Handelswunsch ausschliesslich auf bereits veröffentlichten Berichten,
+          Medienmitteilungen oder allgemein zugänglichen Zahlen?
+        en: >-
+          Is the trade wish based only on already published reports, press releases or generally
+          available figures?
+      - id: topic_only
+        label: Thema nur besprochen
+        role: exculpatory
+        de: >-
+          Werden Begriffe wie Insiderhandel, vertrauliche Information oder Quartalszahlen nur erklärt,
+          zitiert, verneint oder als Beispiel besprochen, ohne dass jemand gestützt darauf selbst handeln
+          will?
+        en: >-
+          Are terms like insider trading, confidential information or quarterly figures only explained,
+          quoted, denied or discussed as an example, without anyone wanting to trade on them themselves?
+    rules:
+      - id: trade.alarm_1
+        label: alarm
+        when: trade_wish = yes and info_basis != no and nonpublic = yes and public_only != yes
+        text: Eigener Handelswunsch, begründet mit noch nicht öffentlicher Information
+      - id: trade.no_alert_public
+        label: no_alert
+        when: public_only = yes
+        text: Handelswunsch stützt sich nur auf öffentliche Information
+      - id: trade.no_alert_topic
+        label: no_alert
+        when: topic_only = yes and trade_wish != yes
+        text: Insider-Thema nur besprochen, kein eigener Handelswunsch
+      - id: trade.review_1
+        label: review
+        when: trade_wish = yes and info_basis in [yes, unclear] and nonpublic = unclear
+        text: Handelswunsch mit Information verknüpft, Herkunft oder Öffentlichkeit der Information unklar
+      - id: trade.review_2
+        label: review
+        when: trade_wish = unclear and nonpublic = yes
+        text: Nicht öffentliche Information im Gespräch, ob ein eigener Handelswunsch besteht ist unklar
+
+  access:
+    facts:
+      - id: secret_spoken
+        label: Zugangsgeheimnis ausgesprochen
+        role: act
+        de: >-
+          Wird im Gespräch der konkrete Wert eines Zugangsgeheimnisses (PIN, Passwort, TAN,
+          Bestätigungscode oder Anmeldecode) tatsächlich vollständig ausgesprochen, nicht nur erwähnt,
+          erfragt oder verweigert?
+        en: >-
+          Is the concrete value of an access secret (PIN, password, TAN, confirmation code or login code)
+          actually spoken out in full in the call, not just mentioned, asked for or refused?
+      - id: current_process
+        label: Wert gehört zum laufenden Vorgang
+        role: context
+        de: >-
+          Gehört der ausgesprochene Wert zu einem laufenden, noch gültigen Anmelde- oder
+          Freigabevorgang?
+        en: >-
+          Does the spoken value belong to an ongoing, still valid login or approval process?
+      - id: expired_or_sample
+        label: Abgelaufener Wert oder Muster
+        role: exculpatory
+        de: >-
+          Wird der ausgesprochene Wert ausdrücklich als abgelaufen, ungültig, bereits verbraucht oder als
+          Muster bzw. Beispiel aus einer Anleitung bezeichnet?
+        en: >-
+          Is the spoken value explicitly described as expired, invalid, already used, or as a sample or
+          example from instructions?
+      - id: partial_or_reference
+        label: Nur Teilangabe oder Referenznummer
+        role: exculpatory
+        de: >-
+          Sind die genannten Ziffern oder Werte nur Teilangaben (z.B. die letzten vier Stellen) oder
+          Referenz-, Karten-, Kunden- oder Rechnungsnummern und kein vollständiges Zugangsgeheimnis?
+        en: >-
+          Are the digits or values mentioned only partial data (e.g. the last four digits) or reference,
+          card, customer or invoice numbers, and not a complete access secret?
+      - id: warning_or_refusal
+        label: Nur Warnung oder Verweigerung
+        role: exculpatory
+        de: >-
+          Wird nur davor gewarnt, Codes oder Passwörter zu nennen, oder wird die Nennung eines Codes
+          verweigert, ohne dass ein Wert ausgesprochen wird?
+        en: >-
+          Is there only a warning against giving out codes or passwords, or a refusal to give one,
+          without any value being spoken?
+    rules:
+      - id: access.alarm_1
+        label: alarm
+        when: secret_spoken = yes and current_process = yes and expired_or_sample != yes and partial_or_reference != yes
+        text: Gültiges Zugangsgeheimnis am Telefon ausgesprochen
+      - id: access.no_alert_expired
+        label: no_alert
+        when: secret_spoken != no and expired_or_sample = yes
+        text: Ausgesprochener Wert ist abgelaufen oder ein Muster
+      - id: access.no_alert_partial
+        label: no_alert
+        when: partial_or_reference = yes and secret_spoken != yes
+        text: Nur Teilangabe oder Referenznummer genannt
+      - id: access.no_alert_warning
+        label: no_alert
+        when: warning_or_refusal = yes and secret_spoken != yes
+        text: Nur Warnung oder Verweigerung, kein Wert ausgesprochen
+      - id: access.review_1
+        label: review
+        when: secret_spoken = yes and current_process = unclear and expired_or_sample != yes and partial_or_reference != yes
+        text: Wert ausgesprochen, Zugehörigkeit zum Vorgang oder Gültigkeit unklar
+      - id: access.review_2
+        label: review
+        when: secret_spoken = yes and current_process != no and expired_or_sample = unclear and partial_or_reference != yes
+        text: Wert ausgesprochen, unklar ob abgelaufen oder Muster
+      - id: access.review_3
+        label: review
+        when: secret_spoken = unclear and current_process = yes and expired_or_sample != yes and partial_or_reference != yes
+        text: Unklar ob ein gültiger Code vollständig ausgesprochen wurde
+
+  disclosure:
+    facts:
+      - id: third_party_request
+        label: Anfrage zu Drittperson
+        role: context
+        de: >-
+          Erkundigt sich eine Person nach geschützten Informationen über eine andere Person als sich
+          selbst (z.B. Kontostand, Darlehen, Zinstermin, Kundendaten)?
+        en: >-
+          Does someone ask for protected information about a person other than themselves (e.g. account
+          balance, loan, interest date, customer data)?
+      - id: data_given
+        label: Konkrete Daten der Drittperson herausgegeben
+        role: act
+        de: >-
+          Nennt die Beratung der anrufenden Person tatsächlich konkrete, personenbezogene Angaben über
+          eine Drittperson (z.B. Kontostand, Darlehen, Zinstermin, Kundendaten)?
+        en: >-
+          Does the advisor actually tell the caller concrete, person-related information about a third
+          person (e.g. account balance, loan, interest date, customer data)?
+      - id: authorization_confirmed
+        label: Berechtigung festgestellt
+        role: authorization
+        de: >-
+          Werden vor einer Auskunft über die Drittperson die Identität der anrufenden Person und eine
+          gültige Vollmacht oder Berechtigung für diese Drittperson festgestellt?
+        en: >-
+          Before any information about the third person is given, are the caller's identity and a valid
+          power of attorney or authorisation for that third person confirmed?
+      - id: beyond_scope
+        label: Auskunft über Vollmachtsumfang hinaus
+        role: context
+        de: >-
+          Geht eine erteilte Auskunft über den bestätigten Umfang der Vollmacht oder Berechtigung hinaus?
+        en: >-
+          Does information given go beyond the confirmed scope of the power of attorney or
+          authorisation?
+      - id: refused_or_general
+        label: Verweigert oder nur allgemein
+        role: exculpatory
+        de: >-
+          Verweigert die Beratung die Auskunft über die Drittperson oder gibt sie nur allgemeine, nicht
+          personenbezogene Information?
+        en: >-
+          Does the advisor refuse to give information about the third person, or give only general,
+          non-personal information?
+    rules:
+      - id: disclosure.alarm_1
+        label: alarm
+        when: data_given = yes and authorization_confirmed = no
+        text: Daten einer Drittperson ohne festgestellte Berechtigung herausgegeben
+      - id: disclosure.alarm_2
+        label: alarm
+        when: data_given = yes and beyond_scope = yes
+        text: Auskunft geht über den bestätigten Vollmachtsumfang hinaus
+      - id: disclosure.no_alert_authorized
+        label: no_alert
+        when: authorization_confirmed = yes and beyond_scope = no
+        text: Berechtigung festgestellt, Auskunft im Umfang
+      - id: disclosure.review_1
+        label: review
+        when: data_given = yes and (authorization_confirmed = unclear or beyond_scope = unclear)
+        text: Daten herausgegeben, Berechtigung oder Umfang ungeklärt
+      - id: disclosure.review_2
+        label: review
+        when: third_party_request = yes and authorization_confirmed = unclear
+        text: Berechtigung bleibt ungeklärt, auch ohne herausgegebene Daten
+      - id: disclosure.no_alert_refused
+        label: no_alert
+        when: refused_or_general = yes and data_given != yes
+        text: Auskunft verweigert oder nur allgemein
+      - id: disclosure.review_3
+        label: review
+        when: data_given = unclear and authorization_confirmed = no
+        text: Unklar ob konkrete Daten ohne Berechtigung herausgegeben wurden
+
+  documentation:
+    facts:
+      - id: conceal_request
+        label: Verlangt Nicht-Protokollieren
+        role: act
+        de: >-
+          Verlangt oder bittet eine Person darum, dass eine Tatsache nicht protokolliert, nicht notiert,
+          aus einer Notiz entfernt oder vor einer internen Stelle verborgen wird?
+        en: >-
+          Does a person ask or demand that a fact not be recorded, not be noted, be removed from a note,
+          or be hidden from an internal unit?
+      - id: relevant_fact
+        label: Tatsache für den Vorgang relevant
+        role: context
+        de: >-
+          Ist die Tatsache, die verborgen werden soll, für den laufenden Vorgang relevant, z.B. eine
+          bestehende Schuld, ein Kredit, Leasing oder eine andere rückzahlbare Verpflichtung bei einer
+          Kredit- oder Finanzierungsprüfung?
+        en: >-
+          Is the fact to be hidden relevant to the ongoing matter, e.g. an existing debt, loan, lease or
+          other repayable obligation in a credit or financing assessment?
+      - id: responsible_unit
+        label: Vor zuständiger Stelle verborgen
+        role: context
+        de: >-
+          Soll die Tatsache gerade vor der für den Vorgang zuständigen internen Stelle (z.B.
+          Kreditstelle, Finanzierungsstelle) oder aus den Unterlagen, die diese Stelle prüft, ferngehalten
+          werden?
+        en: >-
+          Is the fact to be kept away from the internal unit responsible for the matter (e.g. credit or
+          financing office) or from the records that unit reviews?
+      - id: correction_or_private
+        label: Nur Korrektur oder private Details
+        role: exculpatory
+        de: >-
+          Geht es nur darum, eine falsche oder veraltete Angabe zu berichtigen oder private, für den
+          Vorgang irrelevante Details wegzulassen, während alles Relevante sichtbar bleibt?
+        en: >-
+          Is it only about correcting a wrong or outdated entry, or leaving out private details that are
+          irrelevant to the matter, while everything relevant stays visible?
+    rules:
+      - id: documentation.alarm_1
+        label: alarm
+        when: conceal_request = yes and relevant_fact = yes and responsible_unit != no and correction_or_private != yes
+        text: Relevante Verpflichtung soll vor der zuständigen Stelle verborgen werden
+      - id: documentation.no_alert_correction
+        label: no_alert
+        when: correction_or_private = yes and relevant_fact != yes
+        text: Nur Berichtigung oder Weglassen irrelevanter privater Angaben
+      - id: documentation.review_1
+        label: review
+        when: conceal_request = yes and relevant_fact = unclear and responsible_unit != no
+        text: Etwas soll verborgen werden, Relevanz bleibt offen
+      - id: documentation.review_2
+        label: review
+        when: conceal_request = yes and relevant_fact = yes and (responsible_unit = unclear or correction_or_private = unclear)
+        text: Relevante Tatsache soll weggelassen werden, Ziel oder Zweck unklar
+      - id: documentation.review_3
+        label: review
+        when: conceal_request = unclear and relevant_fact = yes and correction_or_private != yes
+        text: Unklar ob verlangt wird, eine relevante Tatsache zu verbergen
+
+  splitting:
+    facts:
+      - id: split_request
+        label: Aufteilen verlangt
+        role: act
+        de: >-
+          Verlangt eine Person, einen Betrag oder eine Zahlung in mehrere Teilzahlungen aufzuteilen?
+        en: >-
+          Does a person ask for an amount or payment to be split into several partial payments?
+      - id: single_obligation
+        label: Teilbeträge gehören zusammen
+        role: context
+        de: >-
+          Gehören die Teilbeträge zu einer einzigen zusammenhängenden Forderung, z.B. einer einzigen
+          Rechnung oder einem einzigen Auftrag?
+        en: >-
+          Do the partial amounts belong to one single connected obligation, e.g. a single invoice or a
+          single order?
+      - id: control_motive
+        label: Zweck Kontrolle umgehen
+        role: context
+        de: >-
+          Ist der genannte Zweck des Aufteilens, eine interne Kontrolle, Freigabe, Limite, Prüfung oder
+          Zuständigkeit nicht greifen zu lassen?
+        en: >-
+          Is the stated purpose of the split to keep an internal control, approval, limit, review or
+          responsibility from applying?
+      - id: independent_invoices
+        label: Unabhängige echte Rechnungen
+        role: exculpatory
+        de: >-
+          Handelt es sich um mehrere voneinander unabhängige, echte Rechnungen, die einzeln nach ihrer
+          Fälligkeit bezahlt werden?
+        en: >-
+          Are these several independent, genuine invoices that are each paid according to their due
+          date?
+      - id: rejected_or_example
+        label: Umgehung abgelehnt oder nur Beispiel
+        role: exculpatory
+        de: >-
+          Wird das Umgehen einer Kontrolle durch Aufteilen nur abgelehnt, verneint oder als Beispiel
+          (z.B. aus einer Schulung) erwähnt, ohne dass es jemand für eine eigene Zahlung tatsächlich
+          verlangt?
+        en: >-
+          Is getting around a control by splitting payments only rejected, denied or mentioned as an
+          example (e.g. from training), without anyone actually asking for it for their own payment?
+    rules:
+      - id: splitting.alarm_1
+        label: alarm
+        when: split_request = yes and control_motive = yes and single_obligation != no and independent_invoices != yes and rejected_or_example != yes
+        text: Zusammenhängende Zahlung aufgeteilt, um eine interne Kontrolle zu umgehen
+      - id: splitting.no_alert_independent
+        label: no_alert
+        when: independent_invoices = yes and control_motive != yes
+        text: Mehrere unabhängige echte Rechnungen nach Fälligkeit
+      - id: splitting.no_alert_rejected
+        label: no_alert
+        when: rejected_or_example = yes and split_request != yes
+        text: Umgehung nur abgelehnt, verneint oder als Beispiel erwähnt
+      - id: splitting.review_1
+        label: review
+        when: split_request = yes and control_motive = unclear and independent_invoices != yes
+        text: Teilbeträge verlangt, Zusammenhang der Belege oder Motiv unbekannt
+      - id: splitting.review_2
+        label: review
+        when: split_request = unclear and control_motive = yes
+        text: Umgehungsabsicht genannt, unklar ob tatsächlich aufgeteilt werden soll

@@ -1,0 +1,360 @@
+# Fact sheet + decision table for the `facts` check (checks/facts.py, v2_plan A1, ideas N6/N7/N8).
+# Edited by compliance; nothing here is code.
+#
+# How it works: per family the LLM answers each FACT question separately, with exactly one word
+# (yes / no / unknown), over the whole transcript. The probabilities of those three answers become the
+# fact's p(ja), p(nein), p(unklar); a fact counts as `yes` if p(ja) >= 0.5, `no` if p(nein) >= 0.5,
+# otherwise `unclear`. The RULES are then read top to bottom: the first rule whose `when` holds decides
+# the family (alarm / review / no_alert). If no rule matches: no_alert.
+#
+# Fact keys:
+#   id     short name used in the rules (letters, digits, _)
+#   label  short German label shown to the officer ("Fakt: <label> = ja (0.92)")
+#   role   act          the misconduct itself happened (prefix_max applies to these)
+#          context      what makes the act incriminating (non-public, valid, relevant...)
+#          exculpatory  what makes it harmless (public, expired, sample, correction...)
+#          authorization  whether a permission (Vollmacht) was established
+#   de     the question (German; what the officer reads, sent to the LLM with question_lang: de)
+#   en     the same question in English (sent to the LLM with question_lang: en, the default:
+#          small models follow English best; the answer words are English either way)
+#
+# Rule keys:
+#   id     unique name, shown as "Regel: access.alarm_1"
+#   label  alarm | review | no_alert
+#   when   condition over the facts:  fact = yes|no|unclear,  fact != ...,  fact in [yes, unclear],
+#          combined with and / or / not and brackets; `true` always holds (use it for a default rule)
+#   text   German explanation shown to the officer
+#   enabled  optional, default true; `false` switches the rule off without deleting it (UI "Regelwerk")
+#   basis  optional legal basis shown on the rule card (display only)
+#
+# Family key `basis`: the legal basis shown for the whole family (display only; the defaults below are
+# suggestions for compliance to confirm, editable in the UI page "Regelwerk"). Neither `basis` nor
+# `enabled: true` changes the cache key. Versions + four-eyes approval: config/policy_versions/.
+#
+# Speaker roles: the transcript lines carry the diarizer's roles (advisor = Beratung, customer = Kunde);
+# they may be wrong, so questions name the role but the model is told to judge from the content.
+# Regelwerk-Version 2 · verfasst von Benjamin
+
+families:
+  trade:
+    basis: FinfraG Art. 142 (Ausnützen von Insiderinformationen) – Vorschlag, durch Compliance zu bestätigen
+    facts:
+    - id: wish
+      label: Eigener Handelswunsch geäussert
+      role: act
+      de: Äussert eine Person im Gespräch (meist die Kundin/der Kunde) einen eigenen, konkreten Wunsch, ein bestimmtes
+        Wertpapier zu kaufen, zu verkaufen oder damit zu handeln (auch wenn der Auftrag danach nicht ausgeführt
+        oder von der Beratung abgelehnt wird)?
+      en: Does a person in the call (usually the customer) express their own concrete wish to buy, sell or trade
+        a specific security (even if the order is then not executed or is refused by the advisor)?
+    - id: inside_info
+      label: Begründet mit nicht öffentlicher Insider-Information
+      role: context
+      de: Begründet diese Person den Handelswunsch mit Information, die sie selbst aus einer internen oder vertraulichen
+        Quelle erhalten hat (z.B. Familie, Arbeitgeber, Finanzabteilung, "unter uns", vorab gezeigte Zahlen oder
+        Dokumente) und die noch nicht öffentlich ist (z.B. Quartalszahlen, Übernahme oder Grossauftrag vor der Bekanntgabe)?
+      en: Does this person justify the trading wish with information they received themselves from an internal or
+        confidential source (e.g. family, employer, finance department, "between us", figures or documents shown
+        in advance) that is not yet public (e.g. quarterly results, a takeover or a large order before the announcement)?
+    - id: public
+      label: Information bereits öffentlich
+      role: exculpatory
+      de: Wird im Gespräch gesagt, dass die Information, auf die sich der Handelswunsch stützt, bereits öffentlich
+        ist (Medienmitteilung, veröffentlichter Bericht, allgemein zugängliche Zahlen)?
+      en: Does the call say that the information the trading wish is based on is already public (press release,
+        published report, generally available figures)?
+    - id: source_open
+      label: Im Gespräch offen, woher die Information stammt oder ob sie öffentlich ist
+      role: context
+      de: Sagt jemand im Gespräch ausdrücklich, dass unklar oder unbekannt ist, woher die Information stammt, auf
+        die sich der Handelswunsch stützt, oder ob sie schon öffentlich bekannt ist (z.B. "ich weiss nicht, ob das
+        schon publiziert ist", "woher haben Sie das?" ohne klare Antwort)?
+      en: Does someone in the call explicitly say that it is unclear or unknown where the information behind the
+        trading wish comes from, or whether it is already public (e.g. "I don't know if that has been published
+        yet", "where did you get that?" without a clear answer)?
+    rules:
+    - id: trade.alarm_1
+      label: alarm
+      when: wish = yes and inside_info = yes and public != yes
+      text: Handelswunsch mit nicht öffentlicher Information aus interner Quelle.
+    - id: trade.review_1
+      label: review
+      when: wish = yes and inside_info = unclear and public != yes
+      text: Handelswunsch, aber Herkunft oder Öffentlichkeit der Information bleibt offen.
+    - id: trade.review_open
+      label: review
+      when: wish in [yes, unclear] and source_open = yes and public != yes
+      text: Handelswunsch; im Gespräch wird gesagt, dass Herkunft oder Öffentlichkeit der Information offen ist.
+    - id: trade.no_alert
+      label: no_alert
+      when: 'true'
+      text: Kein Handelswunsch auf Basis nicht öffentlicher Information.
+  access:
+    basis: Interne Weisung Informationssicherheit (Zugangsdaten nie am Telefon) – Vorschlag, durch Compliance zu
+      bestätigen
+    facts:
+    - id: spoken
+      label: Code/Wert am Telefon vorgelesen
+      role: act
+      de: Liest eine Person (meist die Kundin/der Kunde) am Telefon die Ziffern oder Zeichen eines Werts vor, der
+        eine PIN, TAN, ein Passwort oder ein Bestätigungs-, Freigabe- oder Anmeldecode sein könnte, auch wenn seine
+        Gültigkeit unklar ist und auch wenn die Beratung sie danach stoppt? (Nur die letzten vier Ziffern, eine
+        Referenznummer oder ein Betrag zählen nicht.)
+      en: Does a person (usually the customer) read out on the phone the digits or characters of a value that may
+        be a PIN, TAN, password, confirmation, approval or login code, even if its validity is unclear and even
+        if the advisor then stops them? (Only the last four digits, a reference number or an amount do not count.)
+    - id: current
+      label: Wert gehört zum laufenden, gültigen Vorgang
+      role: context
+      de: Gehört der ausgesprochene Wert zu einem laufenden, noch gültigen Anmelde- oder Freigabevorgang? Antworte
+        "unknown", wenn offen bleibt, zu welchem Vorgang er gehört oder ob er noch gültig ist.
+      en: Does the value that was said belong to a current, still valid login or approval process? Answer "unknown"
+        if it stays open which process it belongs to or whether it is still valid.
+    - id: validity_open
+      label: Im Gespräch offen, ob der Wert gültig ist
+      role: context
+      de: Sagt jemand im Gespräch, dass unklar oder unbekannt ist, ob der vorgelesene Wert noch gültig ist oder
+        zu welchem Vorgang er gehört?
+      en: Does someone in the call say that it is unclear or unknown whether the value that was read out is still
+        valid, or to which process it belongs?
+    - id: expired_or_sample
+      label: Wert abgelaufen oder Muster
+      role: exculpatory
+      de: Wird der ausgesprochene Wert im Gespräch als abgelaufen, ungültig, nicht verwendbar oder als Muster bzw.
+        Beispiel (z.B. aus einer Anleitung oder Hilfeseite) bezeichnet?
+      en: Is the value that was said described in the call as expired, invalid, not usable, or as a sample or example
+        (e.g. from instructions or a help page)?
+    - id: asked_by_advisor
+      label: Code von der Beratung erfragt
+      role: context
+      de: Fordert die Beraterin/der Berater die Kundin/den Kunden auf, einen Code, eine PIN, eine TAN oder ein Passwort
+        zu nennen oder vorzulesen?
+      en: Does the advisor ask the customer to tell or read out a code, PIN, TAN or password?
+    - id: process_open
+      label: Im Gespräch offen, zu welchem Vorgang der Wert gehört
+      role: context
+      de: Sagt jemand im Gespräch ausdrücklich, dass nicht klar ist, woher der vorgelesene Wert stammt oder zu welchem
+        Vorgang, welcher Nachricht oder welchem Konto er gehört (z.B. "ich weiss nicht, ob das der neue oder der
+        alte Code ist")?
+      en: Does someone in the call explicitly say that it is not clear where the value that was read out comes from,
+        or to which process, message or account it belongs (e.g. "I don't know whether this is the new or the old
+        code")?
+    rules:
+    - id: access.alarm_1
+      label: alarm
+      when: spoken = yes and current = yes and expired_or_sample != yes
+      text: Ein gültiger Zugangswert wurde am Telefon ausgesprochen.
+    - id: access.review_1
+      label: review
+      when: spoken = yes and validity_open = yes and expired_or_sample != yes
+      text: Ein Wert wurde vorgelesen, aber unklar ist, zu welchem Vorgang er gehört oder ob er gültig ist.
+    - id: access.review_open
+      label: review
+      when: spoken in [yes, unclear] and (validity_open = yes or process_open = yes) and expired_or_sample != yes
+      text: Ein Wert wurde (möglicherweise) vorgelesen; im Gespräch wird gesagt, dass Gültigkeit oder Vorgang offen
+        sind.
+    - id: access.no_alert
+      label: no_alert
+      when: 'true'
+      text: Kein gültiger Zugangswert ausgesprochen.
+  disclosure:
+    basis: BankG Art. 47 (Bankkundengeheimnis) – Vorschlag, durch Compliance zu bestätigen
+    facts:
+    - id: data_given
+      label: Konkrete Daten einer Drittperson herausgegeben
+      role: act
+      de: Nennt die Beraterin/der Berater der anrufenden Person konkrete Zahlen oder Angaben aus einem Konto, Darlehen
+        oder Kundendossier, das einer anderen Person als der anrufenden gehört (z.B. Kontostand, Darlehensbetrag,
+        Zinstermin, Zahlungen)?
+      en: Does the advisor tell the caller concrete figures or details from an account, loan or customer file that
+        belongs to someone other than the caller (e.g. an account balance, a loan amount, an interest date, payments)?
+    - id: third_party_request
+      label: Auskunft über Drittperson verlangt
+      role: context
+      de: Bittet die anrufende Person die Beratung, ihr Angaben zu nennen, die die Bank über Konten, Darlehen oder
+        Bankgeschäfte einer anderen Person (nicht der eigenen) hat?
+      en: Does the caller ask the advisor to tell them information that the bank holds about another person's accounts,
+        loans or banking business (not the caller's own)?
+    - id: authorized
+      label: Vollmacht/Auskunftsrecht bestätigt
+      role: authorization
+      de: Bestätigt die Beratung im Gespräch, dass die anrufende Person eine hinterlegte Vollmacht oder ein Auskunftsrecht
+        hat, das genau diese Auskunft abdeckt?
+      en: Does the advisor confirm in the call that the caller has a registered power of attorney or right to information
+        that covers exactly this information?
+    - id: not_authorized
+      label: Keine Vollmacht/Berechtigung festgestellt
+      role: authorization
+      de: Sagt die Beratung im Gespräch, dass die anrufende Person keine Vollmacht, kein Auskunftsrecht oder keine
+        Berechtigung für diese Auskunft hat?
+      en: Does the advisor say in the call that the caller has no power of attorney, no right to information or
+        no authorization for this information?
+    - id: beyond_scope
+      label: Auskunft über den Umfang der Vollmacht hinaus
+      role: context
+      de: Geht die herausgegebene Auskunft über den bestätigten Umfang einer Vollmacht hinaus?
+      en: Does the information given go beyond the confirmed scope of a power of attorney?
+    - id: authorization_open
+      label: Im Gespräch offen, ob eine Berechtigung besteht
+      role: authorization
+      de: Sagt jemand im Gespräch ausdrücklich, dass (noch) unklar, nicht geprüft oder im Moment nicht feststellbar
+        ist, ob die anrufende Person eine Vollmacht oder Berechtigung für Auskünfte über die andere Person hat?
+      en: Does someone in the call explicitly say that it is (still) unclear, not checked, or cannot be established
+        right now whether the caller has a power of attorney or authorization for information about the other person?
+    rules:
+    - id: disclosure.alarm_1
+      label: alarm
+      when: data_given = yes and not_authorized = yes
+      text: Daten einer Drittperson trotz festgestellt fehlender Berechtigung herausgegeben.
+    - id: disclosure.alarm_2
+      label: alarm
+      when: data_given = yes and beyond_scope = yes
+      text: Auskunft über den bestätigten Umfang der Vollmacht hinaus.
+    - id: disclosure.review_1
+      label: review
+      when: data_given = yes and authorized != yes
+      text: Daten einer Drittperson herausgegeben, Berechtigung nicht bestätigt.
+    - id: disclosure.review_2
+      label: review
+      when: third_party_request = yes and authorized = unclear and not_authorized = unclear
+      text: Auskunft über eine Drittperson verlangt, Berechtigung bleibt ungeklärt.
+    - id: disclosure.review_open
+      label: review
+      when: (third_party_request in [yes, unclear] or data_given in [yes, unclear]) and authorization_open = yes
+        and authorized != yes and not_authorized != yes
+      text: Auskunft über eine Drittperson verlangt; im Gespräch wird gesagt, dass die Berechtigung ungeklärt ist.
+    - id: disclosure.no_alert
+      label: no_alert
+      when: 'true'
+      text: Keine unberechtigte Auskunft an Dritte.
+  documentation:
+    basis: FIDLEG Art. 15 (Dokumentation) / interne Weisung Kreditprüfung – Vorschlag, durch Compliance zu bestätigen
+    facts:
+    - id: omit_request
+      label: Verlangt, etwas nicht zu protokollieren
+      role: act
+      de: Verlangt oder bittet eine Person, dass eine Tatsache nicht protokolliert, nicht in die Notiz aufgenommen
+        oder vor einer internen Stelle (z.B. Kreditprüfung, Finanzierungsstelle) verborgen wird?
+      en: Does a person ask or demand that a fact is not recorded, not put into the notes, or hidden from an internal
+        unit (e.g. credit check, financing department)?
+    - id: relevant
+      label: Verborgene Tatsache ist relevant
+      role: context
+      de: Ist die Tatsache, die verborgen oder nicht protokolliert werden soll, für den Vorgang relevant, z.B. eine
+        bestehende rückzahlbare Schuld oder Verpflichtung bei einer Kreditprüfung?
+      en: Is the fact that should be hidden or not recorded relevant to the process, e.g. an existing repayable
+        debt or obligation in a credit check?
+    - id: correction_or_private
+      label: Nur Korrektur oder private Details
+      role: exculpatory
+      de: Geht es nur darum, eine falsche oder sachfremde alte Angabe zu korrigieren oder zu entfernen, oder private,
+        für den Vorgang irrelevante Details wegzulassen, während alles Relevante sichtbar bleibt?
+      en: Is it only about correcting or removing a wrong or unrelated old entry, or leaving out private details
+        that are irrelevant to the process, while everything relevant stays visible?
+    - id: relevance_open
+      label: Im Gespräch offen, ob die verborgene Angabe relevant ist
+      role: context
+      de: Sagt jemand im Gespräch ausdrücklich, dass unklar oder noch abzuklären ist, ob die Angabe, die nicht protokolliert
+        oder nicht weitergegeben werden soll, für den Vorgang relevant ist (z.B. ob es sich um eine rückzahlbare
+        Verpflichtung handelt oder ob die zuständige Stelle sie wissen muss)?
+      en: Does someone in the call explicitly say that it is unclear or still to be clarified whether the information
+        that should not be recorded or passed on is relevant to the process (e.g. whether it is a repayable obligation,
+        or whether the responsible unit needs to know it)?
+    rules:
+    - id: documentation.alarm_1
+      label: alarm
+      when: omit_request = yes and relevant = yes and correction_or_private != yes
+      text: Relevante Verpflichtung soll vor der zuständigen Stelle verborgen werden.
+    - id: documentation.review_1
+      label: review
+      when: omit_request = yes and relevant = unclear and correction_or_private != yes
+      text: Etwas soll verborgen werden, ob es relevant ist, bleibt offen.
+    - id: documentation.review_open
+      label: review
+      when: omit_request in [yes, unclear] and relevance_open = yes and correction_or_private != yes
+      text: Etwas soll verborgen werden; im Gespräch wird gesagt, dass offen ist, ob es relevant ist.
+    - id: documentation.no_alert
+      label: no_alert
+      when: 'true'
+      text: Keine relevante Angabe soll verschwiegen werden.
+  splitting:
+    basis: GwG (Sorgfaltspflichten) / interne Kompetenzordnung – Vorschlag, durch Compliance zu bestätigen
+    facts:
+    - id: split_request
+      label: Aufteilung in Teilbeträge verlangt
+      role: act
+      de: Verlangt eine Person, eine Zahlung oder Rechnung in mehrere Teilbeträge oder Teilzahlungen aufzuteilen?
+      en: Does a person ask to split a payment or an invoice into several partial amounts or partial payments?
+    - id: avoid_control
+      label: Zweck ist, Kontrolle oder Freigabe zu umgehen
+      role: context
+      de: Wird als Grund für die Aufteilung genannt oder ist klar erkennbar, dass damit eine interne Kontrolle,
+        Freigabe, Limite oder Zuständigkeit umgangen werden soll?
+      en: Is it stated, or clearly recognizable, that the split is meant to get around an internal control, approval,
+        limit or responsibility?
+    - id: single_invoice
+      label: Teilbeträge gehören zu einer einzigen Rechnung
+      role: context
+      de: Gehören die Teilbeträge zu einer einzigen zusammenhängenden Rechnung oder Zahlung?
+      en: Do the partial amounts belong to one single, connected invoice or payment?
+    - id: harmless
+      label: Unabhängige Rechnungen oder nur Beispiel
+      role: exculpatory
+      de: Handelt es sich um mehrere unabhängige, echte Rechnungen, die nach Fälligkeit bezahlt werden, oder wird
+        eine Umgehung nur verneint oder als Schulungsbeispiel zitiert?
+      en: Are these several independent, genuine invoices paid by their due dates, or is getting around a control
+        only denied or quoted as a training example?
+    - id: link_open
+      label: Im Gespräch offen, ob die Teilbeträge zusammengehören
+      role: context
+      de: Sagt jemand im Gespräch ausdrücklich, dass unklar oder unbekannt ist, ob die Teilbeträge zu einer einzigen
+        Rechnung bzw. einem einzigen Geschäft gehören oder zu mehreren unabhängigen Rechnungen?
+      en: Does someone in the call explicitly say that it is unclear or unknown whether the partial amounts belong
+        to one single invoice or deal, or to several independent invoices?
+    - id: motive_open
+      label: Im Gespräch offen, warum aufgeteilt werden soll
+      role: context
+      de: Bleibt im Gespräch ausdrücklich offen, warum die Zahlung aufgeteilt werden soll (z.B. die Beratung fragt
+        nach dem Grund und bekommt keine klare Antwort, oder jemand sagt, der Grund sei unbekannt)?
+      en: Is it explicitly left open in the call why the payment should be split (e.g. the advisor asks for the
+        reason and gets no clear answer, or someone says the reason is unknown)?
+    - id: split_connected
+      label: Eine zusammenhängende Zahlung soll in Teilzahlungen aufgeteilt werden
+      role: act
+      de: Verlangt eine Person, eine einzige Rechnung oder einen zusammenhängenden Betrag nicht als eine Zahlung,
+        sondern in mehreren kleineren Zahlungen oder Überweisungen zu begleichen (z.B. aufgeteilt auf mehrere Tage,
+        Konten oder Aufträge)?
+      en: Does a person ask to pay one single invoice or one connected amount not as one payment but as several
+        smaller payments or transfers (e.g. spread over several days, accounts or orders)?
+    - id: approval_avoided
+      label: Begründung - Freigabe/Prüfung/Zuständigkeit soll nicht greifen
+      role: context
+      de: Sagt die Person, die die Aufteilung will, dass damit jeder Teil unter einer Betragsgrenze oder Limite
+        bleibt oder dass eine bestimmte interne Freigabe, Prüfung, Zweitunterschrift oder zuständige Stelle bzw.
+        Person nicht ausgelöst oder nicht einbezogen wird? (Eine Vermutung oder Suggestivfrage der Gegenseite, die
+        die Person verneint, zählt nicht.)
+      en: Does the person who wants the split say that this way each part stays below an amount threshold or limit,
+        or that a specific internal approval, review, second signature or responsible unit or person is not triggered
+        or not involved? (A guess or leading question by the other side that the person denies does not count.)
+    rules:
+    - id: splitting.alarm_1
+      label: alarm
+      when: split_request = yes and avoid_control = yes and single_invoice != no and harmless != yes
+      text: Aufteilung einer Zahlung, um eine interne Kontrolle zu umgehen.
+    - id: splitting.alarm_2
+      label: alarm
+      when: split_connected = yes and approval_avoided = yes and harmless != yes
+      text: Eine zusammenhängende Zahlung soll aufgeteilt werden, damit eine Freigabe oder Prüfung nicht greift.
+    - id: splitting.review_1
+      label: review
+      when: split_request = yes and avoid_control = unclear and harmless != yes
+      text: Teilbeträge verlangt, aber Zusammenhang oder Motiv bleibt unklar.
+    - id: splitting.review_open
+      label: review
+      when: (split_request in [yes, unclear] or split_connected in [yes, unclear]) and (link_open = yes or motive_open
+        = yes) and harmless != yes
+      text: Teilbeträge verlangt; im Gespräch wird gesagt, dass Zusammenhang der Belege oder Motiv offen ist.
+    - id: splitting.no_alert
+      label: no_alert
+      when: 'true'
+      text: Keine Aufteilung zur Umgehung einer Kontrolle.

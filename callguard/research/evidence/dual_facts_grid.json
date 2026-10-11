@@ -1,0 +1,806 @@
+{
+ "meta": {
+  "set": "dev",
+  "profile": "dual-facts",
+  "runs_dir": "/home/bl/repos/hackathon/sprintd/.claude/worktrees/agent-a76e4f47529e630c2/runs/dual-facts/dual-facts",
+  "policy_table": "config/policy_table.yaml",
+  "n_results": 48,
+  "missing": [],
+  "threshold": 0.55,
+  "n_boot": 2000,
+  "seed": 13,
+  "created": "2026-10-10T16:38:28",
+  "bootstrap_unit": "twin group (case: config/splits.yaml groups; test50: data_test50 dataset.yaml groups)",
+  "folds": "locked dev folds (config/splits.yaml), holdout excluded"
+ },
+ "note": "DEV ONLY (dev folds, holdout excluded); nothing is selected from it",
+ "default": {
+  "readers": [
+   {
+    "id": "qwen",
+    "check": "facts",
+    "label": "Qwen",
+    "model": "Qwen2.5-7B",
+    "mode": "three_way",
+    "band": [
+     0.3,
+     0.7
+    ]
+   },
+   {
+    "id": "kev",
+    "check": "facts_kev",
+    "label": "Kev",
+    "model": "Kev-4B",
+    "mode": "band",
+    "band": [
+     0.3,
+     0.7
+    ]
+   }
+  ],
+  "combination": "agree"
+ },
+ "champion_v3": {
+  "readers": [
+   {
+    "id": "qwen",
+    "check": "facts",
+    "label": "Qwen",
+    "model": "Qwen2.5-7B",
+    "mode": "three_way",
+    "band": [
+     0.3,
+     0.7
+    ]
+   },
+   {
+    "id": "kev",
+    "check": "facts_kev",
+    "label": "Kev",
+    "model": "Kev-4B",
+    "mode": "band",
+    "band": [
+     0.3,
+     0.7
+    ]
+   }
+  ],
+  "combination": "only_a"
+ },
+ "ui_text": {
+  "combination": {
+   "only_a": "Nur Qwen entscheidet (= Champion v3), Kev wird nur angezeigt. Dev (48 Anrufe): 27 markiert (15 Alarm, 12 Prüfen), FAR 14 %, Miss 8 %.",
+   "only_b": "Nur Kev entscheidet, Qwen wird nur angezeigt. Dev (48 Anrufe): 21 markiert (9 Alarm, 12 Prüfen), FAR 14 %, Miss 31 %.",
+   "agree": "Einigkeit: zählt nur, wenn beide gleich antworten, sonst «unklar» → Prüfen. Dev (48 Anrufe): 26 markiert (11 Alarm, 15 Prüfen), FAR 14 %, Miss 12 %.",
+   "a_checked": "Qwen entscheidet; sagt Kev klar das Gegenteil, wird es «unklar» → Prüfen. Dev (48 Anrufe): 27 markiert (13 Alarm, 14 Prüfen), FAR 14 %, Miss 8 %."
+  },
+  "band": {
+   "0.2-0.8": "Kev muss sehr sicher sein (ja ab 80 %, nein bis 20 %), sonst «unklar». Dev (48 Anrufe): 26 markiert (11 Alarm, 15 Prüfen), FAR 14 %, Miss 12 %.",
+   "0.3-0.7": "Kev muss recht sicher sein (ja ab 70 %, nein bis 30 %), sonst «unklar» (Standard). Dev (48 Anrufe): 26 markiert (11 Alarm, 15 Prüfen), FAR 14 %, Miss 12 %.",
+   "0.4-0.6": "Kev darf knapp entscheiden (ja ab 60 %, nein bis 40 %), seltener «unklar». Dev (48 Anrufe): 27 markiert (12 Alarm, 15 Prüfen), FAR 14 %, Miss 8 %."
+  }
+ },
+ "entries": [
+  {
+   "setting": "only_a/kev0.2-0.8",
+   "kev_band": [
+    0.2,
+    0.8
+   ],
+   "combination": "only_a",
+   "combination_de": "Nur Qwen",
+   "n": 48,
+   "flagged": 27,
+   "alarms": 15,
+   "reviews": 12,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "accuracy": 0.8333,
+   "auc": 0.9187,
+   "ci": {
+    "auc": [
+     0.8045,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.6786,
+     1.0
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.0769,
+    "accuracy": 0.8333,
+    "review_recall": 1.0,
+    "flagged": 27,
+    "alarms": 15,
+    "reviews": 12
+   },
+   "vs_champion_v3": {
+    "calls_changed": 0,
+    "auc": 0.0,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0,
+    "accuracy": 0.0,
+    "review_recall": 0.0
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": true
+  },
+  {
+   "setting": "only_b/kev0.2-0.8",
+   "kev_band": [
+    0.2,
+    0.8
+   ],
+   "combination": "only_b",
+   "combination_de": "Nur Kev",
+   "n": 48,
+   "flagged": 19,
+   "alarms": 8,
+   "reviews": 11,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.3846,
+   "review_recall": 0.6667,
+   "accuracy": 0.6458,
+   "auc": 0.8374,
+   "ci": {
+    "auc": [
+     0.6593,
+     0.9792
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3333
+    ],
+    "miss_rate": [
+     0.1429,
+     0.6667
+    ],
+    "accuracy": [
+     0.4422,
+     0.8261
+    ],
+    "review_recall": [
+     0.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1538,
+    "accuracy": 0.6458,
+    "review_recall": 0.0,
+    "flagged": 25,
+    "alarms": 19,
+    "reviews": 6
+   },
+   "vs_champion_v3": {
+    "calls_changed": 15,
+    "auc": -0.0813,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.3077,
+    "accuracy": -0.1875,
+    "review_recall": -0.3333
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  },
+  {
+   "setting": "agree/kev0.2-0.8",
+   "kev_band": [
+    0.2,
+    0.8
+   ],
+   "combination": "agree",
+   "combination_de": "Einigkeit",
+   "n": 48,
+   "flagged": 26,
+   "alarms": 11,
+   "reviews": 15,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "accuracy": 0.75,
+   "auc": 0.9205,
+   "ci": {
+    "auc": [
+     0.8242,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.587,
+     0.9167
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1154,
+    "accuracy": 0.7292,
+    "review_recall": 0.3333,
+    "flagged": 26,
+    "alarms": 21,
+    "reviews": 5
+   },
+   "vs_champion_v3": {
+    "calls_changed": 4,
+    "auc": 0.0018,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0385,
+    "accuracy": -0.0833,
+    "review_recall": 0.0
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  },
+  {
+   "setting": "a_checked/kev0.2-0.8",
+   "kev_band": [
+    0.2,
+    0.8
+   ],
+   "combination": "a_checked",
+   "combination_de": "Qwen, Kev als Kontrolle",
+   "n": 48,
+   "flagged": 27,
+   "alarms": 13,
+   "reviews": 14,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "accuracy": 0.7917,
+   "auc": 0.9414,
+   "ci": {
+    "auc": [
+     0.8514,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.62,
+     0.9545
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.0769,
+    "accuracy": 0.7917,
+    "review_recall": 1.0,
+    "flagged": 27,
+    "alarms": 13,
+    "reviews": 14
+   },
+   "vs_champion_v3": {
+    "calls_changed": 2,
+    "auc": 0.0227,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0,
+    "accuracy": -0.0416,
+    "review_recall": 0.0
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  },
+  {
+   "setting": "only_a/kev0.3-0.7",
+   "kev_band": [
+    0.3,
+    0.7
+   ],
+   "combination": "only_a",
+   "combination_de": "Nur Qwen",
+   "n": 48,
+   "flagged": 27,
+   "alarms": 15,
+   "reviews": 12,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "accuracy": 0.8333,
+   "auc": 0.9187,
+   "ci": {
+    "auc": [
+     0.8045,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.6786,
+     1.0
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.0769,
+    "accuracy": 0.8333,
+    "review_recall": 1.0,
+    "flagged": 27,
+    "alarms": 15,
+    "reviews": 12
+   },
+   "vs_champion_v3": {
+    "calls_changed": 0,
+    "auc": 0.0,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0,
+    "accuracy": 0.0,
+    "review_recall": 0.0
+   },
+   "default": false,
+   "champion_v3": true,
+   "equivalent_to_champion_v3": true
+  },
+  {
+   "setting": "only_b/kev0.3-0.7",
+   "kev_band": [
+    0.3,
+    0.7
+   ],
+   "combination": "only_b",
+   "combination_de": "Nur Kev",
+   "n": 48,
+   "flagged": 21,
+   "alarms": 9,
+   "reviews": 12,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.3077,
+   "review_recall": 0.6667,
+   "accuracy": 0.6667,
+   "auc": 0.8619,
+   "ci": {
+    "auc": [
+     0.7017,
+     0.975
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.2504
+    ],
+    "miss_rate": [
+     0.1,
+     0.5455
+    ],
+    "accuracy": [
+     0.5,
+     0.8125
+    ],
+    "review_recall": [
+     0.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1154,
+    "accuracy": 0.6458,
+    "review_recall": 0.0,
+    "flagged": 26,
+    "alarms": 19,
+    "reviews": 7
+   },
+   "vs_champion_v3": {
+    "calls_changed": 17,
+    "auc": -0.0568,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.2308,
+    "accuracy": -0.1666,
+    "review_recall": -0.3333
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  },
+  {
+   "setting": "agree/kev0.3-0.7",
+   "kev_band": [
+    0.3,
+    0.7
+   ],
+   "combination": "agree",
+   "combination_de": "Einigkeit",
+   "n": 48,
+   "flagged": 26,
+   "alarms": 11,
+   "reviews": 15,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.1154,
+   "review_recall": 1.0,
+   "accuracy": 0.75,
+   "auc": 0.9205,
+   "ci": {
+    "auc": [
+     0.8242,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.2917
+    ],
+    "accuracy": [
+     0.587,
+     0.9167
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.1154,
+    "accuracy": 0.7292,
+    "review_recall": 0.3333,
+    "flagged": 26,
+    "alarms": 21,
+    "reviews": 5
+   },
+   "vs_champion_v3": {
+    "calls_changed": 4,
+    "auc": 0.0018,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0385,
+    "accuracy": -0.0833,
+    "review_recall": 0.0
+   },
+   "default": true,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  },
+  {
+   "setting": "a_checked/kev0.3-0.7",
+   "kev_band": [
+    0.3,
+    0.7
+   ],
+   "combination": "a_checked",
+   "combination_de": "Qwen, Kev als Kontrolle",
+   "n": 48,
+   "flagged": 27,
+   "alarms": 13,
+   "reviews": 14,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "accuracy": 0.7917,
+   "auc": 0.9414,
+   "ci": {
+    "auc": [
+     0.8514,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.62,
+     0.9545
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.0769,
+    "accuracy": 0.7917,
+    "review_recall": 1.0,
+    "flagged": 27,
+    "alarms": 13,
+    "reviews": 14
+   },
+   "vs_champion_v3": {
+    "calls_changed": 2,
+    "auc": 0.0227,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0,
+    "accuracy": -0.0416,
+    "review_recall": 0.0
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  },
+  {
+   "setting": "only_a/kev0.4-0.6",
+   "kev_band": [
+    0.4,
+    0.6
+   ],
+   "combination": "only_a",
+   "combination_de": "Nur Qwen",
+   "n": 48,
+   "flagged": 27,
+   "alarms": 15,
+   "reviews": 12,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "accuracy": 0.8333,
+   "auc": 0.9187,
+   "ci": {
+    "auc": [
+     0.8045,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.6786,
+     1.0
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.0769,
+    "accuracy": 0.8333,
+    "review_recall": 1.0,
+    "flagged": 27,
+    "alarms": 15,
+    "reviews": 12
+   },
+   "vs_champion_v3": {
+    "calls_changed": 0,
+    "auc": 0.0,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0,
+    "accuracy": 0.0,
+    "review_recall": 0.0
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": true
+  },
+  {
+   "setting": "only_b/kev0.4-0.6",
+   "kev_band": [
+    0.4,
+    0.6
+   ],
+   "combination": "only_b",
+   "combination_de": "Nur Kev",
+   "n": 48,
+   "flagged": 18,
+   "alarms": 10,
+   "reviews": 8,
+   "false_alarm_rate": 0.0909,
+   "miss_rate": 0.3846,
+   "review_recall": 0.3333,
+   "accuracy": 0.6667,
+   "auc": 0.8357,
+   "ci": {
+    "auc": [
+     0.6696,
+     0.9643
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3077
+    ],
+    "miss_rate": [
+     0.1786,
+     0.6154
+    ],
+    "accuracy": [
+     0.5,
+     0.8149
+    ],
+    "review_recall": [
+     0.0,
+     0.5
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.0909,
+    "miss_rate": 0.1923,
+    "accuracy": 0.6667,
+    "review_recall": 0.0,
+    "flagged": 23,
+    "alarms": 16,
+    "reviews": 7
+   },
+   "vs_champion_v3": {
+    "calls_changed": 19,
+    "auc": -0.083,
+    "false_alarm_rate": -0.0455,
+    "miss_rate": 0.3077,
+    "accuracy": -0.1666,
+    "review_recall": -0.6667
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  },
+  {
+   "setting": "agree/kev0.4-0.6",
+   "kev_band": [
+    0.4,
+    0.6
+   ],
+   "combination": "agree",
+   "combination_de": "Einigkeit",
+   "n": 48,
+   "flagged": 27,
+   "alarms": 12,
+   "reviews": 15,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "accuracy": 0.7708,
+   "auc": 0.9257,
+   "ci": {
+    "auc": [
+     0.8313,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.6042,
+     0.9348
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.0769,
+    "accuracy": 0.7708,
+    "review_recall": 1.0,
+    "flagged": 27,
+    "alarms": 12,
+    "reviews": 15
+   },
+   "vs_champion_v3": {
+    "calls_changed": 3,
+    "auc": 0.007,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0,
+    "accuracy": -0.0625,
+    "review_recall": 0.0
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  },
+  {
+   "setting": "a_checked/kev0.4-0.6",
+   "kev_band": [
+    0.4,
+    0.6
+   ],
+   "combination": "a_checked",
+   "combination_de": "Qwen, Kev als Kontrolle",
+   "n": 48,
+   "flagged": 27,
+   "alarms": 13,
+   "reviews": 14,
+   "false_alarm_rate": 0.1364,
+   "miss_rate": 0.0769,
+   "review_recall": 1.0,
+   "accuracy": 0.7917,
+   "auc": 0.9414,
+   "ci": {
+    "auc": [
+     0.8514,
+     1.0
+    ],
+    "false_alarm_rate": [
+     0.0,
+     0.3502
+    ],
+    "miss_rate": [
+     0.0,
+     0.25
+    ],
+    "accuracy": [
+     0.62,
+     0.9545
+    ],
+    "review_recall": [
+     1.0,
+     1.0
+    ]
+   },
+   "cv": {
+    "false_alarm_rate": 0.1364,
+    "miss_rate": 0.0769,
+    "accuracy": 0.7917,
+    "review_recall": 1.0,
+    "flagged": 27,
+    "alarms": 13,
+    "reviews": 14
+   },
+   "vs_champion_v3": {
+    "calls_changed": 2,
+    "auc": 0.0227,
+    "false_alarm_rate": 0.0,
+    "miss_rate": 0.0,
+    "accuracy": -0.0416,
+    "review_recall": 0.0
+   },
+   "default": false,
+   "champion_v3": false,
+   "equivalent_to_champion_v3": false
+  }
+ ]
+}
