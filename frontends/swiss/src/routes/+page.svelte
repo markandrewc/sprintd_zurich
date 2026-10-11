@@ -2,6 +2,7 @@
 	import { get, put, conn } from '#lib/api.svelte.ts';
 	import { LABEL, SQ, O, time, stripRule } from '#lib/format.ts';
 	import { goto } from '$app/navigation';
+	import Spread from '#lib/components/Spread.svelte';
 	import type { CallsResponse, CallRow, Counts, Change, Meta, Settings, SettingsPut, Summary, Label } from '#lib/types.ts';
 
 	let meta = $state<Meta | null>(null);
@@ -11,6 +12,7 @@
 	let counts = $state<Counts | null>(null);
 	let changed = $state<Change[]>([]);
 	let th = $state(0.55);
+	let cert = $state(0.6);
 	let busy = $state(false);
 
 	let listEpoch = $state(0);
@@ -27,6 +29,7 @@
 		get<Settings>('/api/settings').then((s) => {
 			settings = s;
 			th = s.threshold;
+			cert = s.certainty ?? 0.6;
 		}).catch(() => {});
 		loadSummary();
 	});
@@ -94,6 +97,40 @@
 				busy = false;
 			}
 		}, 160);
+	}
+
+	// «How sure must a reader be?» (same setting as on the Advanced page): the plot's cutoff lines follow the slider
+	// at once, the counts and the list after the re-decision
+	let series = $derived(
+		summary && meta
+			? meta.models.fact_readers
+					.filter((r) => summary!.fact_p_yes_histogram[r.id])
+					.map((r) => ({ id: r.id, label: r.label, counts: summary!.fact_p_yes_histogram[r.id] }))
+			: []
+	);
+	let ct: ReturnType<typeof setTimeout>;
+	function onCertainty() {
+		clearTimeout(ct);
+		ct = setTimeout(async () => {
+			busy = true;
+			try {
+				const r = await put<SettingsPut>('/api/settings', { certainty: cert });
+				counts = r.counts;
+				changed = r.changed;
+				settings = r.settings;
+				listEpoch++;
+				get<Summary>('/api/summary').then((s) => (summary = s));
+			} catch (e: any) {
+				cutErr = e.message;
+			} finally {
+				busy = false;
+			}
+		}, 160);
+	}
+	function resetCertainty() {
+		if (settings?.defaults.certainty == null) return;
+		cert = settings.defaults.certainty;
+		onCertainty();
 	}
 
 	function resetThreshold() {
@@ -183,6 +220,33 @@
 					</ul>
 				{/if}
 			</div>
+
+			{#if settings && settings.certainty != null}
+				<div class="thr cert">
+					<h2 class="h3">How sure must a reader be?</h2>
+					<div class="cval">
+						<span class="display num">{cert.toFixed(2)}</span>
+						{#if settings.defaults.certainty != null && Math.abs(cert - settings.defaults.certainty) > 1e-9}
+							<button class="btn link small" onclick={resetCertainty}>Default {settings.defaults.certainty.toFixed(2)}</button>
+						{/if}
+					</div>
+					<label class="sr-only" for="cc">Certainty cutoff</label>
+					<input
+						id="cc"
+						type="range"
+						min={settings.options.certainty.min}
+						max={settings.options.certainty.max}
+						step={settings.options.certainty.step}
+						bind:value={cert}
+						oninput={onCertainty}
+						aria-valuetext={cert.toFixed(2)}
+					/>
+					{#if summary && series.length}
+						<div class="spread"><Spread edges={summary.fact_p_yes_histogram.edges} {series} c={cert} /></div>
+						<p class="small num">{summary.facts.unclear} of {summary.facts.answered} fact answers unclear</p>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	</aside>
 
@@ -307,6 +371,12 @@
 	}
 	.thr .display {
 		font-size: 64px;
+	}
+	.cert .display {
+		font-size: 40px;
+	}
+	.spread {
+		margin-top: 12px;
 	}
 	.body {
 		align-items: start;
