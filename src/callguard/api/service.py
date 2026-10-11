@@ -9,6 +9,7 @@ the same pure functions the Streamlit demo uses (:mod:`callguard.fact_policy`, t
 from __future__ import annotations
 
 import copy
+import csv
 import logging
 import re
 import threading
@@ -86,6 +87,13 @@ def english(msg: str) -> str:
         if re.match(pat, msg, flags=re.S):
             return re.sub(pat, rep, msg, flags=re.S)
     return msg
+
+
+def _rel(p: Path) -> str:
+    try:
+        return str(Path(p).relative_to(ROOT))
+    except ValueError:
+        return str(p)
 
 
 def bad(detail: str) -> ApiError:
@@ -317,6 +325,10 @@ class Service:
         # table or its versions. None = production (the live config/policy_table.yaml decides).
         self.demo: dict[str, Any] | None = None
         self.demo_undo: list[dict[str, Any]] = []
+        # Call sets (``PUT /api/callset``): run folders the officer can switch between; the rules, settings and the
+        # analysis page always work on the active one. The profile's own run folder is the first.
+        self.call_sets: dict[str, Path] = {self.runs_dir.parent.name: self.runs_dir}
+        self.call_set: str = self.runs_dir.parent.name
         self.reload()
 
     # -- loading -------------------------------------------------------------------------------
@@ -339,6 +351,76 @@ class Service:
         if force or stamp != getattr(self, "_stamp", None):
             self.loaded = be.load_results(self.runs_dir)
             self._stamp = stamp
+
+    # -- call sets -----------------------------------------------------------------------------
+
+    def add_call_set(self, name: str, folder: str | Path) -> None:
+        """A run folder (like ``paths.runs_dir``: results in ``<folder>/<profile>/*/result.json``) to switch to."""
+        p = Path(folder)
+        self.call_sets[str(name)] = (p if p.is_absolute() else ROOT / p) / self.cfg.name
+
+    def name_call_set(self, name: str) -> None:
+        """Rename the active call set (the profile's own run folder is named after its folder otherwise)."""
+        self.call_sets = {(name if k == self.call_set else k): v for k, v in self.call_sets.items()}
+        self.call_set = name
+
+    def call_sets_json(self) -> list[dict[str, Any]]:
+        return [{"id": k, "path": _rel(v), "calls": len(list(v.glob("*/result.json"))) if v.is_dir() else 0,
+                 "labels": (v.parent / "labels.csv").is_file(), "active": k == self.call_set}
+                for k, v in self.call_sets.items()]
+
+    def set_call_set(self, name: str) -> dict[str, Any]:
+        if name not in self.call_sets:
+            raise missing(f"unknown call set {name!r} (have {', '.join(self.call_sets)})")
+        with self.lock:
+            self.call_set, self.runs_dir = name, self.call_sets[name]
+            self._memo.clear()
+            self.prev.clear()
+            for k in ("_comb", "_fam_memo", "_dec_memo", "_rows_memo", "_texts"):
+                self.__dict__.pop(k, None)
+            self.reload(force=True)
+        return {"call_set": name, "call_sets": self.call_sets_json()}
+
+    # -- analysis: the active call set against labels supplied with it ---------------------------
+
+    def analysis(self, client: str) -> dict[str, Any]:
+        """The active call set's decisions (now: this client's settings and the active rule book; stored: as the
+        pipeline wrote them) against ``<run folder>/labels.csv``. Only that file is read, and only here: no label is
+        ever looked up by file name in case data, and nothing in the pipeline or the decisions reads it."""
+        path = self.runs_dir.parent / "labels.csv"
+        base: dict[str, Any] = {"call_set": self.call_set, "labels_file": _rel(path)}
+        if not path.is_file():
+            return {**base, "available": False}
+        with path.open() as fh:
+            truth = {r["call_id"].strip(): r["expected"].strip() for r in csv.DictReader(fh) if r.get("call_id")}
+        s = self.settings(client)
+        outs = self.outcomes(s)
+        now = {cid: o.decision.label for cid, o in outs.by_call.items()}
+        stored = {cid: r.decision.label for cid, r in self.loaded.results.items()}
+        ids = sorted(c for c in truth if c in now)
+
+        def score(pred: Mapping[str, str]) -> dict[str, Any]:
+            conf = {e: {p: 0 for p in LABELS} for e in LABELS}
+            for c in ids:
+                if truth[c] in conf and pred.get(c) in LABELS:
+                    conf[truth[c]][pred[c]] += 1
+            harmless = [c for c in ids if truth[c] == "no_alert"]
+            flaggable = [c for c in ids if truth[c] != "no_alert"]
+            reviews = [c for c in ids if truth[c] == "review"]
+            return {"exact": sum(pred.get(c) == truth[c] for c in ids), "n": len(ids), "confusion": conf,
+                    "false_alarms": sum(pred.get(c) != "no_alert" for c in harmless), "harmless": len(harmless),
+                    "misses": sum(pred.get(c) == "no_alert" for c in flaggable), "flaggable": len(flaggable),
+                    "reviews_found": sum(pred.get(c) == "review" for c in reviews), "reviews": len(reviews)}
+
+        rows = []
+        for c in ids:
+            d = outs.by_call[c].decision
+            rows.append({"id": c, "expected": truth[c], "now": now[c], "stored": stored.get(c),
+                         "score": r4(d.score), "family": self.family_label(d.top_family) if d.top_family else None})
+        return {**base, "available": True, "now": score(now), "stored": score(stored), "rows": rows,
+                "missing": sorted(set(truth) - set(now)),
+                "settings": {"threshold": r4(s.threshold), "certainty": r4(s.certainty), "combination": s.combination,
+                             "on_split": s.on_split, "rulebook": self.rulebook_json()}}
 
     def _file_memo(self, path: Path, fn: Any) -> Any:
         """``fn(path)`` memoised per file version (mtime + size): the YAML files are re-read only when changed."""
@@ -1308,11 +1390,8 @@ class Service:
         doc = self.active_doc() if self.has_policy else {}
         fams = [{"id": f.id, "label": self.family_label(f.id), "label_de": f.label, "can_alarm": f.can_alarm,
                  "legal_basis": self.legal_basis(doc, f.id)} for f in self.families()]
-        try:
-            rel = str(self.runs_dir.relative_to(ROOT))
-        except ValueError:
-            rel = str(self.runs_dir)
-        return {"app": APP_NAME, "api_version": API_VERSION, "profile": self.cfg.name, "runs_dir": rel,
+        return {"app": APP_NAME, "api_version": API_VERSION, "profile": self.cfg.name, "runs_dir": _rel(self.runs_dir),
+                "call_set": self.call_set, "call_sets": self.call_sets_json(),
                 "code_version": self.code_version(), "models": self.models(),
                 "counts": {"calls": len(labels), **self.counts(labels), "reviewed": len(self.reviewed_calls())},
                 "families": fams, "has_fact_policy": self.has_policy, "load_errors": list(self.loaded.errors),

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { get, put, conn } from '#lib/api.svelte.ts';
+	import { get, put, conn, probe, bump } from '#lib/api.svelte.ts';
 	import { LABEL, SQ, O, time, stripRule } from '#lib/format.ts';
 	import { goto } from '$app/navigation';
 	import Spread from '#lib/components/Spread.svelte';
@@ -16,6 +16,28 @@
 	let busy = $state(false);
 
 	let listEpoch = $state(0);
+
+	// call sets (PUT /api/callset): which run folder the dashboard shows; rules and sliders apply to that one
+	let sets = $state<{ id: string; calls: number; active: boolean }[]>([]);
+	let setBusy = $state(false);
+	$effect(() => {
+		conn.epoch;
+		get<{ call_sets: typeof sets }>('/api/callsets').then((r) => (sets = r.call_sets)).catch(() => {});
+	});
+	async function useSet(id: string) {
+		setBusy = true;
+		try {
+			await put('/api/callset', { id });
+			status = '';
+			changed = [];
+			await probe();
+			bump();
+		} catch (e: any) {
+			cutErr = e.message;
+		} finally {
+			setBusy = false;
+		}
+	}
 
 	// filters
 	let status = $state<'' | 'flagged' | Label>('');
@@ -166,6 +188,13 @@
 	<!-- 1. The three numbers + the alarm threshold -->
 	<aside class="cut" aria-label="Outcome counts and alarm threshold">
 		<div class="sticky">
+			{#if sets.length > 1}
+				<div class="sets" role="group" aria-label="Call set">
+					{#each sets as cs}
+						<button class="setb" class:on={cs.active} aria-pressed={cs.active} disabled={setBusy || cs.active} onclick={() => useSet(cs.id)}>{cs.id} <span class="num">{cs.calls}</span></button>
+					{/each}
+				</div>
+			{/if}
 			<p class="label">
 				<span class="num">{total || '–'}</span> calls{#if reviewedCount !== undefined && conn.mode === 'live'}{' · '}<span class="num">{reviewedCount}</span> reviewed{/if}
 			</p>
@@ -371,6 +400,33 @@
 	}
 	.thr .display {
 		font-size: 64px;
+	}
+	.sets {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-bottom: 20px;
+	}
+	.setb {
+		font: inherit;
+		font-weight: 600;
+		padding: 8px 14px;
+		border: 2px solid #000;
+		background: #fff;
+		color: #000;
+		cursor: pointer;
+	}
+	.setb.on {
+		background: #000;
+		color: #fff;
+		cursor: default;
+	}
+	.setb:disabled:not(.on) {
+		opacity: 0.5;
+	}
+	.setb .num {
+		opacity: 0.7;
+		margin-left: 4px;
 	}
 	.cert .display {
 		font-size: 40px;

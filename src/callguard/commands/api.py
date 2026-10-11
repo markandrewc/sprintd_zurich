@@ -10,13 +10,21 @@ DEFAULT_PORT = 8600
 DEFAULT_PROFILE = "sherlock"  # the production profile (config/sherlock.yaml)
 
 
-def build_app(config: str = DEFAULT_PROFILE, sets: Optional[list[str]] = None, start_empty_rules: bool = False):
+def build_app(config: str = DEFAULT_PROFILE, sets: Optional[list[str]] = None, start_empty_rules: bool = False,
+              calls: Optional[list[str]] = None, calls_name: Optional[str] = None):
     from callguard.api.app import create_app
     from callguard.api.service import Service
     from callguard.config import load_config
 
     cfg = load_config(config, sets or [])
     svc = Service(cfg)
+    if calls_name:
+        svc.name_call_set(calls_name)
+    for spec in calls or []:
+        name, sep, folder = spec.partition("=")
+        if not sep or not name.strip() or not folder.strip():
+            raise ValueError(f"--calls expects NAME=RUN_FOLDER, got {spec!r}")
+        svc.add_call_set(name.strip(), folder.strip())
     if start_empty_rules:
         svc.set_rulebook("default", "demo")
     return create_app(svc)
@@ -33,14 +41,21 @@ def register(app: typer.Typer) -> None:
                 start_empty_rules: Annotated[bool, typer.Option(
                     "--start-empty-rules",
                     help="Start with the EMPTY demo rule book (in memory; config/policy_table.yaml is untouched). "
-                         "The dashboard's «Apply our rule book» switches to the full rule book.")] = False) -> None:
+                         "The dashboard's «Apply our rule book» switches to the full rule book.")] = False,
+                calls: Annotated[Optional[list[str]], typer.Option(
+                    "--calls", help="Another call set to switch to in the dashboard: NAME=RUN_FOLDER (repeatable; "
+                                    "the run folder as for paths.runs_dir). Its labels.csv, if any, feeds the "
+                                    "Analysis page.")] = None,
+                calls_name: Annotated[Optional[str], typer.Option(
+                    "--calls-name", help="Name of the profile's own call set in the dashboard (default: its folder "
+                                         "name).")] = None) -> None:
         """HTTP API for the frontends on port 8600 (docs/API.md). Uses stored results only; runs no model.
 
         Another run folder: --set paths.runs_dir=<folder> (results are read from <folder>/<profile>/*/result.json).
         """
         import uvicorn
 
-        application = build_app(config, set_ or [], start_empty_rules)
+        application = build_app(config, set_ or [], start_empty_rules, calls or [], calls_name)
         svc = application.state.service
         svc.warm()
         import threading

@@ -87,6 +87,18 @@ def create_app(service: Service) -> FastAPI:
     def rulebook() -> dict[str, Any]:
         return svc.rulebook_json()
 
+    @app.get("/api/callsets")
+    def callsets() -> dict[str, Any]:
+        return {"call_set": svc.call_set, "call_sets": svc.call_sets_json()}
+
+    @app.put("/api/callset")
+    def callset_put(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        return svc.set_call_set(str(body.get("id") or ""))
+
+    @app.get("/api/analysis")
+    def analysis(x_client: str | None = Header(None)) -> dict[str, Any]:
+        return svc.analysis(client(x_client))
+
     @app.put("/api/rulebook")
     def rulebook_put(body: dict[str, Any] = Body(...), x_client: str | None = Header(None)) -> dict[str, Any]:
         return svc.set_rulebook(client(x_client), str(body.get("mode") or ""))
