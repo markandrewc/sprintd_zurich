@@ -1,17 +1,16 @@
-# Notes for a coding agent working in this repo (sprintd Zürich 2026, Inventx/Outcept case)
+# Sherlock Phones (`callguard`): notes for a coding agent working in this repo
 
-Two parts live here:
+Start with `GUIDE.md` (install, run a folder of .wav files, dashboard, scoring) and `RESULTS.md` (what we measured
+and how). The case brief is `docs/CASE.md`.
 
-| folder | what |
-|---|---|
-| `callguard/` | **Sherlock Phones, the production pipeline we hand in.** Start with `callguard/GUIDE.md` (install on one or two GPUs, run a folder of `.wav` files, dashboard, scoring) and `callguard/RESULTS.md` (what we measured on the 60 case calls, and how). The case brief is `callguard/docs/CASE.md`. |
-| `fraud_analysis/`, `transcription/`, `dashboard/`, `finetuning/`, `shared/`, `misc/`, `start.*` | The first prototype (see `README.md`). Of it, the production pipeline uses only the Kev-4B service code in `fraud_analysis/kev/` (reader B, served by `callguard/scripts/remote/serve_kev.py`). |
+Production chain = profile `sherlock` (`config/sherlock.yaml`): Whisper large-v3 Swiss German -> sherpa-onnx speakers
+-> Qwen3.8-27B 3-bit roles + reader A -> Kev-4B reader B + masking passages -> fact policy -> policy table rules ->
+keywords/patterns -> fusion. `scripts/run_testset.sh <wavs> <name>` runs it staged on one GPU.
 
-Production chain = profile `sherlock` (`callguard/config/sherlock.yaml`): Whisper large-v3 Swiss German -> sherpa-onnx
-speakers -> Qwen3.8-27B 3-bit roles + reader A -> Kev-4B reader B + masking passages -> fact policy -> policy table rules
--> keywords/patterns -> fusion. `callguard/scripts/run_testset.sh <wavs> <name>` runs it staged on one GPU.
+`fraud_analysis/` (+ `shared/`) is the Kev-4B service code from our first prototype: reader B runs it with its own env
+`.venv-kev` via `scripts/remote/serve_kev.py` (GUIDE.md §3). The rest of the prototype is at tag `prototype`.
 
-## Commands (run inside `callguard/`)
+## Commands
 ```bash
 uv sync --extra asr --extra diarize --extra ui --extra dev
 uv run pytest -q -m "not slow"                   # offline tests, must stay green
@@ -24,6 +23,6 @@ uv run callguard api -c sherlock --set paths.runs_dir=runs/testset-NAME --set pa
 1. Self-hosted models only; no cloud API in transcription or checks.
 2. Never feed file names, call ids, reference scripts or expected labels into the audio pipeline. `oracle` /
    `demo-offline` profiles read scripts instead of audio: tests and UI work only, never results.
-3. Results are only what the pipeline produces from the .wav files; label numbers come from
-   `callguard/scripts/score_results.py` after the run.
+3. Results are only what the pipeline produces from the .wav files; label numbers come from `scripts/score_results.py`
+   after the run.
 4. Never commit `data_upstream/`, `models/`, `.cache/`, `runs/` or secrets. Stop processes by PID, never `pkill -f`.

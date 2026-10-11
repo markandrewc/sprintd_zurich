@@ -1,26 +1,20 @@
-# Python
 .venv/
 __pycache__/
 *.pyc
+.cache
+models
+runs
+data_upstream
+.pytest_cache/
+.cuda-libs
+.venv-vllm/
+data_perturbed
 
-# Case-Daten: eigenes Repo (github.com/Outcept/inventx-case-study), ~860 MB mit Audio
-inventx-case-study/
-# Audio-Kopien der Case-Daten (~500 MB)
-/data/
+# external held-out test set imported from the teammate repo (scripts/data/import_test50.py)
+data_test50
 
-# Referenz-Klone von github.com/jaredpalmer/kev und dem HF-Space (~930 MB); der genutzte Code liegt in fraud_analysis/kev/
-kev-src/
-
-# Erzeugte Ergebnisse (Transkripte, Kev-Scores, TTS-Audio, Logs): reproduzierbar
-outputs/
-*.log
-
-# Daten des Dashboards (Anrufe, Audio, Labels)
-dashboard/data/
-
-# Frühere Fassungen der Fakten und Regeln (fraud_analysis/facts.json), je Version eine Datei
-fraud_analysis/config_history/
-fraud_analysis/questions_history/
-
-# Python env of the Kev service (callguard/GUIDE.md §3)
+# local files that must never be committed
+.env
+*.egg-info/
+data_synth
 .venv-kev/
