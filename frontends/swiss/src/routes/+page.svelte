@@ -99,7 +99,7 @@
 		}, 160);
 	}
 
-	// «How sure must a reader be?» (same setting as on the Advanced page): the plot's cutoff lines follow the slider
+	// «How sure must a fact be?» (same setting as on the Advanced page): the plot's cutoff lines follow the slider
 	// at once, the counts and the list after the re-decision
 	let series = $derived(
 		summary && meta
@@ -223,7 +223,7 @@
 
 			{#if settings && settings.certainty != null}
 				<div class="thr cert">
-					<h2 class="h3">How sure must a reader be?</h2>
+					<h2 class="h3">How sure must a fact be?</h2>
 					<div class="cval">
 						<span class="display num">{cert.toFixed(2)}</span>
 						{#if settings.defaults.certainty != null && Math.abs(cert - settings.defaults.certainty) > 1e-9}

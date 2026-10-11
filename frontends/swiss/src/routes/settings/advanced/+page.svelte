@@ -75,7 +75,7 @@
 
 <div class="grid adv">
 	<section class="k">
-		<p class="label muted">How sure must a reader be?</p>
+		<p class="label muted">How sure must a fact be?</p>
 		{#if !hasCutoff}
 			<p class="small muted">Not available for this profile.</p>
 		{:else}
